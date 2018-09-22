@@ -1,7 +1,4 @@
-﻿using System;using System.Collections.Generic;using System.Drawing;using System.Windows.Forms;using System.IO;using System.ComponentModel;using System.Collections;
-using System.Drawing.Imaging;
-using System.Numerics;
-using NewWidgets;
+﻿using System;using System.Windows.Forms;using System.ComponentModel;using System.Numerics;
 using NewWidgets.Widgets;
 
 namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private const int MaxWidth = 680;        private const int MaxHeight = 440;
@@ -10,8 +7,10 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
             zoomTrackBar.Visible = false;
             m_perspectiveViewRotate = Vector3.Zero;
             m_perspectiveViewShift = new Vector3(perspectiveViewPictureBox.Width / 2f, perspectiveViewPictureBox.Height / 2f, 1000);
-            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, 1.0f, 1.0f, false, "assets");
-            m_windowController.OnInit += HandleOnInit;            WidgetManager.Init(m_windowController.FontScale);            WidgetManager.LoadUI("assets/ui.xml");
+            ResourceLoader loader = new ResourceLoader("en-en");            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, .5f, .5f, false, "assets");
+            m_windowController.OnInit += HandleOnInit;            m_windowController.SetSpriteSubdivision("font5", 16, 16);            WidgetManager.LoadUI(System.IO.File.ReadAllText("assets/ui.xml"));
+
+            updateTimer.Start();
         }
 
         private void HandleOnInit()
@@ -45,4 +44,12 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
 
         #endregion
 
+        private void updateTimer_Tick(object sender, EventArgs e)
+        {
+            if (m_windowController != null)
+            {
+                m_windowController.Update();
+                perspectiveViewPictureBox.Invalidate();
+            }
+        }
     }}

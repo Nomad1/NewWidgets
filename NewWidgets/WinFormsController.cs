@@ -73,7 +73,7 @@ namespace NewWidgets
         }
 
         public event Action OnInit;
-
+        public override event TouchDelegate OnTouch;
         public WinFormsController(int width, int height, float scale, float fontScale, bool isSmallScreen, string imagePath)
         {
             Instance = this;
@@ -86,6 +86,8 @@ namespace NewWidgets
             m_imagePath = imagePath;
 
             m_windows = new WindowObjectArray();
+
+            Widgets.WidgetManager.Init(fontScale);
 
             foreach (string file in Directory.GetFiles(m_imagePath, "*.png"))
                 RegisterSprite(Path.GetFileNameWithoutExtension(file), file);
@@ -111,7 +113,7 @@ namespace NewWidgets
                     for (int y = 0; y < subdivideY; y++)
                     {
                         int index = x + y * subdivideX;
-                        frames[index] = new Tuple<RectangleF, int>(new RectangleF(0, 0, x / (float)subdivideX, y / (float)subdivideY), index);
+                        frames[index] = new Tuple<RectangleF, int>(new RectangleF(x / (float)subdivideX, y / (float)subdivideY, 1 / (float)subdivideX, 1 / (float)subdivideY), index);
                     }
 
             m_sprites[id] = new SpriteData(image, id, frames);
@@ -188,8 +190,14 @@ namespace NewWidgets
 
         public bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (ProcessTouch(x, y, press, unpress, pointer))
-                return true;
+            if (OnTouch != null)
+            {
+                foreach (Delegate ndelegate in OnTouch.GetInvocationList())
+                {
+                    if (((TouchDelegate)ndelegate)(x, y, press, unpress, pointer))
+                        return true;
+                }
+            }
 
             for (int i = Windows.Count - 1; i >= 0; i--)
             {

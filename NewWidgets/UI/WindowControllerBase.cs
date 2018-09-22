@@ -13,7 +13,7 @@ namespace NewWidgets.UI
         {
             get
             {
-                System.Diagnostics.Debug.Assert(WindowControllerBase.Instance != null, "WindowController.Instance requested before WindowController was inited!");
+                System.Diagnostics.Debug.Assert(s_instance != null, "WindowController.Instance requested before WindowController was inited!");
                 return s_instance;
             }
             protected set
@@ -22,28 +22,10 @@ namespace NewWidgets.UI
             }
         }
 
-        #region Touch event
-
         /// <summary>
         /// Top level touch event
         /// </summary>
-        public event TouchDelegate OnTouch;
-
-        protected bool ProcessTouch(float x, float y, bool press, bool unpress, int pointer)
-        {
-            if (OnTouch != null)
-            {
-                foreach (Delegate ndelegate in OnTouch.GetInvocationList())
-                {
-                    if (((TouchDelegate)ndelegate)(x, y, press, unpress, pointer))
-                        return true;
-                }
-            }
-
-            return false;
-        }
-
-        #endregion
+        public abstract event TouchDelegate OnTouch;
 
         /// <summary>
         /// Gets the width of the screen in pixels

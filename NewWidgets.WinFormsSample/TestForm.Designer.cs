@@ -31,11 +31,12 @@ namespace NewWidgets.WinFormsSample
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestForm));
+            this.components = new System.ComponentModel.Container();
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.zoomTrackBar = new System.Windows.Forms.TrackBar();
             this.perspectiveViewPictureBox = new System.Windows.Forms.PictureBox();
+            this.updateTimer = new System.Windows.Forms.Timer(this.components);
             this.statusStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.zoomTrackBar)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.perspectiveViewPictureBox)).BeginInit();
@@ -47,7 +48,7 @@ namespace NewWidgets.WinFormsSample
             this.statusLabel});
             this.statusStrip.Location = new System.Drawing.Point(0, 574);
             this.statusStrip.Name = "statusStrip";
-            this.statusStrip.Size = new System.Drawing.Size(1018, 22);
+            this.statusStrip.Size = new System.Drawing.Size(793, 22);
             this.statusStrip.TabIndex = 2;
             this.statusStrip.Text = "statusStrip";
             // 
@@ -60,7 +61,7 @@ namespace NewWidgets.WinFormsSample
             // 
             this.zoomTrackBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.zoomTrackBar.AutoSize = false;
-            this.zoomTrackBar.Location = new System.Drawing.Point(860, 0);
+            this.zoomTrackBar.Location = new System.Drawing.Point(402, 574);
             this.zoomTrackBar.Maximum = 80;
             this.zoomTrackBar.Minimum = 1;
             this.zoomTrackBar.Name = "zoomTrackBar";
@@ -76,10 +77,10 @@ namespace NewWidgets.WinFormsSample
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.perspectiveViewPictureBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.perspectiveViewPictureBox.Location = new System.Drawing.Point(130, 27);
+            this.perspectiveViewPictureBox.Location = new System.Drawing.Point(0, 0);
             this.perspectiveViewPictureBox.Margin = new System.Windows.Forms.Padding(0, 0, 256, 0);
             this.perspectiveViewPictureBox.Name = "perspectiveViewPictureBox";
-            this.perspectiveViewPictureBox.Size = new System.Drawing.Size(624, 547);
+            this.perspectiveViewPictureBox.Size = new System.Drawing.Size(793, 574);
             this.perspectiveViewPictureBox.TabIndex = 0;
             this.perspectiveViewPictureBox.TabStop = false;
             this.perspectiveViewPictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.perspectiveView_Paint);
@@ -87,13 +88,17 @@ namespace NewWidgets.WinFormsSample
             this.perspectiveViewPictureBox.MouseEnter += new System.EventHandler(this.perspectiveViewPictureBox_MouseEnter);
             this.perspectiveViewPictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.perspectivePictureBox_MouseMove);
             this.perspectiveViewPictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.perspectivePictureBox_MouseUp);
-         
+            // 
+            // updateTimer
+            // 
+            this.updateTimer.Interval = 16;
+            this.updateTimer.Tick += new System.EventHandler(this.updateTimer_Tick);
             // 
             // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1018, 596);
+            this.ClientSize = new System.Drawing.Size(793, 596);
             this.Controls.Add(this.zoomTrackBar);
             this.Controls.Add(this.statusStrip);
             this.Controls.Add(this.perspectiveViewPictureBox);
@@ -115,6 +120,7 @@ namespace NewWidgets.WinFormsSample
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
         private System.Windows.Forms.TrackBar zoomTrackBar;
         private System.Windows.Forms.PictureBox perspectiveViewPictureBox;
+        private Timer updateTimer;
     }
 }
 

@@ -18,8 +18,10 @@ namespace NewWidgets.WinFormsSample
         private WidgetButton m_loginButton;
 
         public TestWindow()
-            : base(WindowFlags.FullScreen)
+            : base(WindowFlags.None)
         {
+            Size = new Vector2(600, 300);
+
             WidgetPanel panel = new WidgetPanel(WidgetManager.DefaultWindowStyle);
             panel.Size = new Vector2(600, 560);
             panel.Scale = WindowControllerBase.Instance.ScreenScale;

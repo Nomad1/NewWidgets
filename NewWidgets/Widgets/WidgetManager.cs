@@ -58,7 +58,7 @@ namespace NewWidgets.Widgets
                     return result;
             }
 
-            WindowControllerBase.Instance.LogError("WidgetManager got GetStyle for not existing style {0}", name);
+            WindowControllerBase.Instance.LogError("WidgetManager got GetStyle request for not existing style {0}", name);
 
             return null;  // TODO: return default style to avoid crash?
         }

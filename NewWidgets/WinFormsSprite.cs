@@ -47,7 +47,7 @@ namespace NewWidgets
             get { return m_frame; }
             set
             {
-                Debug.Assert(m_frame < 0 || m_frame >= m_frames.Length, "Invalid rame number");
+                Debug.Assert(value >= 0 && value < m_frames.Length, "Invalid frame number");
                 m_frame = value;
             }
         }
@@ -148,15 +148,17 @@ namespace NewWidgets
 
             ImageAttributes ia = new ImageAttributes();
             ColorMatrix matrix = new ColorMatrix();
-            matrix.Matrix33 = (m_color >> 24) / 255.0f;
-            matrix.Matrix00 = (m_color >> 16) / 255.0f;
+            matrix.Matrix00 = ((m_color >> 16) & 0xff) / 255.0f;
             matrix.Matrix11 = ((m_color >> 8) & 0xff) / 255.0f;
-            matrix.Matrix22 = ((m_color & 0xff)) / 255.0f;
+            matrix.Matrix22 = ((m_color >> 0) & 0xff) / 255.0f;
+            matrix.Matrix33 = ((m_color >> 24) & 0xff) / 255.0f;
             ia.SetColorMatrix(matrix);
+
+            RectangleF frameRect = m_frames[m_frame].Item1;
 
             graphics.DrawImage(m_image,
                 new PointF[] { new PointF(arr[0].X, arr[0].Y), new PointF(arr[1].X, arr[1].Y), new PointF(arr[2].X, arr[2].Y) },
-                m_frames[m_frame].Item1,
+                new RectangleF(frameRect.X * Size.X, frameRect.Y * Size.Y, frameRect.Width * Size.X, frameRect.Height * Size.Y),
                 GraphicsUnit.Pixel,
                 ia
                 );
