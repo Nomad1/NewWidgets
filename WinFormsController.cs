@@ -1,0 +1,285 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Numerics;
+using NewWidgets.UI;
+
+namespace NewWidgets
+{
+    /// <summary>
+    /// Controller class for RunMobile game engine
+    /// </summary>
+    public class WinFormsController : WindowControllerBase
+    {
+        private struct SpriteData
+        {
+            public readonly Image Image;
+            public readonly string Name;
+            public Tuple<RectangleF, int>[] Frames;
+
+            public SpriteData(Image image, string name, Tuple<RectangleF, int>[] frames)
+            {
+                Name = name;
+                Image = image;
+                Frames = frames;
+            }
+        }
+
+        private readonly LinkedList<Tuple<Action, DateTime>> m_delayedActions = new LinkedList<Tuple<Action, DateTime>>();
+        private readonly Dictionary<string, SpriteData> m_sprites = new Dictionary<string, SpriteData>();
+
+        private readonly int m_screenWidth;
+        private readonly int m_screenHeight;
+        private readonly float m_screenScale;
+        private readonly float m_fontScale;
+        private readonly bool m_isSmallScreen;
+        private readonly WindowObjectArray m_windows;
+        private readonly string m_imagePath;
+
+        public override int ScreenWidth
+        {
+            get { return m_screenWidth; }
+        }
+
+        public override int ScreenHeight
+        {
+            get { return m_screenHeight; }
+        }
+
+        public override float ScreenScale
+        {
+            get { return m_screenScale; }
+        }
+
+        public override float FontScale
+        {
+            get { return m_fontScale; }
+        }
+
+        public override bool IsSmallScreen
+        {
+            get { return m_isSmallScreen; }
+        }
+
+        public override WindowObjectArray Windows
+        {
+            get { return m_windows; }
+        }
+
+        public string ImagePath
+        {
+            get { return m_imagePath; }
+        }
+
+        public event Action OnInit;
+
+        public WinFormsController(int width, int height, float scale, float fontScale, bool isSmallScreen, string imagePath)
+        {
+            Instance = this;
+
+            m_screenWidth = width;
+            m_screenHeight = height;
+            m_screenScale = scale;
+            m_fontScale = fontScale;
+            m_isSmallScreen = isSmallScreen;
+            m_imagePath = imagePath;
+
+            m_windows = new WindowObjectArray();
+
+            foreach (string file in Directory.GetFiles(m_imagePath, "*.png"))
+                RegisterSprite(Path.GetFileNameWithoutExtension(file), file);
+        }
+
+        private void RegisterSprite(string id, string file, int subdivideX = 1, int subdivideY = 1)
+        {
+            Image image = null;
+
+            SpriteData oldData;
+            if (m_sprites.TryGetValue(id, out oldData))
+                image = oldData.Image;
+            else
+                image = Image.FromFile(file);
+
+            if (image == null)
+                LogError("Failed to load sprite {0}", id);
+
+            int count = subdivideX * subdivideY;
+
+            Tuple<RectangleF, int> [] frames = new Tuple<RectangleF, int>[count];
+            for (int x = 0; x < subdivideX; x++)
+                    for (int y = 0; y < subdivideY; y++)
+                    {
+                        int index = x + y * subdivideX;
+                        frames[index] = new Tuple<RectangleF, int>(new RectangleF(0, 0, x / (float)subdivideX, y / (float)subdivideY), index);
+                    }
+
+            m_sprites[id] = new SpriteData(image, id, frames);
+        }
+
+        #region Abstract WindowControllerBase implementation
+
+        public override void SetSpriteSubdivision(string id, int subdivideX, int subdivideY)
+        {
+            RegisterSprite(id, Path.Combine(m_imagePath, id + ".png"), subdivideX, subdivideY);
+        }
+
+        public override SpriteBase CloneSprite(SpriteBase sprite, Vector2 position)
+        {
+            SpriteBase result = CreateSprite(((WinFormsSprite)sprite).Id, position);
+            result.Frame = sprite.Frame;
+            result.PivotShift = sprite.PivotShift;
+            result.Alpha = sprite.Alpha;
+            result.Color = sprite.Color;
+
+            return result;
+        }
+
+        public override SpriteBase CreateSprite(string id, Vector2 position)
+        {
+            SpriteData spriteData;
+            if (!m_sprites.TryGetValue(id, out spriteData))
+            {
+                LogError("Controller asked to create non-existing sprite {0}", id);
+                return null;
+            }
+
+            return new WinFormsSprite(spriteData.Image, id, new Vector2(spriteData.Image.Size.Width, spriteData.Image.Size.Height), spriteData.Frames);
+        }
+
+        public override long GetTime()
+        {
+            return Environment.TickCount;
+        }
+
+        public override void LogError(string error, params object[] parameters)
+        {
+            Console.Error.WriteLine(error, parameters);
+        }
+
+        public override void LogMessage(string message, params object[] parameters)
+        {
+            Console.WriteLine(message, parameters);
+        }
+
+        public override void PlaySound(string id)
+        {
+            Console.WriteLine("Playing sound {0}", id);
+        }
+
+        public override void ScheduleAction(Action action, int delay)
+        {
+            m_delayedActions.AddLast(new Tuple<Action, DateTime>(action, DateTime.Now.AddMilliseconds(delay)));
+        }
+
+        public override void SetClipRect(int x, int y, int width, int height)
+        {
+            // no clip rects in winforms
+        }
+
+        public override void CancelClipRect()
+        {
+            // no clip rects in winforms
+        }
+
+        #endregion
+
+        #region External events
+
+        public bool Touch(float x, float y, bool press, bool unpress, int pointer)
+        {
+            if (ProcessTouch(x, y, press, unpress, pointer))
+                return true;
+
+            for (int i = Windows.Count - 1; i >= 0; i--)
+            {
+                if (Windows[i].Touch(x, y, press, unpress, pointer))
+                    return true;
+
+                bool hit = Windows[i].HitTest(x, y);
+
+                if (hit)
+                    break;
+
+                if (((Window)Windows[i]).Modal)
+                {
+                    if (press || unpress)
+                        Windows[i].Key(SpecialKey.Back, true, '\0');
+                    break;
+                }
+            }
+
+            return false;
+        }
+
+        public bool Key(int code, bool up, char character)
+        {
+            SpecialKey key = (SpecialKey)code;
+
+            for (int i = Windows.Count - 1; i >= 0; /*i--*/)
+            {
+                if (Windows[i].Key(key, up, character))
+                    return true;
+
+                break;
+            }
+
+            return false;
+        }
+
+        public bool Zoom(float x, float y, float value)
+        {
+            for (int i = Windows.Count - 1; i >= 0; i--)
+            {
+                if (Windows[i].Zoom(x, y, value))
+                    return true;
+
+                bool hit = Windows[i].HitTest(x, y);
+
+                if (hit)
+                    break;
+            }
+
+            return false;
+        }
+
+        #endregion
+
+        #region Draw/Update/Init
+
+        public void Draw(Graphics canvas)
+        {
+            Windows.Draw(canvas);
+        }
+
+        public void Update()
+        {
+            LinkedListNode<Tuple<Action, DateTime>> node = m_delayedActions.First;
+            while (node != null)
+            {
+                LinkedListNode<Tuple<Action, DateTime>> next = node.Next;
+                if (node.Value.Item2 < DateTime.Now)
+                {
+                    try
+                    {
+                        node.Value.Item1();
+                    }
+                    catch(Exception ex)
+                    {
+                        LogError("Error executing action: {0}", ex);
+                    }
+
+                    m_delayedActions.Remove(node);
+                }
+                node = next;
+            }
+
+            if (Windows.Count == 0 && OnInit != null)
+                OnInit();
+
+            Windows.Update();
+        }
+
+        #endregion
+    }
+}

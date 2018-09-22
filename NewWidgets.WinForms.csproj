@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B9E44880-DC40-4C45-A457-035B20581E54}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>NewWidgets</RootNamespace>
+    <AssemblyName>NewWidgets</AssemblyName>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Numerics.Vectors" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Widgets\Enums.cs" />
+    <Compile Include="Widgets\IFocusableWidget.cs" />
+    <Compile Include="Widgets\ResourceLoader.cs" />
+    <Compile Include="Widgets\Widget.cs" />
+    <Compile Include="Widgets\WidgetButton.cs" />
+    <Compile Include="Widgets\WidgetCheckBox.cs" />
+    <Compile Include="Widgets\WidgetContextMenu.cs" />
+    <Compile Include="Widgets\WidgetImage.cs" />
+    <Compile Include="Widgets\WidgetLabel.cs" />
+    <Compile Include="Widgets\WidgetLine.cs" />
+    <Compile Include="Widgets\WidgetManager.cs" />
+    <Compile Include="Widgets\WidgetPanel.cs" />
+    <Compile Include="Widgets\WidgetScrollView.cs" />
+    <Compile Include="Widgets\WidgetStyleSheet.cs" />
+    <Compile Include="Widgets\WidgetText.cs" />
+    <Compile Include="Widgets\WidgetTextEdit.cs" />
+    <Compile Include="Widgets\WidgetTooltip.cs" />
+    <Compile Include="Utility\Margin.cs" />
+    <Compile Include="UI\Animator.cs" />
+    <Compile Include="UI\Font.cs" />
+    <Compile Include="UI\ImageObject.cs" />
+    <Compile Include="UI\LabelObject.cs" />
+    <Compile Include="UI\Window.cs" />
+    <Compile Include="UI\WindowObject.cs" />
+    <Compile Include="UI\WindowObjectArray.cs" />
+    <Compile Include="Utility\Transform.cs" />
+    <Compile Include="Utility\SortedLinkedList.cs" />
+    <Compile Include="UI\WindowControllerBase.cs" />
+    <Compile Include="UI\SpriteBase.cs" />
+    <Compile Include="Utility\MathHelper.cs" />
+    <Compile Include="Utility\MatrixHelper.cs" />
+    <Compile Include="WinFormsController.cs" />
+    <Compile Include="WinFormsSprite.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Widgets\" />
+    <Folder Include="Utility\" />
+    <Folder Include="UI\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
