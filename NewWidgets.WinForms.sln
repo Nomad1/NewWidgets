@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewWidgets.WinForms", "NewWidgets\NewWidgets.WinForms.csproj", "{B9E44880-DC40-4C45-A457-035B20581E54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewWidgets.WinFormsSample", "NewWidgets.WinFormsSample\NewWidgets.WinFormsSample.csproj", "{A4D44570-7663-455A-BD5F-A00A739B532E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B9E44880-DC40-4C45-A457-035B20581E54}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B9E44880-DC40-4C45-A457-035B20581E54}.Debug|x86.Build.0 = Debug|Any CPU
+		{B9E44880-DC40-4C45-A457-035B20581E54}.Release|x86.ActiveCfg = Release|Any CPU
+		{B9E44880-DC40-4C45-A457-035B20581E54}.Release|x86.Build.0 = Release|Any CPU
+		{A4D44570-7663-455A-BD5F-A00A739B532E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A4D44570-7663-455A-BD5F-A00A739B532E}.Debug|x86.Build.0 = Debug|Any CPU
+		{A4D44570-7663-455A-BD5F-A00A739B532E}.Release|x86.ActiveCfg = Release|Any CPU
+		{A4D44570-7663-455A-BD5F-A00A739B532E}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ui>
+	
+	<!-- Fonts -->
+	
+	<font name="default" resource="font5" spacing="-2" baseline="30" />
+	
+	<!-- Nine patches -->
+	
+	<nine name="panel_9" />
+	<nine name="panel_white_normal_9" />
+	<nine name="panel_white_hovered_9" />
+	<nine name="window_9" />
+	<nine name="window_dialog_9" />
+	<nine name="scroll_horizontal" />
+	<nine name="scroll_vertical" />
+	<nine name="scroll_indicator_horizontal" />
+	<nine name="scroll_indicator_vertical" />
+
+	<!-- Three patches -->
+	
+	<three name="button_white_normal_3" />
+	<three name="button_white_hovered_3" />
+	<three name="line_3" />
+	
+	<!-- Default Styles -->
+
+	<style name="default_window">
+		<back_style>NineImage</back_style>
+		<back_image>window_9</back_image>
+		<back_scale>0.75</back_scale>
+		<size>400;300</size>
+	</style>
+	
+	<style name="default_panel">
+		<back_style>NineImage</back_style>
+		<back_image>window_9</back_image>
+		<back_scale>0.5</back_scale>
+		<size>100;100</size>
+	</style>
+
+	<style name="default_label">
+		<back_style>None</back_style>
+		<font>default</font>
+		<font_size>0.6</font_size>
+		<text_color>0xffffff</text_color>
+		<size>100;35</size>
+	</style>
+
+	<style name="default_textedit">
+		<back_style>NineImage</back_style>
+		<back_image>panel_white_normal_9</back_image>
+		<back_scale>1.0</back_scale>
+		<font>default</font>
+		<font_size>0.5</font_size>
+		<size>200;45</size>
+		<text_color>#666666</text_color>
+		<clip>true</clip>
+		<clip_margin>1;2;3;2</clip_margin>
+		<cursor_color>0xaa9988</cursor_color>
+		<focus_color>#000000</focus_color>
+		<focus_image>panel_white_hovered_9</focus_image>
+		<padding>6;0;6;0</padding>
+	</style>
+
+	<!-- ScrollView -->
+	
+	<style name="scroll_horizontal">
+		<back_style>NineImage</back_style>
+		<back_image>scroll_horizontal</back_image>
+		<back_scale>1.0</back_scale>
+	</style>
+	
+	<style name="scroll_indicator_horizontal">
+		<back_style>NineImage</back_style>
+		<back_image>scroll_indicator_horizontal</back_image>
+		<back_scale>1.0</back_scale>
+	</style>
+	
+	<style name="scroll_vertical">
+		<back_style>NineImage</back_style>
+		<back_image>scroll_vertical</back_image>
+		<back_scale>1.0</back_scale>
+	</style>
+	
+	<style name="scroll_indicator_vertical">
+		<back_style>NineImage</back_style>
+		<back_image>scroll_indicator_vertical</back_image>
+		<back_scale>1.0</back_scale>
+	</style>
+
+	<!-- Context menu -->
+	
+	<style name="default_context_menu">
+		<back_style>NineImage</back_style>
+		<back_image>panel_9</back_image>
+		<back_scale>1.0</back_scale>
+		<padding>4;4;4;4</padding>
+		<item_style>default_context_menu_item</item_style>
+	</style>
+
+	<style name="default_context_menu_item">
+		<back_style>None</back_style>
+		<font>default</font>
+		<font_size>0.5</font_size>
+		<text_color>0xcceeff</text_color>
+		<padding>4;2;4;2</padding>
+		<hovered_style>default_context_menu_item_hovered</hovered_style>
+	</style>
+
+	<style name="default_context_menu_item_hovered" parent="default_context_menu_item">
+		<back_style>None</back_style>
+		<back_scale>0.5</back_scale>
+		<text_color>#ffffff</text_color>
+	</style>
+
+	<style name="tooltip">
+		<back_style>NineImage</back_style>
+		<back_image>panel_9</back_image>
+		<back_scale>0.5</back_scale>
+		<padding>14;14;16;14</padding>
+	</style>
+	
+	<!-- Default button -->
+	
+	<style name="default_button">
+		<back_style>ThreeImage</back_style>
+		<back_image>button_white_normal_3</back_image>
+		<back_scale>1.0</back_scale>
+		<padding>0;0;0;6</padding>
+		<font>default</font>
+		<font_size>0.75</font_size>
+		<size>120;40</size>
+		<hovered_style>default_button_hovered</hovered_style>
+		<disabled_style>default_button_disabled</disabled_style>
+		<text_color>0xffffff</text_color>
+	</style>
+	
+	<style name="default_button_hovered" parent="default_button">
+		<back_image>button_white_hovered_3</back_image>
+		<text_color>0xffffff</text_color>
+	</style>
+
+	<style name="default_button_disabled" parent="default_button">
+		<back_image>button_white_normal_3</back_image>
+		<opacity>0.5</opacity>
+        <color>0xaaaaaa</color>
+		<text_color>0xaaaaaa</text_color>
+	</style>
+    
+    <!-- Window backgound -->
+    
+    <style name="back_pattern">
+        <back_style>ImageTiled</back_style>
+        <back_depth>BackClipped</back_depth>
+        <back_image>back_pattern</back_image>
+        <back_scale>1.0</back_scale>
+        <opacity>0.04</opacity>
+        <clip>true</clip>
+    </style>
+    
+</ui>
