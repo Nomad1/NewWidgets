@@ -4,6 +4,9 @@ using NewWidgets.Widgets;
 
 namespace NewWidgets.WinFormsSample
 {
+    /// <summary>
+    /// Test window. Taken from Project Amalthea login dialog
+    /// </summary>
     public class TestWindow : Window
     {
         private static string DefaultLogin = "login";
@@ -19,7 +22,8 @@ namespace NewWidgets.WinFormsSample
         public TestWindow()
             : base(WindowFlags.None)
         {
-            Size = new Vector2(WindowControllerBase.Instance.ScreenWidth, WindowControllerBase.Instance.ScreenHeight);
+            Size = new Vector2(2048, 2048.0f * WindowControllerBase.Instance.ScreenHeight / WindowControllerBase.Instance.ScreenWidth);
+            Scale = WindowControllerBase.Instance.ScreenHeight / Size.Y;
 
             WidgetPanel panel = new WidgetPanel(WidgetManager.DefaultWindowStyle);
             panel.Size = new Vector2(600, 560);
@@ -142,7 +146,17 @@ namespace NewWidgets.WinFormsSample
 
         private void HandleWebSitePress(object t)
         {
+            DialogWindow dialog = DialogWindow.Show("@dialog_title",
+                ResourceLoader.Instance.GetString("dialog_web", "something"), "@button_yes", "@button_no");
 
+            dialog.OnDialog += delegate (DialogWindow d, int index)
+            {
+                dialog.Close();
+                if (index == 0)
+                {
+                    // Do something
+                }
+            };
         }
 
         private void HandleLoginPress(object t)

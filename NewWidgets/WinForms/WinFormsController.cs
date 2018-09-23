@@ -8,10 +8,13 @@ using NewWidgets.UI;
 namespace NewWidgets.WinForms
 {
     /// <summary>
-    /// Controller class for RunMobile game engine
+    /// Controller class for Windows Forms test implementation
     /// </summary>
     public class WinFormsController : WindowControllerBase
     {
+        /// <summary>
+        /// Helper struct to store sprite data
+        /// </summary>
         private struct SpriteData
         {
             public readonly string Image;
@@ -86,6 +89,8 @@ namespace NewWidgets.WinForms
 
         public event Action OnInit;
         public override event TouchDelegate OnTouch;
+
+
         public WinFormsController(int width, int height, float scale, float fontScale, bool isSmallScreen, string imagePath)
         {
             Instance = this;
@@ -134,6 +139,11 @@ namespace NewWidgets.WinForms
             m_sprites[id] = new SpriteData(file, id, frames);
         }
 
+        /// <summary>
+        /// Load sprite atlas resulting in bunch of registered sprites or single sprite with 
+        /// many frames (i.e. fonts)
+        /// </summary>
+        /// <param name="atlasFile"></param>
         public void RegisterSpriteAtlas(string atlasFile)
         {
             string spriteName = Path.GetFileNameWithoutExtension(atlasFile);
@@ -236,6 +246,7 @@ namespace NewWidgets.WinForms
         public override void LogError(string error, params object[] parameters)
         {
             Console.Error.WriteLine(error, parameters);
+            Console.WriteLine(error, parameters);
         }
 
         public override void LogMessage(string message, params object[] parameters)

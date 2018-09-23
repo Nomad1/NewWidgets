@@ -91,7 +91,7 @@ namespace NewWidgets.WinFormsSample
             // 
             // updateTimer
             // 
-            this.updateTimer.Interval = 16;
+            this.updateTimer.Interval = 15;
             this.updateTimer.Tick += new System.EventHandler(this.updateTimer_Tick);
             // 
             // TestForm

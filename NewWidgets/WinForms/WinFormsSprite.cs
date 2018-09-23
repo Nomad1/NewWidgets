@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿#define USE_CACHE
+
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Numerics;
@@ -47,6 +49,11 @@ namespace NewWidgets.WinForms
         private Vector2 m_pivotShift;
         private uint m_color;
         private int m_frame;
+
+#if USE_CACHE
+        private uint m_cacheHash;
+        private Bitmap m_cache;
+#endif
 
         public string Id
         {
@@ -184,16 +191,76 @@ namespace NewWidgets.WinForms
             matrix.Matrix33 = ((m_color >> 24) & 0xff) / 255.0f;
             ia.SetColorMatrix(matrix);
 
-            graphics.DrawImage(m_image,
-                 new PointF[] { new PointF(arr[0].X, arr[0].Y), new PointF(arr[1].X, arr[1].Y), new PointF(arr[2].X, arr[2].Y) },
-                 new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),
-                 GraphicsUnit.Pixel,
-                 ia
-                 );
+#if USE_CACHE
+            int nwidth = (int)(m_transform.ActualScale.X * FrameSize.X + 0.5f);
+            int nheight = (int)(m_transform.ActualScale.Y * FrameSize.Y + 0.5f);
+
+            if (nwidth <= 0 || nheight <= 0)
+                return;
+
+            uint cacheHash = ((uint)(m_frame & 0xff) << 24) | ((uint)nwidth << 12) | (uint)nheight;
+
+            if (m_cacheHash == cacheHash)
+            {
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
+
+                if (m_cache != null)
+                {
+                    // round everything to ints to avoid blur and increase speed
+
+                    graphics.DrawImage(m_cache,
+                     new Point[] { new Point((int)(arr[0].X), (int)(arr[0].Y)), new Point((int)(arr[1].X), (int)(arr[1].Y)), new Point((int)(arr[2].X), (int)(arr[2].Y)) },
+                     new Rectangle(0, 0, m_cache.Width, m_cache.Height),
+                     GraphicsUnit.Pixel,
+                     ia
+                     );
+                }
+            }
+            else
+#endif
+            {
+                // frame changed before the update
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+
+                graphics.DrawImage(m_image,
+                     new PointF[] { new PointF(arr[0].X, arr[0].Y), new PointF(arr[1].X, arr[1].Y), new PointF(arr[2].X, arr[2].Y) },
+                     new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),
+                     GraphicsUnit.Pixel,
+                     ia
+                     );
+            }
         }
 
         public override void Update()
         {
+#if USE_CACHE
+            int nwidth = (int)(m_transform.ActualScale.X * FrameSize.X + 0.5f);
+            int nheight = (int)(m_transform.ActualScale.Y * FrameSize.Y + 0.5f);
+            uint cacheHash = ((uint)(m_frame & 0xff) << 24) | ((uint)nwidth << 12) | (uint)nheight;
+
+            if (cacheHash != m_cacheHash)
+            {
+                if (m_cache != null)
+                {
+                    m_cache.Dispose();
+                    m_cache = null;
+                }
+
+                if (nwidth > 0 && nheight > 0)
+                {
+                    m_cache = new Bitmap(nwidth, nheight);
+                    using (Graphics g = Graphics.FromImage(m_cache))
+                    {
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        g.DrawImage(m_image,
+                        new Rectangle(0, 0, m_cache.Width, m_cache.Height),
+                        m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height,
+                        GraphicsUnit.Pixel);
+                    }
+                }
+                m_cacheHash = cacheHash;
+            }
+#endif
         }
 
         private RectangleF GetScreenRect()

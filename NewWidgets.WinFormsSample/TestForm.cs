@@ -1,23 +1,88 @@
-﻿using System;using System.Windows.Forms;using System.ComponentModel;using System.Drawing;
+﻿using System;using System.Windows.Forms;using System.Drawing;
 
 using NewWidgets.Widgets;
 using NewWidgets.WinForms;
+using NewWidgets.UI;
 
-namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private const int MaxWidth = 680;        private const int MaxHeight = 440;
-
-        private WinFormsController m_windowController;        public TestForm()        {            InitializeComponent();            this.perspectiveViewPictureBox.MouseWheel += perspectiveViewPictureBox_MouseWheel;            this.KeyPreview = true;
+namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private WinFormsController m_windowController;        public TestForm()        {            InitializeComponent();            this.perspectiveViewPictureBox.MouseWheel += perspectiveViewPictureBox_MouseWheel;            this.KeyPreview = true;
             this.zoomTrackBar.Visible = false;            this.perspectiveViewPictureBox.BackColor = Color.Black;
-            ResourceLoader loader = new ResourceLoader("en-en");            loader.RegisterString("login_title", "Connect to server");            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, 0.75f, 0.75f, false, "assets");
+            ResourceLoader loader = new ResourceLoader("en-en");            loader.RegisterString("login_title", "Connect to server");            loader.RegisterString("login_login", "Login");
+            loader.RegisterString("login_password", "Password");
+            loader.RegisterString("login_local", "Custom server");
+            loader.RegisterString("login_register", "Register new account");
+            loader.RegisterString("login_connect", "Connect");            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, 1.5f, 0.85f, false, "assets");
             m_windowController.OnInit += HandleOnInit;            m_windowController.RegisterSpriteAtlas("assets/font5.bin");            WidgetManager.LoadUI(System.IO.File.ReadAllText("assets/ui.xml"));
 
             updateTimer.Start();
         }
-
+        
         private void HandleOnInit()
         {            m_windowController.Windows.Add(new TestWindow());
-        }        protected override void OnKeyDown(KeyEventArgs e)        {            if (e.KeyCode == Keys.Q && (ModifierKeys & Keys.Alt) != 0)            {                Close();                return;            }            if (m_windowController != null)                m_windowController.Key(0, false, (char)e.KeyValue);            base.OnKeyDown(e);        }
+        }        protected override void OnKeyDown(KeyEventArgs e)        {            if (e.KeyCode == Keys.Q && (ModifierKeys & Keys.Alt) != 0)            {                Close();                return;            }
 
-        protected override void OnClosing(CancelEventArgs e)        {            base.OnClosing(e);        }
+            ProcessKey(e.KeyCode, e.KeyValue, e.Control, false);
+            base.OnKeyDown(e);        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            ProcessKey(e.KeyCode, e.KeyValue, e.Control, true);
+
+            base.OnKeyUp(e);
+        }
+
+        private void ProcessKey(Keys key, int value, bool control, bool up)
+        {
+            if (m_windowController != null)
+            {
+                switch (key)
+                {
+                    case Keys.Left:
+                        m_windowController.Key((int)SpecialKey.Left, up, '\0');
+                        break;
+                    case Keys.Right:
+                        m_windowController.Key((int)SpecialKey.Right, up, '\0');
+                        break;
+                    case Keys.Up:
+                        m_windowController.Key((int)SpecialKey.Up, up, '\0');
+                        break;
+                    case Keys.Down:
+                        m_windowController.Key((int)SpecialKey.Down, up, '\0');
+                        break;
+                    case Keys.Space:
+                        m_windowController.Key((int)SpecialKey.Select, up, ' ');
+                        break;
+                    case Keys.Enter:
+                        m_windowController.Key((int)SpecialKey.Enter, up, '\n');
+                        break;
+                    case Keys.Tab:
+                        m_windowController.Key((int)SpecialKey.Tab, up, '\t');
+                        break;
+                    case Keys.Delete:
+                        m_windowController.Key((int)SpecialKey.Delete, up, '\0');
+                        break;
+                    default:
+
+                        if (value == '\b')
+                        {
+                            m_windowController.Key((int)SpecialKey.Backspace, up, '\0');
+
+                            if (control)
+                                for (int i = 0; i < 31; i++)
+                                    m_windowController.Key((int)SpecialKey.Backspace, up, '\0');
+                            break;
+                        }
+                        break;
+                }            }
+        }
+
+        protected override void OnKeyPress(KeyPressEventArgs e)
+        {
+            if (m_windowController != null)
+                m_windowController.Key((int)SpecialKey.Letter, true, (char)e.KeyChar);
+
+            base.OnKeyPress(e);
+        }
+
         #region Events
 
         private void zoomTrackBar_Scroll(object sender, EventArgs e)        {            perspectiveViewPictureBox.Invalidate();        }
@@ -40,9 +105,8 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
         }
         private void perspectiveView_Paint(object sender, PaintEventArgs e)        {            Graphics g = e.Graphics;
 
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+            
+            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
 
             if (m_windowController != null)
                 m_windowController.Draw(g);        }        private void perspectivePictureBox_MouseDown(object sender, MouseEventArgs e)        {

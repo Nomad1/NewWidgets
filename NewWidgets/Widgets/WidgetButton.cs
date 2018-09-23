@@ -172,7 +172,7 @@ namespace NewWidgets.Widgets
             m_layout = ButtonLayout.Center;
             m_textPadding = style.Padding;
 
-            m_image = new WidgetImage(WidgetBackgroundStyle.ImageFit, string.Empty);
+            m_image = new WidgetImage(WidgetBackgroundStyle.None, string.Empty);
             m_image.Parent = this;
             m_image.Color = style.GetParameterColor("image_color", 0xffffff);
             m_imagePadding = style.GetParameter<Margin>("image_padding");
@@ -215,12 +215,6 @@ namespace NewWidgets.Widgets
                     m_label.Position = m_textPadding.TopLeft;
                 }
             }
-            /*//else
-            if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
-            {
-                m_image.Size = new Vector2(Size.X - m_imagePadding.Width, Size.Y - m_imagePadding.Height);
-                m_image.Position = m_imagePadding.TopLeft;
-            }*/
 
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
             {
@@ -235,9 +229,7 @@ namespace NewWidgets.Widgets
                 {
                     m_image.Size = new Vector2(Size.X - m_imagePadding.Width, Size.Y - m_imagePadding.Height);
                     m_image.Position = m_imagePadding.TopLeft;
-                    //m_image.Position = m_imagePadding.TopLeft + m_image.Size / 2;
                     m_image.ImageStyle = WidgetBackgroundStyle.ImageFit;
-                    //m_image.ImagePivot = new Vector2(0.5f, 0.5f);
                 }
             }
             /*else

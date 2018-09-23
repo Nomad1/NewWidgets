@@ -146,7 +146,12 @@ namespace NewWidgets.Widgets
         private void InitBackground(WidgetBackgroundStyle style, string texture, float scale, float rotation, Vector2 backgroundPivot)
         {
             m_backgroundInited = true;
-            
+
+            foreach (WindowObject obj in m_background.List)
+                obj.Remove();
+
+            m_background.Clear();
+
             if (string.IsNullOrEmpty(texture))
             {
                 if (style != WidgetBackgroundStyle.None)
@@ -160,11 +165,6 @@ namespace NewWidgets.Widgets
                 WindowControllerBase.Instance.LogError("Widget texture not found for sprite {0}", textureSprite);
                 return;
             }
-
-            foreach (WindowObject obj in m_background.List)
-                obj.Remove();
-
-            m_background.Clear();
 
             Vector2 backSize = new Vector2(Size.X - m_backgroundPadding.Left - m_backgroundPadding.Right, Size.Y - m_backgroundPadding.Top - m_backgroundPadding.Bottom);
             Vector2 backStart = new Vector2(m_backgroundPadding.Left, m_backgroundPadding.Top);
