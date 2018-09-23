@@ -24,6 +24,11 @@ namespace NewWidgets.UI
         public abstract int Frame { get; set; }
 
         /// <summary>
+        /// Number of frames
+        /// </summary>
+        public abstract int Frames { get; }
+
+        /// <summary>
         /// Gets the tag of current frame
         /// </summary>
         /// <value>The frame tag.</value>

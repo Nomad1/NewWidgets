@@ -220,7 +220,7 @@ namespace NewWidgets.Widgets
                         for (int x = 0; x < countX; x++)
                             for (int y = 0; y < countY; y++)
                             {
-                            ImageObject image;
+                                ImageObject image;
                                 if (x == 0 && y == 0)
                                     image = background;
                                 else
@@ -258,7 +258,6 @@ namespace NewWidgets.Widgets
                         {
                             if (i % 3 == 0)
                                 x = 0;
-
 
                             SpriteBase sprite = WindowControllerBase.Instance.CreateSprite(texture, new Vector2(x, y));
                             sprite.Frame = i;

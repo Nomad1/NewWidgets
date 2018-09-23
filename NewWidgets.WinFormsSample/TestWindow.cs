@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Widgets;
 
@@ -20,7 +19,7 @@ namespace NewWidgets.WinFormsSample
         public TestWindow()
             : base(WindowFlags.None)
         {
-            Size = new Vector2(600, 300);
+            Size = new Vector2(WindowControllerBase.Instance.ScreenWidth, WindowControllerBase.Instance.ScreenHeight);
 
             WidgetPanel panel = new WidgetPanel(WidgetManager.DefaultWindowStyle);
             panel.Size = new Vector2(600, 560);
@@ -148,7 +147,6 @@ namespace NewWidgets.WinFormsSample
 
         private void HandleLoginPress(object t)
         {
-
             m_loginButton.Enabled = false;
         }
 

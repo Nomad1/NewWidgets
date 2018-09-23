@@ -54,14 +54,9 @@ namespace NewWidgets.UI
             m_glyphs = new Dictionary<char, Glyph>();
             int maxHeight = 0;
 
-            for (int i = 0; i < 256; i++)
+            for (int i = 0; i < fontSprite.Frames; i++)
             {
                 fontSprite.Frame = i;
-
-                if (fontSprite.Frame != i)
-                {
-                    break;
-                }
 
                 if ((int)fontSprite.FrameSize.Y > maxHeight)
                     maxHeight = (int)fontSprite.FrameSize.Y;

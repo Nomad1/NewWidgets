@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Numerics;
@@ -7,17 +6,40 @@ using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
-namespace NewWidgets
+namespace NewWidgets.WinForms
 {
     public class WinFormsSprite : SpriteBase
     {
+        public struct FrameData
+        {
+            public readonly int X;
+            public readonly int Y;
+            public readonly int Width;
+            public readonly int Height;
+            public readonly int OffsetX;
+            public readonly int OffsetY;
+
+            public readonly int Tag;
+
+            public FrameData(int x, int y, int width, int height, int offsetX, int offsetY, int tag)
+            {
+                X = x;
+                Y = y;
+                Width = width;
+                Height = height;
+                OffsetX = offsetX;
+                OffsetY = offsetY;
+                Tag = tag;
+            }
+        }
+
         private static uint ColorMask = 0x00ffffff;
         private static uint AlphaMask = 0xff000000;
         private static uint AlphaDrawThreshold = 0x01000000; // alpha <= 1 means invisible
 
         private readonly string m_id;
         private readonly Vector2 m_size;
-        private readonly Tuple<RectangleF, int> [] m_frames;
+        private readonly FrameData[] m_frames;
         private readonly Image m_image;
 
         private Transform m_transform;
@@ -38,8 +60,8 @@ namespace NewWidgets
 
         public override Vector2 PivotShift
         {
-            get { return m_pivotShift / Size; }
-            set { m_pivotShift = value * Size; }
+            get { return m_pivotShift; }
+            set { m_pivotShift = value; }
         }
 
         public override int Frame
@@ -52,14 +74,19 @@ namespace NewWidgets
             }
         }
 
+        public override int Frames
+        {
+            get { return m_frames.Length; }
+        }
+
         public override int FrameTag
         {
-            get { return m_frames[m_frame].Item2; }
+            get { return m_frames[m_frame].Tag; }
         }
 
         public override Vector2 FrameSize
         {
-            get { return Size; }
+            get { return new Vector2(m_frames[m_frame].Width, m_frames[m_frame].Height); }
         }
 
         public override int Alpha
@@ -101,7 +128,7 @@ namespace NewWidgets
             set { m_transform.RotationZ = value; }
         }
 
-        internal WinFormsSprite(Image image, string id, Vector2 size, Tuple<RectangleF, int>[] frames)
+        internal WinFormsSprite(Image image, string id, Vector2 size, FrameData[] frames)
         {
             m_image = image;
             m_id = id;
@@ -122,7 +149,7 @@ namespace NewWidgets
 
             // OOBB test
 
-            Vector2 coord = m_transform.GetClientPoint(new Vector2(x, y)) + m_pivotShift/* + new Vector2(m_currentAnimation.PivotX, m_currentAnimation.PivotY)*/;
+            Vector2 coord = m_transform.GetClientPoint(new Vector2(x, y)) + m_pivotShift * FrameSize;
 
             return coord.X >= 0 && coord.Y >= 0 && coord.X < Size.X && coord.Y < Size.Y;
         }
@@ -137,14 +164,17 @@ namespace NewWidgets
             if (graphics == null)
                 return;
 
+            // Clipping!
+            graphics.SetClip(((WinFormsController)WindowControllerBase.Instance).GetClipRect);
+
             // Here goes sprite drawing
 
-            Vector2 from = -m_pivotShift/* - new Vector2(m_currentAnimation.PivotX, m_currentAnimation.PivotY)*/;
+            Vector2 from = -m_pivotShift * FrameSize + new Vector2(m_frames[m_frame].OffsetX, m_frames[m_frame].OffsetY);
 
             Vector2[] arr = new Vector2[3];
             arr[0] = m_transform.GetScreenPoint(from);
-            arr[1] = m_transform.GetScreenPoint(from + new Vector2(Size.X, 0));
-            arr[2] = m_transform.GetScreenPoint(from + new Vector2(0, Size.Y));
+            arr[1] = m_transform.GetScreenPoint(from + new Vector2(FrameSize.X, 0));
+            arr[2] = m_transform.GetScreenPoint(from + new Vector2(0, FrameSize.Y));
 
             ImageAttributes ia = new ImageAttributes();
             ColorMatrix matrix = new ColorMatrix();
@@ -154,15 +184,12 @@ namespace NewWidgets
             matrix.Matrix33 = ((m_color >> 24) & 0xff) / 255.0f;
             ia.SetColorMatrix(matrix);
 
-            RectangleF frameRect = m_frames[m_frame].Item1;
-
             graphics.DrawImage(m_image,
-                new PointF[] { new PointF(arr[0].X, arr[0].Y), new PointF(arr[1].X, arr[1].Y), new PointF(arr[2].X, arr[2].Y) },
-                new RectangleF(frameRect.X * Size.X, frameRect.Y * Size.Y, frameRect.Width * Size.X, frameRect.Height * Size.Y),
-                GraphicsUnit.Pixel,
-                ia
-                );
-
+                 new PointF[] { new PointF(arr[0].X, arr[0].Y), new PointF(arr[1].X, arr[1].Y), new PointF(arr[2].X, arr[2].Y) },
+                 new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),
+                 GraphicsUnit.Pixel,
+                 ia
+                 );
         }
 
         public override void Update()
@@ -171,13 +198,13 @@ namespace NewWidgets
 
         private RectangleF GetScreenRect()
         {
-            Vector2 from = -m_pivotShift/* - new Vector2(m_currentAnimation.PivotX, m_currentAnimation.PivotY)*/;
+            Vector2 from = -m_pivotShift * FrameSize + new Vector2(m_frames[m_frame].OffsetX, m_frames[m_frame].OffsetY);
 
             Vector2[] arr = new Vector2[4];
             arr[0] = m_transform.GetScreenPoint(from);
-            arr[1] = m_transform.GetScreenPoint(from + new Vector2(Size.X, 0));
-            arr[2] = m_transform.GetScreenPoint(from + new Vector2(0, Size.Y));
-            arr[3] = m_transform.GetScreenPoint(from + Size);
+            arr[1] = m_transform.GetScreenPoint(from + new Vector2(FrameSize.X, 0));
+            arr[2] = m_transform.GetScreenPoint(from + new Vector2(0, FrameSize.Y));
+            arr[3] = m_transform.GetScreenPoint(from + FrameSize);
 
             float minX = arr[0].X;
             float minY = arr[0].Y;

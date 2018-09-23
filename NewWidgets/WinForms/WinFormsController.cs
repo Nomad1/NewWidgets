@@ -5,7 +5,7 @@ using System.IO;
 using System.Numerics;
 using NewWidgets.UI;
 
-namespace NewWidgets
+namespace NewWidgets.WinForms
 {
     /// <summary>
     /// Controller class for RunMobile game engine
@@ -14,11 +14,11 @@ namespace NewWidgets
     {
         private struct SpriteData
         {
-            public readonly Image Image;
+            public readonly string Image;
             public readonly string Name;
-            public Tuple<RectangleF, int>[] Frames;
+            public WinFormsSprite.FrameData[] Frames;
 
-            public SpriteData(Image image, string name, Tuple<RectangleF, int>[] frames)
+            public SpriteData(string image, string name, WinFormsSprite.FrameData[] frames)
             {
                 Name = name;
                 Image = image;
@@ -27,7 +27,9 @@ namespace NewWidgets
         }
 
         private readonly LinkedList<Tuple<Action, DateTime>> m_delayedActions = new LinkedList<Tuple<Action, DateTime>>();
+        private readonly Dictionary<string, Image> m_images = new Dictionary<string, Image>();
         private readonly Dictionary<string, SpriteData> m_sprites = new Dictionary<string, SpriteData>();
+        private readonly Stack<Rectangle> m_clipRect = new Stack<Rectangle>();
 
         private readonly int m_screenWidth;
         private readonly int m_screenHeight;
@@ -72,6 +74,16 @@ namespace NewWidgets
             get { return m_imagePath; }
         }
 
+        public Rectangle GetClipRect
+        {
+            get
+            {
+                if (m_clipRect.Count == 0)
+                    return new Rectangle(0, 0, ScreenWidth, ScreenHeight);
+                return m_clipRect.Peek();
+            }
+        }
+
         public event Action OnInit;
         public override event TouchDelegate OnTouch;
         public WinFormsController(int width, int height, float scale, float fontScale, bool isSmallScreen, string imagePath)
@@ -90,40 +102,98 @@ namespace NewWidgets
             Widgets.WidgetManager.Init(fontScale);
 
             foreach (string file in Directory.GetFiles(m_imagePath, "*.png"))
-                RegisterSprite(Path.GetFileNameWithoutExtension(file), file);
+                RegisterSprite(Path.GetFileNameWithoutExtension(file), file, null, 1, 1);
         }
 
-        private void RegisterSprite(string id, string file, int subdivideX = 1, int subdivideY = 1)
+        private void RegisterSprite(string id, string file, WinFormsSprite.FrameData[] frames, int subdivideX = 1, int subdivideY = 1)
         {
             Image image = null;
 
-            SpriteData oldData;
-            if (m_sprites.TryGetValue(id, out oldData))
-                image = oldData.Image;
-            else
-                image = Image.FromFile(file);
+            if (!m_images.TryGetValue(file, out image))
+                m_images[file] = image = Image.FromFile(file);
 
             if (image == null)
                 LogError("Failed to load sprite {0}", id);
 
-            int count = subdivideX * subdivideY;
+            if (frames == null)
+            {
+                int count = subdivideX * subdivideY;
+                frames = new WinFormsSprite.FrameData[count];
 
-            Tuple<RectangleF, int> [] frames = new Tuple<RectangleF, int>[count];
-            for (int x = 0; x < subdivideX; x++)
-                    for (int y = 0; y < subdivideY; y++)
+                int frameWidth = image.Size.Width / subdivideX;
+                int frameHeight = image.Size.Height / subdivideY;
+
+                for (int y = 0; y < subdivideY; y++)
+                    for (int x = 0; x < subdivideX; x++)
                     {
                         int index = x + y * subdivideX;
-                        frames[index] = new Tuple<RectangleF, int>(new RectangleF(x / (float)subdivideX, y / (float)subdivideY, 1 / (float)subdivideX, 1 / (float)subdivideY), index);
+                        frames[index] = new WinFormsSprite.FrameData(x*frameWidth, y*frameHeight, frameWidth, frameHeight, 0, 0, index);
                     }
+            }
 
-            m_sprites[id] = new SpriteData(image, id, frames);
+            m_sprites[id] = new SpriteData(file, id, frames);
+        }
+
+        public void RegisterSpriteAtlas(string atlasFile)
+        {
+            string spriteName = Path.GetFileNameWithoutExtension(atlasFile);
+
+            Dictionary<string, List<WinFormsSprite.FrameData>> atlas = new Dictionary<string, List<WinFormsSprite.FrameData>>();
+            try
+            {
+                using (Stream stream = File.OpenRead(atlasFile))
+                {
+                    BinaryReader reader = new BinaryReader(stream);
+                    uint magic = reader.ReadUInt32();
+
+                    int origWidth = magic == 0xfcdeabcc ? 0 : reader.ReadInt16();
+                    int origHeight = magic == 0xfcdeabcc ? 0 : reader.ReadInt16();
+
+                    byte count = reader.ReadByte();
+
+                    for (int i = 0; i < count; i++)
+                    {
+                        int x = reader.ReadInt16();
+                        int y = reader.ReadInt16();
+                        int width = reader.ReadInt16();
+                        int height = reader.ReadInt16();
+                        if (magic == 0xfcdeabcc)
+                        {
+                            origWidth = reader.ReadInt16();
+                            origHeight = reader.ReadInt16();
+                        }
+                        int offsetX = reader.ReadInt16();
+                        int offsetY = reader.ReadInt16();
+                        string texture = reader.ReadString();
+                        int tag = magic == 0xfadeabcc ? (short)-1 : reader.ReadInt16();
+
+                        List<WinFormsSprite.FrameData> frames;
+
+                        if (string.IsNullOrEmpty(texture))
+                            texture = spriteName;
+
+                        if (!atlas.TryGetValue(texture, out frames))
+                            atlas[texture] = frames = new List<WinFormsSprite.FrameData>();
+
+                        frames.Add(new WinFormsSprite.FrameData(x, y, width, height, offsetX, offsetY, tag));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                LogError("Asked to register invalid sprite atlas {0}. Error: {1}", atlasFile, ex);
+                return;
+            }
+
+            foreach(var pair in atlas)
+                RegisterSprite(pair.Key, Path.Combine(m_imagePath, pair.Key + ".png"), pair.Value.ToArray());
         }
 
         #region Abstract WindowControllerBase implementation
 
         public override void SetSpriteSubdivision(string id, int subdivideX, int subdivideY)
         {
-            RegisterSprite(id, Path.Combine(m_imagePath, id + ".png"), subdivideX, subdivideY);
+            RegisterSprite(id, Path.Combine(m_imagePath, id + ".png"), null, subdivideX, subdivideY);
         }
 
         public override SpriteBase CloneSprite(SpriteBase sprite, Vector2 position)
@@ -133,7 +203,7 @@ namespace NewWidgets
             result.PivotShift = sprite.PivotShift;
             result.Alpha = sprite.Alpha;
             result.Color = sprite.Color;
-
+            result.Position = position;
             return result;
         }
 
@@ -146,7 +216,16 @@ namespace NewWidgets
                 return null;
             }
 
-            return new WinFormsSprite(spriteData.Image, id, new Vector2(spriteData.Image.Size.Width, spriteData.Image.Size.Height), spriteData.Frames);
+            Image image;
+            if (!m_images.TryGetValue(spriteData.Image, out image))
+            {
+                LogError("Controller asked to retrieve invalid image {0}", spriteData.Image);
+                return null;
+            }
+
+            WinFormsSprite result = new WinFormsSprite(image, id, new Vector2(image.Size.Width, image.Size.Height), spriteData.Frames);
+            result.Position = position;
+            return result;
         }
 
         public override long GetTime()
@@ -176,11 +255,13 @@ namespace NewWidgets
 
         public override void SetClipRect(int x, int y, int width, int height)
         {
+            m_clipRect.Push(new Rectangle(x, y, width, height));
             // no clip rects in winforms
         }
 
         public override void CancelClipRect()
         {
+            m_clipRect.Pop();
             // no clip rects in winforms
         }
 
