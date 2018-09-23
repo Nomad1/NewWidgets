@@ -38,9 +38,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="System.Numerics">
-      <HintPath>..\..\..\..\..\Library\Frameworks\Mono.framework\Versions\5.16.0\lib\mono\4.7.1-api\System.Numerics.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Numerics.Vectors" />
+    <Reference Include="System.Numerics" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="TestForm.cs">
