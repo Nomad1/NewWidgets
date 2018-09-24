@@ -6,9 +6,9 @@ namespace NewWidgets.UI
 {
 	public class ImageObject : WindowObject
     {
-        private readonly SpriteBase m_sprite;
+        private readonly ISprite m_sprite;
 
-        public SpriteBase Sprite
+        public ISprite Sprite
         {
             get { return m_sprite; }
         }
@@ -19,7 +19,7 @@ namespace NewWidgets.UI
 			set { if (m_sprite != null) m_sprite.PivotShift = value; }
         }
 
-        public ImageObject(WindowObject parent, SpriteBase sprite)
+        public ImageObject(WindowObject parent, ISprite sprite)
 			: base(parent, sprite == null ? new Transform() : sprite.Transform)
         {
 			m_sprite = sprite;

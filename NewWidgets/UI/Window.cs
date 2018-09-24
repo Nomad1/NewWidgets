@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -81,7 +81,7 @@ namespace NewWidgets.UI
             if ((m_flags & WindowFlags.FullScreen) != 0) // auto scale, TODO: separate flag or even remove this
             {
                 Position = Vector2.Zero;
-                Scale = WindowControllerBase.Instance.ScreenWidth / Size.X;
+                Scale = WindowController.Instance.ScreenWidth / Size.X;
             }
 
             m_children = new WindowObjectArray ();

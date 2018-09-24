@@ -272,7 +272,7 @@ namespace NewWidgets.Widgets
 
         private void StopDrag(Vector2 point)
         {
-            WindowControllerBase.Instance.OnTouch -= StopDragTouch;
+            WindowController.Instance.OnTouch -= StopDragTouch;
 
             if (m_dragging)
             {
@@ -339,7 +339,7 @@ namespace NewWidgets.Widgets
                 m_dragVScroller = m_verticalScrollBar.HitTest(x, y);
                 m_dragHScroller = m_horizontalScrollBar.HitTest(x, y);
 
-                if (!WindowControllerBase.Instance.IsSmallScreen && !m_dragVScroller && !m_dragHScroller)
+                if (!WindowController.Instance.IsSmallScreen && !m_dragVScroller && !m_dragHScroller)
                     return true; // on large screens allow only scroller scroll, no body scroll
                     
 
@@ -347,7 +347,7 @@ namespace NewWidgets.Widgets
                 m_dragStart = m_dragShift;
                 m_dragging = true;
 
-                WindowControllerBase.Instance.OnTouch += StopDragTouch;
+                WindowController.Instance.OnTouch += StopDragTouch;
 
                 return true;
             }

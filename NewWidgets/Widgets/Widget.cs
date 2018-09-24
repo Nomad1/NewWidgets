@@ -155,14 +155,14 @@ namespace NewWidgets.Widgets
             if (string.IsNullOrEmpty(texture))
             {
                 if (style != WidgetBackgroundStyle.None)
-                    WindowControllerBase.Instance.LogMessage("Initing Widget {0} without texture", this);
+                    WindowController.Instance.LogMessage("Initing Widget {0} without texture", this);
                 return;
             }
 
-            SpriteBase textureSprite = WindowControllerBase.Instance.CreateSprite(texture, Vector2.Zero);
+            ISprite textureSprite = WindowController.Instance.CreateSprite(texture, Vector2.Zero);
             if (textureSprite == null)
             {
-                WindowControllerBase.Instance.LogError("Widget texture not found for sprite {0}", textureSprite);
+                WindowController.Instance.LogError("Widget texture not found for sprite {0}", textureSprite);
                 return;
             }
 
@@ -224,7 +224,7 @@ namespace NewWidgets.Widgets
                                 if (x == 0 && y == 0)
                                     image = background;
                                 else
-                                image = new ImageObject(this, WindowControllerBase.Instance.CreateSprite(texture, size * new Vector2(x,y)));
+                                image = new ImageObject(this, WindowController.Instance.CreateSprite(texture, size * new Vector2(x,y)));
 
                                 image.Scale = scale;
                                 m_background.Add(image);
@@ -259,7 +259,7 @@ namespace NewWidgets.Widgets
                             if (i % 3 == 0)
                                 x = 0;
 
-                            SpriteBase sprite = WindowControllerBase.Instance.CreateSprite(texture, new Vector2(x, y));
+                            ISprite sprite = WindowController.Instance.CreateSprite(texture, new Vector2(x, y));
                             sprite.Frame = i;
 
                             if (!inited)
@@ -312,7 +312,7 @@ namespace NewWidgets.Widgets
 
                         for (int i = 0; i < 3; i++)
                         {
-                            ImageObject background = new ImageObject(this, WindowControllerBase.Instance.CreateSprite(texture, new Vector2(x, y)));
+                            ImageObject background = new ImageObject(this, WindowController.Instance.CreateSprite(texture, new Vector2(x, y)));
                             background.Sprite.Frame = i;
 
                             if (scales == null)
@@ -401,7 +401,7 @@ namespace NewWidgets.Widgets
             {
                 Vector2 actualScale = Transform.ActualScale;
 
-                WindowControllerBase.Instance.SetClipRect(
+                WindowController.Instance.SetClipRect(
                     (int)(this.Transform.ActualPosition.X + m_clipMargin.Left * actualScale.X),
                     (int)(this.Transform.ActualPosition.Y + m_clipMargin.Top * actualScale.Y),
                     (int)((this.Size.X - m_clipMargin.Left - m_clipMargin.Right) * actualScale.X + 0.5f),
@@ -417,7 +417,7 @@ namespace NewWidgets.Widgets
                 m_background.Draw(canvas);
             
             if (m_clipContents)
-                WindowControllerBase.Instance.CancelClipRect();
+                WindowController.Instance.CancelClipRect();
 
             if (m_backgroundDepth == WidgetBackgroundDepth.Top)
                 m_background.Draw(canvas);

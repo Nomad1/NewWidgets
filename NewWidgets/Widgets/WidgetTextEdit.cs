@@ -13,7 +13,7 @@ namespace NewWidgets.Widgets
         private int m_cursorPosition;
 
         private LabelObject m_label;
-        private SpriteBase m_cursor;
+        private ISprite m_cursor;
 
         private string m_preffix;
         private string m_text;
@@ -194,7 +194,7 @@ namespace NewWidgets.Widgets
 
             if (m_cursor != null)
             {
-                m_cursor.Alpha = (int)(Math.Sin(WindowControllerBase.Instance.GetTime() / 1000.0f) * 255 + 128.5f); // blinks every 2 seconds
+                m_cursor.Alpha = (int)(Math.Sin(WindowController.Instance.GetTime() / 1000.0f) * 255 + 128.5f); // blinks every 2 seconds
                 m_cursor.Update();
             }
 
@@ -409,7 +409,7 @@ namespace NewWidgets.Widgets
                     SetFocused(true);
 
                     Vector2 local = (this.Transform.GetClientPoint(new Vector2(x, y)) - m_label.Position) / m_fontSize;
-                    SpriteBase[] sprites = m_label.InternalGetSprites();
+                    ISprite[] sprites = m_label.InternalGetSprites();
 
                     if (sprites.Length > 0)
                     {

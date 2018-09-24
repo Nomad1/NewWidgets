@@ -152,7 +152,7 @@ namespace NewWidgets.Widgets
                     ApplyStyle(m_hoveredStyle);
                     
                     m_hovered = true;
-                    WindowControllerBase.Instance.OnTouch += UnHoverTouch;
+                    WindowController.Instance.OnTouch += UnHoverTouch;
                 }
 
                 return true;
@@ -168,7 +168,7 @@ namespace NewWidgets.Widgets
                 ApplyStyle(Style);
                 
                 m_hovered = false;
-                WindowControllerBase.Instance.OnTouch -= UnHoverTouch;
+                WindowController.Instance.OnTouch -= UnHoverTouch;
             }
             return false;
         }
@@ -207,7 +207,7 @@ namespace NewWidgets.Widgets
             m_animating = false;
             
             if (OnChecked != null)
-                WindowControllerBase.Instance.ScheduleAction(delegate { OnChecked(this); }, 1);
+                WindowController.Instance.ScheduleAction(delegate { OnChecked(this); }, 1);
         }
     }
 }

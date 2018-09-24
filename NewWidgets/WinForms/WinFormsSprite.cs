@@ -10,7 +10,7 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.WinForms
 {
-    public class WinFormsSprite : SpriteBase
+    public class WinFormsSprite : ISprite
     {
         public struct FrameData
         {
@@ -172,7 +172,7 @@ namespace NewWidgets.WinForms
                 return;
 
             // Clipping!
-            graphics.SetClip(((WinFormsController)WindowControllerBase.Instance).GetClipRect);
+            graphics.SetClip(((WinFormsController)WindowController.Instance).GetClipRect);
 
             // Here goes sprite drawing
 

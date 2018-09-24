@@ -22,12 +22,12 @@ namespace NewWidgets.WinFormsSample
         public TestWindow()
             : base(WindowFlags.None)
         {
-            Size = new Vector2(2048, 2048.0f * WindowControllerBase.Instance.ScreenHeight / WindowControllerBase.Instance.ScreenWidth);
-            Scale = WindowControllerBase.Instance.ScreenHeight / Size.Y;
+            Size = new Vector2(2048, 2048.0f * WindowController.Instance.ScreenHeight / WindowController.Instance.ScreenWidth);
+            Scale = WindowController.Instance.ScreenHeight / Size.Y;
 
             WidgetPanel panel = new WidgetPanel(WidgetManager.DefaultWindowStyle);
             panel.Size = new Vector2(600, 560);
-            panel.Scale = WindowControllerBase.Instance.ScreenScale;
+            panel.Scale = WindowController.Instance.ScreenScale;
             panel.Position = Size / 2 - panel.Size * panel.Scale / 2;
             AddChild(panel);
 

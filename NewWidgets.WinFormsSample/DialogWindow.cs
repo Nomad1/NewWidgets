@@ -115,7 +115,7 @@ namespace NewWidgets.WinFormsSample
 
         public override void Remove()
         {
-            WindowControllerBase.Instance.ScheduleAction(base.Remove, AppearDuration);
+            WindowController.Instance.ScheduleAction(base.Remove, AppearDuration);
 
             OnRemove();
         }
@@ -163,10 +163,10 @@ namespace NewWidgets.WinFormsSample
         public static DialogWindow Show(string title, string text, string yesText, string noText = "")
         {
             DialogWindow dialog = new DialogWindow(title, text, yesText, noText);
-            dialog.Scale = WindowControllerBase.Instance.ScreenScale *  WindowControllerBase.Instance.ScreenWidth / 2048.0f;
+            dialog.Scale = WindowController.Instance.ScreenScale *  WindowController.Instance.ScreenWidth / 2048.0f;
             dialog.OnAppear();
 
-            WindowControllerBase.Instance.ScheduleAction(() => WindowControllerBase.Instance.Windows.Add(dialog), 1);
+            WindowController.Instance.ScheduleAction(() => WindowController.Instance.Windows.Add(dialog), 1);
 
             return dialog;
         }
@@ -174,7 +174,7 @@ namespace NewWidgets.WinFormsSample
         protected void OnAppear()
         {
             Controlling = false;
-            Vector2 targetPosition = (new Vector2(WindowControllerBase.Instance.ScreenWidth, WindowControllerBase.Instance.ScreenHeight) - Size * Scale) / 2;
+            Vector2 targetPosition = (new Vector2(WindowController.Instance.ScreenWidth, WindowController.Instance.ScreenHeight) - Size * Scale) / 2;
             Position = new Vector2(targetPosition.X, -Size.Y / Scale);
             Move(targetPosition, AppearDuration / 2, () => Controlling = true);
         }
@@ -182,7 +182,7 @@ namespace NewWidgets.WinFormsSample
         protected void OnRemove()
         {
             HandleButtonPress(1);
-            Move(new Vector2(WindowControllerBase.Instance.ScreenWidth, Position.Y), AppearDuration, null);
+            Move(new Vector2(WindowController.Instance.ScreenWidth, Position.Y), AppearDuration, null);
         }
 
         public override bool Key(SpecialKey key, bool up, char character)

@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 using System.Numerics;
 
 namespace NewWidgets.UI
 {
     public delegate bool TouchDelegate(float x, float y, bool press, bool unpress, int pointer);
 
-    public abstract class WindowControllerBase
+    public abstract class WindowController
 	{
-        private static WindowControllerBase s_instance;
+        private static WindowController s_instance;
 
-        public static WindowControllerBase Instance
+        public static WindowController Instance
         {
             get
             {
@@ -77,7 +77,7 @@ namespace NewWidgets.UI
         /// <returns>The sprite.</returns>
         /// <param name="sprite">Sprite.</param>
         /// <param name="position">Position.</param>
-        public abstract SpriteBase CloneSprite(SpriteBase sprite, Vector2 position);
+        public abstract ISprite CloneSprite(ISprite sprite, Vector2 position);
 
         /// <summary>
         /// Construct sprite by hashed id string and position
@@ -85,7 +85,7 @@ namespace NewWidgets.UI
         /// <returns>The sprite.</returns>
         /// <param name="id">Identifier.</param>
         /// <param name="position">Position.</param>
-        public abstract SpriteBase CreateSprite(string id, Vector2 position);
+        public abstract ISprite CreateSprite(string id, Vector2 position);
 
         /// <summary>
         /// Sets the screen clip rectangle.

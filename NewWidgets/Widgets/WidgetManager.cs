@@ -58,7 +58,7 @@ namespace NewWidgets.Widgets
                     return result;
             }
 
-            WindowControllerBase.Instance.LogError("WidgetManager got GetStyle request for not existing style {0}", name);
+            WindowController.Instance.LogError("WidgetManager got GetStyle request for not existing style {0}", name);
 
             return null;  // TODO: return default style to avoid crash?
         }
@@ -72,7 +72,7 @@ namespace NewWidgets.Widgets
                     return result;
             }
 
-            WindowControllerBase.Instance.LogError("WidgetManager got GetStyle for not existing font {0}", name);
+            WindowController.Instance.LogError("WidgetManager got GetStyle for not existing font {0}", name);
 
             return null; // TODO: return default font to avoid crash?
         }
@@ -86,7 +86,7 @@ namespace NewWidgets.Widgets
             s_fontScale = ((float)Math.Round(8 * fontScale) / 8.0f); 
             s_styles.Clear();
 
-            WindowControllerBase.Instance.OnTouch += HandleTouch;
+            WindowController.Instance.OnTouch += HandleTouch;
 
             s_defaultWidgetStyle = new WidgetStyleSheet();
         }
@@ -126,7 +126,7 @@ namespace NewWidgets.Widgets
             }
             catch (Exception ex)
             {
-                WindowControllerBase.Instance.LogError("Error loading ui data: " + ex);
+                WindowController.Instance.LogError("Error loading ui data: " + ex);
                 throw;
             }
         }
@@ -167,25 +167,25 @@ namespace NewWidgets.Widgets
             if (name == "default")
                 s_mainFont = font;
 
-            WindowControllerBase.Instance.LogMessage("Registered font {0}, resource {1}, spacing {2}", name, resource, spacing);
+            WindowController.Instance.LogMessage("Registered font {0}, resource {1}, spacing {2}", name, resource, spacing);
         }
 
         private static void RegisterNinePatch(XmlNode node)
         {
             string name = node.Attributes.GetNamedItem("name").Value;
 
-            WindowControllerBase.Instance.SetSpriteSubdivision(name, 3, 3);
+            WindowController.Instance.SetSpriteSubdivision(name, 3, 3);
 
-            WindowControllerBase.Instance.LogMessage("Registered nine patch {0}", name);
+            WindowController.Instance.LogMessage("Registered nine patch {0}", name);
         }
 
         private static void RegisterThreePatch(XmlNode node)
         {
             string name = node.Attributes.GetNamedItem("name").Value;
 
-            WindowControllerBase.Instance.SetSpriteSubdivision(name, 3, 1);
+            WindowController.Instance.SetSpriteSubdivision(name, 3, 1);
 
-            WindowControllerBase.Instance.LogMessage("Registered three patch {0}", name);
+            WindowController.Instance.LogMessage("Registered three patch {0}", name);
         }
 
         private static void RegisterStyle(XmlNode node)
@@ -224,7 +224,7 @@ namespace NewWidgets.Widgets
             }
             s_styles[name] = style;
 
-            WindowControllerBase.Instance.LogMessage("Registered style {0}", name);
+            WindowController.Instance.LogMessage("Registered style {0}", name);
         }
 
         public static bool HasFocus(IWindowContainer window)
@@ -338,7 +338,7 @@ namespace NewWidgets.Widgets
         
         public static Window GetTopmostWindow()
         {
-            return (Window)WindowControllerBase.Instance.Windows[WindowControllerBase.Instance.Windows.Count - 1];
+            return (Window)WindowController.Instance.Windows[WindowController.Instance.Windows.Count - 1];
         }
         
         public static void SetExclusive(Widget widget)

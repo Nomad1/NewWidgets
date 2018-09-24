@@ -328,7 +328,7 @@ namespace NewWidgets.Widgets
                     }
 
                     m_hovered = true;
-                    WindowControllerBase.Instance.OnTouch += UnHoverTouch;
+                    WindowController.Instance.OnTouch += UnHoverTouch;
 
                     if (OnHover != null)
                         OnHover(this);
@@ -349,7 +349,7 @@ namespace NewWidgets.Widgets
                 }
 
                 m_hovered = false;
-                WindowControllerBase.Instance.OnTouch -= UnHoverTouch;
+                WindowController.Instance.OnTouch -= UnHoverTouch;
 
                 if (OnUnhover != null)
                     OnUnhover(this);
@@ -363,7 +363,7 @@ namespace NewWidgets.Widgets
                 return;
 
             if (!string.IsNullOrEmpty(m_clickSound))
-                WindowControllerBase.Instance.PlaySound(m_clickSound);
+                WindowController.Instance.PlaySound(m_clickSound);
 
             AnimatePress(immediate);
         }
@@ -403,7 +403,7 @@ namespace NewWidgets.Widgets
         protected void SchedulePress()
         {
             if (OnPress != null)
-                WindowControllerBase.Instance.ScheduleAction(delegate { OnPress(this); }, 1);
+                WindowController.Instance.ScheduleAction(delegate { OnPress(this); }, 1);
         }
     }
 }

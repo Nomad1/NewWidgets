@@ -191,7 +191,7 @@ namespace NewWidgets.Widgets
             m_needAnimate = false;
             for (int i = 0; i < m_label.InternalGetSprites().Length; i++)
             {
-                SpriteBase sprite = m_label.InternalGetSprites()[i];
+                ISprite sprite = m_label.InternalGetSprites()[i];
                 sprite.Alpha = 255;
                 Animator.RemoveAnimation((AnimationKind)((int)AnimationKind.Custom + i));
             }
@@ -220,7 +220,7 @@ namespace NewWidgets.Widgets
 
             for (int i = 0; i < m_label.InternalGetSprites().Length; i++)
             {
-                SpriteBase sprite = m_label.InternalGetSprites()[i];
+                ISprite sprite = m_label.InternalGetSprites()[i];
                 sprite.Alpha = 0;
 
                 // Different letters appear with random delay vs constant fade in

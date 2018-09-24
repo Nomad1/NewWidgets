@@ -11,7 +11,7 @@ namespace NewWidgets.UI
         private readonly Dictionary<char, Glyph> m_glyphs;
         private readonly int m_spacing;
         private readonly int m_leading;
-        private readonly SpriteBase m_fontSprite;
+        private readonly ISprite m_fontSprite;
         private readonly int m_height;
         private readonly int m_baseline;
 
@@ -41,11 +41,11 @@ namespace NewWidgets.UI
         }
 
         public Font(string font, int spacing, int leading, int baseline)
-            : this(WindowControllerBase.Instance.CreateSprite(font, Vector2.Zero), spacing, leading, baseline)
+            : this(WindowController.Instance.CreateSprite(font, Vector2.Zero), spacing, leading, baseline)
         {
         }
 
-        public Font(SpriteBase fontSprite, int spacing, int leading, int baseline)
+        public Font(ISprite fontSprite, int spacing, int leading, int baseline)
         {
             m_baseline = baseline;
             m_fontSprite = fontSprite;
@@ -67,9 +67,9 @@ namespace NewWidgets.UI
             m_height = maxHeight;
         }
 
-        public SpriteBase[] GetSprites(string text, Vector2 position)
+        public ISprite[] GetSprites(string text, Vector2 position)
         {
-            SpriteBase[] result = new SpriteBase[text.Length];
+            ISprite[] result = new ISprite[text.Length];
 
             for (int i = 0; i < text.Length; i++)
             {
@@ -77,7 +77,7 @@ namespace NewWidgets.UI
                 if (!m_glyphs.TryGetValue(text[i], out glyph))
                     glyph = m_glyphs[' '];
 
-                SpriteBase sprite = WindowControllerBase.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, 0));
+                ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, 0));
                 sprite.Frame = glyph.Frame;
                 result[i] = sprite;
 
@@ -87,11 +87,11 @@ namespace NewWidgets.UI
             return result;
         }
 
-        public void GetSprites(string text, Vector2 position, ref SpriteBase[] result)
+        public void GetSprites(string text, Vector2 position, ref ISprite[] result)
         {
             if (result == null || result.Length != text.Length)
             {
-                result = new SpriteBase[text.Length];
+                result = new ISprite[text.Length];
                 // TODO: release old sprites?
             }
 
@@ -108,7 +108,7 @@ namespace NewWidgets.UI
                 }
                 else
                 {
-                    SpriteBase sprite = WindowControllerBase.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, 0));
+                    ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, 0));
                     sprite.Frame = glyph.Frame;
                     result[i] = sprite;
                 }

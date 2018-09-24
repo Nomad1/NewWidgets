@@ -225,7 +225,7 @@ namespace NewWidgets.Widgets
                 }
                 catch (Exception ex)
                 {
-                    WindowControllerBase.Instance.LogError("Error parsing style {0}, element {1}: {2}", name, element.Name, ex);
+                    WindowController.Instance.LogError("Error parsing style {0}, element {1}: {2}", name, element.Name, ex);
                     throw;
                 }
             }

@@ -155,18 +155,18 @@ namespace NewWidgets.UI
 
         public Animator()
         {
-            m_lastUpdate = WindowControllerBase.Instance.GetTime();
+            m_lastUpdate = WindowController.Instance.GetTime();
         }
 
         public void Reset()
         {
-            m_lastUpdate = WindowControllerBase.Instance.GetTime();
+            m_lastUpdate = WindowController.Instance.GetTime();
             m_tasks.Clear();
         }
 
         public void Update()
         {
-            int elapsed = (int)(WindowControllerBase.Instance.GetTime() - m_lastUpdate);
+            int elapsed = (int)(WindowController.Instance.GetTime() - m_lastUpdate);
             if (elapsed > 0)
             {
 
@@ -182,7 +182,7 @@ namespace NewWidgets.UI
                     node = next;
                 }
 
-                m_lastUpdate = WindowControllerBase.Instance.GetTime();
+                m_lastUpdate = WindowController.Instance.GetTime();
             }
         }
 

@@ -19,7 +19,7 @@ namespace NewWidgets.UI
         
         private int m_color;
         private float m_alpha;
-        private SpriteBase [] m_sprites;
+        private ISprite [] m_sprites;
         private string m_text;
         private bool m_richText;
         
@@ -37,7 +37,7 @@ namespace NewWidgets.UI
                 int ialpha = MathHelper.Clamp((int)(m_alpha * 255), 0, 255);
 
                 if (m_sprites != null)
-                    foreach (SpriteBase sprite in m_sprites)
+                    foreach (ISprite sprite in m_sprites)
                         sprite.Alpha = ialpha;
             }
         }
@@ -49,7 +49,7 @@ namespace NewWidgets.UI
             {
                 m_color = value;
                 if (m_sprites != null)
-                    foreach (SpriteBase sprite in m_sprites)
+                    foreach (ISprite sprite in m_sprites)
                         sprite.Color = m_color;
             }
         }
@@ -110,14 +110,14 @@ namespace NewWidgets.UI
 
             for (int i = 0; i < m_sprites.Length; i++)
             {
-                SpriteBase sprite = m_sprites[i];
+                ISprite sprite = m_sprites[i];
 
                 if (colors != null && colors[i] != null)
                 {
 					if (colors[i] is IconSpan)
 					{
                         IconSpan icon = (IconSpan)colors[i];
-                        SpriteBase iconSprite = WindowControllerBase.Instance.CreateSprite(icon.Icon, Vector2.Zero);
+                        ISprite iconSprite = WindowController.Instance.CreateSprite(icon.Icon, Vector2.Zero);
 
 						if (iconSprite != null) // consume the error cause there is no place for log or message
 						{
@@ -276,7 +276,7 @@ namespace NewWidgets.UI
             if (Visible)
             {
                 if (m_sprites != null)
-                    foreach (SpriteBase sprite in m_sprites)
+                    foreach (ISprite sprite in m_sprites)
 					{
 						sprite.Update();
 					}
@@ -294,7 +294,7 @@ namespace NewWidgets.UI
                       
             if (m_sprites != null)
 			{
-                foreach (SpriteBase sprite in m_sprites)
+                foreach (ISprite sprite in m_sprites)
                     sprite.Draw(canvas);
 			}
 		}
@@ -314,11 +314,11 @@ namespace NewWidgets.UI
             if (m_sprites.Length == 0)
                 return RectangleF.Empty;
 
-            SpriteBase sprite = m_sprites[index];
+            ISprite sprite = m_sprites[index];
             return new RectangleF(sprite.Position.X, sprite.Position.Y, sprite.FrameSize.X + m_font.Spacing, sprite.FrameSize.Y);
         }
 
-        public SpriteBase[] InternalGetSprites()
+        public ISprite[] InternalGetSprites()
         {
             return m_sprites;
         }

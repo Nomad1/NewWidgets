@@ -10,7 +10,7 @@ namespace NewWidgets.WinForms
     /// <summary>
     /// Controller class for Windows Forms test implementation
     /// </summary>
-    public class WinFormsController : WindowControllerBase
+    public class WinFormsController : WindowController
     {
         /// <summary>
         /// Helper struct to store sprite data
@@ -206,9 +206,9 @@ namespace NewWidgets.WinForms
             RegisterSprite(id, Path.Combine(m_imagePath, id + ".png"), null, subdivideX, subdivideY);
         }
 
-        public override SpriteBase CloneSprite(SpriteBase sprite, Vector2 position)
+        public override ISprite CloneSprite(ISprite sprite, Vector2 position)
         {
-            SpriteBase result = CreateSprite(((WinFormsSprite)sprite).Id, position);
+            ISprite result = CreateSprite(((WinFormsSprite)sprite).Id, position);
             result.Frame = sprite.Frame;
             result.PivotShift = sprite.PivotShift;
             result.Alpha = sprite.Alpha;
@@ -217,7 +217,7 @@ namespace NewWidgets.WinForms
             return result;
         }
 
-        public override SpriteBase CreateSprite(string id, Vector2 position)
+        public override ISprite CreateSprite(string id, Vector2 position)
         {
             SpriteData spriteData;
             if (!m_sprites.TryGetValue(id, out spriteData))

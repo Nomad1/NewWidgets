@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace NewWidgets.UI
 {
-    public abstract class SpriteBase
+    public abstract class ISprite
     {
         /// <summary>
         /// Size in pixels of the underlying image

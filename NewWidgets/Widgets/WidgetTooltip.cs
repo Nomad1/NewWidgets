@@ -48,12 +48,12 @@ namespace NewWidgets.Widgets
             if (position.Y < 0)
                 position.Y = 0;
 
-            if (position.X + tooltipSize.X > WindowControllerBase.Instance.ScreenWidth)
-                position.X = WindowControllerBase.Instance.ScreenWidth - tooltipSize.X;
+            if (position.X + tooltipSize.X > WindowController.Instance.ScreenWidth)
+                position.X = WindowController.Instance.ScreenWidth - tooltipSize.X;
                 //position.X -= m_shift.X + tooltipSize.X;
 
-            if (position.Y + tooltipSize.Y> WindowControllerBase.Instance.ScreenHeight)
-                position.Y = WindowControllerBase.Instance.ScreenHeight - tooltipSize.Y;
+            if (position.Y + tooltipSize.Y> WindowController.Instance.ScreenHeight)
+                position.Y = WindowController.Instance.ScreenHeight - tooltipSize.Y;
                 //position.Y -= m_shift.Y + tooltipSize.Y;
 
             Vector2 pos = Parent.Transform.GetClientPoint(position);
@@ -95,7 +95,7 @@ namespace NewWidgets.Widgets
             tooltip.Region = region;
             tooltip.UpdatePosition(position);
 
-            WindowControllerBase.Instance.OnTouch += tooltip.UnHoverTouch;
+            WindowController.Instance.OnTouch += tooltip.UnHoverTouch;
 
             s_currentTooltip = tooltip;
         }
@@ -104,7 +104,7 @@ namespace NewWidgets.Widgets
         {
             if (s_currentTooltip != null)
             {
-                WindowControllerBase.Instance.OnTouch -= s_currentTooltip.UnHoverTouch;
+                WindowController.Instance.OnTouch -= s_currentTooltip.UnHoverTouch;
                 s_currentTooltip.Remove();
                 s_currentTooltip = null;
             }
