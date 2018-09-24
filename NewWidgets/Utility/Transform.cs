@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Numerics;
 
+#if RUNMOBILE
+using RunMobile.Utility;
+#endif
+
 namespace NewWidgets.Utility
 {
     /// <summary>
@@ -40,7 +44,7 @@ namespace NewWidgets.Utility
             }
         }
 
-        internal int Version
+        public int Version
         {
             get { return m_version; }
         }
@@ -203,7 +207,7 @@ namespace NewWidgets.Utility
             {
                 if (m_iMatrixChanged || IsChanged)
                 {
-                    MatrixHelper.Invert(Matrix, ref m_imatrix);
+                    MathHelper.Invert(Matrix, ref m_imatrix);
                     m_iMatrixChanged = false;
                 }
 
@@ -280,12 +284,12 @@ namespace NewWidgets.Utility
         /// </summary>
         private void UpdateMatrix()
         {
-            MatrixHelper.Init(ref m_matrix);
+            MathHelper.Init(ref m_matrix);
 
-			MatrixHelper.GetMatrix3d(m_position, m_rotation * (float)MathHelper.Deg2Rad, m_scale, ref m_matrix);
+            MathHelper.GetMatrix3d(m_position, m_rotation * (float)MathHelper.Deg2Rad, m_scale, ref m_matrix);
 
             if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
-                MatrixHelper.Mul(m_parent.Matrix, ref m_matrix); // this one is most expensive thing in whole engine
+                MathHelper.Mul(m_parent.Matrix, ref m_matrix); // this one is most expensive thing in whole engine
 
             m_iMatrixChanged = true;
 

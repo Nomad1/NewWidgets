@@ -66,7 +66,6 @@
     <Compile Include="UI\WindowControllerBase.cs" />
     <Compile Include="UI\ISprite.cs" />
     <Compile Include="Utility\MathHelper.cs" />
-    <Compile Include="Utility\MatrixHelper.cs" />
     <Compile Include="WinForms\WinFormsController.cs" />
     <Compile Include="WinForms\WinFormsSprite.cs" />
   </ItemGroup>

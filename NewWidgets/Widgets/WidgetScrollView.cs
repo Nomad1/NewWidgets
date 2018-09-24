@@ -6,6 +6,10 @@ using System.Drawing;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
+#if RUNMOBILE
+using RunMobile.Utility;
+#endif
+
 namespace NewWidgets.Widgets
 {
     public class WidgetScrollView : Widget, IWindowContainer

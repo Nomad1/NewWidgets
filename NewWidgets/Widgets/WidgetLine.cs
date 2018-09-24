@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Numerics;
+
+#if RUNMOBILE
+using RunMobile.Utility;
+#else
 using NewWidgets.Utility;
+#endif
 
 namespace NewWidgets.Widgets
 {

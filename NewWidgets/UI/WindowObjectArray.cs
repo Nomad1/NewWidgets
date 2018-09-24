@@ -1,5 +1,10 @@
 ﻿using System;
+
+#if RUNMOBILE
+using RunMobile.Utility;
+#else
 using NewWidgets.Utility;
+#endif
 
 namespace NewWidgets.UI
 {
