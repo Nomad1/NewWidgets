@@ -60,18 +60,18 @@ namespace NewWidgets.WinForms
             get { return m_id; }
         }
 
-        public override Vector2 Size
+        public Vector2 Size
         {
             get { return m_size; }
         }
 
-        public override Vector2 PivotShift
+        public Vector2 PivotShift
         {
             get { return m_pivotShift; }
             set { m_pivotShift = value; }
         }
 
-        public override int Frame
+        public int Frame
         {
             get { return m_frame; }
             set
@@ -81,22 +81,22 @@ namespace NewWidgets.WinForms
             }
         }
 
-        public override int Frames
+        public int Frames
         {
             get { return m_frames.Length; }
         }
 
-        public override int FrameTag
+        public int FrameTag
         {
             get { return m_frames[m_frame].Tag; }
         }
 
-        public override Vector2 FrameSize
+        public Vector2 FrameSize
         {
             get { return new Vector2(m_frames[m_frame].Width, m_frames[m_frame].Height); }
         }
 
-        public override int Alpha
+        public int Alpha
         {
             get { return (int)((m_color & AlphaMask) >> 24); }
             set
@@ -106,30 +106,30 @@ namespace NewWidgets.WinForms
             }
         }
 
-        public override int Color
+        public int Color
         {
             get { return (int)(m_color & ColorMask); }
             set { m_color = ((uint)value & ColorMask) | (m_color & AlphaMask); }
         }
 
-        public override Transform Transform
+        public Transform Transform
         {
             get { return m_transform; }
         }
 
-        public override float Scale
+        public float Scale
         {
             get { return m_transform.UniformScale; }
             set { m_transform.UniformScale = value; }
         }
 
-        public override Vector2 Position
+        public Vector2 Position
         {
             get { return m_transform.FlatPosition; }
             set { m_transform.FlatPosition = value; }
         }
 
-        public override float Rotation
+        public float Rotation
         {
             get { return m_transform.RotationZ; }
             set { m_transform.RotationZ = value; }
@@ -149,7 +149,7 @@ namespace NewWidgets.WinForms
             m_color = 0xffffffff;
         }
 
-        public override bool HitTest(float x, float y)
+        public bool HitTest(float x, float y)
         {
             if (!GetScreenRect().Contains(x, y)) // AABB test
                 return false;
@@ -161,7 +161,7 @@ namespace NewWidgets.WinForms
             return coord.X >= 0 && coord.Y >= 0 && coord.X < Size.X && coord.Y < Size.Y;
         }
 
-        public override void Draw(object canvas)
+        public void Draw(object canvas)
         {
             if ((m_color & AlphaMask) <= AlphaDrawThreshold)
                 return;
@@ -231,7 +231,7 @@ namespace NewWidgets.WinForms
             }
         }
 
-        public override void Update()
+        public void Update()
         {
 #if USE_CACHE
             int nwidth = (int)(m_transform.ActualScale.X * FrameSize.X + 0.5f);

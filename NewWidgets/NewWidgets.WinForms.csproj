@@ -64,7 +64,7 @@
     <Compile Include="Utility\Transform.cs" />
     <Compile Include="Utility\SortedLinkedList.cs" />
     <Compile Include="UI\WindowControllerBase.cs" />
-    <Compile Include="UI\SpriteBase.cs" />
+    <Compile Include="UI\ISprite.cs" />
     <Compile Include="Utility\MathHelper.cs" />
     <Compile Include="Utility\MatrixHelper.cs" />
     <Compile Include="WinForms\WinFormsController.cs" />
