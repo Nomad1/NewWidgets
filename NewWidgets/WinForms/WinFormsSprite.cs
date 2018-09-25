@@ -192,31 +192,24 @@ namespace NewWidgets.WinForms
             ia.SetColorMatrix(matrix);
 
 #if USE_CACHE
-            int nwidth = (int)(m_transform.ActualScale.X * FrameSize.X + 0.5f);
-            int nheight = (int)(m_transform.ActualScale.Y * FrameSize.Y + 0.5f);
-
-            if (nwidth <= 0 || nheight <= 0)
-                return;
-
-            uint cacheHash = ((uint)(m_frame & 0xff) << 24) | ((uint)nwidth << 12) | (uint)nheight;
-
-            if (m_cacheHash == cacheHash)
+            Update(); // make sure that cache is valid
+           
             {
-                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bilinear;
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
 
                 if (m_cache != null)
                 {
                     // round everything to ints to avoid blur and increase speed
 
                     graphics.DrawImage(m_cache,
-                     new Point[] { new Point((int)(arr[0].X), (int)(arr[0].Y)), new Point((int)(arr[1].X), (int)(arr[1].Y)), new Point((int)(arr[2].X), (int)(arr[2].Y)) },
-                     new Rectangle(0, 0, m_cache.Width, m_cache.Height),
+                       new Point[] { new Point((int)(arr[0].X + 0.5f), (int)(arr[0].Y + 0.5f)), new Point((int)(arr[1].X + 0.5f), (int)(arr[1].Y + 0.5f)), new Point((int)(arr[2].X + 0.5f), (int)(arr[2].Y + 0.5f)) },
+                       new Rectangle(0, 0, m_cache.Width, m_cache.Height),
                      GraphicsUnit.Pixel,
                      ia
                      );
                 }
             }
-            else
+            return;
 #endif
             {
                 // frame changed before the update
@@ -234,8 +227,8 @@ namespace NewWidgets.WinForms
         public void Update()
         {
 #if USE_CACHE
-            int nwidth = (int)(m_transform.ActualScale.X * FrameSize.X + 0.5f);
-            int nheight = (int)(m_transform.ActualScale.Y * FrameSize.Y + 0.5f);
+            int nwidth = (int)System.Math.Ceiling(m_transform.ActualScale.X * FrameSize.X);
+            int nheight = (int)System.Math.Ceiling(m_transform.ActualScale.Y * FrameSize.Y);
             uint cacheHash = ((uint)(m_frame & 0xff) << 24) | ((uint)nwidth << 12) | (uint)nheight;
 
             if (cacheHash != m_cacheHash)
@@ -253,8 +246,8 @@ namespace NewWidgets.WinForms
                     {
                         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                         g.DrawImage(m_image,
-                        new Rectangle(0, 0, m_cache.Width, m_cache.Height),
-                        m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height,
+                        new RectangleF(0, 0, m_cache.Width, m_cache.Height),
+                        new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),
                         GraphicsUnit.Pixel);
                     }
                 }

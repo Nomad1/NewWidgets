@@ -147,7 +147,7 @@ namespace NewWidgets.WinFormsSample
         private void HandleWebSitePress(object t)
         {
             DialogWindow dialog = DialogWindow.Show("@dialog_title",
-                ResourceLoader.Instance.GetString("dialog_web", "something"), "@button_yes", "@button_no");
+                ResourceLoader.Instance.GetString("dialog_text", "пример текста"), "@button_yes", "@button_no");
 
             dialog.OnDialog += delegate (DialogWindow d, int index)
             {
