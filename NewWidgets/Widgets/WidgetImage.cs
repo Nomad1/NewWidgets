@@ -31,12 +31,18 @@ namespace NewWidgets.Widgets
 
         public Vector2 ImageSize
         {
-			get { return ((ImageObject)m_background[0]).Sprite.Size; }
+			get { return ImageObject.Sprite.Size; }
         }
 
 		public ImageObject ImageObject
         {
-            get { return ((ImageObject)m_background[0]); }
+            get
+            {
+                if (m_background.Count == 0)
+                    Update();
+
+                return ((ImageObject)m_background[0]);
+            }
         }
 
         public WidgetImage(string image)
