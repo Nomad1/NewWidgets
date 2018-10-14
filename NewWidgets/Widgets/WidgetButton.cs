@@ -124,7 +124,10 @@ namespace NewWidgets.Widgets
                 base.Enabled = value;
                 
                 if (m_disabledStyle != null)
-                    ApplyStyle(value ? Style : m_disabledStyle);
+                    WindowController.Instance.ScheduleAction(
+                    delegate { 
+                        ApplyStyle(value ? Style : m_disabledStyle);
+                    }, 1);
             }
         }
 
@@ -139,7 +142,10 @@ namespace NewWidgets.Widgets
                 m_selected = value;
 
                 if (m_hoveredStyle != null)
-                    ApplyStyle(value ? m_hoveredStyle : Style);
+                    WindowController.Instance.ScheduleAction(
+                    delegate { 
+                        ApplyStyle(value ? m_hoveredStyle : Style);
+                    }, 1);
             }
         }
 
