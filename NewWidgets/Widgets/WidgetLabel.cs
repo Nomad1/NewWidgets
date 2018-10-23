@@ -2,6 +2,12 @@
 using System.Numerics;
 using NewWidgets.UI;
 
+#if RUNMOBILE
+using RunMobile.Utility;
+#else
+using NewWidgets.Utility;
+#endif
+
 namespace NewWidgets.Widgets
 {
     public class WidgetLabel : Widget
@@ -193,7 +199,7 @@ namespace NewWidgets.Widgets
             {
                 ISprite sprite = m_label.InternalGetSprites()[i];
                 sprite.Alpha = 255;
-                Animator.RemoveAnimation((AnimationKind)((int)AnimationKind.Custom + i));
+                Animator.RemoveAnimation(this, (AnimationKind)((int)AnimationKind.Custom + i));
             }
             
             FadeTo(0.0f, 100, null);
@@ -228,10 +234,10 @@ namespace NewWidgets.Widgets
                 // TODO: Unreadable, refactor
                 int time = isRandom ? 100 + random.Next() % 200 : 100 + i * 500 / m_label.InternalGetSprites().Length;
 
-                Animator.StartPreciseAnimation((AnimationKind)((int)AnimationKind.Custom + i), 255, time,
-                delegate (int alpha)
+                Animator.StartAnimation(this, (AnimationKind)((int)AnimationKind.Custom + i), 0, 255, time,
+                delegate (float x, int from, int to)
                 {
-                    sprite.Alpha = Math.Min(Math.Max(0, alpha), 255);
+                    sprite.Alpha = MathHelper.LinearInterpolationInt(x, (int)from, (int)to);
                 },
                 null);
             }

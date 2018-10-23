@@ -16,34 +16,45 @@ namespace NewWidgets.UI
     
     public class Animator
     {
+        private struct AnimationKey
+        {
+            public readonly object Owner;
+            public readonly AnimationKind Kind;
+
+            public AnimationKey(object owner, AnimationKind kind)
+            {
+                Owner = owner;
+                Kind = kind;
+            }
+        }
+
         private abstract class BaseAnimatorTask
         {
-            private readonly AnimationKind m_kind;
-            private readonly Action m_callback;
-            
+            private readonly AnimationKey m_key;
+            private readonly Action m_endCallback;
+
+            private readonly int m_totalTime;
             private int m_timeLeft;
-            private int m_totalTime;
-            
-            public AnimationKind Kind
+
+            public AnimationKey Key
             {
-                get { return m_kind; }
+                get { return m_key; }
             }
 
-            protected BaseAnimatorTask(AnimationKind kind, int time, Action callback)
+            protected BaseAnimatorTask(object owner, AnimationKind kind, int time, Action endCallback)
             {
-                m_kind = kind;
+                m_key = new AnimationKey(owner, kind);
                 m_timeLeft = time;
-                m_callback = callback;
-                m_totalTime = 0;
+                m_totalTime = time;
+                m_endCallback = endCallback;
             }
 
             public bool Update(int elapsed)
             {
                 elapsed = Math.Min(elapsed, m_timeLeft);
                 m_timeLeft -= elapsed;
-                m_totalTime += elapsed;
 
-                DoUpdate(elapsed, m_totalTime);
+                DoUpdate(m_totalTime - m_timeLeft, m_totalTime);
 
                 if (m_timeLeft == 0)
                     return true;
@@ -53,100 +64,31 @@ namespace NewWidgets.UI
 
             public void Complete()
             {
-                if (m_timeLeft == 0 && m_callback != null)
-                    m_callback();
+                if (m_timeLeft == 0 && m_endCallback != null)
+                    m_endCallback();
             }
 
-            protected abstract void DoUpdate(int elapsed, int totalTime);
+            protected abstract void DoUpdate(int sinceStart, int totalTime);
         }
         
-        private class FloatAnimatorTask : BaseAnimatorTask
+        private class InterpolateAnimatorTask<T> : BaseAnimatorTask
         {
-            private readonly float m_vector;
-            private readonly Action<float> m_tickCallback;
+            private readonly T m_start;
+            private readonly T m_end;
+            private readonly Action<float, T, T> m_tickCallback;
 
-            public FloatAnimatorTask(AnimationKind kind, float value, int time, Action<float> tickCallback, Action callback)
-                : base(kind, time, callback)
+            public InterpolateAnimatorTask(object owner, AnimationKind kind, T valueFrom, T valueTo, int time, Action<float,T,T> tickCallback, Action callback)
+                : base(owner, kind, time, callback)
             {
-                m_vector = value / time;
+                m_start = valueFrom;
+                m_end = valueTo;
+
                 m_tickCallback = tickCallback;
             }
 
-            protected override void DoUpdate(int elapsed, int totalTime)
+            protected override void DoUpdate(int sinceStart, int totalTime)
             {
-                m_tickCallback(m_vector * elapsed);
-            }
-        }
-
-        private class Vector2AnimatorTask : BaseAnimatorTask
-        {
-            private readonly Vector2 m_vector;
-            private readonly Action<Vector2> m_tickCallback;
-
-            public Vector2AnimatorTask(AnimationKind kind, Vector2 value, int time, Action<Vector2> tickCallback, Action callback)
-                : base(kind, time, callback)
-            {
-                m_vector = value / time;
-                m_tickCallback = tickCallback;
-            }
-
-            protected override void DoUpdate(int elapsed, int totalTime)
-            {
-                m_tickCallback(m_vector * elapsed);
-            }
-        }
-        
-        private class Vector3AnimatorTask : BaseAnimatorTask
-        {
-            private readonly Vector3 m_vector;
-            private readonly Action<Vector3> m_tickCallback;
-
-            public Vector3AnimatorTask(AnimationKind kind, Vector3 value, int time, Action<Vector3> tickCallback, Action callback)
-                : base(kind, time, callback)
-            {
-                m_vector = value / time;
-                m_tickCallback = tickCallback;
-            }
-
-            protected override void DoUpdate(int elapsed, int totalTime)
-            {
-                m_tickCallback(m_vector * elapsed);
-            }
-        }
-        
-        private class IntAnimatorTask : BaseAnimatorTask
-        {
-            private readonly float m_vector;
-            private readonly Action<int> m_tickCallback;
-
-            public IntAnimatorTask(AnimationKind kind, int value, int time, Action<int> tickCallback, Action callback)
-                : base(kind, time, callback)
-            {
-                m_vector = value / (float)time;
-                m_tickCallback = tickCallback;
-            }
-
-            protected override void DoUpdate(int elapsed, int totalTime)
-            {
-                m_tickCallback((int)(m_vector * elapsed));
-            }
-        }
-
-        private class IntPreciseAnimatorTask : BaseAnimatorTask
-        {
-            private readonly float m_vector;
-            private readonly Action<int> m_tickCallback;
-
-            public IntPreciseAnimatorTask(AnimationKind kind, int value, int time, Action<int> tickCallback, Action callback)
-                : base(kind, time, callback)
-            {
-                m_vector = value / (float)time;
-                m_tickCallback = tickCallback;
-            }
-
-            protected override void DoUpdate(int elapsed, int totalTime)
-            {
-                m_tickCallback((int)Math.Round(m_vector * totalTime));
+                m_tickCallback((float)sinceStart / (float)totalTime, m_start, m_end);
             }
         }
 
@@ -155,109 +97,100 @@ namespace NewWidgets.UI
             private readonly object m_param;
             private readonly Action<int, object> m_tickCallback;
 
-            public CustomAnimatorTask(AnimationKind kind, object param, int time, Action<int, object> tickCallback, Action callback)
-                : base(kind, time, callback)
+            public CustomAnimatorTask(object owner, AnimationKind kind, object param, int time, Action<int, object> tickCallback, Action callback)
+                : base(owner, kind, time, callback)
             {
                 m_param = param;
                 m_tickCallback = tickCallback;
             }
 
-            protected override void DoUpdate(int elapsed, int totalTime)
+            protected override void DoUpdate(int sinceStart, int totalTime)
             {
                 if (m_tickCallback != null)
-                    m_tickCallback(elapsed, m_param);
+                    m_tickCallback(sinceStart, m_param);
             }
         }
 
-        private readonly LinkedList<BaseAnimatorTask> m_tasks = new LinkedList<BaseAnimatorTask>();
-        private long m_lastUpdate;
+        private static readonly LinkedList<BaseAnimatorTask> s_tasks = new LinkedList<BaseAnimatorTask>();
+        private static long s_lastUpdate;
+        private static bool s_scheduled;
 
-        public Animator()
+        static Animator()
         {
-            m_lastUpdate = WindowController.Instance.GetTime();
+            s_lastUpdate = WindowController.Instance.GetTime();
+
         }
 
-        public void Reset()
+        private static void ReSchedule()
         {
-            m_lastUpdate = WindowController.Instance.GetTime();
-            m_tasks.Clear();
+            if (!s_scheduled)
+            {
+                WindowController.Instance.ScheduleAction(Update, 1);
+                s_scheduled = true;
+            }
         }
 
-        public void Update()
+        public static void Update()
         {
-            int elapsed = (int)(WindowController.Instance.GetTime() - m_lastUpdate);
+            s_scheduled = false;
+            int elapsed = (int)(WindowController.Instance.GetTime() - s_lastUpdate);
             if (elapsed > 0)
             {
 
-                LinkedListNode<BaseAnimatorTask> node = m_tasks.First;
+                LinkedListNode<BaseAnimatorTask> node = s_tasks.First;
                 while (node != null)
                 {
                     LinkedListNode<BaseAnimatorTask> next = node.Next;
                     if (node.Value.Update(elapsed))
                     {
-                        m_tasks.Remove(node);
+                        s_tasks.Remove(node);
                         node.Value.Complete();   
                     }
                     node = next;
                 }
 
-                m_lastUpdate = WindowController.Instance.GetTime();
+                s_lastUpdate = WindowController.Instance.GetTime();
             }
+
+            if (s_tasks.Count > 0)
+                ReSchedule();
         }
 
-        public void RemoveAnimation(AnimationKind kind)
+        public static void RemoveAnimation(WindowObject owner, AnimationKind kind = AnimationKind.None)
         {
-            LinkedListNode<BaseAnimatorTask> node = m_tasks.First;
+            LinkedListNode<BaseAnimatorTask> node = s_tasks.First;
+
             while (node != null)
             {
                 LinkedListNode<BaseAnimatorTask> next = node.Next;
-                if (node.Value.Kind == kind)
-                    m_tasks.Remove(node);
+
+                if (node.Value.Key.Owner == owner && (kind == AnimationKind.None || node.Value.Key.Kind == kind))
+                    s_tasks.Remove(node);
+
                 node = next;
             }
         }
         
-        public void StartAnimation(AnimationKind kind, float value, int time, Action<float> tick, Action callback)
+        public static void StartAnimation<T>(WindowObject owner, AnimationKind kind, T valueFrom, T valueTo, int time, Action<float, T, T> tick, Action callback)
         {
             if (kind != AnimationKind.None)
-                RemoveAnimation(kind);
-            m_tasks.AddLast(new FloatAnimatorTask(kind, value, time, tick, callback));
+                RemoveAnimation(owner, kind);
+
+            BaseAnimatorTask task = new InterpolateAnimatorTask<T>(owner, kind, valueFrom, valueTo, time, tick, callback);
+            s_tasks.AddLast(task);
+
+            ReSchedule();
         }
 
-        public void StartAnimation(AnimationKind kind, int value, int time, Action<int> tick, Action callback)
+        public static void StartCustomAnimation(WindowObject owner, AnimationKind kind, object param, int time, Action<int, object> tick, Action callback)
         {
             if (kind != AnimationKind.None)
-                RemoveAnimation(kind);
-            m_tasks.AddLast(new IntAnimatorTask(kind, value, time, tick, callback));
-        }
+                RemoveAnimation(owner, kind);
 
-        public void StartAnimation(AnimationKind kind, Vector2 value, int time, Action<Vector2> tick, Action callback)
-        {
-            if (kind != AnimationKind.None)
-                RemoveAnimation(kind);
-            m_tasks.AddLast(new Vector2AnimatorTask(kind, value, time, tick, callback));
-        }
-        
-        public void StartAnimation(AnimationKind kind, Vector3 value, int time, Action<Vector3> tick, Action callback)
-        {
-            if (kind != AnimationKind.None)
-                RemoveAnimation(kind);
-            m_tasks.AddLast(new Vector3AnimatorTask(kind, value, time, tick, callback));
-        }
-        
-        public void StartPreciseAnimation(AnimationKind kind, int value, int time, Action<int> tick, Action callback)
-        {
-            if (kind != AnimationKind.None)
-                RemoveAnimation(kind);
-            m_tasks.AddLast(new IntPreciseAnimatorTask(kind, value, time, tick, callback));
-        }
+            BaseAnimatorTask task = new CustomAnimatorTask(owner, kind, param, time, tick, callback);
+            s_tasks.AddLast(task);
 
-        public void StartCustomAnimation(AnimationKind kind, object param, int time, Action<int, object> tick, Action callback)
-        {
-            if (kind != AnimationKind.None)
-                RemoveAnimation(kind);
-
-            m_tasks.AddLast(new CustomAnimatorTask(kind, param, time, tick, callback));
+            ReSchedule();
         }
     }
 }

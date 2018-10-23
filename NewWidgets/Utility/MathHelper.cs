@@ -74,5 +74,28 @@ namespace NewWidgets.Utility
         {
             Matrix4x4.Invert(m1, out m2);
         }
+
+        public static float LinearInterpolation(float x, float from, float to)
+        {
+            x = Clamp(x, 0.0f, 1.0f);
+            return from + (to - from) * x;
+        }
+
+        public static Vector2 LinearInterpolation(float x, Vector2 from, Vector2 to)
+        {
+            x = Clamp(x, 0.0f, 1.0f);
+            return from + (to - from) * x;
+        }
+
+        public static Vector3 LinearInterpolation(float x, Vector3 from, Vector3 to)
+        {
+            x = Clamp(x, 0.0f, 1.0f);
+            return from + (to - from) * x;
+        }
+
+        public static int LinearInterpolationInt(float x, int from, int to)
+        {
+            return Clamp((int)(from + (to - from) * x + 0.5f), Math.Min(from, to), Math.Max(from, to));
+        }
     }
 }

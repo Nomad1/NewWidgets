@@ -3,6 +3,10 @@ using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
+#if RUNMOBILE
+using RunMobile.Utility;
+#endif
+
 namespace NewWidgets.Widgets
 {
     public class Widget : WindowObject
@@ -449,7 +453,7 @@ namespace NewWidgets.Widgets
 
         public void FadeTo(float alpha, int time, Action callback)
         {
-            Animator.StartAnimation(AnimationKind.Alpha, alpha - Alpha, time, (float value) => Alpha += value, callback);
+            Animator.StartAnimation(this, AnimationKind.Alpha, Alpha, alpha, time, (float x, float from, float to) => Alpha = MathHelper.LinearInterpolation(x, from, to), callback);
         }
     }
 }

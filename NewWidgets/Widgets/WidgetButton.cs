@@ -278,7 +278,7 @@ namespace NewWidgets.Widgets
 
         protected void DelayedApplyStyle(WidgetStyleSheet style)
         {
-            Animator.StartCustomAnimation(AnimationKind.Custom, null, 1, null, 
+            Animator.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, 
                 delegate { 
                     ApplyStyle(style);
                 });

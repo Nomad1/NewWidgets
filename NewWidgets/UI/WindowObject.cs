@@ -2,6 +2,10 @@ using System;
 using System.Numerics;
 using NewWidgets.Utility;
 
+#if RUNMOBILE
+using RunMobile.Utility;
+#endif
+
 namespace NewWidgets.UI
 {
     public enum SpecialKey
@@ -89,7 +93,6 @@ namespace NewWidgets.UI
 
         private WindowObject m_parent;
 
-        private Animator m_animator;
 		private WindowObjectFlags m_flags;
 
         private WindowObjectArray m_lastList;
@@ -100,17 +103,6 @@ namespace NewWidgets.UI
         {
             get { return m_lastList; }
             set { m_lastList = value; }
-        }
-
-        public Animator Animator
-        {
-            get
-            {
-                // Lazy init. Not thread safe!!! However, all this class is not thread safe
-                if (m_animator == null)
-                    m_animator = new Animator();
-                return m_animator;
-            }
         }
 
 		public object Tag
@@ -245,8 +237,7 @@ namespace NewWidgets.UI
         {
 			m_flags = WindowObjectFlags.Default;
 
-            if (m_animator != null)
-                m_animator.Reset();
+            Animator.RemoveAnimation(this);
         }
 
 		protected virtual void Resize(Vector2 size)
@@ -270,9 +261,6 @@ namespace NewWidgets.UI
         {
 			if ((m_flags & WindowObjectFlags.Removing) != 0)
                 return false;
-
-            if (m_animator != null)
-                m_animator.Update();
 
             return true;
         }
@@ -302,19 +290,23 @@ namespace NewWidgets.UI
 
         public virtual void Move(Vector2 point, int time, Action callback)
         {
-            if ((point - Position).LengthSquared() <= float.Epsilon)
+            Vector2 current = Position;
+
+            if ((point - current).LengthSquared() <= float.Epsilon)
             {
                 if (callback != null)
                     callback();
                 return;
             }
 
-            Animator.StartAnimation(AnimationKind.Position, (point - Position), time, (Vector2 value) => Position += value, callback);
+            Animator.StartAnimation(this, AnimationKind.Position, current, point, time, (float x, Vector2 from, Vector2 to) => Position = MathHelper.LinearInterpolation(x, from, to), callback);
         }
 
         public virtual void Rotate(float angle, int time, Action callback, bool normalize)
         {
-            float delta = (angle - Rotation) % 360;
+            float current = Rotation;
+
+           /* float delta = (angle - current) % 360;
 
             if (normalize)
             {
@@ -322,9 +314,9 @@ namespace NewWidgets.UI
                     delta -= 360;
                 else if (delta < -180)
                     delta += 360;
-            }
+            }*/
 
-            Animator.StartAnimation(AnimationKind.Rotation, delta, time, (float value) => Rotation += value, callback);
+            Animator.StartAnimation(this, AnimationKind.Rotation, current, angle, time, (float x, float from, float to) => Rotation = MathHelper.LinearInterpolation(x, from, to), callback);
         }
 
         public virtual void Rotate(float angle, int time, Action callback)
@@ -339,14 +331,16 @@ namespace NewWidgets.UI
 
         public virtual void ScaleTo(Vector2 target, int time, Action callback)
         {
-			if ((target - Transform.FlatScale).LengthSquared() <= float.Epsilon)
+            Vector2 current = Transform.FlatScale;
+
+			if ((target - current).LengthSquared() <= float.Epsilon)
             {
                 if (callback != null)
                     callback();
                 return;
             }
 
-			Animator.StartAnimation(AnimationKind.Scale, target - Transform.FlatScale, time, (Vector2 value) => Transform.FlatScale += value, callback);
+			Animator.StartAnimation(this, AnimationKind.Scale, current, target, time, (float x, Vector2 from, Vector2 to) => Transform.FlatScale = MathHelper.LinearInterpolation(x, from, to), callback);
         }
     }
 }
