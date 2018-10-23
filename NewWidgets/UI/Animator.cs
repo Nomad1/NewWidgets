@@ -150,6 +150,25 @@ namespace NewWidgets.UI
             }
         }
 
+        private class CustomAnimatorTask : BaseAnimatorTask
+        {
+            private readonly object m_param;
+            private readonly Action<int, object> m_tickCallback;
+
+            public CustomAnimatorTask(AnimationKind kind, object param, int time, Action<int, object> tickCallback, Action callback)
+                : base(kind, time, callback)
+            {
+                m_param = param;
+                m_tickCallback = tickCallback;
+            }
+
+            protected override void DoUpdate(int elapsed, int totalTime)
+            {
+                if (m_tickCallback != null)
+                    m_tickCallback(elapsed, m_param);
+            }
+        }
+
         private readonly LinkedList<BaseAnimatorTask> m_tasks = new LinkedList<BaseAnimatorTask>();
         private long m_lastUpdate;
 
@@ -233,6 +252,13 @@ namespace NewWidgets.UI
             m_tasks.AddLast(new IntPreciseAnimatorTask(kind, value, time, tick, callback));
         }
 
+        public void StartCustomAnimation(AnimationKind kind, object param, int time, Action<int, object> tick, Action callback)
+        {
+            if (kind != AnimationKind.None)
+                RemoveAnimation(kind);
+
+            m_tasks.AddLast(new CustomAnimatorTask(kind, param, time, tick, callback));
+        }
     }
 }
 

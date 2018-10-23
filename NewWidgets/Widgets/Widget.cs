@@ -139,6 +139,8 @@ namespace NewWidgets.Widgets
             m_backgroundScale = style.BackgroundScale;
             m_backgroundPadding = style.BackgroundPadding;
             m_colorTint = style.Color;
+            m_alpha = style.Opacity;
+
             m_clipContents = style.Clip;
             m_clipMargin = style.ClipMargin;
         }

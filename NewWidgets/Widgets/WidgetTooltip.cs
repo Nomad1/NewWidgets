@@ -53,8 +53,8 @@ namespace NewWidgets.Widgets
                 //position.X -= m_shift.X + tooltipSize.X;
 
             if (position.Y + tooltipSize.Y> WindowController.Instance.ScreenHeight)
-                position.Y = WindowController.Instance.ScreenHeight - tooltipSize.Y;
-                //position.Y -= m_shift.Y + tooltipSize.Y;
+                //position.Y = WindowController.Instance.ScreenHeight - tooltipSize.Y;
+                position.Y -= m_shift.Y + tooltipSize.Y;
 
             Vector2 pos = Parent.Transform.GetClientPoint(position);
 

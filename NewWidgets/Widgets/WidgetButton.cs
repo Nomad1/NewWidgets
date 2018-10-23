@@ -124,10 +124,7 @@ namespace NewWidgets.Widgets
                 base.Enabled = value;
                 
                 if (m_disabledStyle != null)
-                    WindowController.Instance.ScheduleAction(
-                    delegate { 
-                        ApplyStyle(value ? Style : m_disabledStyle);
-                    }, 1);
+                    DelayedApplyStyle(value ? Style : m_disabledStyle);
             }
         }
 
@@ -142,10 +139,7 @@ namespace NewWidgets.Widgets
                 m_selected = value;
 
                 if (m_hoveredStyle != null)
-                    WindowController.Instance.ScheduleAction(
-                    delegate { 
-                        ApplyStyle(value ? m_hoveredStyle : Style);
-                    }, 1);
+                    DelayedApplyStyle(value ? Style : m_hoveredStyle);
             }
         }
 
@@ -281,7 +275,16 @@ namespace NewWidgets.Widgets
             if (!string.IsNullOrEmpty(Text))
                 m_label.Draw(canvas);
         }
-        
+
+        protected void DelayedApplyStyle(WidgetStyleSheet style)
+        {
+            Animator.StartCustomAnimation(AnimationKind.Custom, null, 1, null, 
+                delegate { 
+                    ApplyStyle(style);
+                });
+
+        }
+
         protected override void ApplyStyle(WidgetStyleSheet style)
         {
             m_label.Color = style.GetParameterColor("text_color", 0x0);
@@ -300,6 +303,8 @@ namespace NewWidgets.Widgets
 
             if (color != -1)
                 m_image.Color = color;
+
+
             //TextAlign = style.Align;
             
             base.ApplyStyle(style);
@@ -329,8 +334,7 @@ namespace NewWidgets.Widgets
                     if (!m_selected)
                     {
                         if (m_hoveredStyle != null)
-                            ApplyStyle(m_hoveredStyle);
-
+                            DelayedApplyStyle(m_hoveredStyle);
                     }
 
                     m_hovered = true;
@@ -346,12 +350,12 @@ namespace NewWidgets.Widgets
 
         private bool UnHoverTouch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (m_hovered && !HitTest(x, y))
+            if (Enabled && m_hovered && !HitTest(x, y))
             {
                 if (!m_selected)
                 {
                     if (m_hoveredStyle != null)
-                        ApplyStyle(Style);
+                        DelayedApplyStyle(Style);
                 }
 
                 m_hovered = false;
