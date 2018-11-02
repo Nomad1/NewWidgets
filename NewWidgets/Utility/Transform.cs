@@ -13,8 +13,8 @@ namespace NewWidgets.Utility
     public class Transform
     {
 #if STEP_UPDATES
-        private static readonly float PositionEpsilon = 0.1f;
-        private static readonly float AngleEpsilon = 0.0001f;
+        private static readonly float PositionEpsilon = 0.001f;
+        private static readonly float AngleEpsilon = 0.001f;
         private static readonly float ScaleEpsilon = 0.001f;
 #else
         private static readonly float PositionEpsilon = float.Epsilon; // Position vector is three-component, so that should be eps^3
@@ -101,9 +101,9 @@ namespace NewWidgets.Utility
         
         
 		/// <summary>
-        /// Gets or sets the position.
+        /// Gets or sets the rotation in radians.
         /// </summary>
-        /// <value>The position vector.</value>
+        /// <value>The rotation vector.</value>
         public Vector3 Rotation
         {
             get { return m_rotation; }
@@ -117,7 +117,7 @@ namespace NewWidgets.Utility
         }
         
         /// <summary>
-        /// Gets or sets the rotation in degrees.
+        /// Gets or sets the Z rotation in radians (!!)
         /// </summary>
         /// <value>The rotation.</value>
         public float RotationZ
@@ -133,9 +133,9 @@ namespace NewWidgets.Utility
         }
         
 		/// <summary>
-        /// Gets or sets the rotation in degrees.
+        /// Gets or sets the uniform scale
         /// </summary>
-        /// <value>The rotation.</value>
+        /// <value>The scale.</value>
         public float UniformScale
         {
             get { return m_scale.X; }
@@ -149,9 +149,9 @@ namespace NewWidgets.Utility
         }
         
 		/// <summary>
-        /// Gets or sets the rotation in degrees.
+        /// Gets or sets the 2-component scale
         /// </summary>
-        /// <value>The rotation.</value>
+        /// <value>The scale.</value>
         public Vector2 FlatScale
         {
 			get { return new Vector2(m_scale.X, m_scale.Y); }
@@ -252,11 +252,23 @@ namespace NewWidgets.Utility
             
         }
         
+        /// <summary>
+        /// Creates transform with Z-rotation
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <param name="uniformScale"></param>
         public Transform(Vector2 position, float rotation, float uniformScale)
 			: this(new Vector3(position.X, position.Y, 0), new Vector3(0, 0, rotation), new Vector3(uniformScale, uniformScale, uniformScale))
         {
         }
         
+        /// <summary>
+        /// Creates transform with 3-component rotation in radians
+        /// </summary>
+        /// <param name="position"></param>
+        /// <param name="rotation"></param>
+        /// <param name="scale"></param>
         public Transform(Vector3 position, Vector3 rotation, Vector3 scale)
         {
             m_changed = true;
@@ -267,12 +279,23 @@ namespace NewWidgets.Utility
 			m_version = 1;
         }
 
+
+        /// <summary>
+        /// Unproject point
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public Vector2 GetScreenPoint(Vector2 source)
         {            
             Vector3 result = Vector3.Transform(new Vector3(source.X, source.Y, 0), Matrix);
             return new Vector2(result.X, result.Y);
         }
 
+        /// <summary>
+        /// Project point
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         public Vector2 GetClientPoint(Vector2 source)
         {
             Vector3 result = Vector3.Transform(new Vector3(source.X, source.Y, 0), IMatrix);
@@ -286,7 +309,7 @@ namespace NewWidgets.Utility
         {
             MathHelper.Init(ref m_matrix);
 
-            MathHelper.GetMatrix3d(m_position, m_rotation * (float)MathHelper.Deg2Rad, m_scale, ref m_matrix);
+            MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_matrix);
 
             if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
                 MathHelper.Mul(m_parent.Matrix, ref m_matrix); // this one is most expensive thing in whole engine

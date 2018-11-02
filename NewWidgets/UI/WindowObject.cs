@@ -136,8 +136,8 @@ namespace NewWidgets.UI
 
         public Vector2 Position
         {
-			get { return new Vector2(m_transform.Position.X, m_transform.Position.Y); }
-			set { m_transform.Position = new Vector3(value.X, value.Y, 0); }
+			get { return m_transform.FlatPosition; }
+			set { m_transform.FlatPosition = value; }
         }
 
         /// <summary>
@@ -146,14 +146,18 @@ namespace NewWidgets.UI
         /// <value>The scale.</value>
         public float Scale
         {
-			get { return m_transform.Scale.X; }
-			set { m_transform.Scale = new Vector3(value, value, value); }
+			get { return m_transform.UniformScale; }
+			set { m_transform.UniformScale = value; }
         }
 
+
+        /// <summary>
+        /// Z-rotation in degrees
+        /// </summary>
         public float Rotation
         {
-			get { return m_transform.Rotation.Z; }
-			set { m_transform.Rotation = new Vector3(0, 0, value); }
+			get { return m_transform.RotationZ * (float)MathHelper.Rad2Deg; }
+			set { m_transform.RotationZ = value * (float)MathHelper.Deg2Rad; }
         }
             
         public virtual bool Visible
