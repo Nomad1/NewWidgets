@@ -22,6 +22,7 @@ namespace NewWidgets.Utility
         private static readonly float ScaleEpsilon = float.Epsilon; // Scale vector is three-component, so that should be eps^3
 #endif
 
+        private Matrix4x4 m_localMatrix;
         private Matrix4x4 m_matrix;
         private Matrix4x4 m_imatrix;
 
@@ -197,7 +198,7 @@ namespace NewWidgets.Utility
                     UpdateMatrix();
                 }
                 
-                return m_matrix;
+                return m_parent == null ? m_localMatrix : m_matrix;
             }
         }
 
@@ -308,11 +309,13 @@ namespace NewWidgets.Utility
         private void UpdateMatrix()
         {
             MathHelper.Init(ref m_matrix);
+            MathHelper.Init(ref m_localMatrix);
 
-            MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_matrix);
+            if (m_changed)
+                MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_localMatrix);
 
             if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
-                MathHelper.Mul(m_parent.Matrix, ref m_matrix); // this one is most expensive thing in whole engine
+                MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is most expensive thing in whole engine
 
             m_iMatrixChanged = true;
 
