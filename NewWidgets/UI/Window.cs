@@ -21,7 +21,7 @@ namespace NewWidgets.UI
 
     public interface IWindowContainer
     {
-        IEnumerable<WindowObject> Children { get; }
+        ICollection<WindowObject> Children { get; }
         void AddChild(WindowObject child);
     }
 
@@ -68,7 +68,7 @@ namespace NewWidgets.UI
             protected set { m_flags = value ? m_flags | WindowFlags.Focused : m_flags & ~WindowFlags.Focused; }
         }
 
-        public IEnumerable<WindowObject> Children
+        public ICollection<WindowObject> Children
         {
             get { return m_children.List; }
         }

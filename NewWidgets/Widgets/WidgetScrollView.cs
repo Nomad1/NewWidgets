@@ -91,7 +91,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        IEnumerable<WindowObject> IWindowContainer.Children
+        ICollection<WindowObject> IWindowContainer.Children
         {
             get
             {
