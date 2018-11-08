@@ -55,7 +55,7 @@ namespace NewWidgets.UI
         /// Gets a value indicating whether device is a mobile phone (less than 6" or something else)
         /// </summary>
         /// <value><c>true</c> if is small screen; otherwise, <c>false</c>.</value>
-		public abstract bool IsSmallScreen { get; }
+		public abstract bool IsTouchScreen { get; }
 
         /// <summary>
         /// List of currently displayed windows

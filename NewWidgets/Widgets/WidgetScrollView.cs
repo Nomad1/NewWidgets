@@ -343,7 +343,7 @@ namespace NewWidgets.Widgets
                 m_dragVScroller = m_verticalScrollBar.HitTest(x, y);
                 m_dragHScroller = m_horizontalScrollBar.HitTest(x, y);
 
-                if (!WindowController.Instance.IsSmallScreen && !m_dragVScroller && !m_dragHScroller)
+                if (!WindowController.Instance.IsTouchScreen && !m_dragVScroller && !m_dragHScroller)
                     return true; // on large screens allow only scroller scroll, no body scroll
                     
 
