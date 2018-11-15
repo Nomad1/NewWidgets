@@ -69,6 +69,14 @@ namespace NewWidgets.Widgets
                     return "ru-ru";
                 }
                 break;
+            case "fr-fr":
+            case "fr":
+                switch (str)
+                {
+                case "Locale":
+                    return "fr-fr";
+                }
+                break;
             }
 
             return str;
