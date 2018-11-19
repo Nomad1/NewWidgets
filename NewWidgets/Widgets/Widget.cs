@@ -13,7 +13,7 @@ namespace NewWidgets.Widgets
     {
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
-        protected readonly WindowObjectArray m_background;
+        protected readonly WindowObjectArray<WindowObject> m_background;
 
         private readonly WidgetStyleSheet m_style;
 
@@ -116,7 +116,7 @@ namespace NewWidgets.Widgets
         public Widget(WidgetStyleSheet style)
             : base(null)
         {
-            m_background = new WindowObjectArray();
+            m_background = new WindowObjectArray<WindowObject>();
 
             m_backgroundStyle = style.BackgroundStyle;
             m_backgroundTexture = style.BackgroundTexture;
@@ -148,7 +148,13 @@ namespace NewWidgets.Widgets
             m_clipContents = style.Clip;
             m_clipMargin = style.ClipMargin;
         }
-        
+
+        protected void PrepareBackground()
+        {
+            if (!m_backgroundInited)
+                InitBackground(m_backgroundStyle, m_backgroundTexture, m_backgroundScale, m_backgroundRotation, m_backgroundPivot);
+        }
+
         private void InitBackground(WidgetBackgroundStyle style, string texture, float scale, float rotation, Vector2 backgroundPivot)
         {
             m_backgroundInited = true;

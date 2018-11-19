@@ -35,7 +35,7 @@ namespace NewWidgets.UI
 
     public class Window : WindowObject, IWindowContainer
     {
-        private readonly WindowObjectArray m_children;
+        private readonly WindowObjectArray<WindowObject> m_children;
 
         private WindowFlags m_flags;
         
@@ -84,7 +84,7 @@ namespace NewWidgets.UI
                 Scale = WindowController.Instance.ScreenWidth / Size.X;
             }
 
-            m_children = new WindowObjectArray ();
+            m_children = new WindowObjectArray<WindowObject> ();
         }
 
         public override bool Update ()

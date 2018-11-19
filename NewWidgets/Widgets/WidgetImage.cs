@@ -39,7 +39,7 @@ namespace NewWidgets.Widgets
             get
             {
                 if (m_background.Count == 0)
-                    Update();
+                    PrepareBackground();
 
                 return ((ImageObject)m_background[0]);
             }
@@ -62,6 +62,13 @@ namespace NewWidgets.Widgets
 		{
 			BackgroundTexture = image;
 		}
+
+        public void Relayout()
+        {
+            PrepareBackground();
+            if (Size.X <= 0 && Size.Y <= 0 && BackgroundStyle == WidgetBackgroundStyle.Image)
+                Size = ImageSize;
+        }
 	}
 }
 

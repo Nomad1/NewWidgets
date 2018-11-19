@@ -446,9 +446,17 @@ namespace NewWidgets.Widgets
             return true;
         }
 
-        public void AddChild(WindowObject child)
+        public void AddChild(Widget child)
         {
             m_contentView.AddChild(child);
+        }
+
+        void IWindowContainer.AddChild(WindowObject child)
+        {
+            if (child is Widget)
+                AddChild((Widget)child);
+            else
+                throw new ArgumentException("child");
         }
 
         public void Clear(bool scroolToZero = false)

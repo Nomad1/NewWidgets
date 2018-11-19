@@ -1,21 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NewWidgets.UI;
 
 namespace NewWidgets.Widgets
 {
     public class WidgetPanel : Widget, IWindowContainer
     {
-        private readonly WindowObjectArray m_children;
+        private readonly WindowObjectArray<Widget> m_children;
         
         public IList<Widget> Children
         {
             get
             {
-                Widget[] array = new Widget[m_children.Count];
-
-                m_children.List.CopyTo(array, 0);
-
-                return array;
+                return m_children.List;
             }
         }
 
@@ -35,7 +32,7 @@ namespace NewWidgets.Widgets
         public WidgetPanel(WidgetStyleSheet style)
             : base(style)
         {
-            m_children = new WindowObjectArray();
+            m_children = new WindowObjectArray<Widget>();
 
             Size = style.Size;
         }
@@ -45,10 +42,6 @@ namespace NewWidgets.Widgets
             if (!base.Update())
                 return false;
 
-            /*foreach (WindowObject obj in m_children.List)
-                if (obj is Widget)
-                    ((Widget)obj).Alpha = Alpha;
-*/
             m_children.Update();
 
             return true;
@@ -113,15 +106,23 @@ namespace NewWidgets.Widgets
             return false;
         }
         
-        public void AddChild(WindowObject child)
+        public void AddChild(Widget child)
         {
             m_children.Add(child);
             child.Parent = this;
         }
 
+        void IWindowContainer.AddChild(WindowObject child)
+        {
+            if (child is Widget)
+                AddChild((Widget)child);
+            else
+                throw new ArgumentException("child");
+        }
+
         public virtual void Clear()
         {
-            foreach (WindowObject obj in m_children.List)
+            foreach (Widget obj in m_children.List)
                 obj.Remove();
 
             m_children.Clear();

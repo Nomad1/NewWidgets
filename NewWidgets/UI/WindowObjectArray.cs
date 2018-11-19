@@ -13,10 +13,10 @@ namespace NewWidgets.UI
     /// is rebuilt on every change. Array operations are much faster and mostly thread-safe and tamper-resistant.
     /// However, the class itself is not 100% thread safe and does not have any locks
     /// </summary>
-    public class WindowObjectArray
+    public class WindowObjectArray<T> where T: WindowObject
     {
-        private WindowObject[] m_array;
-        private SortedLinkedList<int, WindowObject> m_list;
+        private T[] m_array;
+        private SortedLinkedList<int, T> m_list;
         private int m_version;
         private int m_arrayVersion;
 
@@ -28,7 +28,7 @@ namespace NewWidgets.UI
             }
         }
 
-        public WindowObject this[int index]
+        public T this[int index]
         {
             get
             {
@@ -36,7 +36,7 @@ namespace NewWidgets.UI
             }
         }
 
-        public WindowObject [] List
+        public T [] List
         {
             get
             {
@@ -46,11 +46,11 @@ namespace NewWidgets.UI
 
         public WindowObjectArray()
         {
-            m_list = new SortedLinkedList<int, WindowObject>();
-            m_array = new WindowObject[0];
+            m_list = new SortedLinkedList<int, T>();
+            m_array = new T[0];
         }
 
-        private WindowObject[] EnsureArray()
+        private T[] EnsureArray()
         {
             if (m_version != m_arrayVersion)
             {
@@ -62,18 +62,18 @@ namespace NewWidgets.UI
 
         public void Clear()
         {
-            WindowObject[] array = EnsureArray();
+            T[] array = EnsureArray();
 
             for (int i = 0; i < array.Length; i++)
                 if (array[i] != null)
 					array[i].LastList = null;
 
             m_list.Clear();
-            m_array = new WindowObject[0];
+            m_array = new T[0];
             m_arrayVersion = ++m_version;
         }
 
-        public void Remove(WindowObject obj)
+        public void Remove(T obj)
         {
             if (obj.LastList == this)
             {
@@ -84,7 +84,7 @@ namespace NewWidgets.UI
             }
         }
 
-        public void Add(WindowObject obj)
+        public void Add(T obj)
         {
             if (obj.LastList == this && Array.IndexOf(EnsureArray(), obj) != -1)
 			{
@@ -112,7 +112,7 @@ namespace NewWidgets.UI
                 do
                 {
     				var nextNode = node.Next;
-    				WindowObject obj = node.Value.Value;
+    				T obj = node.Value.Value;
 
                     if (!obj.Update())
                     {
@@ -142,7 +142,7 @@ namespace NewWidgets.UI
 
         public void Draw(object canvas)
         {
-            WindowObject[] array = EnsureArray();
+            T[] array = EnsureArray();
 
             for (int i = 0; i < array.Length; i++)
                 if (array[i] != null/*&& array[i].Visible*/)
@@ -151,7 +151,7 @@ namespace NewWidgets.UI
 
         public bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            WindowObject[] array = EnsureArray();
+            T[] array = EnsureArray();
 
             for (int i = array.Length - 1; i >= 0; i--)
                 if (array[i] != null && array[i].Visible && array[i].HitTest(x, y))
@@ -165,7 +165,7 @@ namespace NewWidgets.UI
 
         public bool Zoom(float x, float y, float value)
         {
-            WindowObject[] array = EnsureArray();
+            T[] array = EnsureArray();
 
             for (int i = array.Length - 1; i >= 0; i--)
                 if (array[i] != null && array[i].Visible && array[i].HitTest(x, y))
@@ -179,7 +179,7 @@ namespace NewWidgets.UI
 
         public bool Key(SpecialKey key, bool up, char character)
         {
-            WindowObject[] array = EnsureArray();
+            T[] array = EnsureArray();
 
             for (int i = array.Length - 1; i >= 0; i--)
                 if (array[i] != null && array[i].Visible)

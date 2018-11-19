@@ -95,11 +95,11 @@ namespace NewWidgets.UI
 
 		private WindowObjectFlags m_flags;
 
-        private WindowObjectArray m_lastList;
+        private object m_lastList;
 
         public event TouchDelegate OnTouch;
 
-        internal WindowObjectArray LastList
+        internal object LastList
         {
             get { return m_lastList; }
             set { m_lastList = value; }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace NewWidgets.UI
@@ -71,7 +72,12 @@ namespace NewWidgets.UI
         /// List of currently displayed windows
         /// </summary>
         /// <value>The windows.</value>
-		public abstract WindowObjectArray Windows { get; }
+		public abstract IList<Window> Windows { get; }
+
+        /// <summary>
+        /// Adds new window to Windows collection
+        /// </summary>
+        public abstract void AddWindow(Window window);
 
         /// <summary>
         /// Indicates that sprite should be divicede to MxN equal frames
