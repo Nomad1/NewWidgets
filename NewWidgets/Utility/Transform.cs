@@ -22,9 +22,9 @@ namespace NewWidgets.Utility
         private static readonly float ScaleEpsilon = float.Epsilon; // Scale vector is three-component, so that should be eps^3
 #endif
 
-        private Matrix4x4 m_localMatrix;
-        private Matrix4x4 m_matrix;
-        private Matrix4x4 m_imatrix;
+        internal Matrix4x4 m_matrix;
+        internal Matrix4x4 m_localMatrix;
+        internal Matrix4x4 m_imatrix;
 
 		private Vector3 m_rotation;
         private Vector3 m_position;
@@ -224,8 +224,8 @@ namespace NewWidgets.Utility
 			get
 			{
 				// Alternative is GetScreenPoint(new Vector3(0,0,0));
-				Matrix4x4 transform = Matrix;
-                Vector3 position = transform.Translation;
+                PrepareMatrix();
+                Vector3 position = m_parent == null ? m_localMatrix.Translation : m_matrix.Translation;
                 
                 return new Vector2(position.X, position.Y);  // or new Vector3(transform[12], transform[13], transform[14]); 
 			}
@@ -288,7 +288,13 @@ namespace NewWidgets.Utility
         /// <returns></returns>
         public Vector2 GetScreenPoint(Vector2 source)
         {            
-            Vector3 result = Vector3.Transform(new Vector3(source.X, source.Y, 0), Matrix);
+            PrepareMatrix();
+            Vector3 result;
+
+            if (m_parent == null)
+                result = MathHelper.Transform(new Vector3(source, 0), ref m_localMatrix);
+            else
+                result = MathHelper.Transform(new Vector3(source, 0), ref m_matrix);
             return new Vector2(result.X, result.Y);
         }
 
@@ -299,7 +305,8 @@ namespace NewWidgets.Utility
         /// <returns></returns>
         public Vector2 GetClientPoint(Vector2 source)
         {
-            Vector3 result = Vector3.Transform(new Vector3(source.X, source.Y, 0), IMatrix);
+            PrepareIMatrix();
+            Vector3 result = MathHelper.Transform(new Vector3(source, 0), ref m_imatrix);
             return new Vector2(result.X, result.Y);
         }
 
@@ -322,6 +329,21 @@ namespace NewWidgets.Utility
             m_changed = false;
             m_version++;
             m_parentVersion = m_parent != null ? m_parent.m_version : 0;
+        }
+
+        internal void PrepareMatrix()
+        {
+            if (IsChanged)
+                UpdateMatrix();
+        }
+
+        internal void PrepareIMatrix()
+        {
+            if (m_iMatrixChanged || IsChanged)
+            {
+                MathHelper.Invert(Matrix, ref m_imatrix);
+                m_iMatrixChanged = false;
+            }
         }
     }
 }

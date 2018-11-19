@@ -58,6 +58,16 @@ namespace NewWidgets.UI
 		public abstract bool IsTouchScreen { get; }
 
         /// <summary>
+        /// Gets last mouse or touch position
+        /// </summary>
+        public abstract Vector2 PointerPosition { get; }
+
+        /// <summary>
+        /// Gets last sesor value
+        /// </summary>
+        public abstract Vector3 SensorValue { get; }
+
+        /// <summary>
         /// List of currently displayed windows
         /// </summary>
         /// <value>The windows.</value>
@@ -133,6 +143,7 @@ namespace NewWidgets.UI
         /// </summary>
         /// <param name="id">Sound id</param>
         public abstract void PlaySound(string id);
+
     }
 }
 

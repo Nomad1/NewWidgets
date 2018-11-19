@@ -14,7 +14,6 @@ namespace NewWidgets.Widgets
         private static Font s_mainFont;
 
         private static Widget s_currentTooltip;
-        private static Vector2 s_lastPointerPosition;
 
         // styles
         private static WidgetStyleSheet s_defaultWidgetStyle;
@@ -48,8 +47,6 @@ namespace NewWidgets.Widgets
         public static WidgetStyleSheet DefaultLabelStyle { get { return s_defaultLabelStyle ?? s_defaultWidgetStyle; } }
         public static WidgetStyleSheet DefaultWindowStyle { get { return s_defaultWindowStyle ?? s_defaultWidgetStyle; } }
 
-        //
-        public static Vector2 LastPointerPosition { get { return s_lastPointerPosition; } }
         //
 
         public static WidgetStyleSheet GetStyle(string name)
@@ -136,8 +133,6 @@ namespace NewWidgets.Widgets
 
         private static bool HandleTouch(float x, float y, bool press, bool unpress, int pointer)
         {
-            s_lastPointerPosition = new Vector2(x, y);
-
             if (s_currentTooltip != null && !s_currentTooltip.HitTest(x, y))
                 HandleTooltip(null, null, Vector2.Zero, null);
 
