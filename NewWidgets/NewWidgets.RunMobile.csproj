@@ -57,6 +57,18 @@
     <TargetFrameworkProfile />
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release.Modern|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Release.Modern\</OutputPath>
+    <DefineConstants>RUNMOBILE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <TargetFrameworkProfile />
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+  </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.Numerics|AnyCPU'">
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
