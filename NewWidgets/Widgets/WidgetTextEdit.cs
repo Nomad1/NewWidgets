@@ -318,7 +318,7 @@ namespace NewWidgets.Widgets
 
                 m_label.Text = MaskText(m_text.Substring(0, m_cursorPosition) + '\0' + m_text.Substring(m_cursorPosition));
 
-                System.Drawing.RectangleF frame = m_label.GetCharFrame(m_cursorPosition);
+                var frame = m_label.GetCharFrame(m_cursorPosition);
                 float nsize = Size.X / m_fontSize;
 
                 if (m_label.Size.X > nsize)

@@ -70,7 +70,7 @@ namespace NewWidgets.Widgets
 			m_needLayout = true;
 		}
 
-		private void Relayout()
+		private new void Relayout()
 		{
 			Vector2 direction = m_from - m_to;
 

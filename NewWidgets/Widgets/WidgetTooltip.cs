@@ -1,7 +1,7 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
+using System.Drawing;
 
 namespace NewWidgets.Widgets
 {
