@@ -39,7 +39,7 @@ namespace NewWidgets.WinForms
         private readonly float m_screenScale;
         private readonly float m_fontScale;
         private readonly bool m_isSmallScreen;
-        private readonly WindowObjectArray m_windows;
+        private readonly WindowObjectArray<Window> m_windows;
         private readonly string m_imagePath;
 
         public override int ScreenWidth
@@ -62,14 +62,14 @@ namespace NewWidgets.WinForms
             get { return m_fontScale; }
         }
 
-        public override bool IsSmallScreen
+        public override bool IsTouchScreen
         {
             get { return m_isSmallScreen; }
         }
 
-        public override WindowObjectArray Windows
+        public override IList<Window> Windows
         {
-            get { return m_windows; }
+            get { return m_windows.List; }
         }
 
         public string ImagePath
@@ -87,6 +87,19 @@ namespace NewWidgets.WinForms
             }
         }
 
+        public override Vector2 PointerPosition
+        {
+            get
+            {
+                return Vector2.Zero;
+            }
+        }
+
+        public override Vector3 SensorValue
+        {
+            get { return Vector3.Zero; }
+        }
+
         public event Action OnInit;
         public override event TouchDelegate OnTouch;
 
@@ -102,7 +115,7 @@ namespace NewWidgets.WinForms
             m_isSmallScreen = isSmallScreen;
             m_imagePath = imagePath;
 
-            m_windows = new WindowObjectArray();
+            m_windows = new WindowObjectArray<Window>();
 
             Widgets.WidgetManager.Init(fontScale);
 
@@ -349,7 +362,7 @@ namespace NewWidgets.WinForms
 
         public void Draw(Graphics canvas)
         {
-            Windows.Draw(canvas);
+            m_windows.Draw(canvas);
         }
 
         public void Update()
@@ -377,7 +390,12 @@ namespace NewWidgets.WinForms
             if (Windows.Count == 0 && OnInit != null)
                 OnInit();
 
-            Windows.Update();
+            m_windows.Update();
+        }
+
+        public override void AddWindow(Window window)
+        {
+            m_windows.Add(window);
         }
 
         #endregion

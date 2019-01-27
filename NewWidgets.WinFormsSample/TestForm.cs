@@ -17,7 +17,7 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
         }
         
         private void HandleOnInit()
-        {            m_windowController.Windows.Add(new TestWindow());
+        {            m_windowController.AddWindow(new TestWindow());
         }        protected override void OnKeyDown(KeyEventArgs e)        {            if (e.KeyCode == Keys.Q && (ModifierKeys & Keys.Alt) != 0)            {                Close();                return;            }
 
             ProcessKey(e.KeyCode, e.KeyValue, e.Control, false);

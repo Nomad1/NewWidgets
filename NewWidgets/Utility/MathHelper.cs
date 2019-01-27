@@ -70,6 +70,21 @@ namespace NewWidgets.Utility
             m2 = m2 * m1;
         }
 
+        public static void Mul(Matrix4x4 m1, Matrix4x4 m2, ref Matrix4x4 nresult)
+        {
+            nresult = Matrix4x4.Multiply(m2, m1);
+        }
+
+        public static Vector3 Transform(Vector3 vector, ref Matrix4x4 matrix)
+        {
+            Vector3 result;
+            result.X = matrix.M11 * vector.X + matrix.M21 * vector.Y + matrix.M31 * vector.Z + matrix.M41;
+            result.Y = matrix.M12 * vector.X + matrix.M22 * vector.Y + matrix.M32 * vector.Z + matrix.M42;
+            result.Z = matrix.M13 * vector.X + matrix.M23 * vector.Y + matrix.M33 * vector.Z + matrix.M43;
+
+            return result;
+        }
+
         public static void Invert(Matrix4x4 m1, ref Matrix4x4 m2)
         {
             Matrix4x4.Invert(m1, out m2);
