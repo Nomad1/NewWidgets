@@ -104,6 +104,11 @@ namespace NewWidgets.Widgets
             get { return m_contentView.Children; }
         }
 
+        protected WidgetPanel ContentView
+        {
+            get { return m_contentView; }
+        }
+
         public WidgetScrollView()
             : this(WidgetManager.DefaultPanelStyle)
         {            

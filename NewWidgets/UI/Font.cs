@@ -61,7 +61,7 @@ namespace NewWidgets.UI
                 if ((int)fontSprite.FrameSize.Y > maxHeight)
                     maxHeight = (int)fontSprite.FrameSize.Y;
 
-                m_glyphs.Add((char)fontSprite.FrameTag, new Glyph((int)fontSprite.FrameSize.X, (int)fontSprite.FrameSize.Y, (char)fontSprite.FrameTag, i));
+                m_glyphs[(char)fontSprite.FrameTag] = new Glyph((int)fontSprite.FrameSize.X, (int)fontSprite.FrameSize.Y, (char)fontSprite.FrameTag, i);
             }
 
             m_height = maxHeight;
