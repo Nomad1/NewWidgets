@@ -83,7 +83,7 @@ namespace NewWidgets.Widgets
         /// <param name="fontScale">Font scale.</param>
         public static void Init(float fontScale)
         {
-            s_fontScale = ((float)Math.Round(8 * fontScale) / 8.0f); 
+            s_fontScale = (int)(8 * fontScale + 0.5f) / 8.0f; 
             s_styles.Clear();
 
             WindowController.Instance.OnTouch += HandleTouch;
