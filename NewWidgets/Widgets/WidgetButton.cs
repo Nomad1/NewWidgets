@@ -194,7 +194,7 @@ namespace NewWidgets.Widgets
 
         public virtual void Relayout()
         {
-            if (m_label != null && (Size.X == 0 || Size.Y == 0))
+            if (m_label != null && (Size.X <= 0 || Size.Y <= 0))
             {
                 m_label.Relayout();
                 Size = new Vector2(Math.Max(m_textPadding.Width + m_label.Size.X, m_imagePadding.Width + m_image.Size.X), Math.Max(m_textPadding.Height + m_label.Size.Y, m_imagePadding.Height + m_image.Size.Y));

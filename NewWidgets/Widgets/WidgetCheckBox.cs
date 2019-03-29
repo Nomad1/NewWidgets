@@ -146,19 +146,20 @@ namespace NewWidgets.Widgets
             if (Enabled)
             {
                 if (unpress)
+                {
                     Press();
+                    return true;
+                }
                 else if (!press && !unpress && !m_hovered && m_hoveredStyle != null)
                 {
                     ApplyStyle(m_hoveredStyle);
-                    
+
                     m_hovered = true;
                     WindowController.Instance.OnTouch += UnHoverTouch;
                 }
-
-                return true;
             }
 
-            return false;
+            return base.Touch(x, y, press, unpress, pointer);
         }
 
         private bool UnHoverTouch(float x, float y, bool press, bool unpress, int pointer)
