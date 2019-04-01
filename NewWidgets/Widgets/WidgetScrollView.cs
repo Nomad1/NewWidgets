@@ -93,12 +93,14 @@ namespace NewWidgets.Widgets
 
         ICollection<WindowObject> IWindowContainer.Children
         {
-            get
-            {
-                return ((IWindowContainer)m_contentView).Children;
-            }
+            get { return ((IWindowContainer)m_contentView).Children; }
         }
-        
+
+        public int MaximumZIndex
+        {
+            get { return ((IWindowContainer)m_contentView).MaximumZIndex; }
+        }
+
         public IList<Widget> Children
         {
             get { return m_contentView.Children; }

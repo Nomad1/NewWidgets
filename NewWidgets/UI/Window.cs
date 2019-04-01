@@ -22,6 +22,7 @@ namespace NewWidgets.UI
     public interface IWindowContainer
     {
         ICollection<WindowObject> Children { get; }
+        int MaximumZIndex { get; }
         void AddChild(WindowObject child);
     }
 
@@ -71,6 +72,11 @@ namespace NewWidgets.UI
         public ICollection<WindowObject> Children
         {
             get { return m_children.List; }
+        }
+
+        public int MaximumZIndex
+        {
+            get { return m_children.MaximumZIndex; }
         }
 
         public Window(WindowFlags flags)

@@ -13,35 +13,34 @@ namespace NewWidgets.UI
     /// is rebuilt on every change. Array operations are much faster and mostly thread-safe and tamper-resistant.
     /// However, the class itself is not 100% thread safe and does not have any locks
     /// </summary>
-    public class WindowObjectArray<T> where T: WindowObject
+    public class WindowObjectArray<T> where T : WindowObject
     {
+        private readonly SortedLinkedList<int, T> m_list;
         private T[] m_array;
-        private SortedLinkedList<int, T> m_list;
+
         private int m_version;
         private int m_arrayVersion;
 
+        private int m_maximumZIndex;
+
         public int Count
         {
-            get
-            {
-                return EnsureArray().Length;
-            }
+            get { return EnsureArray().Length; }
         }
 
         public T this[int index]
         {
-            get
-            {
-                return EnsureArray()[index];
-            }
+            get { return EnsureArray()[index]; }
         }
 
-        public T [] List
+        public T[] List
         {
-            get
-            {
-                return EnsureArray();
-            }
+            get { return EnsureArray(); }
+        }
+
+        public int MaximumZIndex
+        {
+            get { return m_maximumZIndex; }
         }
 
         public WindowObjectArray()
@@ -66,7 +65,7 @@ namespace NewWidgets.UI
 
             for (int i = 0; i < array.Length; i++)
                 if (array[i] != null)
-					array[i].LastList = null;
+                    array[i].LastList = null;
 
             m_list.Clear();
             m_array = new T[0];
@@ -87,12 +86,12 @@ namespace NewWidgets.UI
         public void Add(T obj)
         {
             if (obj.LastList == this && Array.IndexOf(EnsureArray(), obj) != -1)
-			{
-				obj.TempZIndex = m_list.Last.Value.Key + 1;
-				return;
-			}
+            {
+                obj.TempZIndex = m_list.Last.Value.Key + 1;
+                return;
+            }
             else
-				obj.TempZIndex = 0;
+                obj.TempZIndex = 0;
 
             m_list.Add(obj.ZIndex, obj);
             obj.LastList = this;
@@ -104,15 +103,15 @@ namespace NewWidgets.UI
         {
             bool hasChanges = false;
 
-			// Re-sort list. Magic is here: we're modifying collection during enumeration
+            // Re-sort list. Magic is here: we're modifying collection during enumeration
             var node = m_list.First;
 
-			if (node != null)
-			{
+            if (node != null)
+            {
                 do
                 {
-    				var nextNode = node.Next;
-    				T obj = node.Value.Value;
+                    var nextNode = node.Next;
+                    T obj = node.Value.Value;
 
                     if (!obj.Update())
                     {
@@ -127,15 +126,17 @@ namespace NewWidgets.UI
 
                         if (obj.ZIndex != node.Value.Key)
                         {
-        					m_list.Remove(node);
-        					m_list.Add(obj.ZIndex, obj);
-        					m_version++;
+                            m_list.Remove(node);
+                            m_list.Add(obj.ZIndex, obj);
+                            m_version++;
                         }
-					}
-    				node = nextNode;
+                    }
+                    node = nextNode;
                 }
                 while (node != null);
-			}
+            }
+
+            m_maximumZIndex = m_list.Last == null ? 0 : m_list.Last.Value.Value.ZIndex;
 
             return hasChanges;
         }

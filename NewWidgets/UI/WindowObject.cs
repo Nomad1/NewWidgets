@@ -71,7 +71,7 @@ namespace NewWidgets.UI
     }
 
     [Flags]
-	public enum WindowObjectFlags
+    public enum WindowObjectFlags
     {
         None = 0x00,
         Removing = 0x01,
@@ -80,20 +80,20 @@ namespace NewWidgets.UI
         Changed = 0x08,
 
         Default = Visible | Enabled | Changed
-	}
+    }
 
     public class WindowObject
     {
-		private readonly Transform m_transform;
+        private readonly Transform m_transform;
 
-		private Vector2 m_size;
-		private object m_tag;
+        private Vector2 m_size;
+        private object m_tag;
         private int m_zIndex;
         private int m_tempZIndex;
 
         private WindowObject m_parent;
 
-		private WindowObjectFlags m_flags;
+        private WindowObjectFlags m_flags;
 
         private object m_lastList;
 
@@ -105,15 +105,15 @@ namespace NewWidgets.UI
             set { m_lastList = value; }
         }
 
-		public object Tag
+        public object Tag
         {
             get { return m_tag; }
-			set { m_tag = value; }
+            set { m_tag = value; }
         }
         
         public int ZIndex
         {
-			get { return m_zIndex == 0 ? m_tempZIndex : m_zIndex; }
+            get { return m_zIndex == 0 ? m_tempZIndex : m_zIndex; }
             set { m_zIndex = value; }
         }
 
@@ -126,18 +126,18 @@ namespace NewWidgets.UI
         public WindowObject Parent
         {
             get { return m_parent; }
-			set { m_parent = value; m_transform.Parent = value == null ? null : value.Transform; }
+            set { m_parent = value; m_transform.Parent = value == null ? null : value.Transform; }
         }
 
         public Transform Transform
-		{
-			get { return m_transform; }
-		}
+        {
+            get { return m_transform; }
+        }
 
         public Vector2 Position
         {
-			get { return m_transform.FlatPosition; }
-			set { m_transform.FlatPosition = value; }
+            get { return m_transform.FlatPosition; }
+            set { m_transform.FlatPosition = value; }
         }
 
         /// <summary>
@@ -146,8 +146,8 @@ namespace NewWidgets.UI
         /// <value>The scale.</value>
         public float Scale
         {
-			get { return m_transform.UniformScale; }
-			set { m_transform.UniformScale = value; }
+            get { return m_transform.UniformScale; }
+            set { m_transform.UniformScale = value; }
         }
 
 
@@ -156,61 +156,61 @@ namespace NewWidgets.UI
         /// </summary>
         public float Rotation
         {
-			get { return m_transform.RotationZ * (float)MathHelper.Rad2Deg; }
-			set { m_transform.RotationZ = value * (float)MathHelper.Deg2Rad; }
+            get { return m_transform.RotationZ * (float)MathHelper.Rad2Deg; }
+            set { m_transform.RotationZ = value * (float)MathHelper.Deg2Rad; }
         }
             
         public virtual bool Visible
         {
-			get { return (m_flags & WindowObjectFlags.Visible) == WindowObjectFlags.Visible; }
-			set
-			{
-				if (value)
+            get { return (m_flags & WindowObjectFlags.Visible) == WindowObjectFlags.Visible; }
+            set
+            {
+                if (value)
                     m_flags |= WindowObjectFlags.Visible;
                 else
-					m_flags &= ~WindowObjectFlags.Visible;
-			}
+                    m_flags &= ~WindowObjectFlags.Visible;
+            }
         }
 
         public virtual bool Enabled
         {
-			get { return (m_flags & WindowObjectFlags.Enabled) == WindowObjectFlags.Enabled; }
-			set
-			{
-				if (value)
-					m_flags |= WindowObjectFlags.Enabled;
-				else
-					m_flags &= ~WindowObjectFlags.Enabled;
-			}
+            get { return (m_flags & WindowObjectFlags.Enabled) == WindowObjectFlags.Enabled; }
+            set
+            {
+                if (value)
+                    m_flags |= WindowObjectFlags.Enabled;
+                else
+                    m_flags &= ~WindowObjectFlags.Enabled;
+            }
         }
 
-		public bool Removing
+        public bool Removing
         {
-			get { return (m_flags & WindowObjectFlags.Removing) == WindowObjectFlags.Removing; }
+            get { return (m_flags & WindowObjectFlags.Removing) == WindowObjectFlags.Removing; }
         }
         
         internal bool HasChanges
         {
-			get
-			{
-				bool value = (m_flags & WindowObjectFlags.Changed) == WindowObjectFlags.Changed;
-				m_flags &= ~WindowObjectFlags.Changed;
-				return value;
-			}
-			set
+            get
+            {
+                bool value = (m_flags & WindowObjectFlags.Changed) == WindowObjectFlags.Changed;
+                m_flags &= ~WindowObjectFlags.Changed;
+                return value;
+            }
+            set
             {
                 if (value)
                     m_flags |= WindowObjectFlags.Changed;
                 else
-					m_flags &= ~WindowObjectFlags.Changed;
+                    m_flags &= ~WindowObjectFlags.Changed;
             }
         }
 
         public Vector2 Size
-		{
-			get { return m_size; }
-			set { Resize(value); }
-		}
+        {
+            get { return m_size; }
+            set { Resize(value); }
+        }
 
         /// <summary>
         /// Unwinds hierarchy to find top-level window
@@ -230,23 +230,23 @@ namespace NewWidgets.UI
         protected WindowObject(WindowObject parent, Transform transform = null)
         {
             m_parent = parent;
-			m_transform = transform == null ? new Transform() : transform;
-			if (parent != null)
-				m_transform.Parent = parent.Transform;
+            m_transform = transform == null ? new Transform() : transform;
+            if (parent != null)
+                m_transform.Parent = parent.Transform;
 
-			m_flags = WindowObjectFlags.Default;
+            m_flags = WindowObjectFlags.Default;
         }
 
         public virtual void Reset()
         {
-			m_flags = WindowObjectFlags.Default;
+            m_flags = WindowObjectFlags.Default;
 
             Animator.RemoveAnimation(this);
         }
 
-		protected virtual void Resize(Vector2 size)
+        protected virtual void Resize(Vector2 size)
         {
-			m_size = size;
+            m_size = size;
         }
 
         public virtual bool HitTest(float x, float y)
@@ -254,25 +254,25 @@ namespace NewWidgets.UI
             Vector2 coord = m_transform.GetClientPoint(new Vector2(x, y));
 
             return coord.X >= 0 && coord.Y >= 0 && coord.X < Size.X && coord.Y < Size.Y;
-		}
+        }
 
         public virtual void Remove()
         {
-			m_flags |= WindowObjectFlags.Removing;
+            m_flags |= WindowObjectFlags.Removing;
         }
 
         public virtual bool Update()
         {
-			if ((m_flags & WindowObjectFlags.Removing) != 0)
+            if ((m_flags & WindowObjectFlags.Removing) != 0)
                 return false;
 
             return true;
         }
 
-		public virtual void Draw(object canvas)
-		{
-			
-		}
+        public virtual void Draw(object canvas)
+        {
+            
+        }
 
         public virtual bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
@@ -337,14 +337,28 @@ namespace NewWidgets.UI
         {
             Vector2 current = Transform.FlatScale;
 
-			if ((target - current).LengthSquared() <= float.Epsilon)
+            if ((target - current).LengthSquared() <= float.Epsilon)
             {
                 if (callback != null)
                     callback();
                 return;
             }
 
-			Animator.StartAnimation(this, AnimationKind.Scale, current, target, time, (float x, Vector2 from, Vector2 to) => Transform.FlatScale = MathHelper.LinearInterpolation(x, from, to), callback);
+            Animator.StartAnimation(this, AnimationKind.Scale, current, target, time, 
+                (float x, Vector2 from, Vector2 to) =>
+                Transform.FlatScale = MathHelper.LinearInterpolation(x, from, to), callback);
+        }
+
+        public void BringToFront()
+        {
+            IWindowContainer windowParent = this.Parent as IWindowContainer;
+
+            if (windowParent != null)
+            {
+                int max = windowParent.MaximumZIndex;
+                if (max == 0 || this.ZIndex != max)
+                    this.ZIndex = max + 1;
+            }
         }
     }
 }

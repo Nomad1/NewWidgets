@@ -10,18 +10,17 @@ namespace NewWidgets.Widgets
         
         public IList<Widget> Children
         {
-            get
-            {
-                return m_children.List;
-            }
+            get { return m_children.List; }
         }
 
         ICollection<WindowObject> IWindowContainer.Children
         {
-            get
-            {
-                return m_children.List;
-            }
+            get { return m_children.List; }
+        }
+
+        public int MaximumZIndex
+        {
+            get { return m_children.MaximumZIndex; }
         }
 
         public WidgetPanel()
