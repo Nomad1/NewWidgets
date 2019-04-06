@@ -40,6 +40,11 @@ namespace NewWidgets.UI
             get { return m_baseline; }
         }
 
+        public ISprite Sprite
+        {
+            get { return m_fontSprite; }
+        }
+
         public Font(string font, int spacing, int leading, int baseline)
             : this(WindowController.Instance.CreateSprite(font, Vector2.Zero), spacing, leading, baseline)
         {
