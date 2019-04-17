@@ -9,7 +9,6 @@ namespace NewWidgets.Widgets
     public class WidgetTextEdit : Widget, IFocusableWidget
     {
         private char m_cursorChar = '|';
-        private bool m_focused;
         private int m_cursorPosition;
 
         private LabelObject m_label;
@@ -20,19 +19,16 @@ namespace NewWidgets.Widgets
         private Font m_font;
         private float m_fontSize;
         private int m_textColor;
-        private int m_focusedColor;
         private char m_maskChar;
         
         private readonly Margin m_padding;
-        private readonly int m_cursorColor;
+        private int m_cursorColor;
 
         public event Action<WidgetTextEdit, string> OnFocusLost;
         public event Action<WidgetTextEdit, string> OnTextEntered;
         public event Action<WidgetTextEdit, string> OnTextChanged;
 
         private bool m_needLayout;
-
-        private string m_focusImage;
 
         public Font Font
         {
@@ -59,28 +55,6 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public int TextColor
-        {
-            get { return m_textColor; }
-            set
-            {
-                m_textColor = value;
-                
-                UpdateColor();
-            }
-        }
-        
-        public int FocusedColor
-        {
-            get { return m_focusedColor; }
-            set
-            {
-                m_focusedColor = value;
-
-                UpdateColor();
-            }
-        }
-
         public char MaskChar
         {
             get { return m_maskChar; }
@@ -89,7 +63,8 @@ namespace NewWidgets.Widgets
 
         public bool IsFocused
         {
-            get { return m_focused; }
+            get { return Selected; }
+            private set { Selected = value; }
         }
 
         public bool IsFocusable
@@ -131,15 +106,28 @@ namespace NewWidgets.Widgets
             
             m_font = style.Font;
             m_fontSize = style.FontSize;
-            m_textColor = style.GetParameterColor("text_color", 0x0);
-            m_focusedColor = style.GetParameterColor("focus_color", 0xffffff);
-            m_cursorColor = style.GetParameterColor("cursor_color", 0x0);
 
             Size = style.Size;
+
             ClipContents = true;
             
-            m_focusImage = style.GetParameter("focus_image");
             m_padding = style.Padding;
+
+            ApplyStyle(style);
+        }
+
+        protected override void ApplyStyle(WidgetStyleSheet style)
+        {
+            base.ApplyStyle(style);
+
+            m_textColor = style.GetParameterColor("text_color", 0x0);
+            m_cursorColor = style.GetParameterColor("cursor_color", 0x0);
+
+            if (m_label != null)
+                m_label.Color = m_textColor;
+
+            if (m_cursor != null)
+                m_cursor.Color = m_cursorColor;
         }
 
         private void Relayout()
@@ -173,7 +161,6 @@ namespace NewWidgets.Widgets
             m_needLayout = false;
             
             UpdateCursor(0);
-            UpdateColor();
         }
 
         protected override void Resize(Vector2 size)
@@ -208,13 +195,13 @@ namespace NewWidgets.Widgets
             if (m_label != null)
                 m_label.Draw(canvas);
 
-            if (m_focused)
+            if (IsFocused)
                 m_cursor.Draw(canvas);
         }
         
         public override bool Key(SpecialKey key, bool up, char character)
         {
-            if (!m_focused)
+            if (!IsFocused)
                 return false;
 
             if (up && key == SpecialKey.Back)
@@ -306,7 +293,7 @@ namespace NewWidgets.Widgets
             if (m_needLayout)
                 return;
             
-            if (m_focused)
+            if (IsFocused)
             {
                 m_cursorPosition += change;
 
@@ -366,7 +353,7 @@ namespace NewWidgets.Widgets
 
             char [] result = text.ToCharArray();
             for (int i = 0; i < result.Length; i++)
-                if (!m_focused || i != m_cursorPosition)
+                if (!IsFocused || i != m_cursorPosition)
                     result[i] = '*';
 
             return new string(result);
@@ -374,28 +361,17 @@ namespace NewWidgets.Widgets
 
         public void SetFocused(bool value)
         {
-            if (m_focused == value)
+            if (IsFocused == value)
                 return;
 
-            m_focused = value;
-
-            if (!string.IsNullOrEmpty(m_focusImage))
-                BackgroundTexture = value ? m_focusImage : Style.BackgroundTexture;
+            IsFocused = value;
 
             //UpdateColor();
             m_cursorPosition = m_text.Length;
             UpdateCursor(0);
             
-            UpdateColor();
-            
             WidgetManager.UpdateFocus(this, value);
             //WidgetManager.UpdateFocus(this, true);
-        }
-        
-        private void UpdateColor()
-        {
-            if (m_label != null)
-                m_label.Color = m_focused ? m_focusedColor : m_textColor;
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
@@ -404,7 +380,7 @@ namespace NewWidgets.Widgets
             {
                 if (press)
                 {
-                    bool wasFocused = m_focused;
+                    bool wasFocused = IsFocused;
 
                     SetFocused(true);
 

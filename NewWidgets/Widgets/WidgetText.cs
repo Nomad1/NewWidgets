@@ -110,7 +110,7 @@ namespace NewWidgets.Widgets
         }
 
         public WidgetText(WidgetStyleSheet style, string text = "")
-            : base(style)
+            : base(style, true)
         {
             m_text = text;
             m_textAlign = WidgetAlign.Left | WidgetAlign.Top;

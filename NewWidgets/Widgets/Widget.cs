@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
@@ -15,7 +16,8 @@ namespace NewWidgets.Widgets
 
         protected readonly WindowObjectArray<WindowObject> m_background;
 
-        private readonly WidgetStyleSheet m_style;
+        private readonly Dictionary<WidgetStyleType, WidgetStyleSheet> m_styles;
+        //private readonly WidgetStyleSheet m_style;
 
         private WidgetBackgroundStyle m_backgroundStyle;
         private WidgetBackgroundDepth m_backgroundDepth;
@@ -34,11 +36,43 @@ namespace NewWidgets.Widgets
         private float m_alpha;
         private string m_tooltip;
 
-        public WidgetStyleSheet Style
+        private WidgetStyleType m_currentStyle;
+
+        public WidgetStyleType CurrentStyleType
         {
-            get { return m_style; }
+            get { return m_currentStyle; }
         }
-        
+
+        public override bool Enabled
+        {
+            get { return base.Enabled; }
+            set
+            {
+                base.Enabled = value;
+                DelayedUpdateStyle();
+            }
+        }
+
+        public override bool Selected
+        {
+            get { return base.Selected; }
+            set
+            {
+                base.Selected = value;
+                DelayedUpdateStyle();
+            }
+        }
+
+        public override bool Hovered
+        {
+            get { return base.Hovered; }
+            set
+            {
+                base.Hovered = value;
+                DelayedUpdateStyle();
+            }
+        }
+
         protected string BackgroundTexture
         {
             get { return m_backgroundTexture; }
@@ -113,34 +147,201 @@ namespace NewWidgets.Widgets
 
         public event TooltipDelegate OnTooltip;
 
-        public Widget(WidgetStyleSheet style)
+        protected Widget(WidgetStyleSheet style)
             : base(null)
         {
             m_background = new WindowObjectArray<WindowObject>();
 
-            m_backgroundStyle = style.BackgroundStyle;
-            m_backgroundTexture = style.BackgroundTexture;
-            m_backgroundScale = style.BackgroundScale;
-            m_backgroundPivot = style.BackgroundPivot;
-            m_backgroundInited = false;
-            m_backgroundDepth = style.BackgroundDepth;
-            m_backgroundPadding = style.BackgroundPadding;
-            m_colorTint = style.Color;
-            m_alpha = style.Opacity;
-            
-            m_clipContents = style.Clip;
-            m_clipMargin = style.ClipMargin;
+            m_styles = new Dictionary<WidgetStyleType, WidgetStyleSheet>();
 
-            m_style = style;
+            LoadStyle(WidgetStyleType.Normal, style);
+
+            m_currentStyle = WidgetStyleType.Normal;
+
+            Animator.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null,
+                delegate {
+                    UpdateStyle();
+                });
+        }
+
+        internal Widget(WidgetStyleSheet style, bool applyStyle = true)
+            : this(style)
+        {
+            if (applyStyle)
+                ApplyStyle(style);
+        }
+
+        #region Styles
+
+        protected bool HasStyle(WidgetStyleType styleType)
+        {
+            return m_styles.ContainsKey(styleType);
+        }
+
+        protected void DelayedSwitchStyle(WidgetStyleType styleType)
+        {
+            Animator.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null,
+                delegate {
+                    SwitchStyle(styleType);
+                });
+        }
+
+        protected void DelayedUpdateStyle()
+        {
+            Animator.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, UpdateStyle);
+        }
+
+        public void UpdateStyle()
+        {
+            WidgetStyleType type = WidgetStyleType.Normal;
+
+            if (Selected)
+                type |= WidgetStyleType.Selected;
+
+            if (!Enabled)
+                type |= WidgetStyleType.Disabled;
+
+            if (Hovered)
+                type |= WidgetStyleType.Hovered;
+
+            if (!HasStyle(type)) // try to fall back
+            {
+                if (HasStyle(type & ~WidgetStyleType.Selected))
+                    type &= ~WidgetStyleType.Selected;
+
+                if (HasStyle(type & ~WidgetStyleType.Disabled))
+                    type &= ~WidgetStyleType.Disabled;
+
+                if (HasStyle(type & ~WidgetStyleType.Hovered))
+                    type &= ~WidgetStyleType.Hovered;
+            }
+
+            DelayedSwitchStyle(type);
+        }
+
+        /// <summary>
+        /// Switches the style.
+        /// </summary>
+        /// <param name="styleType">Style type.</param>
+        public void SwitchStyle(WidgetStyleType styleType)
+        {
+            WidgetStyleSheet style;
+
+            if (!m_styles.TryGetValue(styleType, out style))
+                throw new ArgumentNullException(nameof(style), "Invalid style " + styleType);
+
+            m_currentStyle = styleType;
+            ApplyStyle(style);
+        }
+
+        /// <summary>
+        /// Loads the style and possible sub-styles
+        /// </summary>
+        /// <param name="styleType">Style type.</param>
+        /// <param name="style">Style.</param>
+        public void LoadStyle(WidgetStyleType styleType, WidgetStyleSheet style)
+        {
+            m_styles[styleType] = style;
+
+            string hoveredStyleName = style.GetParameter("hovered_style");
+
+            // Hovered can be only subset of Normal, Disabled, Selected or SelectedDisabled
+            if (styleType == WidgetStyleType.Normal || styleType == WidgetStyleType.Disabled || styleType == WidgetStyleType.Selected || styleType == WidgetStyleType.SelectedDisabled)
+            {
+                if (!string.IsNullOrEmpty(hoveredStyleName))
+                {
+                    WidgetStyleSheet hoveredStyle = WidgetManager.GetStyle(hoveredStyleName);
+
+                    if (hoveredStyle != null && hoveredStyle != style)
+                    {
+                        WidgetStyleType targetStyleType = 0;
+                        switch (styleType)
+                        {
+                            case WidgetStyleType.Normal:
+                                targetStyleType = WidgetStyleType.Hovered;
+                                break;
+                            case WidgetStyleType.Selected:
+                                targetStyleType = WidgetStyleType.SelectedHovered;
+                                break;
+                            case WidgetStyleType.Disabled:
+                                targetStyleType = WidgetStyleType.DisabledHovered;
+                                break;
+                            case WidgetStyleType.SelectedDisabled:
+                                targetStyleType = WidgetStyleType.SelectedDisabledHovered;
+                                break;
+                        }
+
+                        if (targetStyleType != 0)
+                            LoadStyle(targetStyleType, hoveredStyle);
+                    }
+                }
+            }
+
+
+            // Disabled can be only subset of Normal or Selected
+            if (styleType == WidgetStyleType.Normal || styleType == WidgetStyleType.Selected)
+            {
+
+                string disabledStyleName = style.GetParameter("disabled_style");
+
+                if (!string.IsNullOrEmpty(disabledStyleName))
+                {
+                    WidgetStyleSheet disabledStyle = WidgetManager.GetStyle(disabledStyleName);
+
+                    if (disabledStyle != null && disabledStyle != style)
+                    {
+                        WidgetStyleType targetStyleType = 0;
+                        switch (styleType)
+                        {
+                            case WidgetStyleType.Normal:
+                                targetStyleType = WidgetStyleType.Disabled;
+                                break;
+                            case WidgetStyleType.Selected:
+                                targetStyleType = WidgetStyleType.SelectedDisabled;
+                                break;
+                        }
+
+                        if (targetStyleType != 0)
+                            LoadStyle(targetStyleType, disabledStyle);
+                    }
+                }
+            }
+
+            // Selected can be only subset of Normal
+            if (styleType == WidgetStyleType.Normal)
+            {
+                string selectedStyleName = style.GetParameter("selected_style");
+
+                if (!string.IsNullOrEmpty(selectedStyleName))
+                {
+                    WidgetStyleSheet selectedStyle = WidgetManager.GetStyle(selectedStyleName);
+
+                    if (selectedStyle != null && selectedStyle != style)
+                    {
+                        WidgetStyleType targetStyleType = 0;
+                        switch (styleType)
+                        {
+                            case WidgetStyleType.Normal:
+                                targetStyleType = WidgetStyleType.Selected;
+                                break;
+                        }
+
+                        if (targetStyleType != 0)
+                            LoadStyle(targetStyleType, selectedStyle);
+                    }
+                }
+            }
         }
 
         protected virtual void ApplyStyle(WidgetStyleSheet style)
         {
             m_backgroundInited = false;
-            
+
             m_backgroundStyle = style.BackgroundStyle;
             m_backgroundTexture = style.BackgroundTexture;
             m_backgroundScale = style.BackgroundScale;
+            m_backgroundPivot = style.BackgroundPivot;
+            m_backgroundDepth = style.BackgroundDepth;
             m_backgroundPadding = style.BackgroundPadding;
             m_colorTint = style.Color;
             m_alpha = style.Opacity;
@@ -148,6 +349,8 @@ namespace NewWidgets.Widgets
             m_clipContents = style.Clip;
             m_clipMargin = style.ClipMargin;
         }
+
+        #endregion
 
         protected void PrepareBackground()
         {

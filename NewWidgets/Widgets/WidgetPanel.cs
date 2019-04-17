@@ -29,7 +29,7 @@ namespace NewWidgets.Widgets
         }
 
         public WidgetPanel(WidgetStyleSheet style)
-            : base(style)
+            : base(style, true)
         {
             m_children = new WindowObjectArray<Widget>();
 
