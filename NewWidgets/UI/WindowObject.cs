@@ -110,7 +110,7 @@ namespace NewWidgets.UI
             get { return m_tag; }
             set { m_tag = value; }
         }
-        
+
         public int ZIndex
         {
             get { return m_zIndex == 0 ? m_tempZIndex : m_zIndex; }
@@ -159,7 +159,7 @@ namespace NewWidgets.UI
             get { return m_transform.RotationZ * (float)MathHelper.Rad2Deg; }
             set { m_transform.RotationZ = value * (float)MathHelper.Deg2Rad; }
         }
-            
+
         public virtual bool Visible
         {
             get { return (m_flags & WindowObjectFlags.Visible) == WindowObjectFlags.Visible; }
@@ -188,7 +188,7 @@ namespace NewWidgets.UI
         {
             get { return (m_flags & WindowObjectFlags.Removing) == WindowObjectFlags.Removing; }
         }
-        
+
         internal bool HasChanges
         {
             get
@@ -209,7 +209,11 @@ namespace NewWidgets.UI
         public Vector2 Size
         {
             get { return m_size; }
-            set { Resize(value); }
+            set
+            {
+                if (value.DistanceAvr(Size) > float.Epsilon)
+                    Resize(value);
+            }
         }
 
         /// <summary>
@@ -271,7 +275,7 @@ namespace NewWidgets.UI
 
         public virtual void Draw(object canvas)
         {
-            
+
         }
 
         public virtual bool Touch(float x, float y, bool press, bool unpress, int pointer)
@@ -310,15 +314,15 @@ namespace NewWidgets.UI
         {
             float current = Rotation;
 
-           /* float delta = (angle - current) % 360;
+            /* float delta = (angle - current) % 360;
 
-            if (normalize)
-            {
-                if (delta > 180)
-                    delta -= 360;
-                else if (delta < -180)
-                    delta += 360;
-            }*/
+             if (normalize)
+             {
+                 if (delta > 180)
+                     delta -= 360;
+                 else if (delta < -180)
+                     delta += 360;
+             }*/
 
             Animator.StartAnimation(this, AnimationKind.Rotation, current, angle, time, (float x, float from, float to) => Rotation = MathHelper.LinearInterpolation(x, from, to), callback);
         }
@@ -344,7 +348,7 @@ namespace NewWidgets.UI
                 return;
             }
 
-            Animator.StartAnimation(this, AnimationKind.Scale, current, target, time, 
+            Animator.StartAnimation(this, AnimationKind.Scale, current, target, time,
                 (float x, Vector2 from, Vector2 to) =>
                 Transform.FlatScale = MathHelper.LinearInterpolation(x, from, to), callback);
         }

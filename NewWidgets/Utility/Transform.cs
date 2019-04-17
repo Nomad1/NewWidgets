@@ -26,11 +26,11 @@ namespace NewWidgets.Utility
         internal Matrix4x4 m_localMatrix;
         internal Matrix4x4 m_imatrix;
 
-		private Vector3 m_rotation;
+        private Vector3 m_rotation;
         private Vector3 m_position;
         private Vector3 m_scale;
         
-		private bool m_changed;
+        private bool m_changed;
         private bool m_iMatrixChanged;
         private int m_version;
         private int m_parentVersion;
@@ -82,26 +82,26 @@ namespace NewWidgets.Utility
             }
         }
 
-		/// <summary>
+        /// <summary>
         /// Gets or sets the position.
         /// </summary>
         /// <value>The position vector.</value>
         public Vector2 FlatPosition
         {
-			get { return new Vector2(m_position.X, m_position.Y); }
+            get { return new Vector2(m_position.X, m_position.Y); }
             set
             {
-				Vector3 newVector = new Vector3(value.X, value.Y, 0);
+                Vector3 newVector = new Vector3(value.X, value.Y, 0);
 
-				if (!m_changed && (newVector - m_position).LengthSquared() > PositionEpsilon)
+                if (!m_changed && (newVector - m_position).LengthSquared() > PositionEpsilon)
                     m_changed = true;
 
-				m_position = newVector;
+                m_position = newVector;
             }
         }
         
         
-		/// <summary>
+        /// <summary>
         /// Gets or sets the rotation in radians.
         /// </summary>
         /// <value>The rotation vector.</value>
@@ -110,10 +110,10 @@ namespace NewWidgets.Utility
             get { return m_rotation; }
             set
             {
-				if (!m_changed && (value - m_rotation).LengthSquared() > AngleEpsilon)
+                if (!m_changed && (value - m_rotation).LengthSquared() > AngleEpsilon)
                     m_changed = true;
 
-				m_rotation = value;
+                m_rotation = value;
             }
         }
         
@@ -133,7 +133,7 @@ namespace NewWidgets.Utility
             }
         }
         
-		/// <summary>
+        /// <summary>
         /// Gets or sets the uniform scale
         /// </summary>
         /// <value>The scale.</value>
@@ -142,28 +142,28 @@ namespace NewWidgets.Utility
             get { return m_scale.X; }
             set
             {
-				if (!m_changed && (Math.Abs(m_scale.X - value) >= ScaleEpsilon))
+                if (!m_changed && (Math.Abs(m_scale.X - value) >= ScaleEpsilon))
                     m_changed = true;
 
-				m_scale = new Vector3(value, value, value);
+                m_scale = new Vector3(value, value, value);
             }
         }
         
-		/// <summary>
+        /// <summary>
         /// Gets or sets the 2-component scale
         /// </summary>
         /// <value>The scale.</value>
         public Vector2 FlatScale
         {
-			get { return new Vector2(m_scale.X, m_scale.Y); }
+            get { return new Vector2(m_scale.X, m_scale.Y); }
             set
             {
-				Vector3 newScale = new Vector3(value.X, value.Y, value.X);
+                Vector3 newScale = new Vector3(value.X, value.Y, value.X);
 
-				if (!m_changed && (newScale - m_scale).LengthSquared() >= ScaleEpsilon)
+                if (!m_changed && (newScale - m_scale).LengthSquared() >= ScaleEpsilon)
                     m_changed = true;
 
-				m_scale = newScale;
+                m_scale = newScale;
             }
         }
         
@@ -221,21 +221,21 @@ namespace NewWidgets.Utility
 
         public Vector2 ActualPosition
         {
-			get
-			{
-				// Alternative is GetScreenPoint(new Vector3(0,0,0));
+            get
+            {
+                // Alternative is GetScreenPoint(new Vector3(0,0,0));
                 PrepareMatrix();
                 Vector3 position = m_parent == null ? m_localMatrix.Translation : m_matrix.Translation;
                 
                 return new Vector2(position.X, position.Y);  // or new Vector3(transform[12], transform[13], transform[14]); 
-			}
-		}
+            }
+        }
         
         public Vector2 ActualScale
         {
             get
             {
-				return (m_parent == null ? Vector2.One : m_parent.ActualScale) * new Vector2(m_scale.X, m_scale.Y);
+                return (m_parent == null ? Vector2.One : m_parent.ActualScale) * new Vector2(m_scale.X, m_scale.Y);
             }
         }
         
@@ -248,7 +248,7 @@ namespace NewWidgets.Utility
         }
 
         public Transform()
-			: this(Vector3.Zero, Vector3.Zero, Vector3.One)
+            : this(Vector3.Zero, Vector3.Zero, Vector3.One)
         {
             
         }
@@ -260,7 +260,7 @@ namespace NewWidgets.Utility
         /// <param name="rotation"></param>
         /// <param name="uniformScale"></param>
         public Transform(Vector2 position, float rotation, float uniformScale)
-			: this(new Vector3(position.X, position.Y, 0), new Vector3(0, 0, rotation), new Vector3(uniformScale, uniformScale, uniformScale))
+            : this(new Vector3(position.X, position.Y, 0), new Vector3(0, 0, rotation), new Vector3(uniformScale, uniformScale, uniformScale))
         {
         }
         
@@ -277,7 +277,7 @@ namespace NewWidgets.Utility
             m_position = position;
             m_rotation = rotation;
             m_scale = scale;
-			m_version = 1;
+            m_version = 1;
         }
 
 
