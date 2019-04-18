@@ -3,10 +3,11 @@ using System.Numerics;
 
 using NewWidgets.UI;
 using NewWidgets.Utility;
+using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetTextEdit : Widget, IFocusableWidget
+    public class WidgetTextEdit : WidgetBackground, IFocusableWidget
     {
         private char m_cursorChar = '|';
         private int m_cursorPosition;
@@ -16,12 +17,9 @@ namespace NewWidgets.Widgets
 
         private string m_preffix;
         private string m_text;
-        private Font m_font;
-        private float m_fontSize;
-        private int m_textColor;
+
         private char m_maskChar;
         
-        private readonly Margin m_padding;
         private int m_cursorColor;
 
         public event Action<WidgetTextEdit, string> OnFocusLost;
@@ -30,18 +28,56 @@ namespace NewWidgets.Widgets
 
         private bool m_needLayout;
 
+        public new WidgetTextEditStyleSheet Style
+        {
+            get { return (WidgetTextEditStyleSheet)base.Style; }
+        }
+
+        protected new WidgetTextEditStyleSheet WritableStyle
+        {
+            get { return (WidgetTextEditStyleSheet)base.WritableStyle; }
+        }
+
         public Font Font
         {
-            get { return m_font; }
-            set { m_font = value; m_needLayout = true; }
+            get { return Style.Font; }
+            set { WritableStyle.Font = value; m_needLayout = true; }
         }
 
         public float FontSize
         {
-            get { return m_fontSize; }
-            set { m_fontSize = value; m_needLayout = true; }
+            get { return Style.FontSize; }
+            set { WritableStyle.FontSize = value; m_needLayout = true; }
         }
-        
+
+        public Margin TextPadding
+        {
+            get { return Style.TextPadding; }
+            set { WritableStyle.TextPadding = value; m_needLayout = true; }
+        }
+
+        public int TextColor
+        {
+            get { return Style.TextColor; }
+            set
+            {
+                WritableStyle.TextColor = value;
+                if (m_label != null) // try to avoid settings m_needLayout
+                    m_label.Color = value;
+            }
+        }
+
+        public int CursorColor
+        {
+            get { return Style.CursorColor; }
+            set
+            {
+                WritableStyle.CursorColor = value;
+                if (m_cursor != null) // try to avoid settings m_needLayout
+                    m_cursor.Color = value;
+            }
+        }
+
         public string Text
         {
             get { return m_text; }
@@ -103,54 +139,31 @@ namespace NewWidgets.Widgets
             m_text = string.Empty;
             m_preffix = string.Empty;
             m_needLayout = true;
-            
-            m_font = style.Font;
-            m_fontSize = style.FontSize;
 
             Size = style.Size;
-
-            ClipContents = true;
-            
-            m_padding = style.Padding;
-
-            ApplyStyle(style);
-        }
-
-        protected override void ApplyStyle(WidgetStyleSheet style)
-        {
-            base.ApplyStyle(style);
-
-            m_textColor = style.GetParameterColor("text_color", 0x0);
-            m_cursorColor = style.GetParameterColor("cursor_color", 0x0);
-
-            if (m_label != null)
-                m_label.Color = m_textColor;
-
-            if (m_cursor != null)
-                m_cursor.Color = m_cursorColor;
         }
 
         private void Relayout()
         {
             if (m_label == null)
             {
-                m_label = new LabelObject(this, m_font, string.Empty,
+                m_label = new LabelObject(this, Font, string.Empty,
                                           LabelAlign.Start, LabelAlign.Start);
-                m_label.Position = m_padding.TopLeft;
+                m_label.Position = TextPadding.TopLeft;
             }
 
-            m_label.Scale = m_fontSize;
+            m_label.Scale = FontSize;
 
             if (m_cursor == null)
             {
-                m_cursor = m_font.GetSprites(m_cursorChar.ToString(), Vector2.Zero)[0];
+                m_cursor = Font.GetSprites(m_cursorChar.ToString(), Vector2.Zero)[0];
                 m_cursor.Color = m_cursorColor;
-                m_cursor.Scale = m_fontSize;
+                m_cursor.Scale = FontSize;
                 //m_cursor.Blink(2000);
                 m_cursor.Transform.Parent = Transform;
             }
 
-            Vector2 minSize = m_label.Size * m_fontSize + m_padding.Size;
+            Vector2 minSize = m_label.Size * FontSize + TextPadding.Size;
             if (minSize.X < Size.X)
                 minSize.X = Size.X;
             if (minSize.Y < Size.Y)
@@ -228,7 +241,7 @@ namespace NewWidgets.Widgets
                 return true;
             }
 
-            if ((key == SpecialKey.Letter || key == SpecialKey.Paste) && m_font.HaveSymbol(character))
+            if ((key == SpecialKey.Letter || key == SpecialKey.Paste) && Font.HaveSymbol(character))
             {
                 m_text = m_text.Insert(m_cursorPosition, character.ToString());
                 
@@ -306,11 +319,11 @@ namespace NewWidgets.Widgets
                 m_label.Text = MaskText(m_text.Substring(0, m_cursorPosition) + '\0' + m_text.Substring(m_cursorPosition));
 
                 var frame = m_label.GetCharFrame(m_cursorPosition);
-                float nsize = Size.X / m_fontSize;
+                float nsize = Size.X / FontSize;
 
                 if (m_label.Size.X > nsize)
                 {
-                    float from = -m_label.Position.X / m_fontSize;
+                    float from = -m_label.Position.X / FontSize;
                     float to = from + nsize;
 
                     if (frame.X > from && frame.X < to)
@@ -319,30 +332,30 @@ namespace NewWidgets.Widgets
                     {
                         if (frame.X > from)
                         {
-                            float nx = (nsize - frame.X) * m_fontSize - m_padding.Width;
-                            if (nx > m_padding.Left)
-                                nx = m_padding.Left;
+                            float nx = (nsize - frame.X) * FontSize - TextPadding.Width;
+                            if (nx > TextPadding.Left)
+                                nx = TextPadding.Left;
 
-                            m_label.Position = new Vector2(nx, m_padding.Top);
+                            m_label.Position = new Vector2(nx, TextPadding.Top);
                         } else
                             if (frame.X < to)
                         {
-                            float nx = -frame.X * m_fontSize;
-                            if (nx > m_padding.Left)
-                                nx = m_padding.Left;
+                            float nx = -frame.X * FontSize;
+                            if (nx > TextPadding.Left)
+                                nx = TextPadding.Left;
 
-                            m_label.Position = new Vector2(nx, m_padding.Top);
+                            m_label.Position = new Vector2(nx, TextPadding.Top);
                         }
                     }
                 } else
-                    m_label.Position = m_padding.TopLeft;
+                    m_label.Position = TextPadding.TopLeft;
 
-                m_cursor.Position = m_label.Position + new Vector2(frame.X * m_fontSize - 2, 0);
+                m_cursor.Position = m_label.Position + new Vector2(frame.X * FontSize - 2, 0);
 
             } else
             {
                 m_label.Text = MaskText(m_text);
-                m_label.Position = m_padding.TopLeft;
+                m_label.Position = TextPadding.TopLeft;
             }
         }
 
@@ -384,7 +397,7 @@ namespace NewWidgets.Widgets
 
                     SetFocused(true);
 
-                    Vector2 local = (this.Transform.GetClientPoint(new Vector2(x, y)) - m_label.Position) / m_fontSize;
+                    Vector2 local = (this.Transform.GetClientPoint(new Vector2(x, y)) - m_label.Position) / FontSize;
                     ISprite[] sprites = m_label.InternalGetSprites();
 
                     if (sprites.Length > 0)

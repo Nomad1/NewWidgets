@@ -2,6 +2,7 @@
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
+using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
@@ -15,13 +16,10 @@ namespace NewWidgets.Widgets
         TextRight = 0x08
     }
 
-    public class WidgetButton : Widget
+    public class WidgetButton : WidgetBackground
     {
         private WidgetLabel m_label;
-        private Margin m_textPadding;
-
         private WidgetImage m_image;
-        private Margin m_imagePadding;
 
         private string m_clickSound;
 
@@ -32,9 +30,23 @@ namespace NewWidgets.Widgets
         public event Action<WidgetButton> OnHover;
         public event Action<WidgetButton> OnUnhover;
 
-        private ButtonLayout m_layout;
-
         private bool m_needLayout;
+
+        public new WidgetButtonStyleSheet Style
+        {
+            get { return (WidgetButtonStyleSheet)base.Style; }
+        }
+
+        protected new WidgetButtonStyleSheet WritableStyle
+        {
+            get { return (WidgetButtonStyleSheet)base.WritableStyle; }
+        }
+
+        public string Text
+        {
+            get { return m_label.Text; }
+            set { m_label.Text = value; m_needLayout = true; }
+        }
 
         public string Image
         {
@@ -50,44 +62,20 @@ namespace NewWidgets.Widgets
 
         public ButtonLayout Layout
         {
-            get { return m_layout; }
-            set { m_layout = value; m_needLayout = true; }
+            get { return Style.ButtonLayout; }
+            set { WritableStyle.ButtonLayout = value; m_needLayout = true; }
         }
 
         public Margin ImagePadding
         {
-            get { return m_imagePadding; }
-            set { m_imagePadding = value; m_needLayout = true; }
-        }
-
-        public float FontSize
-        {
-            get { return m_label.FontSize; }
-            set { m_label.FontSize = value; m_needLayout = true; }
-        }
-
-        public Font Font
-        {
-            get { return m_label.Font; }
-            set { m_label.Font = value; m_needLayout = true; }
-        }
-
-        public string Text
-        {
-            get { return m_label.Text; }
-            set { m_label.Text = value; m_needLayout = true; }
-        }
-        
-        public int TextColor
-        {
-            get { return m_label.Color; }
-            set { m_label.Color = value; }
+            get { return Style.ImagePadding; }
+            set { WritableStyle.ImagePadding = value; m_needLayout = true; }
         }
 
         public Margin TextPadding
         {
-            get { return m_textPadding; }
-            set { m_textPadding = value; m_needLayout = true; }
+            get { return Style.TextPadding; }
+            set { WritableStyle.TextPadding = value; m_needLayout = true; }
         }
 
         public string ClickSound
@@ -98,14 +86,8 @@ namespace NewWidgets.Widgets
         
         public bool OverridePress
         {
-            get
-            {
-                return m_overridePress;
-            }
-            set
-            {
-                m_overridePress = value;
-            }
+            get { return m_overridePress; }
+            set { m_overridePress = value; }
         }
        
         protected WidgetImage InternalImage
@@ -117,38 +99,52 @@ namespace NewWidgets.Widgets
         {
             get { return m_label; }
         }
-        
+
+        public override float Alpha
+        {
+            get { return base.Alpha;}
+            set
+            {
+                base.Alpha = value;
+                if (m_image != null)
+                    m_image.Alpha = value;
+
+                if (m_label != null)
+                    m_label.Alpha = value;
+            }
+        }
+
         public WidgetButton(string text = "")
             : this(WidgetManager.DefaultButtonStyle, text)
         {
         }
 
-        public WidgetButton(WidgetStyleSheet style, string text = "")
+        public WidgetButton(WidgetButtonStyleSheet style, string text = "")
             : base(style)
         {
             m_needLayout = true;
 
-            // TODO: move this shit to ApplyStyle
+            WidgetTextStyleSheet labelStyle = WidgetManager.GetStyle(style.TextStyle) as WidgetTextStyleSheet;
 
-            m_label = new WidgetLabel();
-            m_label.Color = style.GetParameterColor("text_color", 0x0);
-            m_label.FontSize = style.FontSize;
-            m_label.Font = style.Font;
-            m_label.Text = text;
+            m_label = new WidgetLabel(labelStyle ?? WidgetManager.DefaultLabelStyle, text);
             m_label.Parent = this;
-            m_layout = ButtonLayout.Center;
-            m_textPadding = style.Padding;
 
-            m_image = new WidgetImage(WidgetBackgroundStyle.None, string.Empty);
+            WidgetImageStyleSheet imageStyle = WidgetManager.GetStyle(style.ImageStyle) as WidgetImageStyleSheet;
+
+            m_image = new WidgetImage(imageStyle ?? WidgetManager.DefaultImageStyle);
             m_image.Parent = this;
-            m_image.Color = style.GetParameterColor("image_color", 0xffffff);
-            m_imagePadding = style.GetParameter<Margin>("image_padding");
 
             m_clickSound = "click";
 
             Size = style.Size;
+        }
 
-            ApplyStyle(style);
+        public override void SwitchStyle(WidgetStyleType styleType)
+        {
+            base.SwitchStyle(styleType);
+
+            m_label.SwitchStyle(styleType);
+            m_image.SwitchStyle(styleType);
         }
 
         protected override void Resize(Vector2 size)
@@ -163,38 +159,38 @@ namespace NewWidgets.Widgets
             if (m_label != null && (Size.X <= 0 || Size.Y <= 0))
             {
                 m_label.Relayout();
-                Size = new Vector2(Math.Max(m_textPadding.Width + m_label.Size.X, m_imagePadding.Width + m_image.Size.X), Math.Max(m_textPadding.Height + m_label.Size.Y, m_imagePadding.Height + m_image.Size.Y));
+                Size = new Vector2(Math.Max(TextPadding.Width + m_label.Size.X, ImagePadding.Width + m_image.Size.X), Math.Max(TextPadding.Height + m_label.Size.Y, ImagePadding.Height + m_image.Size.Y));
             }
 
             if (m_label != null && !string.IsNullOrEmpty(m_label.Text))
             {
-                if ((m_layout & ButtonLayout.TextLeft) != 0)
+                if ((Layout & ButtonLayout.TextLeft) != 0)
                 {
-                    m_label.Size = new Vector2(Size.X - m_textPadding.Width, Size.Y - m_textPadding.Height);
-                    m_label.Position = m_textPadding.TopLeft;
+                    m_label.Size = new Vector2(Size.X - TextPadding.Width, Size.Y - TextPadding.Height);
+                    m_label.Position = TextPadding.TopLeft;
                     m_label.TextAlign = WidgetAlign.Left | WidgetAlign.Top;
                 }
                 else
                 {
                     m_label.TextAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
-                    m_label.Size = new Vector2(Size.X - m_textPadding.Width, Size.Y - m_textPadding.Height);
-                    m_label.Position = m_textPadding.TopLeft;
+                    m_label.Size = new Vector2(Size.X - TextPadding.Width, Size.Y - TextPadding.Height);
+                    m_label.Position = TextPadding.TopLeft;
                 }
             }
 
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
             {
-                if ((m_layout & ButtonLayout.ImageLeft) != 0)
+                if ((Layout & ButtonLayout.ImageLeft) != 0)
                 {
-                    m_image.Size = new Vector2(Size.X - m_imagePadding.Width, Size.Y - m_imagePadding.Height);
+                    m_image.Size = new Vector2(Size.X - ImagePadding.Width, Size.Y - ImagePadding.Height);
                     m_image.ImageStyle = WidgetBackgroundStyle.ImageTopLeft;
                     m_image.ImagePivot = new Vector2(0, 0);
-                    m_image.Position = m_imagePadding.TopLeft;
+                    m_image.Position = ImagePadding.TopLeft;
                 }
                 else
                 {
-                    m_image.Size = new Vector2(Size.X - m_imagePadding.Width, Size.Y - m_imagePadding.Height);
-                    m_image.Position = m_imagePadding.TopLeft;
+                    m_image.Size = new Vector2(Size.X - ImagePadding.Width, Size.Y - ImagePadding.Height);
+                    m_image.Position = ImagePadding.TopLeft;
                     m_image.ImageStyle = WidgetBackgroundStyle.ImageFit;
                 }
             }
@@ -242,18 +238,6 @@ namespace NewWidgets.Widgets
                 m_label.Draw(canvas);
         }
 
-        protected override void ApplyStyle(WidgetStyleSheet style)
-        {
-            base.ApplyStyle(style);
-
-            if (m_label != null)
-                m_label.Color = style.GetParameterColor("text_color", 0x0);
-
-            int imageColor = style.GetParameterColor("image_color", -1);
-
-            if (imageColor != -1 && m_image != null)
-                m_image.Color = imageColor;
-        }
         
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {

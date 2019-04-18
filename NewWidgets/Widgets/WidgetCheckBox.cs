@@ -2,6 +2,7 @@
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
+using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
@@ -74,8 +75,6 @@ namespace NewWidgets.Widgets
             Size = style.Size;
 
             Selected = isChecked;
-
-            ApplyStyle(style);
         }
 
         protected override void Resize(Vector2 size)
@@ -89,6 +88,14 @@ namespace NewWidgets.Widgets
             }
         }
 
+        public override void SwitchStyle(WidgetStyleType styleType)
+        {
+            base.SwitchStyle(styleType);
+
+            if (m_linkedLabel != null)
+                m_linkedLabel.SwitchStyle(styleType);
+        }
+
         public override bool Update()
         {
             if (!base.Update())
@@ -97,19 +104,6 @@ namespace NewWidgets.Widgets
             m_image.Update();
 
             return true;
-        }
-        
-        protected override void ApplyStyle(WidgetStyleSheet style)
-        {
-            m_image.Image = style.GetParameter("check_image");
-            m_image.Color = style.GetParameterColor("image_color", 0xffffff);
-
-            m_imagePadding = style.GetParameter<Margin>("image_padding");
-
-            if (m_linkedLabel != null)
-                m_linkedLabel.Color = style.GetParameterColor("text_color", 0xffffff);
-
-            base.ApplyStyle(style);
         }
 
         protected override void DrawContents(object canvas)

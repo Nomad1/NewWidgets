@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using NewWidgets.UI;
+using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetPanel : Widget, IWindowContainer
+    public class WidgetPanel : WidgetBackground, IWindowContainer
     {
         private readonly WindowObjectArray<Widget> m_children;
         
@@ -29,7 +30,7 @@ namespace NewWidgets.Widgets
         }
 
         public WidgetPanel(WidgetStyleSheet style)
-            : base(style, true)
+            : base(style)
         {
             m_children = new WindowObjectArray<Widget>();
 
@@ -66,7 +67,7 @@ namespace NewWidgets.Widgets
             if (m_children.Touch(x, y, press, unpress, pointer))
                 return true;
 
-            if (m_background.Touch(x, y, press, unpress, pointer))
+            if (m_background.Touch(x, y, press, unpress, pointer)) // make sure that click inside panel is not transparent
                 return true;
 
             return false;

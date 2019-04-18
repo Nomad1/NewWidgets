@@ -49,7 +49,6 @@
     <Compile Include="Widgets\WidgetManager.cs" />
     <Compile Include="Widgets\WidgetPanel.cs" />
     <Compile Include="Widgets\WidgetScrollView.cs" />
-    <Compile Include="Widgets\WidgetStyleSheet.cs" />
     <Compile Include="Widgets\WidgetText.cs" />
     <Compile Include="Widgets\WidgetTextEdit.cs" />
     <Compile Include="Widgets\WidgetTooltip.cs" />
@@ -68,7 +67,17 @@
     <Compile Include="Utility\MathHelper.cs" />
     <Compile Include="WinForms\WinFormsController.cs" />
     <Compile Include="WinForms\WinFormsSprite.cs" />
+    <Compile Include="Widgets\WidgetBackground.cs" />
+    <Compile Include="Widgets\Styles\WidgetStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetBackgroundStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetTextStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetTextEditStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetButtonStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetImageStyleSheet.cs" />
   </ItemGroup>
   <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Widgets\Styles\" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

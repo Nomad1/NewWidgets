@@ -5,6 +5,7 @@ using System.Drawing;
 
 using NewWidgets.UI;
 using NewWidgets.Utility;
+using NewWidgets.Widgets.Styles;
 
 #if RUNMOBILE
 using RunMobile.Utility;
