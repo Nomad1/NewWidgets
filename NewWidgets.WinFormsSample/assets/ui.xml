@@ -58,13 +58,8 @@
     <clip_margin>1;2;3;2</clip_margin>
     <cursor_color>0xffffff</cursor_color>
     <focus_color>#ffffff</focus_color>
+    <focus_image>panel_white_normal_9</focus_image>
     <padding>6;2;6;0</padding>
-    <selected_style>default_textedit_selected</selected_style>
-  </style>
-    
-  <style name="default_textedit_selected" parent="default_textedit">
-    <back_image>panel_white_normal_9</back_image>
-    <text_color>#ffffff</text_color>
   </style>
 
   <!-- ScrollView -->
@@ -163,7 +158,7 @@
     <image_color>#000032</image_color>
     <text_color>#cceeff</text_color>
   </style>
-    
+
   <style name="default_checkbox_hovered" parent="default_checkbox">
     <back_image>checkbox_back_hovered</back_image>
     <image_color>#ffffff</image_color>

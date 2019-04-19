@@ -91,7 +91,7 @@ namespace NewWidgets.Widgets
         }
         
         public WidgetLabel(WidgetStyleSheet style, string text)
-            : base(style, true)
+            : base(style)
         {
             m_needLayout = true;
             m_text = text;
@@ -100,6 +100,7 @@ namespace NewWidgets.Widgets
             
             m_font = style.Font;
             m_fontSize = style.FontSize;
+			base.Color = style.GetParameterColor("text_color", 0x0);
             m_richText = true;
         }
 

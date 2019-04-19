@@ -25,7 +25,12 @@ namespace NewWidgets.Widgets
 
         private string m_clickSound;
 
+        private WidgetStyleSheet m_hoveredStyle;
+        private WidgetStyleSheet m_disabledStyle;
+
         private bool m_animating;
+        private bool m_hovered;
+        private bool m_selected;
         private bool m_overridePress;
 
         public event Action<WidgetButton> OnPress;
@@ -107,7 +112,37 @@ namespace NewWidgets.Widgets
                 m_overridePress = value;
             }
         }
-       
+        
+        public override bool Enabled
+        {
+            get
+            {
+                return base.Enabled;
+            }
+            set
+            {
+                base.Enabled = value;
+                
+                if (m_disabledStyle != null)
+                    DelayedApplyStyle(value ? Style : m_disabledStyle);
+            }
+        }
+
+        public bool Selected
+        {
+            get
+            {
+                return m_selected;
+            }
+            set
+            {
+                m_selected = value;
+
+                if (m_hoveredStyle != null)
+                    DelayedApplyStyle(value ? Style : m_hoveredStyle);
+            }
+        }
+
         protected WidgetImage InternalImage
         {
             get { return m_image; }
@@ -128,8 +163,6 @@ namespace NewWidgets.Widgets
         {
             m_needLayout = true;
 
-            // TODO: move this shit to ApplyStyle
-
             m_label = new WidgetLabel();
             m_label.Color = style.GetParameterColor("text_color", 0x0);
             m_label.FontSize = style.FontSize;
@@ -144,11 +177,12 @@ namespace NewWidgets.Widgets
             m_image.Color = style.GetParameterColor("image_color", 0xffffff);
             m_imagePadding = style.GetParameter<Margin>("image_padding");
 
+            m_hoveredStyle = WidgetManager.GetStyle(style.GetParameter("hovered_style"));
+            m_disabledStyle = WidgetManager.GetStyle(style.GetParameter("disabled_style"));
+
             m_clickSound = "click";
 
             Size = style.Size;
-
-            ApplyStyle(style);
         }
 
         protected override void Resize(Vector2 size)
@@ -242,17 +276,38 @@ namespace NewWidgets.Widgets
                 m_label.Draw(canvas);
         }
 
+        protected void DelayedApplyStyle(WidgetStyleSheet style)
+        {
+            Animator.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, 
+                delegate { 
+                    ApplyStyle(style);
+                });
+
+        }
+
         protected override void ApplyStyle(WidgetStyleSheet style)
         {
+            m_label.Color = style.GetParameterColor("text_color", 0x0);
+
+            string hoveredStyle = style.GetParameter("hovered_style");
+
+            if (hoveredStyle != null)
+                m_hoveredStyle = WidgetManager.GetStyle(hoveredStyle);
+
+            string disabledStyle = style.GetParameter("disabled_style");
+
+            if (disabledStyle != null)
+                m_disabledStyle = WidgetManager.GetStyle(disabledStyle);
+
+            int color = style.GetParameterColor("image_color", -1);
+
+            if (color != -1)
+                m_image.Color = color;
+
+
+            //TextAlign = style.Align;
+            
             base.ApplyStyle(style);
-
-            if (m_label != null)
-                m_label.Color = style.GetParameterColor("text_color", 0x0);
-
-            int imageColor = style.GetParameterColor("image_color", -1);
-
-            if (imageColor != -1 && m_image != null)
-                m_image.Color = imageColor;
         }
         
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
@@ -274,9 +329,15 @@ namespace NewWidgets.Widgets
                         return true;
                     }
                 }
-                else if (!press && !unpress && !Hovered)
+                else if (!press && !unpress && !m_hovered)
                 {
-                    Hovered = true;
+                    if (!m_selected)
+                    {
+                        if (m_hoveredStyle != null)
+                            DelayedApplyStyle(m_hoveredStyle);
+                    }
+
+                    m_hovered = true;
                     WindowController.Instance.OnTouch += UnHoverTouch;
 
                     if (OnHover != null)
@@ -289,9 +350,15 @@ namespace NewWidgets.Widgets
 
         private bool UnHoverTouch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (Hovered && !HitTest(x, y))
+            if (Enabled && m_hovered && !HitTest(x, y))
             {
-                Hovered = false;
+                if (!m_selected)
+                {
+                    if (m_hoveredStyle != null)
+                        DelayedApplyStyle(Style);
+                }
+
+                m_hovered = false;
                 WindowController.Instance.OnTouch -= UnHoverTouch;
 
                 if (OnUnhover != null)
