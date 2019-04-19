@@ -12,6 +12,8 @@ namespace NewWidgets.Widgets
 {
     public class WidgetBackground : Widget
     {
+        public static readonly new WidgetStyleReference<WidgetBackgroundStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetBackgroundStyleSheet>("default_background");
+
         protected readonly WindowObjectArray<WindowObject> m_background;
 
         private bool m_backgroundInited;
@@ -80,8 +82,12 @@ namespace NewWidgets.Widgets
             set { WritableStyle.BackgroundColor = value; } // no need to redraw background there
         }
 
-        protected WidgetBackground(WidgetBackgroundStyleSheet style)
-            : base(style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetBackground"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        public WidgetBackground(WidgetBackgroundStyleSheet style)
+            : base(style ?? DefaultStyle)
         {
             m_background = new WindowObjectArray<WindowObject>();
         }
@@ -90,7 +96,7 @@ namespace NewWidgets.Widgets
         {
             base.SwitchStyle(styleType);
 
-            InvalidateBackground();
+            InvalidateBackground(); // TODO: check if it was actually changed
         }
 
         protected virtual void PrepareBackground()

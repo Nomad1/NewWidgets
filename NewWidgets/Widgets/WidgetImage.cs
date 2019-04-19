@@ -7,6 +7,8 @@ namespace NewWidgets.Widgets
 {
     public class WidgetImage : Widget
     {
+        public static readonly new WidgetStyleReference<WidgetImageStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetImageStyleSheet>("default_image");
+
         private ImageObject m_imageObject;
 
         private bool m_imageInited;
@@ -79,16 +81,42 @@ namespace NewWidgets.Widgets
             get { PrepareImage(); return m_imageObject; }
         }
 
-        public WidgetImage(WidgetBackgroundStyle imageStyle, string image)
-            : base(WidgetManager.DefaultWindowStyle)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetImage"/> class.
+        /// Unlike <see cref="T:NewWidgets.Widgets.WidgetBackground"/> it does not allows tiling
+        /// and always contain only one image
+        /// </summary>
+        /// <param name="image">Image.</param>
+        public WidgetImage(string image = "")
+            : this(null, WidgetBackgroundStyle.Image, image)
         {
-            ImageStyle = imageStyle;
-            Image = image;
+
         }
 
-        public WidgetImage(WidgetImageStyleSheet style)
-            : base(style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetImage"/> class.
+        /// Unlike <see cref="T:NewWidgets.Widgets.WidgetBackground"/> it does not allows tiling
+        /// </summary>
+        /// <param name="imageStyle">Image style.</param>
+        /// <param name="image">Image.</param>
+        public WidgetImage(WidgetBackgroundStyle imageStyle, string image)
+            : this(null, imageStyle, image)
         {
+           
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetImage"/> class.
+        /// Unlike <see cref="T:NewWidgets.Widgets.WidgetBackground"/> it does not allows tiling
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="imageStyle">Image style.</param>
+        /// <param name="image">Image.</param>
+        public WidgetImage(WidgetImageStyleSheet style, WidgetBackgroundStyle imageStyle = 0, string image = "")
+            : base(style ?? DefaultStyle)
+        {
+            ImageStyle = imageStyle == 0 ? Style.ImageStyle : imageStyle;
+            Image = string.IsNullOrEmpty(image) ? Style.Image : image;
         }
 
         private void InvalidateImage()

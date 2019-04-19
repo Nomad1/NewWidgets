@@ -8,13 +8,29 @@ namespace NewWidgets.Widgets.Styles
     /// </summary>
     public class WidgetTextEditStyleSheet : WidgetBackgroundStyleSheet
     {
+        [WidgetStyleValue("font")]
         private Font m_font = WidgetManager.MainFont;
+
+        [WidgetStyleValue("font_size")]
         private float m_fontSize = 1.0f;
+
+        [WidgetStyleValue("text_color")]
         private int m_textColor = 0;
+
+        [WidgetStyleValue("cursor_color")]
         private int m_cursorColor = 0;
+
+        [WidgetStyleValue("line_spacing")]
         private float m_lineSpacing = 5.0f;
+
+        [WidgetStyleValue("text_align")]
         private WidgetAlign m_textAlign = WidgetAlign.Left | WidgetAlign.Top;
+
+        [WidgetStyleValue("text_padding")]
         private Margin m_textPadding = new Margin(0);
+
+        [WidgetStyleValue("cursor_char")]
+        private string m_cursorChar = "|";
 
         public float FontSize
         {
@@ -40,6 +56,12 @@ namespace NewWidgets.Widgets.Styles
             internal set { m_cursorColor = value; CheckReadonly(); }
         }
 
+        public string CursorChar
+        {
+            get { return m_cursorChar; }
+            internal set { m_cursorChar = value; CheckReadonly(); }
+        }
+
         public float LineSpacing
         {
             get { return m_lineSpacing; }
@@ -56,62 +78,6 @@ namespace NewWidgets.Widgets.Styles
         {
             get { return m_textPadding; }
             internal set { m_textPadding = value; CheckReadonly(); }
-        }
-
-        public WidgetTextEditStyleSheet(string name, WidgetStyleSheet parent)
-            : base(name, parent)
-        {
-            WidgetTextEditStyleSheet textEditParent = parent as WidgetTextEditStyleSheet;
-
-            if (textEditParent != null)
-            {
-                m_font = textEditParent.m_font;
-                m_fontSize = textEditParent.m_fontSize;
-                m_textColor = textEditParent.m_textColor;
-                m_cursorColor = textEditParent.m_cursorColor;
-                m_textAlign = textEditParent.m_textAlign;
-                m_lineSpacing = textEditParent.m_lineSpacing;
-                m_textPadding = textEditParent.m_textPadding;
-            }
-        }
-
-        protected override bool ParseParameter(string name, string value)
-        {
-            if (base.ParseParameter(name, value))
-                return true;
-
-            switch (name)
-            {
-                case "font":
-                    m_font = WidgetManager.GetFont(value);
-                    break;
-                case "font_size":
-                    m_fontSize = FloatParse(value) * WidgetManager.FontScale;
-                    break;
-                case "line_spacing":
-                    m_fontSize = FloatParse(value);
-                    break;
-                case "text_color":
-                    m_textColor = ColorParse(value);
-                    break;
-                case "cursor_color":
-                    m_cursorColor = ColorParse(value);
-                    break;
-                case "text_align":
-                    m_textAlign = EnumParse<WidgetAlign>(value);
-                    break;
-                case "text_padding":
-                    m_textPadding = MarginParse(value);
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
-
-        protected override WidgetStyleSheet Clone()
-        {
-            return new WidgetTextEditStyleSheet(null, this);
         }
     }
 }

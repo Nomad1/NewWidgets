@@ -36,10 +36,10 @@ namespace NewWidgets.WinFormsSample
         protected DialogWindow(string title, string text, string yesText, string noText)
             : base(WindowFlags.CustomAnim | WindowFlags.Blackout)
         {
-            m_panel = new WidgetPanel(WidgetManager.GetStyle("dialog_window"));
+            m_panel = new WidgetWindow();
             Vector2 size = m_panel.Size;
 
-            m_text = new WidgetText(WidgetManager.DefaultLabelStyle);
+            m_text = new WidgetText();
             m_text.Text = text;
             m_text.Size = new Vector2(size.X, 0);
             m_text.MaxWidth = size.X - 40;

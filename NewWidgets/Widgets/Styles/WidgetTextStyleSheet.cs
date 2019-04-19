@@ -7,10 +7,19 @@ namespace NewWidgets.Widgets.Styles
     /// </summary>
     public class WidgetTextStyleSheet : WidgetStyleSheet
     {
+        [WidgetStyleValue("font")]
         private Font m_font = WidgetManager.MainFont;
+
+        [WidgetStyleValue("font_size")]
         private float m_fontSize = 1.0f;
+
+        [WidgetStyleValue("text_color")]
         private int m_textColor = 0;
+
+        [WidgetStyleValue("line_spacing")]
         private float m_lineSpacing = 5.0f;
+
+        [WidgetStyleValue("text_align")]
         private WidgetAlign m_textAlign = WidgetAlign.Left | WidgetAlign.Top;
 
         public float FontSize
@@ -41,54 +50,6 @@ namespace NewWidgets.Widgets.Styles
         {
             get { return m_textAlign; }
             internal set { m_textAlign = value; CheckReadonly(); }
-        }
-
-        public WidgetTextStyleSheet(string name, WidgetStyleSheet parent)
-            : base(name, parent)
-        {
-            WidgetTextStyleSheet textParent = parent as WidgetTextStyleSheet;
-
-            if (textParent != null)
-            {
-                m_font = textParent.m_font;
-                m_fontSize = textParent.m_fontSize;
-                m_textColor = textParent.m_textColor;
-                m_textAlign = textParent.m_textAlign;
-                m_lineSpacing = textParent.m_lineSpacing;
-            }
-        }
-
-        protected override bool ParseParameter(string name, string value)
-        {
-            if (base.ParseParameter(name, value))
-                return true;
-
-            switch (name)
-            {
-                case "font":
-                    m_font = WidgetManager.GetFont(value);
-                    break;
-                case "font_size":
-                    m_fontSize = FloatParse(value) * WidgetManager.FontScale;
-                    break;
-                case "line_spacing":
-                    m_fontSize = FloatParse(value);
-                    break;
-                case "text_color":
-                    m_textColor = ColorParse(value);
-                    break;
-                case "text_align":
-                    m_textAlign = EnumParse<WidgetAlign>(value);
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
-
-        protected override WidgetStyleSheet Clone()
-        {
-            return new WidgetTextStyleSheet(null, this);
         }
     }
 }

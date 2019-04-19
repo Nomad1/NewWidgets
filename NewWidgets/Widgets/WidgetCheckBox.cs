@@ -8,14 +8,24 @@ namespace NewWidgets.Widgets
 {
     public class WidgetCheckBox : Widget
     {
+        public static readonly new WidgetStyleReference<WidgetButtonStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetButtonStyleSheet>("default_checkbox");
+
         private WidgetImage m_image;
-        private WidgetAlign m_imageAlign;
-        private Margin m_imagePadding;
         private WidgetLabel m_linkedLabel;
 
         private bool m_animating;
 
         public event Action<WidgetCheckBox> OnChecked;
+
+        public new WidgetButtonStyleSheet Style
+        {
+            get { return (WidgetButtonStyleSheet)base.Style; }
+        }
+
+        protected new WidgetButtonStyleSheet WritableStyle
+        {
+            get { return (WidgetButtonStyleSheet)base.WritableStyle; }
+        }
 
         public bool Checked
         {
@@ -27,12 +37,6 @@ namespace NewWidgets.Widgets
         {
             get { return m_image.Image; }
             set { m_image.Image = value; }
-        }
-
-        public WidgetAlign ImageAlign
-        {
-            get { return m_imageAlign; }
-            set { m_imageAlign = value; }
         }
 
         public WidgetLabel LinkedLabel
@@ -50,29 +54,37 @@ namespace NewWidgets.Widgets
 
         public Margin ImagePadding
         {
-            get { return m_imagePadding; }
-            set { m_imagePadding = value; }
+            get { return m_image.ImagePadding; }
+            set { m_image.ImagePadding = value; }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetCheckBox"/> class.
+        /// </summary>
         public WidgetCheckBox()
-            : this(WidgetManager.DefaultCheckBoxStyle, false)
+            : this(null, false)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetCheckBox"/> class.
+        /// </summary>
+        /// <param name="isChecked">If set to <c>true</c> is checked.</param>
         public WidgetCheckBox(bool isChecked)
-            : this(WidgetManager.DefaultCheckBoxStyle, isChecked)
+            : this(null, isChecked)
         {
         }
-        
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetCheckBox"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="isChecked">If set to <c>true</c> is checked.</param>
         public WidgetCheckBox(WidgetStyleSheet style, bool isChecked)
-            : base(style)
+            : base(style ?? DefaultStyle)
         {
-            m_image = new WidgetImage(WidgetBackgroundStyle.ImageFit, style.GetParameter("check_image"));
+            m_image = new WidgetImage(Style.ImageStyle);
             m_image.Parent = this;
-
-            m_imageAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
-
-            Size = style.Size;
 
             Selected = isChecked;
         }
@@ -83,14 +95,17 @@ namespace NewWidgets.Widgets
 
             if (m_image != null)
             {
-                m_image.Size = new Vector2(size.X - m_imagePadding.Width, size.Y - m_imagePadding.Height);
-                m_image.Position = m_imagePadding.TopLeft;
+                m_image.Size = new Vector2(size.X - ImagePadding.Width, size.Y - ImagePadding.Height);
+                m_image.Position = ImagePadding.TopLeft;
             }
         }
 
         public override void SwitchStyle(WidgetStyleType styleType)
         {
             base.SwitchStyle(styleType);
+
+            if (m_image != null)
+                m_image.SwitchStyle(styleType);
 
             if (m_linkedLabel != null)
                 m_linkedLabel.SwitchStyle(styleType);
@@ -161,13 +176,13 @@ namespace NewWidgets.Widgets
             
             if (Checked)
             {
-                m_image.Position = m_imagePadding.TopLeft + new Vector2(0, 10);
-                m_image.Move(m_imagePadding.TopLeft, 100, AnimateFinished);
+                m_image.Position = ImagePadding.TopLeft + new Vector2(0, 10);
+                m_image.Move(ImagePadding.TopLeft, 100, AnimateFinished);
                 m_image.FadeTo(1.0f, 100, null);
             } else
             {
-                m_image.Position = m_imagePadding.TopLeft;
-                m_image.Move(m_imagePadding.TopLeft + new Vector2(0, 10), 100, AnimateFinished);
+                m_image.Position = ImagePadding.TopLeft;
+                m_image.Move(ImagePadding.TopLeft + new Vector2(0, 10), 100, AnimateFinished);
                 m_image.FadeTo(0.0f, 100, null);
             }
         }

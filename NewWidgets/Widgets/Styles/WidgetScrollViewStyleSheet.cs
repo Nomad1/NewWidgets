@@ -5,7 +5,7 @@ namespace NewWidgets.Widgets.Styles
     /// <summary>
     /// Style sheet for buttons
     /// </summary>
-    public class WidgetButtonStyleSheet : WidgetBackgroundStyleSheet
+    public class WidgetScrollViewStyleSheet : WidgetBackgroundStyleSheet
     {
         [WidgetStyleValue("button_layout")]
         private ButtonLayout m_buttonLayout = ButtonLayout.Center;
@@ -17,10 +17,10 @@ namespace NewWidgets.Widgets.Styles
         private Margin m_imagePadding = new Margin(0);
 
         [WidgetStyleValue("image_style")]
-        private WidgetStyleReference m_imageStyle = WidgetImage.DefaultStyle;
+        private WidgetStyleReference m_imageStyle = new WidgetStyleReference("default_image");
 
         [WidgetStyleValue("text_style")]
-        private WidgetStyleReference m_textStyle = WidgetLabel.DefaultStyle;
+        private WidgetStyleReference m_textStyle = new WidgetStyleReference("default_text");
 
         public Margin TextPadding
         {

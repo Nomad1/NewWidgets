@@ -8,12 +8,25 @@ namespace NewWidgets.Widgets.Styles
     /// </summary>
     public class WidgetImageStyleSheet : WidgetStyleSheet
     {
-        private WidgetBackgroundStyle m_imageStyle = WidgetBackgroundStyle.None;
+        [WidgetStyleValue("image")]
         private string m_image = "";
+
+        [WidgetStyleValue("image_style")]
+        private WidgetBackgroundStyle m_imageStyle = WidgetBackgroundStyle.None;
+
+        [WidgetStyleValue("image_angle")]
         private float m_imageRotation = 0.0f;
+
+        [WidgetStyleValue("image_pivot")]
         private Vector2 m_imagePivot = new Vector2(0);
+
+        [WidgetStyleValue("image_padding")]
         private Margin m_imagePadding = new Margin(0);
+
+        [WidgetStyleValue("image_color")]
         private int m_imageColor = 0xffffff;
+
+        [WidgetStyleValue("image_opacity")]
         private float m_imageOpacity = 1.0f;
 
         public WidgetBackgroundStyle ImageStyle
@@ -56,61 +69,6 @@ namespace NewWidgets.Widgets.Styles
         {
             get { return m_imageColor; }
             internal set { m_imageColor = value; CheckReadonly(); }
-        }
-
-        public WidgetImageStyleSheet(string name, WidgetStyleSheet parent)
-            : base(name, parent)
-        {
-            WidgetImageStyleSheet imageParent = parent as WidgetImageStyleSheet;
-
-            if (imageParent != null)
-            {
-                m_imageColor = imageParent.m_imageColor;
-                m_imageOpacity = imageParent.m_imageOpacity;
-                m_imageStyle = imageParent.m_imageStyle;
-                m_image = imageParent.m_image;
-                m_imagePivot = imageParent.m_imagePivot;
-                m_imagePadding = imageParent.m_imagePadding;
-            }
-        }
-
-        protected override bool ParseParameter(string name, string value)
-        {
-            if (base.ParseParameter(name, value))
-                return true;
-
-            switch (name)
-            {
-                case "image_style":
-                    m_imageStyle = EnumParse<WidgetBackgroundStyle>(value);
-                    break;
-                case "image":
-                    m_image = value;
-                    break;
-                case "image_angle":
-                    m_imageRotation = FloatParse(value);
-                    break;
-                case "image_pivot":
-                    m_imagePivot = Vector2Parse(value);
-                    break;
-                case "image_color":
-                    m_imageColor = ColorParse(value);
-                    break;
-                case "image_opacity":
-                    m_imageOpacity = FloatParse(value);
-                    break;
-                case "image_padding":
-                    m_imagePadding = MarginParse(value);
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
-
-        protected override WidgetStyleSheet Clone()
-        {
-            return new WidgetImageStyleSheet(null, this);
         }
     }
 }

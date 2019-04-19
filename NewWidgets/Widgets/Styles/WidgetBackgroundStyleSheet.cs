@@ -8,14 +8,31 @@ namespace NewWidgets.Widgets.Styles
     /// </summary>
     public class WidgetBackgroundStyleSheet : WidgetStyleSheet
     {
+        [WidgetStyleValue("back_style")]
         private WidgetBackgroundStyle m_backgroundStyle = WidgetBackgroundStyle.None;
+
+        [WidgetStyleValue("back_depth")]
         private WidgetBackgroundDepth m_backgroundDepth = WidgetBackgroundDepth.Back;
+
+        [WidgetStyleValue("back_image")]
         private string m_backgroundTexture = "";
+
+        [WidgetStyleValue("back_scale")]
         private float m_backgroundScale = 1.0f;
+
+        [WidgetStyleValue("back_angle")]
         private float m_backgroundRotation = 0.0f;
+
+        [WidgetStyleValue("back_pivot")]
         private Vector2 m_backgroundPivot = new Vector2(0);
+
+        [WidgetStyleValue("back_padding")]
         private Margin m_backgroundPadding = new Margin(0);
+
+        [WidgetStyleValue("back_color")]
         private int m_backgroundColor = 0xffffff;
+
+        [WidgetStyleValue("back_opacity")]
         private float m_backgroundOpacity = 1.0f;
 
         public WidgetBackgroundStyle BackgroundStyle
@@ -72,67 +89,5 @@ namespace NewWidgets.Widgets.Styles
             internal set { m_backgroundColor = value; CheckReadonly(); }
         }
 
-        public WidgetBackgroundStyleSheet(string name, WidgetStyleSheet parent)
-            : base(name, parent)
-        {
-            WidgetBackgroundStyleSheet backParent = parent as WidgetBackgroundStyleSheet;
-
-            if (backParent != null)
-            {
-                m_backgroundColor = backParent.m_backgroundColor;
-                m_backgroundOpacity = backParent.m_backgroundOpacity;
-                m_backgroundScale = backParent.m_backgroundScale;
-                m_backgroundDepth = backParent.m_backgroundDepth;
-                m_backgroundStyle = backParent.m_backgroundStyle;
-                m_backgroundTexture = backParent.m_backgroundTexture;
-                m_backgroundPivot = backParent.m_backgroundPivot;
-                m_backgroundPadding = backParent.m_backgroundPadding;
-            }
-        }
-
-        protected override bool ParseParameter(string name, string value)
-        {
-            if (base.ParseParameter(name, value))
-                return true;
-
-            switch (name)
-            {
-                case "back_style":
-                    m_backgroundStyle = EnumParse<WidgetBackgroundStyle>(value);
-                    break;
-                case "back_depth":
-                    m_backgroundDepth = EnumParse<WidgetBackgroundDepth>(value);
-                    break;
-                case "back_image":
-                    m_backgroundTexture = value;
-                    break;
-                case "back_scale":
-                    m_backgroundScale = FloatParse(value);
-                    break;
-                case "back_angle":
-                    m_backgroundRotation = FloatParse(value);
-                    break;
-                case "back_pivot":
-                    m_backgroundPivot = Vector2Parse(value);
-                    break;
-                case "back_color":
-                    m_backgroundColor = ColorParse(value);
-                    break;
-                case "back_opacity":
-                    m_backgroundOpacity = FloatParse(value);
-                    break;
-                case "back_padding":
-                    m_backgroundPadding = MarginParse(value);
-                    break;
-                default:
-                    return false;
-            }
-            return true;
-        }
-
-        protected override WidgetStyleSheet Clone()
-        {
-            return new WidgetBackgroundStyleSheet(null, this);
-        }
     }
 }

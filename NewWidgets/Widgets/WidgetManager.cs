@@ -4,39 +4,17 @@ using System.Numerics;
 using System.Collections.Generic;
 using System.Xml;
 using NewWidgets.UI;
-using System.Reflection;
-using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
-    public static class WidgetManager
+    public static partial class WidgetManager
     {
-        private const string DefaultStyleName = "default";
-        private const string DefaultPanelStyleName = "default_panel";
-        private const string DefaultButtonStyleName = "default_button";
-        private const string DefaultImageStyleName = "default_image";
-        private const string DefaultLabelStyleName = "default_label";
-        private const string DefaultTextEditStyleName = "default_textedit";
-        private const string DefaultCheckBoxStyleName = "default_checkbox";
-        private const string DefaultWindowStyleName = "default_window";
-
         // 
         private static float s_fontScale;
         private static Font s_mainFont;
 
         private static Widget s_currentTooltip;
 
-        // styles
-        private static WidgetStyleSheet s_defaultWidgetStyle;
-        private static WidgetBackgroundStyleSheet s_defaultWindowStyle;
-        private static WidgetBackgroundStyleSheet s_defaultPanelStyle;
-        private static WidgetTextStyleSheet s_defaultLabelStyle;
-        private static WidgetButtonStyleSheet s_defaultButtonStyle;
-        private static WidgetButtonStyleSheet s_defaultCheckBoxStyle;
-        private static WidgetTextEditStyleSheet s_defaultTextEditStyle;
-        private static WidgetImageStyleSheet s_defaultImageStyle;
-
-        private static readonly Dictionary<string, WidgetStyleSheet> s_styles = new Dictionary<string, WidgetStyleSheet>();
         private static readonly Dictionary<string, Font> s_fonts = new Dictionary<string, Font>();
 
         // focus
@@ -51,30 +29,7 @@ namespace NewWidgets.Widgets
         public static Font MainFont { get { return s_mainFont; } }
         public static float FontScale { get { return s_fontScale; } }
 
-        public static WidgetStyleSheet DefaultWidgetStyle { get { return s_defaultWidgetStyle ?? (s_defaultWidgetStyle = new WidgetStyleSheet(DefaultStyleName, null)); } }
-        public static WidgetButtonStyleSheet DefaultCheckBoxStyle { get { return s_defaultCheckBoxStyle ?? (s_defaultButtonStyle = new WidgetButtonStyleSheet(DefaultCheckBoxStyleName, DefaultWidgetStyle)); } }
-        public static WidgetButtonStyleSheet DefaultButtonStyle { get { return s_defaultButtonStyle ?? (s_defaultButtonStyle = new WidgetButtonStyleSheet(DefaultButtonStyleName, DefaultWidgetStyle)); } }
-        public static WidgetBackgroundStyleSheet DefaultPanelStyle { get { return s_defaultPanelStyle ?? (s_defaultPanelStyle = new WidgetBackgroundStyleSheet(DefaultPanelStyleName, DefaultWidgetStyle)); } }
-        public static WidgetTextEditStyleSheet DefaultTextEditStyle { get { return s_defaultTextEditStyle ?? (s_defaultTextEditStyle = new WidgetTextEditStyleSheet(DefaultTextEditStyleName, DefaultWidgetStyle)); } }
-        public static WidgetTextStyleSheet DefaultLabelStyle { get { return s_defaultLabelStyle ?? (s_defaultLabelStyle = new WidgetTextStyleSheet(DefaultLabelStyleName, DefaultWidgetStyle)); } }
-        public static WidgetBackgroundStyleSheet DefaultWindowStyle { get { return s_defaultWindowStyle ?? (s_defaultWindowStyle = new WidgetBackgroundStyleSheet(DefaultWindowStyleName, DefaultWidgetStyle)); } }
-        public static WidgetImageStyleSheet DefaultImageStyle { get { return s_defaultImageStyle ?? (s_defaultImageStyle = new WidgetImageStyleSheet(DefaultImageStyleName, DefaultWidgetStyle)); } }
 
-        //
-
-        public static WidgetStyleSheet GetStyle(string name)
-        {
-            if (!string.IsNullOrEmpty(name))
-            {
-                WidgetStyleSheet result;
-                if (s_styles.TryGetValue(name, out result))
-                    return result;
-            }
-
-            WindowController.Instance.LogError("WidgetManager got GetStyle request for not existing style {0}", name);
-
-            return null;  // TODO: return default style to avoid crash?
-        }
 
         public static Font GetFont(string name)
         {
@@ -199,96 +154,7 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered three patch {0}", name);
         }
 
-        private static void RegisterStyle(XmlNode node)
-        {
-            string name = node.Attributes.GetNamedItem("name").Value;
-
-            string @class = node.Attributes.GetNamedItem("class").Value;
-
-            WidgetStyleSheet parent = node.Attributes.GetNamedItem("parent") == null ? null : GetStyle(node.Attributes.GetNamedItem("parent").Value);
-
-            if (parent == null)
-                parent = DefaultWidgetStyle;
-
-            WidgetStyleSheet style = null;
-
-            if (!string.IsNullOrEmpty(@class))
-            {
-                switch (@class.ToLower())
-                {
-                    case "image":
-                        style = new WidgetImageStyleSheet(name, parent);
-                        break;
-                    case "background":
-                    case "panel":
-                    case "window":
-                        style = new WidgetBackgroundStyleSheet(name, parent);
-                        break;
-                    case "label":
-                    case "text":
-                        style = new WidgetTextStyleSheet(name, parent);
-                        break;
-                    case "textedit":
-                        style = new WidgetTextEditStyleSheet(name, parent);
-                        break;
-                    case "button":
-                    case "checkbox":
-                        style = new WidgetButtonStyleSheet(name, parent);
-                        break;
-                    default:
-                        Type type = Type.GetType(@class);
-
-                        if (type == null)
-                            type = Type.GetType(typeof(WidgetStyleSheet).Namespace + "." + @class);
-
-                        if (type == null)
-                            type = Type.GetType(typeof(WidgetStyleSheet).Namespace + ".Widget" + @class + "StyleSheet");
-
-                        if (type == null)
-                            WindowController.Instance.LogError("Class {0} not found for style {1}", @class, name);
-
-                        ConstructorInfo info = type.GetConstructor(new Type[] { typeof(string), typeof(WidgetStyleSheet) });
-
-                        if (info != null)
-                            style = (WidgetStyleSheet)info.Invoke(new object[] { name, parent });
-                        break;
-
-                        //style = (WidgetStyleSheet)Activator.CreateInstance(type, new object[] { name, parent }); // TODO: it will crash if there is no such constructor. Use ConstructorInfo
-                }
-            }
-
-            if (style == null)
-                style = new WidgetStyleSheet(name, parent);
-
-            switch (name)
-            {
-            case DefaultStyleName:
-                s_defaultWidgetStyle = style;
-                break;
-            case DefaultPanelStyleName:
-                s_defaultPanelStyle = style as WidgetBackgroundStyleSheet;
-                break;
-            case DefaultLabelStyleName:
-                s_defaultLabelStyle = style as WidgetTextStyleSheet;
-                break;
-            case DefaultButtonStyleName:
-                s_defaultButtonStyle = style as WidgetButtonStyleSheet;
-                break;
-            case DefaultCheckBoxStyleName:
-                s_defaultCheckBoxStyle = style;
-                break;
-            case DefaultTextEditStyleName:
-                s_defaultTextEditStyle = style as WidgetTextEditStyleSheet;
-                break;
-            case DefaultWindowStyleName:
-                s_defaultWindowStyle = style as WidgetBackgroundStyleSheet;
-                break;
-            }
-            s_styles[name] = style;
-
-            WindowController.Instance.LogMessage("Registered style {0}", name);
-        }
-
+       
         public static bool HasFocus(IWindowContainer window)
         {
             if (window == null)
@@ -400,7 +266,7 @@ namespace NewWidgets.Widgets
         
         public static Window GetTopmostWindow()
         {
-            return (Window)WindowController.Instance.Windows[WindowController.Instance.Windows.Count - 1];
+            return WindowController.Instance.Windows[WindowController.Instance.Windows.Count - 1];
         }
         
         public static void SetExclusive(Widget widget)

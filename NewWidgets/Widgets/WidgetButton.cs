@@ -18,6 +18,8 @@ namespace NewWidgets.Widgets
 
     public class WidgetButton : WidgetBackground
     {
+        public static readonly new WidgetStyleReference<WidgetButtonStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetButtonStyleSheet>("default_button");
+
         private WidgetLabel m_label;
         private WidgetImage m_image;
 
@@ -114,24 +116,29 @@ namespace NewWidgets.Widgets
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetButton"/> class.
+        /// </summary>
+        /// <param name="text">Text.</param>
         public WidgetButton(string text = "")
-            : this(WidgetManager.DefaultButtonStyle, text)
+            : this(null, text)
         {
         }
 
-        public WidgetButton(WidgetButtonStyleSheet style, string text = "")
-            : base(style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetButton"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="text">Text.</param>
+        public WidgetButton(WidgetButtonStyleSheet style, string text)
+            : base(style ?? DefaultStyle)
         {
             m_needLayout = true;
 
-            WidgetTextStyleSheet labelStyle = WidgetManager.GetStyle(style.TextStyle) as WidgetTextStyleSheet;
-
-            m_label = new WidgetLabel(labelStyle ?? WidgetManager.DefaultLabelStyle, text);
+            m_label = new WidgetLabel(Style.TextStyle, text);
             m_label.Parent = this;
 
-            WidgetImageStyleSheet imageStyle = WidgetManager.GetStyle(style.ImageStyle) as WidgetImageStyleSheet;
-
-            m_image = new WidgetImage(imageStyle ?? WidgetManager.DefaultImageStyle);
+            m_image = new WidgetImage(Style.ImageStyle);
             m_image.Parent = this;
 
             m_clickSound = "click";

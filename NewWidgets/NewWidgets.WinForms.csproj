@@ -74,6 +74,9 @@
     <Compile Include="Widgets\Styles\WidgetTextEditStyleSheet.cs" />
     <Compile Include="Widgets\Styles\WidgetButtonStyleSheet.cs" />
     <Compile Include="Widgets\Styles\WidgetImageStyleSheet.cs" />
+    <Compile Include="Widgets\WidgetManager.Styles.cs" />
+    <Compile Include="Widgets\WidgetWindow.cs" />
+    <Compile Include="Widgets\Styles\WidgetScrollViewStyleSheet.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

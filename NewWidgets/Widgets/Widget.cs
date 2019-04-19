@@ -13,6 +13,8 @@ namespace NewWidgets.Widgets
 {
     public class Widget : WindowObject
     {
+        public static readonly WidgetStyleReference<WidgetStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetStyleSheet>("default");
+
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
         private readonly Dictionary<WidgetStyleType, WidgetStyleSheet> m_styles;
@@ -108,9 +110,12 @@ namespace NewWidgets.Widgets
 
         public event TooltipDelegate OnTooltip;
 
-        protected Widget(WidgetStyleSheet style)
+        protected Widget(WidgetStyleSheet style = null)
             : base(null)
         {
+            if (style == null)
+                style = DefaultStyle;
+
             m_styles = new Dictionary<WidgetStyleType, WidgetStyleSheet>();
 
             LoadStyle(WidgetStyleType.Normal, style);
@@ -118,6 +123,7 @@ namespace NewWidgets.Widgets
             m_currentStyleType = WidgetStyleType.Normal;
             m_currentStyle = style;
 
+            Size = style.Size;
         }
 
         #region Styles

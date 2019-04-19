@@ -9,7 +9,8 @@ namespace NewWidgets.Widgets
 {
     public class WidgetTextEdit : WidgetBackground, IFocusableWidget
     {
-        private char m_cursorChar = '|';
+        public static readonly new WidgetStyleReference<WidgetTextEditStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetTextEditStyleSheet>("default_label");
+
         private int m_cursorPosition;
 
         private LabelObject m_label;
@@ -20,7 +21,6 @@ namespace NewWidgets.Widgets
 
         private char m_maskChar;
         
-        private int m_cursorColor;
 
         public event Action<WidgetTextEdit, string> OnFocusLost;
         public event Action<WidgetTextEdit, string> OnTextEntered;
@@ -78,6 +78,16 @@ namespace NewWidgets.Widgets
             }
         }
 
+        public string CursorChar
+        {
+            get { return Style.CursorChar; }
+            set
+            {
+                WritableStyle.CursorChar = value;
+                m_needLayout = true;
+            }
+        }
+
         public string Text
         {
             get { return m_text; }
@@ -128,13 +138,12 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public WidgetTextEdit()
-            : this(WidgetManager.DefaultTextEditStyle)
-        {
-        }
-
-        public WidgetTextEdit(WidgetStyleSheet style)
-            : base(style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextEdit"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        public WidgetTextEdit(WidgetTextEditStyleSheet style = null)
+            : base(style ?? DefaultStyle)
         {
             m_text = string.Empty;
             m_preffix = string.Empty;
@@ -156,8 +165,8 @@ namespace NewWidgets.Widgets
 
             if (m_cursor == null)
             {
-                m_cursor = Font.GetSprites(m_cursorChar.ToString(), Vector2.Zero)[0];
-                m_cursor.Color = m_cursorColor;
+                m_cursor = Font.GetSprites(CursorChar, Vector2.Zero)[0];
+                m_cursor.Color = CursorColor;
                 m_cursor.Scale = FontSize;
                 //m_cursor.Blink(2000);
                 m_cursor.Transform.Parent = Transform;

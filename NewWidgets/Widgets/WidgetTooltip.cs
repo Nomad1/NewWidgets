@@ -24,10 +24,9 @@ namespace NewWidgets.Widgets
             set { m_region = value; }
         }
 
-        public WidgetTooltip(WidgetStyleSheet style)
+        public WidgetTooltip(WidgetBackgroundStyleSheet style)
             : base(style)
         {
-            Size = style.Size;
         }
 
         public virtual void UpdatePosition(Vector2 position)

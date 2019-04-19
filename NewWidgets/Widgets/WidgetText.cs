@@ -9,6 +9,8 @@ namespace NewWidgets.Widgets
 {
     public class WidgetText : Widget
     {
+        public static readonly new WidgetStyleReference<WidgetTextStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetTextStyleSheet>("default_text");
+
         private static char[] s_separatorChars = { ' ', '\t' };
 
         private LabelObject[] m_labels;
@@ -112,12 +114,12 @@ namespace NewWidgets.Widgets
         }
 
         public WidgetText(string text = "")
-            : this(WidgetManager.DefaultLabelStyle, text)
+            : this(null, text)
         {
         }
 
         public WidgetText(WidgetTextStyleSheet style, string text = "")
-            : base(style)
+            : base(style ?? DefaultStyle)
         {
             m_text = text;
             m_needLayout = true;

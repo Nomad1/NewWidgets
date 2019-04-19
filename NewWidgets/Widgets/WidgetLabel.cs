@@ -13,6 +13,8 @@ namespace NewWidgets.Widgets
 {
     public class WidgetLabel : Widget
     {
+        public static readonly new WidgetStyleReference<WidgetTextStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetTextStyleSheet>("default_label");
+
         private LabelObject m_label;
 
         private string m_text;
@@ -100,19 +102,23 @@ namespace NewWidgets.Widgets
                     m_label.Alpha = value;
             }
         }
-        
-        public WidgetLabel()
-            : this(WidgetManager.DefaultLabelStyle, string.Empty)
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetLabel"/> class.
+        /// </summary>
+        /// <param name="text">Text.</param>
+        public WidgetLabel(string text = "")
+            : this(null, text)
         {
         }
 
-        public WidgetLabel(string text)
-            : this(WidgetManager.DefaultLabelStyle, text)
-        {
-        }
-        
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetLabel"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="text">Text.</param>
         public WidgetLabel(WidgetTextStyleSheet style, string text)
-            : base(style)
+            : base(style ?? DefaultStyle)
         {
             m_needLayout = true;
             m_text = text;

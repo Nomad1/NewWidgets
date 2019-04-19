@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if false
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Drawing;
@@ -122,18 +123,28 @@ namespace NewWidgets.Widgets
         {
             m_contentView = new WidgetPanel(WidgetManager.DefaultWidgetStyle);
             m_contentView.Parent = this;
-            ClipContents = true;
             m_horizontalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;
             m_verticalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;
 
-            m_horizontalScrollBar = new Widget(WidgetManager.GetStyle("scroll_horizontal"));
+
+            WidgetBackgroundStyleSheet horizontalScrollStyle = WidgetManager.GetStyle(style.HorizontalScrollStyle) as WidgetTextStyleSheet;
+
+            m_horizontalScrollBar = new WidgetBackground(horizontalScrollStyle);
             m_horizontalScrollBar.Parent = this;
-            m_horizontalScrollBarIndicator = new Widget(WidgetManager.GetStyle("scroll_indicator_horizontal"));
+
+            WidgetBackgroundStyleSheet horizontalIndicatorStyle = WidgetManager.GetStyle(style.HorizontalIndicatorStyle) as WidgetTextStyleSheet;
+
+            m_horizontalScrollBarIndicator = new WidgetBackground(horizontalIndicatorStyle);
             m_horizontalScrollBarIndicator.Parent = this;
-            
-            m_verticalScrollBar = new Widget(WidgetManager.GetStyle("scroll_vertical"));
+
+            WidgetBackgroundStyleSheet verticalScrollStyle = WidgetManager.GetStyle(style.VerticalScrollStyle) as WidgetTextStyleSheet;
+
+            m_verticalScrollBar = new WidgetBackground(verticalScrollStyle /* WidgetManager.GetStyle("scroll_vertical")*/);
             m_verticalScrollBar.Parent = this;
-            m_verticalScrollBarIndicator = new Widget(WidgetManager.GetStyle("scroll_indicator_vertical"));
+
+            WidgetBackgroundStyleSheet verticalIndicatorStyle = WidgetManager.GetStyle(style.VerticalIndicatorStyle) as WidgetTextStyleSheet;
+
+            m_verticalScrollBarIndicator = new WidgetBackground(verticalIndicatorStyle /* WidgetManager.GetStyle("scroll_indicator_vertical");*/);
             m_verticalScrollBarIndicator.Parent = this;
 
             m_needLayout = true;
@@ -464,7 +475,7 @@ namespace NewWidgets.Widgets
             if (child is Widget)
                 AddChild((Widget)child);
             else
-                throw new ArgumentException("child");
+                throw new ArgumentException(nameof(child));
         }
 
         public void Clear(bool scroolToZero = false)
@@ -531,3 +542,4 @@ namespace NewWidgets.Widgets
     }
 }
 
+#endif
