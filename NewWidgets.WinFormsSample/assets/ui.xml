@@ -62,13 +62,22 @@
     <focus_color>#ffffff</focus_color>
     <padding>6;2;6;0</padding>
     <selected_style>default_textedit_selected</selected_style>
+    <hovered_style>default_textedit_hovered</hovered_style>
   </style>
     
   <style name="default_textedit_selected" parent="default_textedit">
     <back_image>panel_white_normal_9</back_image>
     <text_color>#ffffff</text_color>
+    <hovered_style>default_textedit_selected_hovered</hovered_style>
   </style>
 
+  <style name="default_textedit_selected_hovered" parent="default_textedit_selected">
+    <back_color>#ffee88</back_color>
+  </style>
+    
+    <style name="default_textedit_hovered" parent="default_textedit">
+    <back_color>#ffee88</back_color>
+  </style>
   <!-- ScrollView -->
 
   <style name="scroll_horizontal" class="background">

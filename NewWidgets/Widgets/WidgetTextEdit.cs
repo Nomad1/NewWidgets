@@ -399,22 +399,20 @@ namespace NewWidgets.Widgets
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (HitTest(x, y))
+            if (press)
             {
-                if (press)
+                bool wasFocused = IsFocused;
+
+                SetFocused(true);
+
+                Vector2 local = (this.Transform.GetClientPoint(new Vector2(x, y)) - m_label.Position) / FontSize;
+                ISprite[] sprites = m_label.InternalGetSprites();
+
+                if (sprites.Length > 0)
                 {
-                    bool wasFocused = IsFocused;
+                    bool found = false;
 
-                    SetFocused(true);
-
-                    Vector2 local = (this.Transform.GetClientPoint(new Vector2(x, y)) - m_label.Position) / FontSize;
-                    ISprite[] sprites = m_label.InternalGetSprites();
-
-                    if (sprites.Length > 0)
-                    {
-                        bool found = false;
-
-                        if (!found && wasFocused)
+                    if (!found && wasFocused)
                         for (int i = 0; i < sprites.Length; i++)
                         {
                             if (local.X < sprites[i].Position.X + sprites[i].Size.X / 2)
@@ -423,25 +421,39 @@ namespace NewWidgets.Widgets
                                     UpdateCursor(i - m_cursorPosition);
                                 else
                                     if (i >= m_cursorPosition)
-                                        UpdateCursor(i - m_cursorPosition - 1);
+                                    UpdateCursor(i - m_cursorPosition - 1);
                                 found = true;
                                 break;
                             }
                         }
 
-                        if (!found)
-                        {
-                            int last = m_text.Length - 1;
-                            UpdateCursor(last - m_cursorPosition + 1);
-                        }
+                    if (!found)
+                    {
+                        int last = m_text.Length - 1;
+                        UpdateCursor(last - m_cursorPosition + 1);
                     }
                 }
-                return true;
             }
 
-            return base.Touch(x, y, press, unpress, pointer);
+            if (!press && !unpress && !Hovered)
+            {
+                Hovered = true;
+                WindowController.Instance.OnTouch += UnHoverTouch;
+            }
+            return true;
         }
-        
+
+        private bool UnHoverTouch(float x, float y, bool press, bool unpress, int pointer)
+        {
+            if (Hovered && !HitTest(x, y))
+            {
+                Hovered = false;
+                WindowController.Instance.OnTouch -= UnHoverTouch;
+            }
+            return false;
+        }
+
+
         public override void Remove()
         {
             WidgetManager.UpdateFocus(this, false);
