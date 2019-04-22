@@ -9,44 +9,52 @@ using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetStyleReference
+    public class WidgetStyleReference<T> where T : WidgetStyleSheet
     {
         private WidgetStyleSheet m_style;
         private readonly string m_name;
 
-        public WidgetStyleSheet Style
+        public T Style
         {
             get
             {
                 if (m_style == null)
                     m_style = WidgetManager.GetStyle(m_name);
 
-                return m_style;
+                if (m_style != null && !(m_style is T))
+                    throw new Exception(string.Format("Style {0} is requested to be cast to type {1} while being type {2}", m_name, typeof(T), m_style.GetType()));
+
+                return m_style as T;
             }
         }
 
-        public WidgetStyleReference(string name)
+        internal WidgetStyleReference(string name)
         {
             m_name = name;
-        }
-    }
-
-    public class WidgetStyleReference<T> : WidgetStyleReference where T : WidgetStyleSheet
-    {
-        public WidgetStyleReference(string name)
-            : base(name)
-        {
-
         }
 
         public static implicit operator T(WidgetStyleReference<T> reference)
         {
-            return reference.Style as T;
+            return reference.Style;
         }
     }
 
     public static partial class WidgetManager
     {
+        public static WidgetStyleReference<T> RegisterDefaultStyle<T>(string name) where T : WidgetStyleSheet, new()
+        {
+            WidgetStyleReference<T> result = new WidgetStyleReference<T>(name);
+
+            if (!s_styles.ContainsKey(name))
+            {
+                WidgetStyleSheet defaultStyle = new T();
+                defaultStyle.Name = name;
+                s_styles[name] = defaultStyle;
+            }
+
+            return result;
+        }
+
         // styles
         private static readonly IDictionary<string, WidgetStyleSheet> s_styles = new Dictionary<string, WidgetStyleSheet>();
         private static readonly IDictionary<Type, IDictionary<string, FieldInfo>> s_styleAttributes = new Dictionary<Type, IDictionary<string, FieldInfo>>();
@@ -117,14 +125,16 @@ namespace NewWidgets.Widgets
 
         private static void RegisterStyle(XmlNode node)
         {
-            string name = node.Attributes.GetNamedItem("name").Value;
+            string name = GetAttribute(node, "name");
 
-            string @class = node.Attributes.GetNamedItem("class").Value;
+            string @class = GetAttribute(node, "class");
 
-            WidgetStyleSheet parent = node.Attributes.GetNamedItem("parent") == null ? null : GetStyle(node.Attributes.GetNamedItem("parent").Value);
+            string parent = GetAttribute(node, "parent");
 
-            if (parent == null)
-                parent = new WidgetStyleSheet();
+            WidgetStyleSheet parentStyle = parent == null ? null : GetStyle(parent);
+
+            if (parentStyle == null)
+                parentStyle = new WidgetStyleSheet();
 
             WidgetStyleSheet style = null;
 
@@ -133,23 +143,23 @@ namespace NewWidgets.Widgets
                 switch (@class.ToLower())
                 {
                     case "image":
-                        style = CreateStyle(name, typeof(WidgetImageStyleSheet), parent);
+                        style = CreateStyle(name, typeof(WidgetImageStyleSheet), parentStyle);
                         break;
                     case "background":
                     case "panel":
                     case "window":
-                        style = CreateStyle(name, typeof(WidgetBackgroundStyleSheet), parent);
+                        style = CreateStyle(name, typeof(WidgetBackgroundStyleSheet), parentStyle);
                         break;
                     case "label":
                     case "text":
-                        style = CreateStyle(name, typeof(WidgetTextStyleSheet), parent);
+                        style = CreateStyle(name, typeof(WidgetTextStyleSheet), parentStyle);
                         break;
                     case "textedit":
-                        style = CreateStyle(name, typeof(WidgetTextEditStyleSheet), parent);
+                        style = CreateStyle(name, typeof(WidgetTextEditStyleSheet), parentStyle);
                         break;
                     case "button":
                     case "checkbox":
-                        style = CreateStyle(name, typeof(WidgetButtonStyleSheet), parent);
+                        style = CreateStyle(name, typeof(WidgetButtonStyleSheet), parentStyle);
                         break;
                     default:
                         Type type = Type.GetType(@class);
@@ -163,14 +173,16 @@ namespace NewWidgets.Widgets
                         if (type == null)
                             WindowController.Instance.LogError("Class {0} not found for style {1}", @class, name);
 
-                        style = CreateStyle(name, type, parent);
+                        style = CreateStyle(name, type, parentStyle);
                         break;
 
                 }
             }
 
             if (style == null)
-                style = CreateStyle(name, typeof(WidgetStyleSheet), parent);
+                style = CreateStyle(name, parentStyle.GetType(), parentStyle);
+
+            InitStyle(style, node);
 
             s_styles[name] = style;
 
@@ -186,16 +198,20 @@ namespace NewWidgets.Widgets
             if (!s_styleAttributes.TryGetValue(type, out styleMap))
             {
                 styleMap = new Dictionary<string, FieldInfo>();
-
-                FieldInfo[] fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
-
-                foreach (FieldInfo field in fields)
-                    foreach (WidgetStyleValueAttribute attribute in field.GetCustomAttributes<WidgetStyleValueAttribute>())
-                    {
-                        styleMap[attribute.Name] = field;
-                    }
-
                 s_styleAttributes[type] = styleMap;
+
+                while (type != null)
+                {
+                    FieldInfo[] fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+
+                    foreach (FieldInfo field in fields)
+                        foreach (WidgetStyleValueAttribute attribute in field.GetCustomAttributes<WidgetStyleValueAttribute>())
+                        {
+                            styleMap[attribute.Name] = field;
+                        }
+
+                    type = type.BaseType;
+                }
             }
 
             return styleMap;
@@ -207,7 +223,9 @@ namespace NewWidgets.Widgets
 
             foreach (XmlNode element in node.ChildNodes)
             {
+#if !DEBUG
                 try
+#endif
                 {
                     string value = element.InnerText;
                     if (string.IsNullOrEmpty(value) && element.Attributes.GetNamedItem("value") != null)
@@ -219,14 +237,16 @@ namespace NewWidgets.Widgets
                         value = value.Trim('\r', '\n', '\t', ' ');
 
                     FieldInfo field;
-                    if (styleMap.TryGetValue(value, out field))
+                    if (styleMap.TryGetValue(element.Name, out field))
                         InitField(style, field, value);
                 }
+#if !DEBUG
                 catch (Exception ex)
                 {
                     WindowController.Instance.LogError("Error parsing style {0}, element {1}: {2}", style.Name, element.Name, ex);
                     throw;
                 }
+#endif
             }
         }
 
@@ -238,8 +258,8 @@ namespace NewWidgets.Widgets
 
             if (fieldType == typeof(Font))
                 fieldValue = GetFont(value); // font should be registered first to avoid confusion
-            else if (fieldType == typeof(WidgetStyleReference))
-                fieldValue = new WidgetStyleReference(value); // saves only reference
+            else if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(WidgetStyleReference<>))
+                fieldValue = Activator.CreateInstance(fieldType, new object[] { value }); // saves only reference
             else if (fieldType == typeof(string))
                 fieldValue = (object)value;
             else if (fieldType == typeof(float))
@@ -274,7 +294,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        #region String parsers
+#region String parsers
 
         /// <summary>
         /// Culture invariant float parsing
@@ -310,7 +330,7 @@ namespace NewWidgets.Widgets
         {
             string[] values = value.Split(';');
 
-            if (value.Length != 2)
+            if (values.Length != 2)
                 throw new ArgumentException("Invalid string value for Vector2 type!");
 
             float x = FloatParse(values[0]);
@@ -327,7 +347,7 @@ namespace NewWidgets.Widgets
         {
             string[] values = value.Split(';');
 
-            if (value.Length != 1 && value.Length != 4)
+            if (values.Length != 1 && values.Length != 4)
                 throw new ArgumentException("Invalid string value for Margin type!");
 
             if (values.Length == 1)
@@ -366,6 +386,13 @@ namespace NewWidgets.Widgets
             return (Enum)Enum.Parse(enumType, value, true);
         }
 
-        #endregion
+        public static string GetAttribute(XmlNode node, string name)
+        {
+            var attribute = node.Attributes.GetNamedItem(name);
+
+            return attribute == null ? null : attribute.Value;
+        }
+
+#endregion
     }
 }

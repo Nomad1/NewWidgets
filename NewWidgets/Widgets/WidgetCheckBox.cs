@@ -8,7 +8,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetCheckBox : Widget
     {
-        public static readonly new WidgetStyleReference<WidgetButtonStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetButtonStyleSheet>("default_checkbox");
+        public static readonly new WidgetStyleReference<WidgetButtonStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetButtonStyleSheet>("default_checkbox");
 
         private WidgetImage m_image;
         private WidgetLabel m_linkedLabel;
@@ -81,8 +81,11 @@ namespace NewWidgets.Widgets
         /// <param name="style">Style.</param>
         /// <param name="isChecked">If set to <c>true</c> is checked.</param>
         public WidgetCheckBox(WidgetStyleSheet style, bool isChecked)
-            : base(style ?? DefaultStyle)
+            : base(style as WidgetButtonStyleSheet ?? DefaultStyle)
         {
+            if (Style != style)
+                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
+
             m_image = new WidgetImage(Style.ImageStyle);
             m_image.Parent = this;
 

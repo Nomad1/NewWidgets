@@ -9,7 +9,7 @@ namespace NewWidgets.Widgets.Styles
     public class WidgetBackgroundStyleSheet : WidgetStyleSheet
     {
         [WidgetStyleValue("back_style")]
-        private WidgetBackgroundStyle m_backgroundStyle = WidgetBackgroundStyle.None;
+        protected WidgetBackgroundStyle m_backgroundStyle = WidgetBackgroundStyle.None;
 
         [WidgetStyleValue("back_depth")]
         private WidgetBackgroundDepth m_backgroundDepth = WidgetBackgroundDepth.Back;
@@ -24,7 +24,7 @@ namespace NewWidgets.Widgets.Styles
         private float m_backgroundRotation = 0.0f;
 
         [WidgetStyleValue("back_pivot")]
-        private Vector2 m_backgroundPivot = new Vector2(0);
+        private Vector2 m_backgroundPivot = new Vector2(0.5f);
 
         [WidgetStyleValue("back_padding")]
         private Margin m_backgroundPadding = new Margin(0);
@@ -88,6 +88,5 @@ namespace NewWidgets.Widgets.Styles
             get { return m_backgroundColor; }
             internal set { m_backgroundColor = value; CheckReadonly(); }
         }
-
     }
 }

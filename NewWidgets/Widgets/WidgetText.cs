@@ -9,7 +9,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetText : Widget
     {
-        public static readonly new WidgetStyleReference<WidgetTextStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetTextStyleSheet>("default_text");
+        public static readonly new WidgetStyleReference<WidgetTextStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextStyleSheet>("default_text");
 
         private static char[] s_separatorChars = { ' ', '\t' };
 
@@ -118,9 +118,12 @@ namespace NewWidgets.Widgets
         {
         }
 
-        public WidgetText(WidgetTextStyleSheet style, string text = "")
-            : base(style ?? DefaultStyle)
+        public WidgetText(WidgetStyleSheet style, string text = "")
+            : base(style as WidgetTextStyleSheet ?? DefaultStyle)
         {
+            if (Style != style)
+                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
+
             m_text = text;
             m_needLayout = true;
             m_richText = true;

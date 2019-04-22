@@ -17,10 +17,10 @@ namespace NewWidgets.Widgets.Styles
         private Margin m_imagePadding = new Margin(0);
 
         [WidgetStyleValue("image_style")]
-        private WidgetStyleReference m_imageStyle = WidgetImage.DefaultStyle;
+        private WidgetStyleReference<WidgetImageStyleSheet> m_imageStyle = WidgetImage.DefaultStyle;
 
         [WidgetStyleValue("text_style")]
-        private WidgetStyleReference m_textStyle = WidgetLabel.DefaultStyle;
+        private WidgetStyleReference<WidgetTextStyleSheet> m_textStyle = WidgetLabel.DefaultStyle;
 
         public Margin TextPadding
         {

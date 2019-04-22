@@ -9,7 +9,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetTextEdit : WidgetBackground, IFocusableWidget
     {
-        public static readonly new WidgetStyleReference<WidgetTextEditStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetTextEditStyleSheet>("default_label");
+        public static readonly new WidgetStyleReference<WidgetTextEditStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextEditStyleSheet>("default_textedit");
 
         private int m_cursorPosition;
 
@@ -142,14 +142,15 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextEdit"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetTextEdit(WidgetTextEditStyleSheet style = null)
-            : base(style ?? DefaultStyle)
+        public WidgetTextEdit(WidgetStyleSheet style = null)
+            : base(style as WidgetTextEditStyleSheet ?? DefaultStyle)
         {
+            if (Style != style)
+                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
+
             m_text = string.Empty;
             m_preffix = string.Empty;
             m_needLayout = true;
-
-            Size = style.Size;
         }
 
         private void Relayout()

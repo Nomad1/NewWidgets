@@ -17,10 +17,10 @@ namespace NewWidgets.Widgets.Styles
         private Margin m_imagePadding = new Margin(0);
 
         [WidgetStyleValue("image_style")]
-        private WidgetStyleReference m_imageStyle = new WidgetStyleReference("default_image");
+        private WidgetStyleReference<WidgetImageStyleSheet> m_imageStyle = WidgetImage.DefaultStyle;
 
         [WidgetStyleValue("text_style")]
-        private WidgetStyleReference m_textStyle = new WidgetStyleReference("default_text");
+        private WidgetStyleReference<WidgetTextStyleSheet> m_textStyle = WidgetLabel.DefaultStyle;
 
         public Margin TextPadding
         {
@@ -42,12 +42,12 @@ namespace NewWidgets.Widgets.Styles
 
         public WidgetImageStyleSheet ImageStyle
         {
-            get { return m_imageStyle.Style as WidgetImageStyleSheet; }
+            get { return m_imageStyle.Style; }
         }
 
         public WidgetTextStyleSheet TextStyle
         {
-            get { return m_textStyle.Style as WidgetTextStyleSheet; }
+            get { return m_textStyle.Style; }
         }
     }
 }

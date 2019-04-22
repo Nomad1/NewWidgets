@@ -37,16 +37,16 @@ namespace NewWidgets.Widgets.Styles
         [WidgetStyleValue("size")]
         private Vector2 m_size = new Vector2(0);
         [WidgetStyleValue("clip")]
-        private bool m_clipContents = false;
+        private bool m_clipContents = true;
         [WidgetStyleValue("clip_margin")]
-        private Margin m_clipMargin = new Margin(0);
+        private Margin m_clipMargin = new Margin(2);
 
         [WidgetStyleValue("hovered_style")]
-        private string m_hoveredStyle = "default";
+        private string m_hoveredStyle = null;
         [WidgetStyleValue("disabled_style")]
-        private string m_disabledStyle = "default";
+        private string m_disabledStyle = null;
         [WidgetStyleValue("selected_style")]
-        private string m_selectedStyle = "default";
+        private string m_selectedStyle = null;
 
         // Internal properties
 
@@ -111,6 +111,11 @@ namespace NewWidgets.Widgets.Styles
         protected void CheckReadonly()
         {
             Debug.Assert(m_instancedFor != 0, "Read only class");
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Style: {0}, name {1}", GetType().Name, m_name);
         }
 
     }

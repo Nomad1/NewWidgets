@@ -13,7 +13,7 @@ namespace NewWidgets.Widgets
 {
     public class Widget : WindowObject
     {
-        public static readonly WidgetStyleReference<WidgetStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetStyleSheet>("default");
+        public static readonly WidgetStyleReference<WidgetStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetStyleSheet>("default");
 
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
@@ -21,7 +21,7 @@ namespace NewWidgets.Widgets
         private WidgetStyleType m_currentStyleType;
         private WidgetStyleSheet m_currentStyle;
 
-        private float m_alpha; // the only property that could be changed for simple widget without affecting its stylesheet
+        private float m_alpha = 1.0f; // the only property that could be changed for simple widget without affecting its stylesheet
 
         private string m_tooltip;
 
@@ -118,10 +118,10 @@ namespace NewWidgets.Widgets
 
             m_styles = new Dictionary<WidgetStyleType, WidgetStyleSheet>();
 
-            LoadStyle(WidgetStyleType.Normal, style);
-
             m_currentStyleType = WidgetStyleType.Normal;
             m_currentStyle = style;
+
+            LoadStyle(WidgetStyleType.Normal, style);
 
             Size = style.Size;
         }
@@ -209,6 +209,9 @@ namespace NewWidgets.Widgets
 
                     if (hoveredStyle != null && hoveredStyle != style)
                     {
+                        if (hoveredStyle.GetType() != m_currentStyle.GetType() && !hoveredStyle.GetType().IsSubclassOf(m_currentStyle.GetType()))
+                            throw new Exception(string.Format("Hovered style {0} for {1} has incompatible type {2}", hoveredStyleName, this, hoveredStyle.GetType()));
+
                         WidgetStyleType targetStyleType = 0;
                         switch (styleType)
                         {
@@ -236,7 +239,6 @@ namespace NewWidgets.Widgets
             // Disabled can be only subset of Normal or Selected
             if (styleType == WidgetStyleType.Normal || styleType == WidgetStyleType.Selected)
             {
-
                 string disabledStyleName = style.DisabledStyle;
 
                 if (!string.IsNullOrEmpty(disabledStyleName))
@@ -245,6 +247,9 @@ namespace NewWidgets.Widgets
 
                     if (disabledStyle != null && disabledStyle != style)
                     {
+                        if (disabledStyle.GetType() != m_currentStyle.GetType() && !disabledStyle.GetType().IsSubclassOf(m_currentStyle.GetType()))
+                            throw new Exception(string.Format("Disabled style {0} for {1} has incompatible type {2}", disabledStyleName, this, disabledStyle.GetType()));
+
                         WidgetStyleType targetStyleType = 0;
                         switch (styleType)
                         {
@@ -273,6 +278,9 @@ namespace NewWidgets.Widgets
 
                     if (selectedStyle != null && selectedStyle != style)
                     {
+                        if (selectedStyle.GetType() != m_currentStyle.GetType() && !selectedStyle.GetType().IsSubclassOf(m_currentStyle.GetType()))
+                            throw new Exception(string.Format("Selected style {0} for {1} has incompatible type {2}", selectedStyleName, this, selectedStyle.GetType()));
+
                         WidgetStyleType targetStyleType = 0;
                         switch (styleType)
                         {

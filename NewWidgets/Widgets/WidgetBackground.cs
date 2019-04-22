@@ -12,7 +12,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetBackground : Widget
     {
-        public static readonly new WidgetStyleReference<WidgetBackgroundStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetBackgroundStyleSheet>("default_background");
+        public static readonly new WidgetStyleReference<WidgetBackgroundStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_background");
 
         protected readonly WindowObjectArray<WindowObject> m_background;
 
@@ -86,9 +86,12 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetBackground"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetBackground(WidgetBackgroundStyleSheet style)
-            : base(style ?? DefaultStyle)
+        public WidgetBackground(WidgetStyleSheet style)
+            : base(style as WidgetBackgroundStyleSheet ?? DefaultStyle)
         {
+            if (Style != style)
+                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
+
             m_background = new WindowObjectArray<WindowObject>();
         }
 

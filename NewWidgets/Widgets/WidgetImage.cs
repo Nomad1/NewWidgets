@@ -7,7 +7,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetImage : Widget
     {
-        public static readonly new WidgetStyleReference<WidgetImageStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetImageStyleSheet>("default_image");
+        public static readonly new WidgetStyleReference<WidgetImageStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetImageStyleSheet>("default_image");
 
         private ImageObject m_imageObject;
 
@@ -112,9 +112,12 @@ namespace NewWidgets.Widgets
         /// <param name="style">Style.</param>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetImageStyleSheet style, WidgetBackgroundStyle imageStyle = 0, string image = "")
-            : base(style ?? DefaultStyle)
+        public WidgetImage(WidgetStyleSheet style, WidgetBackgroundStyle imageStyle = 0, string image = "")
+            : base(style as WidgetImageStyleSheet ?? DefaultStyle)
         {
+            if (Style != style)
+                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
+
             ImageStyle = imageStyle == 0 ? Style.ImageStyle : imageStyle;
             Image = string.IsNullOrEmpty(image) ? Style.Image : image;
         }

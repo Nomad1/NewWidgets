@@ -18,7 +18,7 @@ namespace NewWidgets.Widgets
 
     public class WidgetButton : WidgetBackground
     {
-        public static readonly new WidgetStyleReference<WidgetButtonStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetButtonStyleSheet>("default_button");
+        public static readonly new WidgetStyleReference<WidgetButtonStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetButtonStyleSheet>("default_button");
 
         private WidgetLabel m_label;
         private WidgetImage m_image;
@@ -44,6 +44,8 @@ namespace NewWidgets.Widgets
             get { return (WidgetButtonStyleSheet)base.WritableStyle; }
         }
 
+        // Dynamic properties
+
         public string Text
         {
             get { return m_label.Text; }
@@ -56,11 +58,27 @@ namespace NewWidgets.Widgets
             set { m_image.Image = value; m_needLayout = true; }
         }
 
+        // Forwarded style properties
+
         public int ImageTint
         {
             get { return m_image.Color; }
             set { m_image.Color = value; }
         }
+
+        public Font Font
+        {
+            get { return m_label.Font; }
+            set { m_label.Font = value; }
+        }
+
+        public float FontSize
+        {
+            get { return m_label.FontSize; }
+            set { m_label.FontSize = value; }
+        }
+
+        // Own style properties
 
         public ButtonLayout Layout
         {
@@ -79,6 +97,8 @@ namespace NewWidgets.Widgets
             get { return Style.TextPadding; }
             set { WritableStyle.TextPadding = value; m_needLayout = true; }
         }
+
+        // Button properties
 
         public string ClickSound
         {
@@ -130,9 +150,12 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="text">Text.</param>
-        public WidgetButton(WidgetButtonStyleSheet style, string text)
-            : base(style ?? DefaultStyle)
+        public WidgetButton(WidgetStyleSheet style, string text)
+            : base(style as WidgetButtonStyleSheet ?? DefaultStyle)
         {
+            if (Style != style)
+                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
+
             m_needLayout = true;
 
             m_label = new WidgetLabel(Style.TextStyle, text);
@@ -142,8 +165,6 @@ namespace NewWidgets.Widgets
             m_image.Parent = this;
 
             m_clickSound = "click";
-
-            Size = style.Size;
         }
 
         public override void SwitchStyle(WidgetStyleType styleType)

@@ -40,7 +40,7 @@ namespace NewWidgets.Widgets
                     return result;
             }
 
-            WindowController.Instance.LogError("WidgetManager got GetStyle for not existing font {0}", name);
+            WindowController.Instance.LogError("WidgetManager got GetFont for not existing font {0}", name);
 
             return null; // TODO: return default font to avoid crash?
         }
@@ -59,7 +59,9 @@ namespace NewWidgets.Widgets
 
         public static void LoadUI(string uiData)
         {
+#if !DEBUG
             try
+#endif
             {
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(uiData);
@@ -90,11 +92,13 @@ namespace NewWidgets.Widgets
                 }
 
             }
+#if !DEBUG
             catch (Exception ex)
             {
                 WindowController.Instance.LogError("Error loading ui data: " + ex);
                 throw;
             }
+#endif
         }
 
         private static bool HandleTouch(float x, float y, bool press, bool unpress, int pointer)

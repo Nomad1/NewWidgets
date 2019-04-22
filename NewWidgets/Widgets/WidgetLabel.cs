@@ -13,7 +13,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetLabel : Widget
     {
-        public static readonly new WidgetStyleReference<WidgetTextStyleSheet> DefaultStyle = new WidgetStyleReference<WidgetTextStyleSheet>("default_label");
+        public static readonly new WidgetStyleReference<WidgetTextStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextStyleSheet>("default_label");
 
         private LabelObject m_label;
 
@@ -117,9 +117,12 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="text">Text.</param>
-        public WidgetLabel(WidgetTextStyleSheet style, string text)
-            : base(style ?? DefaultStyle)
+        public WidgetLabel(WidgetStyleSheet style, string text)
+            : base(style as WidgetTextStyleSheet ?? DefaultStyle)
         {
+            if (Style != style)
+                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
+
             m_needLayout = true;
             m_text = text;
             m_richText = true;
