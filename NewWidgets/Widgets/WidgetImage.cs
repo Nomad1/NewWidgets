@@ -81,7 +81,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="image">Image.</param>
         public WidgetImage(string image = "")
-            : this(default(WidgetStyleSheet), WidgetBackgroundStyle.ImageFit, image)
+            : this(default(WidgetStyleSheet), string.IsNullOrEmpty(image) ? 0 : WidgetBackgroundStyle.ImageFit, image)
         {
 
         }
@@ -93,7 +93,7 @@ namespace NewWidgets.Widgets
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
         public WidgetImage(WidgetBackgroundStyle imageStyle = WidgetBackgroundStyle.ImageFit, string image = "")
-            : this(default(WidgetStyleSheet), imageStyle, image)
+            : this(default(WidgetStyleSheet), string.IsNullOrEmpty(image)? 0 : imageStyle, image)
         {
            
         }
@@ -105,7 +105,7 @@ namespace NewWidgets.Widgets
         /// <param name="style">Style.</param>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetStyleSheet style = default(WidgetStyleSheet), WidgetBackgroundStyle imageStyle = 0, string image = "")
+        public WidgetImage(WidgetStyleSheet style = default(WidgetStyleSheet), WidgetBackgroundStyle imageStyle = WidgetBackgroundStyle.ImageFit, string image = "")
             : base(style.IsEmpty ? DefaultStyle : style)
         {
             if (imageStyle != 0)

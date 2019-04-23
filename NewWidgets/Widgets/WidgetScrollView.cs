@@ -122,17 +122,19 @@ namespace NewWidgets.Widgets
             m_horizontalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;
             m_verticalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;
 
-            m_horizontalScrollBar = new WidgetBackground(GetProperty(WidgetParameterIndex.HorizontalScrollStyle, WidgetLabel.DefaultStyle));
+            m_horizontalScrollBar = new WidgetBackground(GetProperty(WidgetParameterIndex.HorizontalScrollStyle, DefaultStyle.Get(WidgetParameterIndex.HorizontalScrollStyle, WidgetBackground.DefaultStyle)));
             m_horizontalScrollBar.Parent = this;
 
-            m_horizontalScrollBarIndicator = new WidgetBackground(GetProperty(WidgetParameterIndex.HorizontalIndicatorStyle, WidgetLabel.DefaultStyle));
+            m_horizontalScrollBarIndicator = new WidgetBackground(GetProperty(WidgetParameterIndex.HorizontalIndicatorStyle, DefaultStyle.Get(WidgetParameterIndex.HorizontalIndicatorStyle, WidgetBackground.DefaultStyle)));
             m_horizontalScrollBarIndicator.Parent = this;
 
-            m_verticalScrollBar = new WidgetBackground(GetProperty(WidgetParameterIndex.VerticalcrollStyle, WidgetLabel.DefaultStyle));
+            m_verticalScrollBar = new WidgetBackground(GetProperty(WidgetParameterIndex.VerticalcrollStyle, DefaultStyle.Get(WidgetParameterIndex.VerticalcrollStyle, WidgetBackground.DefaultStyle)));
             m_verticalScrollBar.Parent = this;
 
-            m_verticalScrollBarIndicator = new WidgetBackground(GetProperty(WidgetParameterIndex.VerticalIndicatorStyle, WidgetLabel.DefaultStyle));
+            m_verticalScrollBarIndicator = new WidgetBackground(GetProperty(WidgetParameterIndex.VerticalIndicatorStyle, DefaultStyle.Get(WidgetParameterIndex.VerticalIndicatorStyle, WidgetBackground.DefaultStyle)));
             m_verticalScrollBarIndicator.Parent = this;
+
+            ClipContents = true;
 
             m_needLayout = true;
         }

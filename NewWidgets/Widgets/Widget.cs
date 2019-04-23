@@ -115,12 +115,12 @@ namespace NewWidgets.Widgets
                     m_styles[i].Set(this, index, value);
         }
 
-        protected T GetProperty<T>(string name, T defaultValue)
+        public T GetProperty<T>(string name, T defaultValue)
         {
             return m_styles[(int)m_styleType].Get(name, defaultValue);
         }
 
-        protected void SetProperty(string name, string value)
+        public void SetProperty(string name, string value)
         {
             for (int i = 0; i < m_styles.Length; i++)
                 if (!m_styles[i].IsEmpty)

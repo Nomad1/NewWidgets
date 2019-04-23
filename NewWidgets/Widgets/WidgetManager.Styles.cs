@@ -159,8 +159,8 @@ namespace NewWidgets.Widgets
 
                     if (s_styleAttributes.TryGetValue(element.Name, out field))
                         style.Set(null, field.Item1, ParseValue(field.Item2, value));
-                    else
-                        style.Set(null, element.Name, value);
+
+                    //style.Set(null, element.Name, value);
 
                 }
 #if !DEBUG
