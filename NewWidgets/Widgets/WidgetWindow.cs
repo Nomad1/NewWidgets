@@ -9,7 +9,7 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetWindow : WidgetPanel
     {
-        public static readonly new WidgetStyleReference<WidgetBackgroundStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_window");
+        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_window");
 
         private static readonly float s_dragEpsilonSquared = 10.0f*10.0f;
 
@@ -28,16 +28,9 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public WidgetWindow()
-            : this(null)
+        public WidgetWindow(WidgetStyleReference style = default(WidgetStyleReference))
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
-        }
-
-        public WidgetWindow(WidgetStyleSheet style)
-            : base(style as WidgetBackgroundStyleSheet ?? DefaultStyle)
-        {
-            if (Style != style)
-                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)

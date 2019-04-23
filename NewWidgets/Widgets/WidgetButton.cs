@@ -18,7 +18,7 @@ namespace NewWidgets.Widgets
 
     public class WidgetButton : WidgetBackground
     {
-        public static readonly new WidgetStyleReference<WidgetButtonStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetButtonStyleSheet>("default_button");
+        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetButtonStyleSheet>("default_button");
 
         private WidgetLabel m_label;
         private WidgetImage m_image;
@@ -34,14 +34,14 @@ namespace NewWidgets.Widgets
 
         private bool m_needLayout;
 
-        public new WidgetButtonStyleSheet Style
+        private WidgetButtonStyleSheet Style
         {
-            get { return (WidgetButtonStyleSheet)base.Style; }
+            get { return m_style.Get<WidgetButtonStyleSheet>(); }
         }
 
-        protected new WidgetButtonStyleSheet WritableStyle
+        private WidgetButtonStyleSheet WritableStyle
         {
-            get { return (WidgetButtonStyleSheet)base.WritableStyle; }
+            get { return m_style.Get<WidgetButtonStyleSheet>(this); }
         }
 
         // Dynamic properties
@@ -69,13 +69,13 @@ namespace NewWidgets.Widgets
         public Font Font
         {
             get { return m_label.Font; }
-            set { m_label.Font = value; }
+            set { m_label.Font = value; m_needLayout = true; }
         }
 
         public float FontSize
         {
             get { return m_label.FontSize; }
-            set { m_label.FontSize = value; }
+            set { m_label.FontSize = value; m_needLayout = true; }
         }
 
         // Own style properties
@@ -140,8 +140,8 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetButton"/> class.
         /// </summary>
         /// <param name="text">Text.</param>
-        public WidgetButton(string text = "")
-            : this(null, text)
+        public WidgetButton(string text)
+            : this(default(WidgetStyleReference), text)
         {
         }
 
@@ -150,11 +150,9 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="text">Text.</param>
-        public WidgetButton(WidgetStyleSheet style, string text)
-            : base(style as WidgetButtonStyleSheet ?? DefaultStyle)
+        public WidgetButton(WidgetStyleReference style = default(WidgetStyleReference), string text = "")
+           : base(style.IsEmpty ? DefaultStyle : style)
         {
-            if (Style != style)
-                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
 
             m_needLayout = true;
 
@@ -187,6 +185,7 @@ namespace NewWidgets.Widgets
             if (m_label != null && (Size.X <= 0 || Size.Y <= 0))
             {
                 m_label.Relayout();
+
                 Size = new Vector2(Math.Max(TextPadding.Width + m_label.Size.X, ImagePadding.Width + m_image.Size.X), Math.Max(TextPadding.Height + m_label.Size.Y, ImagePadding.Height + m_image.Size.Y));
             }
 

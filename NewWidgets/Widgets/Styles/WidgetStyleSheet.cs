@@ -1,28 +1,10 @@
-﻿using System;
-
-using System.Numerics;
+﻿using System.Numerics;
 
 using NewWidgets.Utility;
 using System.Diagnostics;
 
 namespace NewWidgets.Widgets.Styles
 {
-    [AttributeUsage(AttributeTargets.Field)]
-    public class WidgetStyleValueAttribute : Attribute
-    {
-        private readonly string m_name;
-
-        public string Name
-        {
-            get { return m_name; }
-        }
-
-        public WidgetStyleValueAttribute(string name)
-        {
-            m_name = name;
-        }
-    }
-
     /// <summary>
     /// Very basic style sheet for dummy widgets
     /// </summary>
@@ -37,16 +19,16 @@ namespace NewWidgets.Widgets.Styles
         [WidgetStyleValue("size")]
         private Vector2 m_size = new Vector2(0);
         [WidgetStyleValue("clip")]
-        private bool m_clipContents = true;
+        private bool m_clipContents = false;
         [WidgetStyleValue("clip_margin")]
-        private Margin m_clipMargin = new Margin(2);
+        private Margin m_clipMargin = new Margin(0);
 
         [WidgetStyleValue("hovered_style")]
-        private string m_hoveredStyle = null;
+        private WidgetStyleReference m_hoveredStyle;
         [WidgetStyleValue("disabled_style")]
-        private string m_disabledStyle = null;
+        private WidgetStyleReference m_disabledStyle;
         [WidgetStyleValue("selected_style")]
-        private string m_selectedStyle = null;
+        private WidgetStyleReference m_selectedStyle;
 
         // Internal properties
 
@@ -75,19 +57,28 @@ namespace NewWidgets.Widgets.Styles
             get { return m_size; }
         }
 
-        public string HoveredStyle
+        public WidgetStyleReference HoveredStyle
         {
             get { return m_hoveredStyle; }
+            internal set { m_hoveredStyle = value; CheckReadonly(); }
         }
 
-        public string DisabledStyle
+        public WidgetStyleReference DisabledStyle
         {
             get { return m_disabledStyle; }
+            internal set { m_disabledStyle = value; CheckReadonly(); }
         }
 
-        public string SelectedStyle
+        public WidgetStyleReference SelectedStyle
         {
             get { return m_selectedStyle; }
+            internal set { m_selectedStyle = value; CheckReadonly(); }
+        }
+
+        internal int InstancedFor
+        {
+            get { return m_instancedFor; }
+            set { m_instancedFor = value; }
         }
 
         /// <summary>

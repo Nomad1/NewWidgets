@@ -49,7 +49,7 @@ namespace NewWidgets.UI
                 m_endCallback = endCallback;
             }
 
-            public bool Update(int elapsed)
+            public bool UpdateAnimator(int elapsed)
             {
                 elapsed = Math.Min(elapsed, m_timeLeft);
                 m_timeLeft -= elapsed;
@@ -141,7 +141,7 @@ namespace NewWidgets.UI
                 while (node != null)
                 {
                     LinkedListNode<BaseAnimatorTask> next = node.Next;
-                    if (node.Value.Update(elapsed))
+                    if (node.Value.UpdateAnimator(elapsed))
                     {
                         s_tasks.Remove(node);
                         node.Value.Complete();   

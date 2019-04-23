@@ -5,11 +5,8 @@ namespace NewWidgets.Widgets.Styles
     /// <summary>
     /// Style sheet for buttons
     /// </summary>
-    public class WidgetScrollViewStyleSheet : WidgetBackgroundStyleSheet
+    public class WidgetCheckBoxStyleSheet : WidgetBackgroundStyleSheet
     {
-        [WidgetStyleValue("button_layout")]
-        private ButtonLayout m_buttonLayout = ButtonLayout.Center;
-
         [WidgetStyleValue("text_padding")]
         private Margin m_textPadding = new Margin(0);
 
@@ -34,12 +31,6 @@ namespace NewWidgets.Widgets.Styles
             internal set { m_imagePadding = value; CheckReadonly(); }
         }
 
-        public ButtonLayout ButtonLayout
-        {
-            get { return m_buttonLayout; }
-            internal set { m_buttonLayout = value; CheckReadonly(); }
-        }
-
         public WidgetStyleReference ImageStyle
         {
             get { return m_imageStyle; }
@@ -48,6 +39,13 @@ namespace NewWidgets.Widgets.Styles
         public WidgetStyleReference TextStyle
         {
             get { return m_textStyle; }
+        }
+
+        [WidgetStyleValue("check_image")]
+        internal string CheckImage
+        {
+            get { return m_imageStyle.Get<WidgetImageStyleSheet>().Image; }
+            set { m_imageStyle.Get<WidgetImageStyleSheet>(this).Image = value; }
         }
     }
 }

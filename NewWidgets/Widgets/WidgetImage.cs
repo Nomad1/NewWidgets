@@ -7,22 +7,21 @@ namespace NewWidgets.Widgets
 {
     public class WidgetImage : Widget
     {
-        public static readonly new WidgetStyleReference<WidgetImageStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetImageStyleSheet>("default_image");
+        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetImageStyleSheet>("default_image");
 
         private ImageObject m_imageObject;
 
         private bool m_imageInited;
 
-        public new WidgetImageStyleSheet Style
+        private WidgetImageStyleSheet Style
         {
-            get { return (WidgetImageStyleSheet)base.Style; }
+            get { return m_style.Get<WidgetImageStyleSheet>(); }
         }
 
-        protected new WidgetImageStyleSheet WritableStyle
+        private WidgetImageStyleSheet WritableStyle
         {
-            get { return (WidgetImageStyleSheet)base.WritableStyle; }
+            get { return m_style.Get<WidgetImageStyleSheet>(this); }
         }
-
         public string Image
         {
             get { return Style.Image; }
@@ -88,7 +87,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="image">Image.</param>
         public WidgetImage(string image = "")
-            : this(null, WidgetBackgroundStyle.Image, image)
+            : this(default(WidgetStyleReference), WidgetBackgroundStyle.Image, image)
         {
 
         }
@@ -99,8 +98,8 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetBackgroundStyle imageStyle, string image)
-            : this(null, imageStyle, image)
+        public WidgetImage(WidgetBackgroundStyle imageStyle = 0, string image = "")
+            : this(default(WidgetStyleReference), imageStyle, image)
         {
            
         }
@@ -112,12 +111,9 @@ namespace NewWidgets.Widgets
         /// <param name="style">Style.</param>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetStyleSheet style, WidgetBackgroundStyle imageStyle = 0, string image = "")
-            : base(style as WidgetImageStyleSheet ?? DefaultStyle)
+        public WidgetImage(WidgetStyleReference style = default(WidgetStyleReference), WidgetBackgroundStyle imageStyle = 0, string image = "")
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
-            if (Style != style)
-                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
-
             ImageStyle = imageStyle == 0 ? Style.ImageStyle : imageStyle;
             Image = string.IsNullOrEmpty(image) ? Style.Image : image;
         }
@@ -211,6 +207,9 @@ namespace NewWidgets.Widgets
                     return;
             }
 
+            if (Size.X <= 0 && Size.Y <= 0)
+                Size = size;
+
             UpdateColor();
         }
 
@@ -252,6 +251,13 @@ namespace NewWidgets.Widgets
                 m_imageObject.Update();
 
             return true;
+        }
+
+        protected override void DrawContents(object canvas)
+        {
+            if (m_imageObject != null)
+                m_imageObject.Draw(canvas);
+            base.DrawContents(canvas);
         }
     }
 }

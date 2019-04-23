@@ -9,7 +9,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetText : Widget
     {
-        public static readonly new WidgetStyleReference<WidgetTextStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextStyleSheet>("default_text");
+        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextStyleSheet>("default_text");
 
         private static char[] s_separatorChars = { ' ', '\t' };
 
@@ -22,14 +22,14 @@ namespace NewWidgets.Widgets
         private bool m_needLayout;
         private bool m_richText;
 
-        public new WidgetTextStyleSheet Style
+        private WidgetTextStyleSheet Style
         {
-            get { return (WidgetTextStyleSheet)base.Style; }
+            get { return m_style.Get<WidgetTextStyleSheet>(); }
         }
 
-        protected new WidgetTextStyleSheet WritableStyle
+        private WidgetTextStyleSheet WritableStyle
         {
-            get { return (WidgetTextStyleSheet)base.WritableStyle; }
+            get { return m_style.Get<WidgetTextStyleSheet>(this); }
         }
 
         public Font Font
@@ -113,17 +113,14 @@ namespace NewWidgets.Widgets
             get { return m_labels == null ? 0 : m_labels.Length; }
         }
 
-        public WidgetText(string text = "")
-            : this(null, text)
+        public WidgetText(string text)
+            : this(default(WidgetStyleReference), text)
         {
         }
 
-        public WidgetText(WidgetStyleSheet style, string text = "")
-            : base(style as WidgetTextStyleSheet ?? DefaultStyle)
+        public WidgetText(WidgetStyleReference style = default(WidgetStyleReference), string text = "")
+            : base(style.IsEmpty? DefaultStyle : style)
         {
-            if (Style != style)
-                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
-
             m_text = text;
             m_needLayout = true;
             m_richText = true;

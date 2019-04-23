@@ -12,20 +12,20 @@ namespace NewWidgets.Widgets
 {
     public class WidgetBackground : Widget
     {
-        public static readonly new WidgetStyleReference<WidgetBackgroundStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_background");
+        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_background");
 
         protected readonly WindowObjectArray<WindowObject> m_background;
 
         private bool m_backgroundInited;
 
-        public new WidgetBackgroundStyleSheet Style
+        private WidgetBackgroundStyleSheet Style
         {
-            get { return (WidgetBackgroundStyleSheet)base.Style; }
+            get { return m_style.Get<WidgetBackgroundStyleSheet>(); }
         }
 
-        protected new WidgetBackgroundStyleSheet WritableStyle
+        private WidgetBackgroundStyleSheet WritableStyle
         {
-            get { return (WidgetBackgroundStyleSheet)base.WritableStyle; }
+            get { return m_style.Get<WidgetBackgroundStyleSheet>(this); }
         }
 
         protected string BackgroundTexture
@@ -86,12 +86,9 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetBackground"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetBackground(WidgetStyleSheet style)
-            : base(style as WidgetBackgroundStyleSheet ?? DefaultStyle)
+        public WidgetBackground(WidgetStyleReference style = default(WidgetStyleReference))
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
-            if (Style != style)
-                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
-
             m_background = new WindowObjectArray<WindowObject>();
         }
 

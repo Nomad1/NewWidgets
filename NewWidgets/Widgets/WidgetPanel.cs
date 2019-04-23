@@ -7,7 +7,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetPanel : WidgetBackground, IWindowContainer
     {
-        public static readonly new WidgetStyleReference<WidgetBackgroundStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_panel");
+        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_panel");
 
         private readonly WindowObjectArray<Widget> m_children;
 
@@ -30,12 +30,9 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetPanel"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetPanel(WidgetStyleSheet style = null)
-            : base(style as WidgetBackgroundStyleSheet ?? DefaultStyle)
+        public WidgetPanel(WidgetStyleReference style = default(WidgetStyleReference))
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
-            if (Style != style)
-                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
-
             m_children = new WindowObjectArray<Widget>();
         }
 

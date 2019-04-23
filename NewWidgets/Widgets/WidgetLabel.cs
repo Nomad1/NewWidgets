@@ -13,7 +13,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetLabel : Widget
     {
-        public static readonly new WidgetStyleReference<WidgetTextStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextStyleSheet>("default_label");
+        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextStyleSheet>("default_label");
 
         private LabelObject m_label;
 
@@ -25,14 +25,14 @@ namespace NewWidgets.Widgets
         
         private bool m_richText;
 
-        public new WidgetTextStyleSheet Style
+        private WidgetTextStyleSheet Style
         {
-            get { return (WidgetTextStyleSheet)base.Style; }
+            get { return m_style.Get<WidgetTextStyleSheet>(); }
         }
 
-        protected new WidgetTextStyleSheet WritableStyle
+        private WidgetTextStyleSheet WritableStyle
         {
-            get { return (WidgetTextStyleSheet)base.WritableStyle; }
+            get { return m_style.Get<WidgetTextStyleSheet>(this); }
         }
 
         public Font Font
@@ -107,8 +107,8 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetLabel"/> class.
         /// </summary>
         /// <param name="text">Text.</param>
-        public WidgetLabel(string text = "")
-            : this(null, text)
+        public WidgetLabel(string text)
+            : this(default(WidgetStyleReference), text)
         {
         }
 
@@ -117,14 +117,10 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="text">Text.</param>
-        public WidgetLabel(WidgetStyleSheet style, string text)
-            : base(style as WidgetTextStyleSheet ?? DefaultStyle)
+        public WidgetLabel(WidgetStyleReference style = default(WidgetStyleReference), string text = "")
+           : base(style.IsEmpty ? DefaultStyle : style)
         {
-            if (Style != style)
-                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
-
-            m_needLayout = true;
-            m_text = text;
+            Text = text;
             m_richText = true;
         }
 

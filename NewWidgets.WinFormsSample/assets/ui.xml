@@ -27,7 +27,7 @@
     <back_style>NineImage</back_style>
     <back_image>window_9</back_image>
     <back_scale>0.75</back_scale>
-    <size>400;300</size>
+    <size>600;400</size>
     <clip>true</clip>
   </style>
 
@@ -40,12 +40,17 @@
   </style>
 
   <style name="default_label" class="label">
-    <back_style>None</back_style>
     <font>default</font>
     <font_size>0.6</font_size>
     <text_color>0xffffff</text_color>
     <size>100;35</size>
     <clip>false</clip>
+  </style>
+    
+  <style name="default_text" class="text">
+    <font>default</font>
+    <font_size>0.6</font_size>
+    <text_color>0xffffff</text_color>
   </style>
 
   <style name="default_textedit" class="textedit">
@@ -59,8 +64,7 @@
     <clip>true</clip>
     <clip_margin>1;2;3;2</clip_margin>
     <cursor_color>0xffffff</cursor_color>
-    <focus_color>#ffffff</focus_color>
-    <padding>6;2;6;0</padding>
+    <text_padding>6;2;6;0</text_padding>
     <selected_style>default_textedit_selected</selected_style>
     <hovered_style>default_textedit_hovered</hovered_style>
   </style>
@@ -143,12 +147,13 @@
     <back_style>ThreeImage</back_style>
     <back_image>button_white_normal_3</back_image>
     <back_scale>1.0</back_scale>
-    <padding>0;0;0;6</padding>
-    <font>default</font>
-    <font_size>0.75</font_size>
-    <size>120;40</size>
     <hovered_style>default_button_hovered</hovered_style>
     <disabled_style>default_button_disabled</disabled_style>
+    <text_padding>0;0;0;6</text_padding>
+    <size>120;40</size>
+        
+    <font>default</font>
+    <font_size>0.75</font_size>
     <text_color>0xffffff</text_color>
   </style>
 
@@ -165,13 +170,14 @@
   </style>
 
 
-  <style name="default_checkbox" class="button">
+  <style name="default_checkbox" class="checkbox">
     <back_style>ImageFit</back_style>
     <back_image>checkbox_back_normal</back_image>
     <size>40;40</size>
-    <check_image>check_icon</check_image>
     <hovered_style>default_checkbox_hovered</hovered_style>
     <disabled_style>default_checkbox_disabled</disabled_style>
+        
+    <check_image>check_icon</check_image>
     <image_color>#000032</image_color>
     <text_color>#cceeff</text_color>
   </style>
@@ -205,7 +211,7 @@
     <font>default</font>
     <font_size>1.0</font_size>
     <text_color>0xcceeff</text_color>
-    <padding>4;2;4;2</padding>
+    <text_padding>4;2;4;2</text_padding>
     <hovered_style>text_button_hovered</hovered_style>
   </style>
 

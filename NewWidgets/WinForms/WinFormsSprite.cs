@@ -1,6 +1,4 @@
-﻿#define USE_CACHE
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Numerics;
@@ -50,10 +48,8 @@ namespace NewWidgets.WinForms
         private uint m_color;
         private int m_frame;
 
-#if USE_CACHE
         private uint m_cacheHash;
         private Bitmap m_cache;
-#endif
 
         public string Id
         {
@@ -191,11 +187,10 @@ namespace NewWidgets.WinForms
             matrix.Matrix33 = ((m_color >> 24) & 0xff) / 255.0f;
             ia.SetColorMatrix(matrix);
 
-#if USE_CACHE
-            Update(); // make sure that cache is valid
+            UpdateCache(); // make sure that cache is valid
            
             {
-                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
 
                 if (m_cache != null)
                 {
@@ -209,24 +204,10 @@ namespace NewWidgets.WinForms
                      );
                 }
             }
-            return;
-#endif
-            {
-                // frame changed before the update
-                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-
-                graphics.DrawImage(m_image,
-                     new PointF[] { new PointF(arr[0].X, arr[0].Y), new PointF(arr[1].X, arr[1].Y), new PointF(arr[2].X, arr[2].Y) },
-                     new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),
-                     GraphicsUnit.Pixel,
-                     ia
-                     );
-            }
         }
 
-        public void Update()
+        private void UpdateCache()
         {
-#if USE_CACHE
             int nwidth = (int)System.Math.Ceiling(m_transform.ActualScale.X * FrameSize.X);
             int nheight = (int)System.Math.Ceiling(m_transform.ActualScale.Y * FrameSize.Y);
             uint cacheHash = ((uint)(m_frame & 0xff) << 24) | ((uint)nwidth << 12) | (uint)nheight;
@@ -244,7 +225,8 @@ namespace NewWidgets.WinForms
                     m_cache = new Bitmap(nwidth, nheight);
                     using (Graphics g = Graphics.FromImage(m_cache))
                     {
-                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+                        g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
                         g.DrawImage(m_image,
                         new RectangleF(0, 0, m_cache.Width, m_cache.Height),
                         new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),
@@ -253,7 +235,10 @@ namespace NewWidgets.WinForms
                 }
                 m_cacheHash = cacheHash;
             }
-#endif
+        }
+
+        public void Update()
+        {
         }
 
         private RectangleF GetScreenRect()

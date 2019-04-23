@@ -24,7 +24,7 @@ namespace NewWidgets.Widgets
             set { m_region = value; }
         }
 
-        public WidgetTooltip(WidgetBackgroundStyleSheet style)
+        public WidgetTooltip(WidgetStyleReference style)
             : base(style)
         {
         }

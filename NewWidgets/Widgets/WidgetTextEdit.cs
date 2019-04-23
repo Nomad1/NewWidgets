@@ -9,7 +9,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetTextEdit : WidgetBackground, IFocusableWidget
     {
-        public static readonly new WidgetStyleReference<WidgetTextEditStyleSheet> DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextEditStyleSheet>("default_textedit");
+        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextEditStyleSheet>("default_textedit");
 
         private int m_cursorPosition;
 
@@ -28,14 +28,14 @@ namespace NewWidgets.Widgets
 
         private bool m_needLayout;
 
-        public new WidgetTextEditStyleSheet Style
+        private WidgetTextEditStyleSheet Style
         {
-            get { return (WidgetTextEditStyleSheet)base.Style; }
+            get { return m_style.Get<WidgetTextEditStyleSheet>(); }
         }
 
-        protected new WidgetTextEditStyleSheet WritableStyle
+        private WidgetTextEditStyleSheet WritableStyle
         {
-            get { return (WidgetTextEditStyleSheet)base.WritableStyle; }
+            get { return m_style.Get<WidgetTextEditStyleSheet>(this); }
         }
 
         public Font Font
@@ -142,12 +142,9 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextEdit"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetTextEdit(WidgetStyleSheet style = null)
-            : base(style as WidgetTextEditStyleSheet ?? DefaultStyle)
+        public WidgetTextEdit(WidgetStyleReference style = default(WidgetStyleReference))
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
-            if (Style != style)
-                WindowController.Instance.LogMessage("WARNING: Initing {0} with style {1}. Falling back to default style.", GetType(), style == null ? "(null)" : style.ToString());
-
             m_text = string.Empty;
             m_preffix = string.Empty;
             m_needLayout = true;

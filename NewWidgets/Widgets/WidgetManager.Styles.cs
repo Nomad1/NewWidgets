@@ -9,41 +9,132 @@ using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetStyleReference<T> where T : WidgetStyleSheet
+    #region Helpers
+
+    public class WidgetException : ApplicationException
+    {
+        public WidgetException()
+            : base()
+        {
+        }
+
+        public WidgetException(string message)
+            : base(message)
+        {
+        }
+
+        public WidgetException(string message, Exception ex)
+            : base(message, ex)
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class WidgetStyleValueAttribute : Attribute
+    {
+        private readonly string m_name;
+
+        public string Name
+        {
+            get { return m_name; }
+        }
+
+        public WidgetStyleValueAttribute(string name)
+        {
+            m_name = name;
+        }
+    }
+
+    /// <summary>
+    /// Reference class that allows lazy loading of styles.
+    /// </summary>
+    public struct WidgetStyleReference
     {
         private WidgetStyleSheet m_style;
         private readonly string m_name;
 
-        public T Style
+        private WidgetStyleSheet Style
         {
             get
             {
                 if (m_style == null)
-                    m_style = WidgetManager.GetStyle(m_name);
+                    m_style = WidgetManager.InternalGetStyle(m_name);
 
-                if (m_style != null && !(m_style is T))
-                    throw new Exception(string.Format("Style {0} is requested to be cast to type {1} while being type {2}", m_name, typeof(T), m_style.GetType()));
-
-                return m_style as T;
+                return m_style;
             }
         }
 
-        internal WidgetStyleReference(string name)
+        public bool IsEmpty
         {
-            m_name = name;
+            get { return string.IsNullOrEmpty(m_name); }
         }
 
-        public static implicit operator T(WidgetStyleReference<T> reference)
+        public bool IsValid
         {
-            return reference.Style;
+            get { return !IsEmpty && Style != null; }
+        }
+
+        public bool IsWritable
+        {
+            get { return IsValid && Style.InstancedFor != 0; }
+        }
+
+        public Type Type
+        {
+            get { return IsValid ? Style.GetType() : null; }
+        }
+
+        public WidgetStyleReference(string name)
+        {
+            m_name = name;
+            m_style = null;
+        }
+
+        internal WidgetStyleReference(string name, WidgetStyleSheet style)
+        {
+            m_name = name;
+            m_style = style;
+        }
+
+        public override string ToString()
+        {
+            return string.Format("Style reference: {0}, style: {1}", m_name, m_style == null ? "(not resolved)" : m_style.ToString());
+        }
+
+        public T Get<T>(object instancedFor = null) where T : WidgetStyleSheet
+        {
+            WidgetStyleSheet result = Style;
+
+            if (result == null)
+                throw new WidgetException("Broken style!");
+
+            if (instancedFor != null)
+            {
+                int instanceHash = instancedFor.GetHashCode();
+
+                if (result.InstancedFor != instanceHash)
+                {
+                    result = WidgetManager.CreateStyle(m_name + "_" + instanceHash, result.GetType(), result);
+                    result.InstancedFor = instanceHash;
+
+                    m_style = result; // replacing cached style with clone
+                }
+            }
+
+            if (!(result is T))
+                throw new WidgetException("Asked to convert style to incompatible type!");
+
+            return (T)result;
         }
     }
 
+    #endregion
+
     public static partial class WidgetManager
     {
-        public static WidgetStyleReference<T> RegisterDefaultStyle<T>(string name) where T : WidgetStyleSheet, new()
+        public static WidgetStyleReference RegisterDefaultStyle<T>(string name) where T : WidgetStyleSheet, new()
         {
-            WidgetStyleReference<T> result = new WidgetStyleReference<T>(name);
+            WidgetStyleReference result = new WidgetStyleReference(name);
 
             if (!s_styles.ContainsKey(name))
             {
@@ -57,36 +148,45 @@ namespace NewWidgets.Widgets
 
         // styles
         private static readonly IDictionary<string, WidgetStyleSheet> s_styles = new Dictionary<string, WidgetStyleSheet>();
-        private static readonly IDictionary<Type, IDictionary<string, FieldInfo>> s_styleAttributes = new Dictionary<Type, IDictionary<string, FieldInfo>>();
+        private static readonly IDictionary<Type, IDictionary<string, MemberInfo>> s_styleAttributes = new Dictionary<Type, IDictionary<string, MemberInfo>>();
 
 
         // Those guys are obsolete and should be replaced by direct Widget.DefaultStyle like calls
 
-        [Obsolete]
-        public static WidgetStyleSheet DefaultWidgetStyle { get { return Widget.DefaultStyle; } }
-        [Obsolete]
-        public static WidgetButtonStyleSheet DefaultCheckBoxStyle { get { return WidgetCheckBox.DefaultStyle; } }
-        [Obsolete]
-        public static WidgetBackgroundStyleSheet DefaultButtonStyle { get { return WidgetBackground.DefaultStyle; } }
-        [Obsolete]
-        public static WidgetButtonStyleSheet DefaultBackgroundStyle { get { return WidgetButton.DefaultStyle; } }
-        [Obsolete]
-        public static WidgetBackgroundStyleSheet DefaultPanelStyle { get { return WidgetPanel.DefaultStyle; } }
-        [Obsolete]
-        public static WidgetTextEditStyleSheet DefaultTextEditStyle { get { return WidgetTextEdit.DefaultStyle; } }
-        [Obsolete]
-        public static WidgetTextStyleSheet DefaultLabelStyle { get { return WidgetLabel.DefaultStyle; } }
-        [Obsolete]
-        public static WidgetBackgroundStyleSheet DefaultWindowStyle { get { return WidgetWindow.DefaultStyle; } }
-        [Obsolete]
-        public static WidgetImageStyleSheet DefaultImageStyle { get { return WidgetImage.DefaultStyle; } }
+        [Obsolete("Use Widget.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultWidgetStyle { get { return Widget.DefaultStyle; } }
+        [Obsolete("Use WidgetCheckBox.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultCheckBoxStyle { get { return WidgetCheckBox.DefaultStyle; } }
+        [Obsolete("Use WidgetBackground.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultButtonStyle { get { return WidgetBackground.DefaultStyle; } }
+        [Obsolete("Use WidgetButton.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultBackgroundStyle { get { return WidgetButton.DefaultStyle; } }
+        [Obsolete("Use WidgetPanel.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultPanelStyle { get { return WidgetPanel.DefaultStyle; } }
+        [Obsolete("Use WidgetTextEdit.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultTextEditStyle { get { return WidgetTextEdit.DefaultStyle; } }
+        [Obsolete("Use WidgetLabel.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultLabelStyle { get { return WidgetLabel.DefaultStyle; } }
+        [Obsolete("Use WidgetWindow.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultWindowStyle { get { return WidgetWindow.DefaultStyle; } }
+        [Obsolete("Use WidgetImage.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultImageStyle { get { return WidgetImage.DefaultStyle; } }
 
         /// <summary>
         /// Gets the style by name
         /// </summary>
         /// <returns>The style.</returns>
         /// <param name="name">Name.</param>
-        public static WidgetStyleSheet GetStyle(string name)
+        public static WidgetStyleReference GetStyle(string name)
+        {
+            WidgetStyleSheet style = InternalGetStyle(name);
+            if (style != null)
+                return new WidgetStyleReference(name, style);
+
+            throw new WidgetException(string.Format("Style {0} not found for GetStyle!", name));
+        }
+
+        internal static WidgetStyleSheet InternalGetStyle(string name)
         {
             if (!string.IsNullOrEmpty(name))
             {
@@ -97,7 +197,7 @@ namespace NewWidgets.Widgets
 
             WindowController.Instance.LogError("WidgetManager got GetStyle request for not existing style {0}", name);
 
-            return null;  // TODO: return default style to avoid crash?
+            return null;
         }
 
         /// <summary>
@@ -112,7 +212,7 @@ namespace NewWidgets.Widgets
             ConstructorInfo info = type.GetConstructor(new Type[0]);
 
             if (info == null)
-                throw new ApplicationException(string.Format("Style class {0} doesn't have appropriate constructpr for CreateStyle", type.Name));
+                throw new ApplicationException(string.Format("Style class {0} doesn't have appropriate constructor for CreateStyle", type.Name));
 
             //style = (WidgetStyleSheet)Activator.CreateInstance(type, new object[] { name }); // TODO: it will crash if there is no such constructor. Use ConstructorInfo
 
@@ -131,7 +231,10 @@ namespace NewWidgets.Widgets
 
             string parent = GetAttribute(node, "parent");
 
-            WidgetStyleSheet parentStyle = parent == null ? null : GetStyle(parent);
+            // NOTE: if there is no @class and no parent, style will have default WidgetStyleSheet
+            // that wouldn't work for most widgets!
+
+            WidgetStyleSheet parentStyle = parent == null ? null : InternalGetStyle(parent);
 
             if (parentStyle == null)
                 parentStyle = new WidgetStyleSheet();
@@ -158,8 +261,10 @@ namespace NewWidgets.Widgets
                         style = CreateStyle(name, typeof(WidgetTextEditStyleSheet), parentStyle);
                         break;
                     case "button":
-                    case "checkbox":
                         style = CreateStyle(name, typeof(WidgetButtonStyleSheet), parentStyle);
+                        break;
+                    case "checkbox":
+                        style = CreateStyle(name, typeof(WidgetCheckBoxStyleSheet), parentStyle);
                         break;
                     default:
                         Type type = Type.GetType(@class);
@@ -189,22 +294,30 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered style {0}", name);
         }
 
-        private static IDictionary<string, FieldInfo> InitStyleMap(WidgetStyleSheet style)
+        private static IDictionary<string, MemberInfo> InitStyleMap(WidgetStyleSheet style)
         {
             Type type = style.GetType();
 
-            IDictionary<string, FieldInfo> styleMap;
+            IDictionary<string, MemberInfo> styleMap;
 
             if (!s_styleAttributes.TryGetValue(type, out styleMap))
             {
-                styleMap = new Dictionary<string, FieldInfo>();
+                styleMap = new Dictionary<string, MemberInfo>();
                 s_styleAttributes[type] = styleMap;
 
                 while (type != null)
                 {
-                    FieldInfo[] fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
+                    FieldInfo[] fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
 
                     foreach (FieldInfo field in fields)
+                        foreach (WidgetStyleValueAttribute attribute in field.GetCustomAttributes<WidgetStyleValueAttribute>())
+                        {
+                            styleMap[attribute.Name] = field;
+                        }
+
+                    PropertyInfo[] properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+
+                    foreach (PropertyInfo field in properties)
                         foreach (WidgetStyleValueAttribute attribute in field.GetCustomAttributes<WidgetStyleValueAttribute>())
                         {
                             styleMap[attribute.Name] = field;
@@ -219,7 +332,7 @@ namespace NewWidgets.Widgets
 
         private static void InitStyle(WidgetStyleSheet style, XmlNode node)
         {
-            IDictionary<string, FieldInfo> styleMap = InitStyleMap(style);
+            IDictionary<string, MemberInfo> styleMap = InitStyleMap(style);
 
             foreach (XmlNode element in node.ChildNodes)
             {
@@ -236,9 +349,11 @@ namespace NewWidgets.Widgets
                     else
                         value = value.Trim('\r', '\n', '\t', ' ');
 
-                    FieldInfo field;
+                    MemberInfo field;
                     if (styleMap.TryGetValue(element.Name, out field))
                         InitField(style, field, value);
+                    else
+                        WindowController.Instance.LogMessage("Invalid field {0} in style for {1}", element.Name, style.Name);
                 }
 #if !DEBUG
                 catch (Exception ex)
@@ -250,48 +365,82 @@ namespace NewWidgets.Widgets
             }
         }
 
-        private static void InitField(WidgetStyleSheet style, FieldInfo field, string value)
+        private static void InitField(WidgetStyleSheet style, MemberInfo member, string value)
         {
-            Type fieldType = field.FieldType;
+            Type memberType = member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
 
-            object fieldValue;
+            object memberValue;
 
-            if (fieldType == typeof(Font))
-                fieldValue = GetFont(value); // font should be registered first to avoid confusion
-            else if (fieldType.IsGenericType && fieldType.GetGenericTypeDefinition() == typeof(WidgetStyleReference<>))
-                fieldValue = Activator.CreateInstance(fieldType, new object[] { value }); // saves only reference
-            else if (fieldType == typeof(string))
-                fieldValue = (object)value;
-            else if (fieldType == typeof(float))
-                fieldValue = (object)FloatParse(value); // bo-oxing (
-            else if (fieldType == typeof(int))
-                fieldValue = (object)ColorParse(value); // assume int field is color by default
-            else if (fieldType == typeof(Margin))
-                fieldValue = (object)MarginParse(value);
-            else if (fieldType == typeof(Vector2))
-                fieldValue = (object)Vector2Parse(value);
-            else if (fieldType.IsEnum)
-                fieldValue = (object)EnumParse(fieldType, value);
+            if (memberType == typeof(Font))
+                memberValue = GetFont(value); // font should be registered first to avoid confusion
+            else if (memberType == typeof(WidgetStyleReference))
+                memberValue = new WidgetStyleReference(value); // saves only reference
+            else if (memberType == typeof(string))
+                memberValue = (object)value;
+            else if (memberType == typeof(float))
+                memberValue = (object)FloatParse(value); // bo-oxing (
+            else if (memberType == typeof(int))
+                memberValue = (object)ColorParse(value); // assume int field is color by default
+            else if (memberType == typeof(Margin))
+                memberValue = (object)MarginParse(value);
+            else if (memberType == typeof(Vector2))
+                memberValue = (object)Vector2Parse(value);
+            else if (memberType.IsEnum)
+                memberValue = (object)EnumParse(memberType, value);
             else
-                fieldValue = Convert.ChangeType(value, fieldType); // fallback, may crash
+                memberValue = Convert.ChangeType(value, memberType); // fallback, may crash
 
-            field.SetValue(style, fieldValue);
+            if (member is FieldInfo)
+                ((FieldInfo)member).SetValue(style, memberValue);
+            else
+                ((PropertyInfo)member).SetValue(style, memberValue);
         }
 
         private static void DeepCopy(WidgetStyleSheet styleFrom, WidgetStyleSheet styleTo)
         {
-            IDictionary<string, FieldInfo> styleMapFrom = InitStyleMap(styleFrom);
-            IDictionary<string, FieldInfo> styleMapTo = InitStyleMap(styleTo);
+            IDictionary<string, MemberInfo> styleMapFrom = InitStyleMap(styleFrom);
+            IDictionary<string, MemberInfo> styleMapTo = InitStyleMap(styleTo);
 
             foreach (var pair in styleMapTo)
             {
-                FieldInfo fieldFrom;
-
-                if (!styleMapFrom.TryGetValue(pair.Key, out fieldFrom))
+                if (pair.Value is PropertyInfo)
                     continue;
 
-                pair.Value.SetValue(styleTo, fieldFrom.GetValue(styleFrom));
+                MemberInfo memberFrom;
+
+                if (!styleMapFrom.TryGetValue(pair.Key, out memberFrom))
+                    continue;
+
+                DeepCopyMember(styleFrom, memberFrom, styleTo, pair.Value);
             }
+
+            foreach (var pair in styleMapTo)
+            {
+                if (!(pair.Value is PropertyInfo))
+                    continue;
+
+                MemberInfo memberFrom;
+
+                if (!styleMapFrom.TryGetValue(pair.Key, out memberFrom))
+                    continue;
+
+                DeepCopyMember(styleFrom, memberFrom, styleTo, pair.Value);
+            }
+        }
+
+        private static void DeepCopyMember(object from, MemberInfo member, object to, MemberInfo memberTo)
+        {
+            object memberValue;
+
+            if (member is FieldInfo)
+                memberValue = ((FieldInfo)member).GetValue(from);
+            else
+                memberValue = ((PropertyInfo)member).GetValue(from);
+
+            if (memberTo is FieldInfo)
+                ((FieldInfo)memberTo).SetValue(to, memberValue);
+            else
+                ((PropertyInfo)memberTo).SetValue(to, memberValue);
         }
 
 #region String parsers

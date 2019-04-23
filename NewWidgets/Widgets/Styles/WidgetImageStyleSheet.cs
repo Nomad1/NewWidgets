@@ -12,13 +12,13 @@ namespace NewWidgets.Widgets.Styles
         private string m_image = "";
 
         [WidgetStyleValue("image_style")]
-        private WidgetBackgroundStyle m_imageStyle = WidgetBackgroundStyle.None;
+        private WidgetBackgroundStyle m_imageStyle = WidgetBackgroundStyle.Image;
 
         [WidgetStyleValue("image_angle")]
         private float m_imageRotation = 0.0f;
 
         [WidgetStyleValue("image_pivot")]
-        private Vector2 m_imagePivot = new Vector2(0);
+        private Vector2 m_imagePivot = new Vector2();
 
         [WidgetStyleValue("image_padding")]
         private Margin m_imagePadding = new Margin(0);
