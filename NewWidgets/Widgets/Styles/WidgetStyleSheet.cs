@@ -17,11 +17,11 @@ namespace NewWidgets.Widgets.Styles
         // style fields
 
         [WidgetStyleValue("size")]
-        private Vector2 m_size = new Vector2(0);
+        private Vector2 m_size;
         [WidgetStyleValue("clip")]
-        private bool m_clipContents = false;
+        private bool m_clipContents;
         [WidgetStyleValue("clip_margin")]
-        private Margin m_clipMargin = new Margin(0);
+        private Margin m_clipMargin;
 
         [WidgetStyleValue("hovered_style")]
         private WidgetStyleReference m_hoveredStyle;
@@ -55,6 +55,7 @@ namespace NewWidgets.Widgets.Styles
         public Vector2 Size
         {
             get { return m_size; }
+            internal set { m_size = value; } // never used
         }
 
         public WidgetStyleReference HoveredStyle

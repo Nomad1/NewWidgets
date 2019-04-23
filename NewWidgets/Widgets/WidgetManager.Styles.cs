@@ -48,7 +48,7 @@ namespace NewWidgets.Widgets
     [AttributeUsage(AttributeTargets.Field)]
     public class WidgetNestedStyleAttribute : Attribute
     {
-        private readonly string m_preffix;
+        private readonly string m_preffix = "";
 
         public string Preffix
         {
@@ -206,14 +206,18 @@ namespace NewWidgets.Widgets
 
         [Obsolete("Use Widget.DefaultStyle instead")]
         public static WidgetStyleReference DefaultWidgetStyle { get { return Widget.DefaultStyle; } }
-        [Obsolete("Use WidgetTextEdit.DefaultStyle instead")]
+      /*  [Obsolete("Use WidgetTextEdit.DefaultStyle instead")]
         public static WidgetStyleReference DefaultTextEditStyle { get { return WidgetTextEdit.DefaultStyle; } }
         [Obsolete("Use WidgetWindow.DefaultStyle instead")]
         public static WidgetStyleReference DefaultWindowStyle { get { return WidgetWindow.DefaultStyle; } }
+        [Obsolete("Use WidgetWindow.DefaultStyle instead")]
+        public static WidgetStyleReference DefaultPanelStyle { get { return WidgetPanel.DefaultStyle; } }*/
+
+        //
+        //[Obsolete("Use WidgetLabel.DefaultStyle instead")]
+        //public static WidgetTextStyleSheet DefaultLabelStyle { get { return WidgetLabel.DefaultStyle.Get<WidgetTextStyleSheet>(); } }  // needed only for font size
 
 
-        [Obsolete("Use WidgetLabel.DefaultStyle instead")]
-        public static WidgetTextStyleSheet DefaultLabelStyle { get { return WidgetLabel.DefaultStyle.Get<WidgetTextStyleSheet>(); } }  // needed only for font size
         /// <summary>
         /// Gets the style by name
         /// </summary>
@@ -362,12 +366,12 @@ namespace NewWidgets.Widgets
 
                 foreach (FieldInfo field in fields)
                 {
-                    foreach (WidgetStyleValueAttribute attribute in field.GetCustomAttributes<WidgetStyleValueAttribute>())
-                    {
-                        styleMap[attribute.Name] = new WidgetMemberInfo(parent, field);
-                    }
+                    foreach (WidgetStyleValueAttribute attribute in field.GetCustomAttributes(typeof(WidgetStyleValueAttribute), true))
+                        {
+                            styleMap[attribute.Name] = new WidgetMemberInfo(parent, field);
+                        }
 
-                    foreach (WidgetNestedStyleAttribute attribute in field.GetCustomAttributes<WidgetNestedStyleAttribute>())
+                    foreach (WidgetNestedStyleAttribute attribute in field.GetCustomAttributes(typeof(WidgetNestedStyleAttribute), true))
                     {
                         InitStyleMapType(field.FieldType, styleMap, new WidgetMemberInfo(parent, field)); // recursion for nested types!
                     }

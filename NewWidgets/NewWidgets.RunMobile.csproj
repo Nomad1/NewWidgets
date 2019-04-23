@@ -99,7 +99,6 @@
     <Compile Include="Widgets\WidgetManager.cs" />
     <Compile Include="Widgets\WidgetPanel.cs" />
     <Compile Include="Widgets\WidgetScrollView.cs" />
-    <Compile Include="Widgets\WidgetStyleSheet.cs" />
     <Compile Include="Widgets\WidgetText.cs" />
     <Compile Include="Widgets\WidgetTextEdit.cs" />
     <Compile Include="Widgets\WidgetTooltip.cs" />
@@ -114,6 +113,17 @@
     <Compile Include="Utility\Transform.cs" />
     <Compile Include="UI\WindowControllerBase.cs" />
     <Compile Include="UI\ISprite.cs" />
+    <Compile Include="Widgets\WidgetBackground.cs" />
+    <Compile Include="Widgets\WidgetManager.Styles.cs" />
+    <Compile Include="Widgets\WidgetWindow.cs" />
+    <Compile Include="Widgets\Styles\WidgetBackgroundStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetButtonStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetCheckBoxStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetImageStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetScrollViewStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetTextEditStyleSheet.cs" />
+    <Compile Include="Widgets\Styles\WidgetTextStyleSheet.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

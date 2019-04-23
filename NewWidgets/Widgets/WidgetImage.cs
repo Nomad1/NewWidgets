@@ -3,6 +3,10 @@ using NewWidgets.UI;
 using NewWidgets.Utility;
 using NewWidgets.Widgets.Styles;
 
+#if RUNMOBILE
+using RunMobile.Utility;
+#endif
+
 namespace NewWidgets.Widgets
 {
     public class WidgetImage : Widget
@@ -22,6 +26,7 @@ namespace NewWidgets.Widgets
         {
             get { return m_style.Get<WidgetImageStyleSheet>(this); }
         }
+
         public string Image
         {
             get { return Style.Image; }

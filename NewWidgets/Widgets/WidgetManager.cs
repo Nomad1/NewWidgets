@@ -29,8 +29,6 @@ namespace NewWidgets.Widgets
         public static Font MainFont { get { return s_mainFont; } }
         public static float FontScale { get { return s_fontScale; } }
 
-
-
         public static Font GetFont(string name)
         {
             if (!string.IsNullOrEmpty(name))

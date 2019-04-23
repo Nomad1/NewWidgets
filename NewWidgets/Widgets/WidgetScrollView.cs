@@ -1,5 +1,4 @@
-﻿#if false
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Drawing;
@@ -14,8 +13,11 @@ using RunMobile.Utility;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetScrollView : Widget, IWindowContainer
+    public class WidgetScrollView : WidgetBackground, IWindowContainer
     {
+        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetScrollViewStyleSheet>("default_scrollview");
+
+
         private static readonly float s_zoomDeltaScale = 10.0f;
         private static readonly float s_borderPadding = 100.0f;
         private static readonly float s_dragMultiplier = 3.0f;
@@ -46,6 +48,16 @@ namespace NewWidgets.Widgets
         private bool m_animating;
         
         private bool m_needLayout;
+
+        private WidgetScrollViewStyleSheet Style
+        {
+            get { return m_style.Get<WidgetScrollViewStyleSheet>(); }
+        }
+
+        private WidgetScrollViewStyleSheet WritableStyle
+        {
+            get { return m_style.Get<WidgetScrollViewStyleSheet>(this); }
+        }
 
         public override bool Enabled
         {
@@ -113,38 +125,24 @@ namespace NewWidgets.Widgets
             get { return m_contentView; }
         }
 
-        public WidgetScrollView()
-            : this(WidgetManager.DefaultPanelStyle)
-        {            
-        }
-
-        public WidgetScrollView(WidgetStyleSheet style)
-            : base(style)
+        public WidgetScrollView(WidgetStyleReference style = default(WidgetStyleReference))
+            : base(style.IsEmpty ? DefaultStyle : style )
         {
-            m_contentView = new WidgetPanel(WidgetManager.DefaultWidgetStyle);
+            m_contentView = new WidgetPanel(WidgetPanel.DefaultStyle);
             m_contentView.Parent = this;
             m_horizontalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;
             m_verticalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;
 
-
-            WidgetBackgroundStyleSheet horizontalScrollStyle = WidgetManager.GetStyle(style.HorizontalScrollStyle) as WidgetTextStyleSheet;
-
-            m_horizontalScrollBar = new WidgetBackground(horizontalScrollStyle);
+            m_horizontalScrollBar = new WidgetBackground(Style.HorizontalScrollStyle);
             m_horizontalScrollBar.Parent = this;
 
-            WidgetBackgroundStyleSheet horizontalIndicatorStyle = WidgetManager.GetStyle(style.HorizontalIndicatorStyle) as WidgetTextStyleSheet;
-
-            m_horizontalScrollBarIndicator = new WidgetBackground(horizontalIndicatorStyle);
+            m_horizontalScrollBarIndicator = new WidgetBackground(Style.HorizontalIndicatorStyle);
             m_horizontalScrollBarIndicator.Parent = this;
 
-            WidgetBackgroundStyleSheet verticalScrollStyle = WidgetManager.GetStyle(style.VerticalScrollStyle) as WidgetTextStyleSheet;
-
-            m_verticalScrollBar = new WidgetBackground(verticalScrollStyle /* WidgetManager.GetStyle("scroll_vertical")*/);
+            m_verticalScrollBar = new WidgetBackground(Style.VerticalScrollStyle /* WidgetManager.GetStyle("scroll_vertical")*/);
             m_verticalScrollBar.Parent = this;
 
-            WidgetBackgroundStyleSheet verticalIndicatorStyle = WidgetManager.GetStyle(style.VerticalIndicatorStyle) as WidgetTextStyleSheet;
-
-            m_verticalScrollBarIndicator = new WidgetBackground(verticalIndicatorStyle /* WidgetManager.GetStyle("scroll_indicator_vertical");*/);
+            m_verticalScrollBarIndicator = new WidgetBackground(Style.VerticalIndicatorStyle /* WidgetManager.GetStyle("scroll_indicator_vertical");*/);
             m_verticalScrollBarIndicator.Parent = this;
 
             m_needLayout = true;
@@ -541,5 +539,3 @@ namespace NewWidgets.Widgets
         }
     }
 }
-
-#endif

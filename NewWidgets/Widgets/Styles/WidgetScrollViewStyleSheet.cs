@@ -1,55 +1,41 @@
-﻿#if false
-using NewWidgets.Utility;
-
+﻿
 namespace NewWidgets.Widgets.Styles
 {
     /// <summary>
-    /// Style sheet for buttons
+    /// Style sheet for scroll view
     /// </summary>
     public class WidgetScrollViewStyleSheet : WidgetBackgroundStyleSheet
     {
-        [WidgetStyleValue("button_layout")]
-        private ButtonLayout m_buttonLayout = ButtonLayout.Center;
+        [WidgetStyleValue("horizontal_scroll")]
+        private WidgetStyleReference m_horizontalScrollStyle = WidgetBackground.DefaultStyle;
 
-        [WidgetStyleValue("text_padding")]
-        private Margin m_textPadding = new Margin(0);
+        [WidgetStyleValue("vertical_scroll")]
+        private WidgetStyleReference m_verticalScrollStyle = WidgetBackground.DefaultStyle;
 
-        [WidgetStyleValue("image_padding")]
-        private Margin m_imagePadding = new Margin(0);
+        [WidgetStyleValue("horizontal_indicator")]
+        private WidgetStyleReference m_horizontalIndicatorStyle = WidgetBackground.DefaultStyle;
 
-        [WidgetStyleValue("image_style")]
-        private WidgetStyleReference m_imageStyle = WidgetImage.DefaultStyle;
+        [WidgetStyleValue("vertical_indicator")]
+        private WidgetStyleReference m_verticalIndicatorStyle = WidgetBackground.DefaultStyle;
 
-        [WidgetStyleValue("text_style")]
-        private WidgetStyleReference m_textStyle = WidgetLabel.DefaultStyle;
-
-        public Margin TextPadding
+        public WidgetStyleReference HorizontalScrollStyle
         {
-            get { return m_textPadding; }
-            internal set { m_textPadding = value; CheckReadonly(); }
+            get { return m_horizontalScrollStyle; }
         }
 
-        public Margin ImagePadding
+        public WidgetStyleReference VerticalScrollStyle
         {
-            get { return m_imagePadding; }
-            internal set { m_imagePadding = value; CheckReadonly(); }
+            get { return m_verticalScrollStyle; }
         }
 
-        public ButtonLayout ButtonLayout
+        public WidgetStyleReference HorizontalIndicatorStyle
         {
-            get { return m_buttonLayout; }
-            internal set { m_buttonLayout = value; CheckReadonly(); }
+            get { return m_horizontalIndicatorStyle; }
         }
 
-        public WidgetStyleReference ImageStyle
+        public WidgetStyleReference VerticalIndicatorStyle
         {
-            get { return m_imageStyle; }
-        }
-
-        public WidgetStyleReference TextStyle
-        {
-            get { return m_textStyle; }
+            get { return m_verticalIndicatorStyle; }
         }
     }
 }
-#endif

@@ -24,7 +24,7 @@ namespace NewWidgets.Widgets.Styles
         private float m_backgroundRotation = 0.0f;
 
         [WidgetStyleValue("back_pivot")]
-        private Vector2 m_backgroundPivot = new Vector2(0.5f);
+        private Vector2 m_backgroundPivot = new Vector2(0.5f, 0.5f);
 
         [WidgetStyleValue("back_padding")]
         private Margin m_backgroundPadding = new Margin(0);

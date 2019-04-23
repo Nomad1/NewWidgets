@@ -66,6 +66,12 @@ namespace NewWidgets.Widgets
             set { m_image.Color = value; }
         }
 
+        public int TextColor
+        {
+            get { return m_label.Color; }
+            set { m_label.Color = value; }
+        }
+
         public Font Font
         {
             get { return m_label.Font; }
