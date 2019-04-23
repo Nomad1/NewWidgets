@@ -28,7 +28,7 @@ namespace NewWidgets.Widgets
         }
     }
 
-    [AttributeUsage(AttributeTargets.Field)]
+    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     internal class WidgetParameterAttribute : Attribute
     {
         private readonly string m_name;
@@ -92,7 +92,9 @@ namespace NewWidgets.Widgets
                     return result;
 
                 if (autoCreate)
-                    return new WidgetStyleSheet(name, Widget.DefaultStyle);
+                {
+                    return s_styles[name] = new WidgetStyleSheet(name, Widget.DefaultStyle);
+                }
             }
 
             return default(WidgetStyleSheet);
@@ -106,11 +108,17 @@ namespace NewWidgets.Widgets
 
             WidgetStyleSheet parentStyle = GetStyle(parent, true); // creates the parent!
 
-            WidgetStyleSheet style = new WidgetStyleSheet(name, parentStyle); // creates the child!
+            WidgetStyleSheet style = GetStyle(name, false); // don't create the child yet!
+
+            if (style.IsEmpty)
+            {
+                style = new WidgetStyleSheet(name, parentStyle); // creates the child!
+                s_styles[name] = style;
+            }
+            else
+                style.SetParent(parentStyle);
 
             InitStyle(ref style, node);
-
-            s_styles[name] = style;
 
             WindowController.Instance.LogMessage("Registered style {0}", name);
         }

@@ -22,26 +22,26 @@ namespace NewWidgets.Widgets
 
         public Font Font
         {
-            get { return m_style.Get(WidgetParameterIndex.Font, WidgetManager.MainFont); }
-            set { m_style.Set(this, WidgetParameterIndex.Font, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
+            set { SetProperty(WidgetParameterIndex.Font, value); m_needLayout = true; }
         }
 
         public float FontSize
         {
-            get { return m_style.Get(WidgetParameterIndex.FontSize, 1.0f); }
-            set { m_style.Set(this, WidgetParameterIndex.FontSize, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
+            set { SetProperty(WidgetParameterIndex.FontSize, value); m_needLayout = true; }
         }
 
         public WidgetAlign TextAlign
         {
-            get { return m_style.Get(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
-            set { m_style.Set(this, WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
+            set { SetProperty(WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
         }
 
         public float LineSpacing
         {
-            get { return m_style.Get(WidgetParameterIndex.LineSpacing, 5.0f); }
-            set { m_style.Set(this, WidgetParameterIndex.LineSpacing, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.LineSpacing, 5.0f); }
+            set { SetProperty(WidgetParameterIndex.LineSpacing, value); m_needLayout = true; }
         }
 
         public float MaxWidth
@@ -66,16 +66,16 @@ namespace NewWidgets.Widgets
 
         public bool RichText
         {
-            get { return m_style.Get(WidgetParameterIndex.RichText, true); }
-            set { m_style.Set(this, WidgetParameterIndex.RichText, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.RichText, true); }
+            set { SetProperty(WidgetParameterIndex.RichText, value); m_needLayout = true; }
         }
 
         public int Color
         {
-            get { return m_style.Get(WidgetParameterIndex.TextColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
             set
             {
-                m_style.Set(this, WidgetParameterIndex.TextColor, value);
+                SetProperty(WidgetParameterIndex.TextColor, value);
 
                 if (m_labels != null)
                     foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout

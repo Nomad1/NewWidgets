@@ -19,56 +19,56 @@ namespace NewWidgets.Widgets
 
         public string BackgroundTexture
         {
-            get { return m_style.Get(WidgetParameterIndex.BackImage, ""); }
-            set { m_style.Set(this, WidgetParameterIndex.BackImage, value); InvalidateBackground(); }
+            get { return GetProperty(WidgetParameterIndex.BackImage, ""); }
+            set { SetProperty(WidgetParameterIndex.BackImage, value); InvalidateBackground(); }
         }
 
         public WidgetBackgroundStyle BackgroundStyle
         {
-            get { return m_style.Get(WidgetParameterIndex.BackStyle, WidgetBackgroundStyle.None); }
-            set { m_style.Set(this, WidgetParameterIndex.BackStyle, value); InvalidateBackground(); }
+            get { return GetProperty(WidgetParameterIndex.BackStyle, WidgetBackgroundStyle.None); }
+            set { SetProperty(WidgetParameterIndex.BackStyle, value); InvalidateBackground(); }
         }
 
         public WidgetBackgroundDepth BackgroundDepth
         {
-            get { return m_style.Get(WidgetParameterIndex.BackDepth, WidgetBackgroundDepth.Back); }
-            set { m_style.Set(this, WidgetParameterIndex.BackDepth, value); } // no need to redraw background there
+            get { return GetProperty(WidgetParameterIndex.BackDepth, WidgetBackgroundDepth.Back); }
+            set { SetProperty(WidgetParameterIndex.BackDepth, value); } // no need to redraw background there
         }
 
         public float BackgroundScale
         {
-            get { return m_style.Get(WidgetParameterIndex.BackScale, 1.0f); }
-            set { m_style.Set(this, WidgetParameterIndex.BackScale, value); InvalidateBackground(); }
+            get { return GetProperty(WidgetParameterIndex.BackScale, 1.0f); }
+            set { SetProperty(WidgetParameterIndex.BackScale, value); InvalidateBackground(); }
         }
 
         public float BackgroundRotation
         {
-            get { return m_style.Get(WidgetParameterIndex.BackAngle, 0.0f); }
-            set { m_style.Set(this, WidgetParameterIndex.BackAngle, value); InvalidateBackground(); }
+            get { return GetProperty(WidgetParameterIndex.BackAngle, 0.0f); }
+            set { SetProperty(WidgetParameterIndex.BackAngle, value); InvalidateBackground(); }
         }
 
         public float BackgroundAlpha
         {
-            get { return m_style.Get(WidgetParameterIndex.BackOpacity, 1.0f); }
-            set { m_style.Set(this, WidgetParameterIndex.BackOpacity, value); } // no need to redraw background there
+            get { return GetProperty(WidgetParameterIndex.BackOpacity, 1.0f); }
+            set { SetProperty(WidgetParameterIndex.BackOpacity, value); } // no need to redraw background there
         }
 
         public Vector2 BackgroundPivot
         {
-            get { return m_style.Get(WidgetParameterIndex.BackPivot, new Vector2(0.5f, 0.5f)); }
-            set { m_style.Set(this, WidgetParameterIndex.BackPivot, value); InvalidateBackground(); }
+            get { return GetProperty(WidgetParameterIndex.BackPivot, new Vector2(0.5f, 0.5f)); }
+            set { SetProperty(WidgetParameterIndex.BackPivot, value); InvalidateBackground(); }
         }
 
         public Margin BackgroundPadding
         {
-            get { return m_style.Get(WidgetParameterIndex.BackPadding, new Margin(0)); }
-            set { m_style.Set(this, WidgetParameterIndex.BackPadding, value); InvalidateBackground(); }
+            get { return GetProperty(WidgetParameterIndex.BackPadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.BackPadding, value); InvalidateBackground(); }
         }
 
         public int BackgroundColor
         {
-            get { return m_style.Get(WidgetParameterIndex.BackColor, 0xffffff); }
-            set { m_style.Set(this, WidgetParameterIndex.BackColor, value); } // no need to redraw background there
+            get { return GetProperty(WidgetParameterIndex.BackColor, 0xffffff); }
+            set { SetProperty(WidgetParameterIndex.BackColor, value); } // no need to redraw background there
         }
 
         /// <summary>
@@ -81,11 +81,14 @@ namespace NewWidgets.Widgets
             m_background = new WindowObjectArray<WindowObject>();
         }
 
-        public override void SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetStyleType styleType)
         {
-            base.SwitchStyle(styleType);
-
-            InvalidateBackground(); // TODO: check if it was actually changed
+            if (base.SwitchStyle(styleType))
+            {
+                InvalidateBackground();
+                return true;
+            }
+            return false;
         }
 
         protected virtual void PrepareBackground()
@@ -301,7 +304,7 @@ namespace NewWidgets.Widgets
 
         protected override void Resize(Vector2 size)
         {
-            if (Vector2.DistanceSquared(Size, size) > float.Epsilon)
+            //if (Vector2.DistanceSquared(Size, size) > float.Epsilon)
             {
                 base.Resize(size);
 

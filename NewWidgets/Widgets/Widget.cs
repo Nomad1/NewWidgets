@@ -16,8 +16,7 @@ namespace NewWidgets.Widgets
 
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
-        private readonly Dictionary<WidgetStyleType, WidgetStyleSheet> m_styles;
-        protected WidgetStyleSheet m_style;
+        private readonly WidgetStyleSheet[] m_styles = new WidgetStyleSheet[(int)WidgetStyleType.Max];
         private WidgetStyleType m_styleType;
 
         private float m_alpha = 1.0f; // the only property that could be changed for simple widget without affecting its stylesheet
@@ -65,14 +64,14 @@ namespace NewWidgets.Widgets
        
         public bool ClipContents
         {
-            get { return m_style.Get(WidgetParameterIndex.Clip, false); }
-            set { m_style.Set(this, WidgetParameterIndex.Clip, value); }
+            get { return GetProperty(WidgetParameterIndex.Clip, false); }
+            set { SetProperty(WidgetParameterIndex.Clip, value); }
         }
 
         public Margin ClipMargin
         {
-            get { return m_style.Get(WidgetParameterIndex.ClipMargin, new Margin(0)); }
-            set { m_style.Set(this, WidgetParameterIndex.ClipMargin, value); }
+            get { return GetProperty(WidgetParameterIndex.ClipMargin, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.ClipMargin, value); }
         }
 
         public virtual float Alpha
@@ -95,25 +94,42 @@ namespace NewWidgets.Widgets
             if (style.IsEmpty)
                 style = DefaultStyle;
 
-            m_styles = new Dictionary<WidgetStyleType, WidgetStyleSheet>();
+            Size = style.Get(WidgetParameterIndex.Size, new Vector2(0, 0));
 
             m_styleType = WidgetStyleType.Normal;
-            m_style = style;
 
             LoadStyle(WidgetStyleType.Normal, style);
-
-            Size = style.Get(WidgetParameterIndex.Size, new Vector2(0, 0));
         }
 
         #region Styles
 
-        /// <summary>
-        /// Makes shallow copy of the style object for own modifications
-        /// </summary>
+        internal T GetProperty<T>(WidgetParameterIndex index, T defaultValue)
+        {
+            return m_styles[(int)m_styleType].Get(index, defaultValue);
+        }
+
+        internal void SetProperty<T>(WidgetParameterIndex index, T value)
+        {
+            for (int i = 0; i < m_styles.Length; i++)
+                if (!m_styles[i].IsEmpty)
+                    m_styles[i].Set(this, index, value);
+        }
+
+        protected T GetProperty<T>(string name, T defaultValue)
+        {
+            return m_styles[(int)m_styleType].Get(name, defaultValue);
+        }
+
+        protected void SetProperty(string name, string value)
+        {
+            for (int i = 0; i < m_styles.Length; i++)
+                if (!m_styles[i].IsEmpty)
+                    m_styles[i].Set(this, name, value);
+        }
 
         protected bool HasStyle(WidgetStyleType styleType)
         {
-            return m_styles.ContainsKey(styleType);
+            return !m_styles[(int)styleType].IsEmpty;
         }
 
         protected void DelayedSwitchStyle(WidgetStyleType styleType)
@@ -162,13 +178,17 @@ namespace NewWidgets.Widgets
         /// Switches the style.
         /// </summary>
         /// <param name="styleType">Style type.</param>
-        public virtual void SwitchStyle(WidgetStyleType styleType)
+        public virtual bool SwitchStyle(WidgetStyleType styleType)
         {
             if (!HasStyle(styleType))
-                return;
+                return false;
 
-            m_style = m_styles[styleType];
+            if (m_styleType == styleType)
+                return false;
+
             m_styleType = styleType;
+
+            return true;
         }
 
         /// <summary>
@@ -181,12 +201,12 @@ namespace NewWidgets.Widgets
             if (style.IsEmpty)
                 return;
 
-            m_styles[styleType] = style;
+            m_styles[(int)styleType] = style;
 
             // Hovered can be only subset of Normal, Disabled, Selected or SelectedDisabled
             if (styleType == WidgetStyleType.Normal || styleType == WidgetStyleType.Disabled || styleType == WidgetStyleType.Selected || styleType == WidgetStyleType.SelectedDisabled)
             {
-                var hoveredStyleReference = WidgetManager.GetStyle(style.Get(WidgetParameterIndex.HoveredStyle, ""));
+                var hoveredStyleReference = style.Get(WidgetParameterIndex.HoveredStyle, default(WidgetStyleSheet));
 
                 if (!hoveredStyleReference.IsEmpty)
                 {
@@ -213,11 +233,10 @@ namespace NewWidgets.Widgets
                 }
             }
 
-
             // Disabled can be only subset of Normal or Selected
             if (styleType == WidgetStyleType.Normal || styleType == WidgetStyleType.Selected)
             {
-                var disabledStyleReference = WidgetManager.GetStyle(style.Get(WidgetParameterIndex.DisabledStyle, ""));
+                var disabledStyleReference = style.Get(WidgetParameterIndex.DisabledStyle, default(WidgetStyleSheet));
 
                 if (!disabledStyleReference.IsEmpty)
                 {
@@ -240,7 +259,7 @@ namespace NewWidgets.Widgets
             // Selected can be only subset of Normal
             if (styleType == WidgetStyleType.Normal)
             {
-                var selectedStyleReference = WidgetManager.GetStyle(style.Get(WidgetParameterIndex.SelectedStyle, ""));
+                var selectedStyleReference = style.Get(WidgetParameterIndex.SelectedStyle, default(WidgetStyleSheet));
 
                 if (!selectedStyleReference.IsEmpty)
                 {

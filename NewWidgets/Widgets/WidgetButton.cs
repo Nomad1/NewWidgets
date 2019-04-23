@@ -77,20 +77,20 @@ namespace NewWidgets.Widgets
 
         public WidgetButtonLayout Layout
         {
-            get { return m_style.Get(WidgetParameterIndex.ButtonLayout, WidgetButtonLayout.Center); }
-            set { m_style.Set(this, WidgetParameterIndex.ButtonLayout, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.ButtonLayout, WidgetButtonLayout.ImageLeft); }
+            set { SetProperty(WidgetParameterIndex.ButtonLayout, value); m_needLayout = true; }
         }
 
         public Margin ImagePadding
         {
-            get { return m_style.Get(WidgetParameterIndex.ImagePadding, new Margin(0)); }
-            set { m_style.Set(this, WidgetParameterIndex.ImagePadding, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.ImagePadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.ImagePadding, value); m_needLayout = true; }
         }
 
         public Margin TextPadding
         {
-            get { return m_style.Get(WidgetParameterIndex.TextPadding, new Margin(0)); }
-            set { m_style.Set(this, WidgetParameterIndex.TextPadding, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.TextPadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.TextPadding, value); m_needLayout = true; }
         }
 
         // Button properties
@@ -151,21 +151,25 @@ namespace NewWidgets.Widgets
 
             m_needLayout = true;
 
-            m_label = new WidgetLabel(m_style.Get(WidgetParameterIndex.ButtonTextStyle, WidgetLabel.DefaultStyle), text);
+            m_label = new WidgetLabel(GetProperty(WidgetParameterIndex.ButtonTextStyle, WidgetLabel.DefaultStyle), text);
             m_label.Parent = this;
 
-            m_image = new WidgetImage(m_style.Get(WidgetParameterIndex.ButtonImageStyle, WidgetImage.DefaultStyle));
+            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, WidgetImage.DefaultStyle));
             m_image.Parent = this;
 
             m_clickSound = "click";
         }
 
-        public override void SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetStyleType styleType)
         {
-            base.SwitchStyle(styleType);
+            if (base.SwitchStyle(styleType))
+            {
+                m_label.SwitchStyle(styleType);
+                m_image.SwitchStyle(styleType);
 
-            m_label.SwitchStyle(styleType);
-            m_image.SwitchStyle(styleType);
+                return true;
+            }
+            return false;
         }
 
         protected override void Resize(Vector2 size)

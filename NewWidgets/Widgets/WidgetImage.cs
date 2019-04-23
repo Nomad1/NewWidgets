@@ -18,44 +18,44 @@ namespace NewWidgets.Widgets
 
         public string Image
         {
-            get { return m_style.Get(WidgetParameterIndex.Image, ""); }
-            set { m_style.Set(this, WidgetParameterIndex.Image, value); InvalidateImage(); }
+            get { return GetProperty(WidgetParameterIndex.Image, ""); }
+            set { SetProperty(WidgetParameterIndex.Image, value); InvalidateImage(); }
         }
 
         public float ImageRotation
         {
-            get { return m_style.Get(WidgetParameterIndex.ImageAngle, 0.0f); }
-            set { m_style.Set(this, WidgetParameterIndex.ImageAngle, value); InvalidateImage(); }
+            get { return GetProperty(WidgetParameterIndex.ImageAngle, 0.0f); }
+            set { SetProperty(WidgetParameterIndex.ImageAngle, value); InvalidateImage(); }
         }
 
         public Vector2 ImagePivot
         {
-            get { return m_style.Get(WidgetParameterIndex.ImagePivot, new Vector2(0,0)); }
-            set { m_style.Set(this, WidgetParameterIndex.ImagePivot, value); InvalidateImage(); }
+            get { return GetProperty(WidgetParameterIndex.ImagePivot, new Vector2(0.5f, 0.5f)); }
+            set { SetProperty(WidgetParameterIndex.ImagePivot, value); InvalidateImage(); }
         }
 
         public Margin ImagePadding
         {
-            get { return m_style.Get(WidgetParameterIndex.ImagePadding, new Margin(0)); }
-            set { m_style.Set(this, WidgetParameterIndex.ImagePadding, value); InvalidateImage(); }
+            get { return GetProperty(WidgetParameterIndex.ImagePadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.ImagePadding, value); InvalidateImage(); }
         }
 
         public WidgetBackgroundStyle ImageStyle
         {
-            get { return m_style.Get(WidgetParameterIndex.ImageStyle, WidgetBackgroundStyle.Image); }
-            set { m_style.Set(this, WidgetParameterIndex.ImageStyle, value); InvalidateImage(); }
+            get { return GetProperty(WidgetParameterIndex.ImageStyle, WidgetBackgroundStyle.ImageFit); }
+            set { SetProperty(WidgetParameterIndex.ImageStyle, value); InvalidateImage(); }
         }
 
         public float ImageAlpha
         {
-            get { return m_style.Get(WidgetParameterIndex.ImageOpacity, 1.0f); }
-            set { m_style.Set(this, WidgetParameterIndex.ImageOpacity, value); UpdateColor(); }
+            get { return GetProperty(WidgetParameterIndex.ImageOpacity, 1.0f); }
+            set { SetProperty(WidgetParameterIndex.ImageOpacity, value); UpdateColor(); }
         }
 
         public int Color
         {
-            get { return m_style.Get(WidgetParameterIndex.ImageColor, 0xffffff); }
-            set { m_style.Set(this, WidgetParameterIndex.ImageColor, value); UpdateColor(); }
+            get { return GetProperty(WidgetParameterIndex.ImageColor, 0xffffff); }
+            set { SetProperty(WidgetParameterIndex.ImageColor, value); UpdateColor(); }
         }
 
         public override float Alpha
@@ -81,7 +81,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="image">Image.</param>
         public WidgetImage(string image = "")
-            : this(default(WidgetStyleSheet), WidgetBackgroundStyle.Image, image)
+            : this(default(WidgetStyleSheet), WidgetBackgroundStyle.ImageFit, image)
         {
 
         }
@@ -92,7 +92,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetBackgroundStyle imageStyle = WidgetBackgroundStyle.Image, string image = "")
+        public WidgetImage(WidgetBackgroundStyle imageStyle = WidgetBackgroundStyle.ImageFit, string image = "")
             : this(default(WidgetStyleSheet), imageStyle, image)
         {
            

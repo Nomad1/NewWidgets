@@ -193,7 +193,8 @@ namespace NewWidgets.WinForms
             m_colorMatrix.Matrix33 = ((m_color >> 24) & 0xff) / 255.0f;
             m_imageAttributes.SetColorMatrix(m_colorMatrix);
 
-            UpdateCache(arr[0].X - (int)arr[0].X, arr[0].Y - (int)arr[0].Y, arr[1].X - arr[0].X, arr[2].Y - arr[0].Y); // make sure that cache is valid
+            if (!UpdateCache(arr[0].X - (int)arr[0].X, arr[0].Y - (int)arr[0].Y, arr[1].X - arr[0].X, arr[2].Y - arr[0].Y)) // make sure that cache is valid
+                return;
            
             {
                 graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
@@ -217,8 +218,11 @@ namespace NewWidgets.WinForms
             }
         }
 
-        private void UpdateCache(float x, float y, float width, float height)
+        private bool UpdateCache(float x, float y, float width, float height)
         {
+            if (width < 1 || height < 1)
+                return false;
+
             uint cacheHash = ((uint)(x * 100)) ^ ((uint)(y * 100)) ^ ((uint)(width * 100) << 16) ^ ((uint)(height * 100) << 16); // kinda fast hash
 
             if (cacheHash != m_cacheHash)
@@ -243,6 +247,7 @@ namespace NewWidgets.WinForms
                 }
                 m_cacheHash = cacheHash;
             }
+            return true;
         }
 
         public void Update()

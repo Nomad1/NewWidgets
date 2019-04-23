@@ -99,6 +99,8 @@ namespace NewWidgets.Widgets
         SelectedHovered = Selected | Hovered,
         SelectedDisabledHovered = Selected | Disabled | Hovered,
         DisabledHovered = Normal | Disabled | Hovered,
+
+        Max = 0x08
     }
 }
 

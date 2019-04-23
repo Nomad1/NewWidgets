@@ -9,8 +9,10 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetLine : WidgetImage
+    public class WidgetLine : WidgetBackground
     {
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_line", true);
+
         private Vector2 m_from;
         private Vector2 m_to;
         private float m_gap;
@@ -58,10 +60,8 @@ namespace NewWidgets.Widgets
         /// <param name="width">Width</param>
         /// <param name="angleSnap">Angle snap</param>
         public WidgetLine(Vector2 from, Vector2 to, float gap = 0, float width = 4, int angleSnap = 180)
-            : base(WidgetBackgroundStyle.ThreeImage, "line_3") // TODO: no constant images!
+            : base(DefaultStyle) // TODO: no constant images!
         {
-            ImagePivot = new Vector2(0.5f, 0f);
-            Alpha = 0.8f;
             m_from = from;
             m_to = to;
             m_gap = gap;

@@ -43,8 +43,8 @@ namespace NewWidgets.Widgets
 
         public Margin ImagePadding
         {
-            get { return m_style.Get(WidgetParameterIndex.ImagePadding, new Margin(0)); }
-            set { m_style.Set(this, WidgetParameterIndex.ImagePadding, value); }
+            get { return GetProperty(WidgetParameterIndex.ImagePadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.ImagePadding, value); }
         }
 
         /// <summary>
@@ -64,7 +64,7 @@ namespace NewWidgets.Widgets
         public WidgetCheckBox(WidgetStyleSheet style = default(WidgetStyleSheet), bool isChecked = false)
             : base(style.IsEmpty ? DefaultStyle : style)
         {
-            m_image = new WidgetImage(m_style.Get(WidgetParameterIndex.ButtonImageStyle, WidgetImage.DefaultStyle));
+            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, WidgetImage.DefaultStyle));
             m_image.Parent = this;
 
             Selected = isChecked;
@@ -83,15 +83,19 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override void SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetStyleType styleType)
         {
-            base.SwitchStyle(styleType);
+            if (base.SwitchStyle(styleType))
+            {
+                if (m_image != null)
+                    m_image.SwitchStyle(styleType);
 
-            if (m_image != null)
-                m_image.SwitchStyle(styleType);
+                if (m_linkedLabel != null)
+                    m_linkedLabel.SwitchStyle(styleType);
 
-            if (m_linkedLabel != null)
-                m_linkedLabel.SwitchStyle(styleType);
+                return true;
+            }
+            return false;
         }
 
         public override bool Update()

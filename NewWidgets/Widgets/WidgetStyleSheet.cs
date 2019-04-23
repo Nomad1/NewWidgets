@@ -1,4 +1,7 @@
-﻿using System.Numerics;
+﻿#define MEMORY_PRIORITY // undefine for speed priority
+
+
+using System.Numerics;
 
 using NewWidgets.Utility;
 using NewWidgets.UI;
@@ -16,11 +19,11 @@ namespace NewWidgets.Widgets
         Clip,
         [WidgetParameter("clip_margin", typeof(Margin))]
         ClipMargin,
-        [WidgetParameter("hovered_style")]
+        [WidgetParameter("hovered_style", typeof(WidgetStyleSheet))]
         HoveredStyle,
-        [WidgetParameter("disabled_style")]
+        [WidgetParameter("disabled_style", typeof(WidgetStyleSheet))]
         DisabledStyle,
-        [WidgetParameter("selected_style")]
+        [WidgetParameter("selected_style", typeof(WidgetStyleSheet))]
         SelectedStyle,
 
         // Background
@@ -57,6 +60,7 @@ namespace NewWidgets.Widgets
         [WidgetParameter("text_align", typeof(WidgetAlign))]
         TextAlign,
         [WidgetParameter("text_padding", typeof(Margin))]
+        [WidgetParameter("padding", typeof(Margin))]
         TextPadding,
         [WidgetParameter("richtext", typeof(bool))]
         RichText,
@@ -115,21 +119,33 @@ namespace NewWidgets.Widgets
     {
         private class ParameterData
         {
-            public readonly ParameterData Parent;
-
+            public ParameterData Parent;
+#if MEMORY_PRIORITY
+            public readonly IDictionary<int, object> ObjectParameters;
+#else
             public readonly object[] ObjectParameters; // internal storage for known indexed parameters
+#endif
             public readonly IDictionary<string, string> DictionaryParameters; // external storage for custom parameters
 
             public ParameterData(ParameterData parent)
             {
                 Parent = parent;
+#if MEMORY_PRIORITY
+                ObjectParameters = new Dictionary<int, object>();
+#else
                 ObjectParameters = new object[(int)WidgetParameterIndex.Max];
+#endif
                 DictionaryParameters = new Dictionary<string, string>();
             }
 
             public object GetParameter(WidgetParameterIndex index)
             {
-                object result = ObjectParameters[(int)index];
+                object result;
+#if MEMORY_PRIORITY
+                ObjectParameters.TryGetValue((int)index, out result);
+#else
+                result = ObjectParameters[(int)index];
+#endif
 
                 if (result == null && Parent != null)
                     result = Parent.GetParameter(index);
@@ -182,7 +198,16 @@ namespace NewWidgets.Widgets
             m_instancedFor = 0;
         }
 
-        public bool MakeWritable(object instance)
+        /// <summary>
+        /// This method is needed to repair hierarchy that could be broken because of premature load
+        /// </summary>
+        /// <param name="parent">Parent.</param>
+        internal void SetParent(WidgetStyleSheet parent)
+        {
+            m_data.Parent = parent.m_data;
+        }
+
+        private bool MakeWritable(object instance)
         {
             if (instance == null)
                 return false;
@@ -192,16 +217,16 @@ namespace NewWidgets.Widgets
             if (instanceHash == m_instancedFor)
                 return true;
 
+            m_instancedFor = instanceHash;
             m_name = m_name + "_" + m_instancedFor;
             m_data = new ParameterData(m_data);
-            m_instancedFor = instanceHash;
 
             return true;
         }
 
         public override string ToString()
         {
-            return string.Format("Style: {0}, instanced {1}", GetType().Name, m_instancedFor != 0);
+            return string.Format("Style: {0}, instanced {1}", m_name, m_instancedFor != 0);
         }
 
         internal T Get<T>(WidgetParameterIndex index, T defaultValue)
@@ -218,6 +243,7 @@ namespace NewWidgets.Widgets
         {
             if (instance != null)
                 MakeWritable(instance);
+
             m_data.ObjectParameters[(int)index] = value;
         }
 

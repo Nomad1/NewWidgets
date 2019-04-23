@@ -26,34 +26,34 @@ namespace NewWidgets.Widgets
 
         public Font Font
         {
-            get { return m_style.Get(WidgetParameterIndex.Font, WidgetManager.MainFont); }
-            set { m_style.Set(this, WidgetParameterIndex.Font, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
+            set { SetProperty(WidgetParameterIndex.Font, value); m_needLayout = true; }
         }
 
         public float FontSize
         {
-            get { return m_style.Get(WidgetParameterIndex.FontSize, 1.0f); }
-            set { m_style.Set(this, WidgetParameterIndex.FontSize, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
+            set { SetProperty(WidgetParameterIndex.FontSize, value); m_needLayout = true; }
         }
 
         public WidgetAlign TextAlign
         {
-            get { return m_style.Get(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
-            set { m_style.Set(this, WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
+            set { SetProperty(WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
         }
 
         public Margin TextPadding
         {
-            get { return m_style.Get(WidgetParameterIndex.TextPadding, new Margin(0)); }
-            set { m_style.Set(this, WidgetParameterIndex.TextPadding, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.TextPadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.TextPadding, value); m_needLayout = true; }
         }
 
         public int TextColor
         {
-            get { return m_style.Get(WidgetParameterIndex.TextColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
             set
             {
-                m_style.Set(this, WidgetParameterIndex.TextColor, value);
+                SetProperty(WidgetParameterIndex.TextColor, value);
 
                 if (m_label != null) // try to avoid settings m_needLayout
                     m_label.Color = value;
@@ -62,10 +62,10 @@ namespace NewWidgets.Widgets
 
         public int CursorColor
         {
-            get { return m_style.Get(WidgetParameterIndex.CursorColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.CursorColor, 0xffffff); }
             set
             {
-                m_style.Set(this, WidgetParameterIndex.CursorColor, value);
+                SetProperty(WidgetParameterIndex.CursorColor, value);
 
                 if (m_cursor != null) // try to avoid settings m_needLayout
                     m_cursor.Color = value;
@@ -74,11 +74,10 @@ namespace NewWidgets.Widgets
 
         public string CursorChar
         {
-            get { return m_style.Get(WidgetParameterIndex.CursorChar, "|"); }
+            get { return GetProperty(WidgetParameterIndex.CursorChar, "|"); }
             set
             {
-                m_style.Set(this, WidgetParameterIndex.CursorChar, value);
-
+                SetProperty(WidgetParameterIndex.CursorChar, value);
                 m_needLayout = true;
             }
         }
@@ -98,11 +97,10 @@ namespace NewWidgets.Widgets
 
         public string MaskChar
         {
-            get { return m_style.Get(WidgetParameterIndex.MaskChar, ""); }
+            get { return GetProperty(WidgetParameterIndex.MaskChar, ""); }
             set
             {
-                m_style.Set(this, WidgetParameterIndex.MaskChar, value);
-
+                SetProperty(WidgetParameterIndex.MaskChar, value);
                 m_needLayout = true;
             }
         }
