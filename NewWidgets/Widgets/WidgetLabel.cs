@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using NewWidgets.UI;
-using NewWidgets.Widgets.Styles;
 
 #if RUNMOBILE
 using RunMobile.Utility;
@@ -13,7 +12,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetLabel : Widget
     {
-        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextStyleSheet>("default_label");
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_label", true);
 
         private LabelObject m_label;
 
@@ -23,44 +22,34 @@ namespace NewWidgets.Widgets
         private bool m_needAnimate;
         private bool m_needAnimateRandom;
         
-        private bool m_richText;
-
-        private WidgetTextStyleSheet Style
-        {
-            get { return m_style.Get<WidgetTextStyleSheet>(); }
-        }
-
-        private WidgetTextStyleSheet WritableStyle
-        {
-            get { return m_style.Get<WidgetTextStyleSheet>(this); }
-        }
-
         public Font Font
         {
-            get { return Style.Font; }
-            set { WritableStyle.Font = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.Font, WidgetManager.MainFont); }
+            set { m_style.Set(this, WidgetParameterIndex.Font, value); m_needLayout = true; }
         }
 
         public float FontSize
         {
-            get { return Style.FontSize; }
-            set { WritableStyle.FontSize = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.FontSize, 1.0f); }
+            set { m_style.Set(this, WidgetParameterIndex.FontSize, value); m_needLayout = true; }
         }
 
         public WidgetAlign TextAlign
         {
-            get { return Style.TextAlign; }
-            set { WritableStyle.TextAlign = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
+            set { m_style.Set(this, WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
         }
 
         public bool RichText
         {
-            get { return m_richText; }
+            get { return m_style.Get(WidgetParameterIndex.RichText, false); }
             set
             {
-                m_richText = value;
+                m_style.Set(this, WidgetParameterIndex.RichText, value);
+
                 if (m_label != null)
                     m_label.RichText = value;
+
                 m_needLayout = true;
             }
         }
@@ -83,10 +72,11 @@ namespace NewWidgets.Widgets
 
         public int Color
         {
-            get { return Style.TextColor; }
+            get { return m_style.Get(WidgetParameterIndex.TextColor, 0xffffff); }
             set
             {
-                WritableStyle.TextColor = value;
+                m_style.Set(this, WidgetParameterIndex.TextColor, value);
+
                 if (m_label != null) // try to avoid settings m_needLayout
                     m_label.Color = value;
             }
@@ -108,7 +98,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="text">Text.</param>
         public WidgetLabel(string text)
-            : this(default(WidgetStyleReference), text)
+            : this(default(WidgetStyleSheet), text)
         {
         }
 
@@ -117,11 +107,10 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="text">Text.</param>
-        public WidgetLabel(WidgetStyleReference style = default(WidgetStyleReference), string text = "")
+        public WidgetLabel(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
            : base(style.IsEmpty ? DefaultStyle : style)
         {
             Text = text;
-            m_richText = true;
         }
 
         public void Relayout()
@@ -129,7 +118,7 @@ namespace NewWidgets.Widgets
             if (m_label == null)
             {
                 m_label = new LabelObject(this, Font, string.Empty,
-                    LabelAlign.Start, LabelAlign.Start, m_richText);
+                    LabelAlign.Start, LabelAlign.Start, RichText);
             }
             
             m_label.Color = Color;

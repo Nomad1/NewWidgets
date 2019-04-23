@@ -3,7 +3,6 @@ using System.Drawing;
 
 using NewWidgets.UI;
 using NewWidgets.Utility;
-using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
@@ -24,7 +23,7 @@ namespace NewWidgets.Widgets
             set { m_region = value; }
         }
 
-        public WidgetTooltip(WidgetStyleReference style)
+        public WidgetTooltip(WidgetStyleSheet style)
             : base(style)
         {
         }

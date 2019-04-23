@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
-using NewWidgets.Widgets.Styles;
 
 #if RUNMOBILE
 using RunMobile.Utility;
@@ -13,12 +12,12 @@ namespace NewWidgets.Widgets
 {
     public class Widget : WindowObject
     {
-        public static readonly WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetStyleSheet>("default");
+        public static readonly WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default", true);
 
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
-        private readonly Dictionary<WidgetStyleType, WidgetStyleReference> m_styles;
-        protected WidgetStyleReference m_style;
+        private readonly Dictionary<WidgetStyleType, WidgetStyleSheet> m_styles;
+        protected WidgetStyleSheet m_style;
         private WidgetStyleType m_styleType;
 
         private float m_alpha = 1.0f; // the only property that could be changed for simple widget without affecting its stylesheet
@@ -30,25 +29,6 @@ namespace NewWidgets.Widgets
         public WidgetStyleType StyleType
         {
             get { return m_styleType; }
-        }
-
-        /// <summary>
-        /// Private style getter. All descendants should implement their own property using m_style.Get
-        /// </summary>
-        /// <value>The style.</value>
-        private WidgetStyleSheet Style
-        {
-            get { return m_style.Get<WidgetStyleSheet>(); }
-        }
-
-        /// <summary>
-        /// This property is mandatory for modifying personal style of a widget. Trying to write something to non-cloned style should raise an assertion
-        /// All descendants should implement their own property using m_style.Get(this)
-        /// </summary>
-        /// <value>The writable style.</value>
-        private WidgetStyleSheet WritableStyle
-        {
-            get { return m_style.Get<WidgetStyleSheet>(this); }
         }
 
         #endregion
@@ -85,14 +65,14 @@ namespace NewWidgets.Widgets
        
         public bool ClipContents
         {
-            get { return Style.ClipContents; }
-            set { WritableStyle.ClipContents = value; }
+            get { return m_style.Get(WidgetParameterIndex.Clip, false); }
+            set { m_style.Set(this, WidgetParameterIndex.Clip, value); }
         }
 
         public Margin ClipMargin
         {
-            get { return Style.ClipMargin; }
-            set { WritableStyle.ClipMargin = value; }
+            get { return m_style.Get(WidgetParameterIndex.ClipMargin, new Margin(0)); }
+            set { m_style.Set(this, WidgetParameterIndex.ClipMargin, value); }
         }
 
         public virtual float Alpha
@@ -109,32 +89,31 @@ namespace NewWidgets.Widgets
 
         public event TooltipDelegate OnTooltip;
 
-        protected Widget(WidgetStyleReference style = default(WidgetStyleReference))
+        protected Widget(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(null)
         {
             if (style.IsEmpty)
                 style = DefaultStyle;
 
-            m_styles = new Dictionary<WidgetStyleType, WidgetStyleReference>();
+            m_styles = new Dictionary<WidgetStyleType, WidgetStyleSheet>();
 
             m_styleType = WidgetStyleType.Normal;
             m_style = style;
 
             LoadStyle(WidgetStyleType.Normal, style);
 
-            Size = Style.Size;
+            Size = style.Get(WidgetParameterIndex.Size, new Vector2(0, 0));
         }
 
         #region Styles
 
+        /// <summary>
+        /// Makes shallow copy of the style object for own modifications
+        /// </summary>
+
         protected bool HasStyle(WidgetStyleType styleType)
         {
-            WidgetStyleReference style;
-
-            if (!m_styles.TryGetValue(styleType, out style))
-                return false;
-
-            return style.IsValid;
+            return m_styles.ContainsKey(styleType);
         }
 
         protected void DelayedSwitchStyle(WidgetStyleType styleType)
@@ -185,13 +164,11 @@ namespace NewWidgets.Widgets
         /// <param name="styleType">Style type.</param>
         public virtual void SwitchStyle(WidgetStyleType styleType)
         {
-            WidgetStyleReference style;
-
-            if (!m_styles.TryGetValue(styleType, out style))
+            if (!HasStyle(styleType))
                 return;
 
+            m_style = m_styles[styleType];
             m_styleType = styleType;
-            m_style = style;
         }
 
         /// <summary>
@@ -199,7 +176,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="styleType">Style type.</param>
         /// <param name="style">Style.</param>
-        public void LoadStyle(WidgetStyleType styleType, WidgetStyleReference style)
+        public void LoadStyle(WidgetStyleType styleType, WidgetStyleSheet style)
         {
             if (style.IsEmpty)
                 return;
@@ -209,13 +186,10 @@ namespace NewWidgets.Widgets
             // Hovered can be only subset of Normal, Disabled, Selected or SelectedDisabled
             if (styleType == WidgetStyleType.Normal || styleType == WidgetStyleType.Disabled || styleType == WidgetStyleType.Selected || styleType == WidgetStyleType.SelectedDisabled)
             {
-                var hoveredStyleReference = style.Get<WidgetStyleSheet>().HoveredStyle;
+                var hoveredStyleReference = WidgetManager.GetStyle(style.Get(WidgetParameterIndex.HoveredStyle, ""));
 
-                if (hoveredStyleReference.IsValid)
+                if (!hoveredStyleReference.IsEmpty)
                 {
-                    if (hoveredStyleReference.Type != m_style.Type && !hoveredStyleReference.Type.IsSubclassOf(m_style.Type))
-                        throw new Exception(string.Format("Hovered style {0} for {1} has incompatible type", hoveredStyleReference, this));
-
                     WidgetStyleType targetStyleType = 0;
                     switch (styleType)
                     {
@@ -243,13 +217,10 @@ namespace NewWidgets.Widgets
             // Disabled can be only subset of Normal or Selected
             if (styleType == WidgetStyleType.Normal || styleType == WidgetStyleType.Selected)
             {
-                var disabledStyleReference = style.Get<WidgetStyleSheet>().DisabledStyle;
+                var disabledStyleReference = WidgetManager.GetStyle(style.Get(WidgetParameterIndex.DisabledStyle, ""));
 
-                if (disabledStyleReference.IsValid)
+                if (!disabledStyleReference.IsEmpty)
                 {
-                    if (disabledStyleReference.Type != m_style.Type && !disabledStyleReference.Type.IsSubclassOf(m_style.Type))
-                        throw new Exception(string.Format("Disabled style {0} for {1} has incompatible type", disabledStyleReference, this));
-
                     WidgetStyleType targetStyleType = 0;
                     switch (styleType)
                     {
@@ -269,13 +240,10 @@ namespace NewWidgets.Widgets
             // Selected can be only subset of Normal
             if (styleType == WidgetStyleType.Normal)
             {
-                var selectedStyleReference = style.Get<WidgetStyleSheet>().SelectedStyle;
+                var selectedStyleReference = WidgetManager.GetStyle(style.Get(WidgetParameterIndex.SelectedStyle, ""));
 
-                if (selectedStyleReference.IsValid)
+                if (!selectedStyleReference.IsEmpty)
                 {
-                    if (selectedStyleReference.Type != m_style.Type && !selectedStyleReference.Type.IsSubclassOf(m_style.Type))
-                        throw new Exception(string.Format("Selected style {0} for {1} has incompatible type", selectedStyleReference, this));
-
                     WidgetStyleType targetStyleType = 0;
                     switch (styleType)
                     {

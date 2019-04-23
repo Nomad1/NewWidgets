@@ -2,7 +2,6 @@
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
-using NewWidgets.Widgets.Styles;
 
 #if RUNMOBILE
 using RunMobile.Utility;
@@ -12,81 +11,71 @@ namespace NewWidgets.Widgets
 {
     public class WidgetBackground : Widget
     {
-        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_background");
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_background", true);
 
         protected readonly WindowObjectArray<WindowObject> m_background;
 
         private bool m_backgroundInited;
 
-        private WidgetBackgroundStyleSheet Style
+        public string BackgroundTexture
         {
-            get { return m_style.Get<WidgetBackgroundStyleSheet>(); }
+            get { return m_style.Get(WidgetParameterIndex.BackImage, ""); }
+            set { m_style.Set(this, WidgetParameterIndex.BackImage, value); InvalidateBackground(); }
         }
 
-        private WidgetBackgroundStyleSheet WritableStyle
+        public WidgetBackgroundStyle BackgroundStyle
         {
-            get { return m_style.Get<WidgetBackgroundStyleSheet>(this); }
-        }
-
-        protected string BackgroundTexture
-        {
-            get { return Style.BackgroundTexture; }
-            set { WritableStyle.BackgroundTexture = value; InvalidateBackground(); }
-        }
-
-        protected WidgetBackgroundStyle BackgroundStyle
-        {
-            get { return Style.BackgroundStyle; }
-            set { WritableStyle.BackgroundStyle = value; InvalidateBackground(); }
-        }
-
-        protected float BackgroundScale
-        {
-            get { return Style.BackgroundScale; }
-            set { WritableStyle.BackgroundScale = value; InvalidateBackground(); }
-        }
-
-        protected float BackgroundRotation
-        {
-            get { return Style.BackgroundRotation; }
-            set { WritableStyle.BackgroundRotation = value; InvalidateBackground(); }
-        }
-
-        protected Vector2 BackgroundPivot
-        {
-            get { return Style.BackgroundPivot; }
-            set { WritableStyle.BackgroundPivot = value; InvalidateBackground(); }
-        }
-
-        public Margin BackgroundPadding
-        {
-            get { return Style.BackgroundPadding; }
-            set { WritableStyle.BackgroundPadding = value; InvalidateBackground(); }
+            get { return m_style.Get(WidgetParameterIndex.BackStyle, WidgetBackgroundStyle.None); }
+            set { m_style.Set(this, WidgetParameterIndex.BackStyle, value); InvalidateBackground(); }
         }
 
         public WidgetBackgroundDepth BackgroundDepth
         {
-            get { return Style.BackgroundDepth; }
-            set { WritableStyle.BackgroundDepth = value; } // no need to redraw background there
+            get { return m_style.Get(WidgetParameterIndex.BackDepth, WidgetBackgroundDepth.Back); }
+            set { m_style.Set(this, WidgetParameterIndex.BackDepth, value); } // no need to redraw background there
         }
 
-        protected float BackgroundAlpha
+        public float BackgroundScale
         {
-            get { return Style.BackgroundOpacity; }
-            set { WritableStyle.BackgroundOpacity = value; } // no need to redraw background there
+            get { return m_style.Get(WidgetParameterIndex.BackScale, 1.0f); }
+            set { m_style.Set(this, WidgetParameterIndex.BackScale, value); InvalidateBackground(); }
         }
 
-        protected int BackgroundColor
+        public float BackgroundRotation
         {
-            get { return Style.BackgroundColor; }
-            set { WritableStyle.BackgroundColor = value; } // no need to redraw background there
+            get { return m_style.Get(WidgetParameterIndex.BackAngle, 0.0f); }
+            set { m_style.Set(this, WidgetParameterIndex.BackAngle, value); InvalidateBackground(); }
+        }
+
+        public float BackgroundAlpha
+        {
+            get { return m_style.Get(WidgetParameterIndex.BackOpacity, 1.0f); }
+            set { m_style.Set(this, WidgetParameterIndex.BackOpacity, value); } // no need to redraw background there
+        }
+
+        public Vector2 BackgroundPivot
+        {
+            get { return m_style.Get(WidgetParameterIndex.BackPivot, new Vector2(0.5f, 0.5f)); }
+            set { m_style.Set(this, WidgetParameterIndex.BackPivot, value); InvalidateBackground(); }
+        }
+
+        public Margin BackgroundPadding
+        {
+            get { return m_style.Get(WidgetParameterIndex.BackPadding, new Margin(0)); }
+            set { m_style.Set(this, WidgetParameterIndex.BackPadding, value); InvalidateBackground(); }
+        }
+
+        public int BackgroundColor
+        {
+            get { return m_style.Get(WidgetParameterIndex.BackColor, 0xffffff); }
+            set { m_style.Set(this, WidgetParameterIndex.BackColor, value); } // no need to redraw background there
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetBackground"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetBackground(WidgetStyleReference style = default(WidgetStyleReference))
+        public WidgetBackground(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(style.IsEmpty ? DefaultStyle : style)
         {
             m_background = new WindowObjectArray<WindowObject>();

@@ -1,6 +1,5 @@
 ﻿using System.Numerics;
 using NewWidgets.UI;
-using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
@@ -9,7 +8,7 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetWindow : WidgetPanel
     {
-        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_window");
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_window", true);
 
         private static readonly float s_dragEpsilonSquared = 10.0f*10.0f;
 
@@ -28,7 +27,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public WidgetWindow(WidgetStyleReference style = default(WidgetStyleReference))
+        public WidgetWindow(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(style.IsEmpty ? DefaultStyle : style)
         {
         }

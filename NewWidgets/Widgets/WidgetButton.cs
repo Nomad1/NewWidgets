@@ -2,12 +2,11 @@
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
-using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
     [Flags]
-    public enum ButtonLayout
+    public enum WidgetButtonLayout
     {
         Center = 0,
         ImageLeft = 0x01,
@@ -18,7 +17,7 @@ namespace NewWidgets.Widgets
 
     public class WidgetButton : WidgetBackground
     {
-        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetButtonStyleSheet>("default_button");
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_button", true);
 
         private WidgetLabel m_label;
         private WidgetImage m_image;
@@ -33,16 +32,6 @@ namespace NewWidgets.Widgets
         public event Action<WidgetButton> OnUnhover;
 
         private bool m_needLayout;
-
-        private WidgetButtonStyleSheet Style
-        {
-            get { return m_style.Get<WidgetButtonStyleSheet>(); }
-        }
-
-        private WidgetButtonStyleSheet WritableStyle
-        {
-            get { return m_style.Get<WidgetButtonStyleSheet>(this); }
-        }
 
         // Dynamic properties
 
@@ -86,22 +75,22 @@ namespace NewWidgets.Widgets
 
         // Own style properties
 
-        public ButtonLayout Layout
+        public WidgetButtonLayout Layout
         {
-            get { return Style.ButtonLayout; }
-            set { WritableStyle.ButtonLayout = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.ButtonLayout, WidgetButtonLayout.Center); }
+            set { m_style.Set(this, WidgetParameterIndex.ButtonLayout, value); m_needLayout = true; }
         }
 
         public Margin ImagePadding
         {
-            get { return Style.ImagePadding; }
-            set { WritableStyle.ImagePadding = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.ImagePadding, new Margin(0)); }
+            set { m_style.Set(this, WidgetParameterIndex.ImagePadding, value); m_needLayout = true; }
         }
 
         public Margin TextPadding
         {
-            get { return Style.TextPadding; }
-            set { WritableStyle.TextPadding = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.TextPadding, new Margin(0)); }
+            set { m_style.Set(this, WidgetParameterIndex.TextPadding, value); m_needLayout = true; }
         }
 
         // Button properties
@@ -147,7 +136,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="text">Text.</param>
         public WidgetButton(string text)
-            : this(default(WidgetStyleReference), text)
+            : this(default(WidgetStyleSheet), text)
         {
         }
 
@@ -156,16 +145,16 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="text">Text.</param>
-        public WidgetButton(WidgetStyleReference style = default(WidgetStyleReference), string text = "")
+        public WidgetButton(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
            : base(style.IsEmpty ? DefaultStyle : style)
         {
 
             m_needLayout = true;
 
-            m_label = new WidgetLabel(Style.TextStyle, text);
+            m_label = new WidgetLabel(m_style.Get(WidgetParameterIndex.ButtonTextStyle, WidgetLabel.DefaultStyle), text);
             m_label.Parent = this;
 
-            m_image = new WidgetImage(Style.ImageStyle);
+            m_image = new WidgetImage(m_style.Get(WidgetParameterIndex.ButtonImageStyle, WidgetImage.DefaultStyle));
             m_image.Parent = this;
 
             m_clickSound = "click";
@@ -197,7 +186,7 @@ namespace NewWidgets.Widgets
 
             if (m_label != null && !string.IsNullOrEmpty(m_label.Text))
             {
-                if ((Layout & ButtonLayout.TextLeft) != 0)
+                if ((Layout & WidgetButtonLayout.TextLeft) != 0)
                 {
                     m_label.Size = new Vector2(Size.X - TextPadding.Width, Size.Y - TextPadding.Height);
                     m_label.Position = TextPadding.TopLeft;
@@ -213,7 +202,7 @@ namespace NewWidgets.Widgets
 
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
             {
-                if ((Layout & ButtonLayout.ImageLeft) != 0)
+                if ((Layout & WidgetButtonLayout.ImageLeft) != 0)
                 {
                     m_image.Size = new Vector2(Size.X - ImagePadding.Width, Size.Y - ImagePadding.Height);
                     m_image.ImageStyle = WidgetBackgroundStyle.ImageTopLeft;

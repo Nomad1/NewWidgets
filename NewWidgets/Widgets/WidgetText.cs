@@ -1,5 +1,4 @@
 ﻿using NewWidgets.UI;
-using NewWidgets.Widgets.Styles;
 
 using System;
 using System.Collections.Generic;
@@ -9,7 +8,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetText : Widget
     {
-        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextStyleSheet>("default_text");
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_text", true);
 
         private static char[] s_separatorChars = { ' ', '\t' };
 
@@ -20,40 +19,29 @@ namespace NewWidgets.Widgets
         private float m_maxWidth;
 
         private bool m_needLayout;
-        private bool m_richText;
-
-        private WidgetTextStyleSheet Style
-        {
-            get { return m_style.Get<WidgetTextStyleSheet>(); }
-        }
-
-        private WidgetTextStyleSheet WritableStyle
-        {
-            get { return m_style.Get<WidgetTextStyleSheet>(this); }
-        }
 
         public Font Font
         {
-            get { return Style.Font; }
-            set { WritableStyle.Font = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.Font, WidgetManager.MainFont); }
+            set { m_style.Set(this, WidgetParameterIndex.Font, value); m_needLayout = true; }
         }
 
         public float FontSize
         {
-            get { return Style.FontSize; }
-            set { WritableStyle.FontSize = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.FontSize, 1.0f); }
+            set { m_style.Set(this, WidgetParameterIndex.FontSize, value); m_needLayout = true; }
         }
 
         public WidgetAlign TextAlign
         {
-            get { return Style.TextAlign; }
-            set { WritableStyle.TextAlign = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
+            set { m_style.Set(this, WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
         }
 
         public float LineSpacing
         {
-            get { return Style.LineSpacing; }
-            set { WritableStyle.LineSpacing = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.LineSpacing, 5.0f); }
+            set { m_style.Set(this, WidgetParameterIndex.LineSpacing, value); m_needLayout = true; }
         }
 
         public float MaxWidth
@@ -78,16 +66,16 @@ namespace NewWidgets.Widgets
 
         public bool RichText
         {
-            get { return m_richText; }
-            set { m_richText = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.RichText, true); }
+            set { m_style.Set(this, WidgetParameterIndex.RichText, value); m_needLayout = true; }
         }
 
         public int Color
         {
-            get { return Style.TextColor; }
+            get { return m_style.Get(WidgetParameterIndex.TextColor, 0xffffff); }
             set
             {
-                WritableStyle.TextColor = value;
+                m_style.Set(this, WidgetParameterIndex.TextColor, value);
 
                 if (m_labels != null)
                     foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
@@ -114,16 +102,15 @@ namespace NewWidgets.Widgets
         }
 
         public WidgetText(string text)
-            : this(default(WidgetStyleReference), text)
+            : this(default(WidgetStyleSheet), text)
         {
         }
 
-        public WidgetText(WidgetStyleReference style = default(WidgetStyleReference), string text = "")
+        public WidgetText(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
             : base(style.IsEmpty? DefaultStyle : style)
         {
             m_text = text;
             m_needLayout = true;
-            m_richText = true;
         }
 
         protected override void Resize(Vector2 size)
@@ -144,14 +131,14 @@ namespace NewWidgets.Widgets
             LabelObject.TextSpan[][] colors = null;
 
 
-            if (m_richText)
+            if (RichText)
                 colors = new LabelObject.TextSpan[lines.Length][];
 
             for (int i = 0; i < lines.Length; i++)
             {
                 string line = lines[i];
 
-                if (m_richText)
+                if (RichText)
                     line = LabelObject.ParseRichText(line, Color, out colors[i], Font.SpaceWidth + Font.Spacing);
 
                 Vector2 size = Font.MeasureString(line);
@@ -206,7 +193,7 @@ namespace NewWidgets.Widgets
 
                                 newSizes.Add(new Vector2(width, lineHeight));
 
-                                if (m_richText)
+                                if (RichText)
                                     newColors.Add(new ArraySegment<LabelObject.TextSpan>(colors[i], start, lastSeparator - start));
 
                                 if (lines[i][lastSeparator] == ' ') // skip line start space
@@ -227,7 +214,7 @@ namespace NewWidgets.Widgets
                             newLines.Add(lines[i].Substring(start));
                             newSizes.Add(new Vector2(width, lineHeight));
 
-                            if (m_richText)
+                            if (RichText)
                                 newColors.Add(new ArraySegment<LabelObject.TextSpan>(colors[i], start, colors[i].Length - start));
                         }
 
@@ -236,14 +223,14 @@ namespace NewWidgets.Widgets
                     {
                         newLines.Add(lines[i]);
                         newSizes.Add(sizes[i]);
-                        if (m_richText)
+                        if (RichText)
                             newColors.Add(new ArraySegment<LabelObject.TextSpan>(colors[i]));
                     }
                 }
                 lines = newLines.ToArray();
                 sizes = newSizes.ToArray();
 
-                if (m_richText)
+                if (RichText)
                 {
                     LabelObject.TextSpan[][] newColorsArray = new LabelObject.TextSpan[newColors.Count][];
                     for (int i = 0; i < newColors.Count; i++)
@@ -272,7 +259,7 @@ namespace NewWidgets.Widgets
                 label.Alpha = Alpha;
                 label.Text = lines[i];
 
-                if (m_richText)
+                if (RichText)
                     label.SetColors(colors[i]);
 
                 float x = 0;

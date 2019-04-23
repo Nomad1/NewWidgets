@@ -3,13 +3,12 @@ using System.Numerics;
 
 using NewWidgets.UI;
 using NewWidgets.Utility;
-using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
     public class WidgetTextEdit : WidgetBackground, IFocusableWidget
     {
-        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetTextEditStyleSheet>("default_textedit");
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_textedit", true);
 
         private int m_cursorPosition;
 
@@ -19,49 +18,43 @@ namespace NewWidgets.Widgets
         private string m_preffix;
         private string m_text;
 
-        private char m_maskChar;
-        
-
         public event Action<WidgetTextEdit, string> OnFocusLost;
         public event Action<WidgetTextEdit, string> OnTextEntered;
         public event Action<WidgetTextEdit, string> OnTextChanged;
 
         private bool m_needLayout;
 
-        private WidgetTextEditStyleSheet Style
-        {
-            get { return m_style.Get<WidgetTextEditStyleSheet>(); }
-        }
-
-        private WidgetTextEditStyleSheet WritableStyle
-        {
-            get { return m_style.Get<WidgetTextEditStyleSheet>(this); }
-        }
-
         public Font Font
         {
-            get { return Style.Font; }
-            set { WritableStyle.Font = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.Font, WidgetManager.MainFont); }
+            set { m_style.Set(this, WidgetParameterIndex.Font, value); m_needLayout = true; }
         }
 
         public float FontSize
         {
-            get { return Style.FontSize; }
-            set { WritableStyle.FontSize = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.FontSize, 1.0f); }
+            set { m_style.Set(this, WidgetParameterIndex.FontSize, value); m_needLayout = true; }
+        }
+
+        public WidgetAlign TextAlign
+        {
+            get { return m_style.Get(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
+            set { m_style.Set(this, WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
         }
 
         public Margin TextPadding
         {
-            get { return Style.TextPadding; }
-            set { WritableStyle.TextPadding = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.TextPadding, new Margin(0)); }
+            set { m_style.Set(this, WidgetParameterIndex.TextPadding, value); m_needLayout = true; }
         }
 
         public int TextColor
         {
-            get { return Style.TextColor; }
+            get { return m_style.Get(WidgetParameterIndex.TextColor, 0xffffff); }
             set
             {
-                WritableStyle.TextColor = value;
+                m_style.Set(this, WidgetParameterIndex.TextColor, value);
+
                 if (m_label != null) // try to avoid settings m_needLayout
                     m_label.Color = value;
             }
@@ -69,10 +62,11 @@ namespace NewWidgets.Widgets
 
         public int CursorColor
         {
-            get { return Style.CursorColor; }
+            get { return m_style.Get(WidgetParameterIndex.CursorColor, 0xffffff); }
             set
             {
-                WritableStyle.CursorColor = value;
+                m_style.Set(this, WidgetParameterIndex.CursorColor, value);
+
                 if (m_cursor != null) // try to avoid settings m_needLayout
                     m_cursor.Color = value;
             }
@@ -80,10 +74,11 @@ namespace NewWidgets.Widgets
 
         public string CursorChar
         {
-            get { return Style.CursorChar; }
+            get { return m_style.Get(WidgetParameterIndex.CursorChar, "|"); }
             set
             {
-                WritableStyle.CursorChar = value;
+                m_style.Set(this, WidgetParameterIndex.CursorChar, value);
+
                 m_needLayout = true;
             }
         }
@@ -101,10 +96,15 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public char MaskChar
+        public string MaskChar
         {
-            get { return m_maskChar; }
-            set { m_maskChar = value; m_needLayout = true; }
+            get { return m_style.Get(WidgetParameterIndex.MaskChar, ""); }
+            set
+            {
+                m_style.Set(this, WidgetParameterIndex.MaskChar, value);
+
+                m_needLayout = true;
+            }
         }
 
         public bool IsFocused
@@ -142,7 +142,7 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextEdit"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetTextEdit(WidgetStyleReference style = default(WidgetStyleReference))
+        public WidgetTextEdit(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(style.IsEmpty ? DefaultStyle : style)
         {
             m_text = string.Empty;
@@ -368,13 +368,13 @@ namespace NewWidgets.Widgets
 
         private string MaskText(string text)
         {
-            if (m_maskChar == 0)
+            if (string.IsNullOrEmpty(MaskChar))
                 return text;
 
             char [] result = text.ToCharArray();
             for (int i = 0; i < result.Length; i++)
                 if (!IsFocused || i != m_cursorPosition)
-                    result[i] = '*';
+                    result[i] = MaskChar[0];
 
             return new string(result);
         }

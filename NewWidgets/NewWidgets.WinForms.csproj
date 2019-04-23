@@ -68,20 +68,10 @@
     <Compile Include="WinForms\WinFormsController.cs" />
     <Compile Include="WinForms\WinFormsSprite.cs" />
     <Compile Include="Widgets\WidgetBackground.cs" />
-    <Compile Include="Widgets\Styles\WidgetStyleSheet.cs" />
-    <Compile Include="Widgets\Styles\WidgetBackgroundStyleSheet.cs" />
-    <Compile Include="Widgets\Styles\WidgetTextStyleSheet.cs" />
-    <Compile Include="Widgets\Styles\WidgetTextEditStyleSheet.cs" />
-    <Compile Include="Widgets\Styles\WidgetButtonStyleSheet.cs" />
-    <Compile Include="Widgets\Styles\WidgetImageStyleSheet.cs" />
     <Compile Include="Widgets\WidgetManager.Styles.cs" />
     <Compile Include="Widgets\WidgetWindow.cs" />
-    <Compile Include="Widgets\Styles\WidgetScrollViewStyleSheet.cs" />
-    <Compile Include="Widgets\Styles\WidgetCheckBoxStyleSheet.cs" />
+    <Compile Include="Widgets\WidgetStyleSheet.cs" />
   </ItemGroup>
   <ItemGroup />
-  <ItemGroup>
-    <Folder Include="Widgets\Styles\" />
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

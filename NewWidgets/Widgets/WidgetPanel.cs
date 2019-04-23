@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using NewWidgets.UI;
-using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
     public class WidgetPanel : WidgetBackground, IWindowContainer
     {
-        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetBackgroundStyleSheet>("default_panel");
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_panel", true);
 
         private readonly WindowObjectArray<Widget> m_children;
 
@@ -30,7 +29,7 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetPanel"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetPanel(WidgetStyleReference style = default(WidgetStyleReference))
+        public WidgetPanel(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(style.IsEmpty ? DefaultStyle : style)
         {
             m_children = new WindowObjectArray<Widget>();

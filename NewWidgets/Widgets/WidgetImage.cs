@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
-using NewWidgets.Widgets.Styles;
 
 #if RUNMOBILE
 using RunMobile.Utility;
@@ -11,62 +10,52 @@ namespace NewWidgets.Widgets
 {
     public class WidgetImage : Widget
     {
-        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetImageStyleSheet>("default_image");
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_image", true);
 
         private ImageObject m_imageObject;
 
         private bool m_imageInited;
 
-        private WidgetImageStyleSheet Style
-        {
-            get { return m_style.Get<WidgetImageStyleSheet>(); }
-        }
-
-        private WidgetImageStyleSheet WritableStyle
-        {
-            get { return m_style.Get<WidgetImageStyleSheet>(this); }
-        }
-
         public string Image
         {
-            get { return Style.Image; }
-            set { WritableStyle.Image = value; InvalidateImage(); }
+            get { return m_style.Get(WidgetParameterIndex.Image, ""); }
+            set { m_style.Set(this, WidgetParameterIndex.Image, value); InvalidateImage(); }
         }
 
         public float ImageRotation
         {
-            get { return Style.ImageRotation; }
-            set { WritableStyle.ImageRotation = value; InvalidateImage(); }
+            get { return m_style.Get(WidgetParameterIndex.ImageAngle, 0.0f); }
+            set { m_style.Set(this, WidgetParameterIndex.ImageAngle, value); InvalidateImage(); }
         }
 
         public Vector2 ImagePivot
         {
-            get { return Style.ImagePivot; }
-            set { WritableStyle.ImagePivot = value; InvalidateImage(); }
+            get { return m_style.Get(WidgetParameterIndex.ImagePivot, new Vector2(0,0)); }
+            set { m_style.Set(this, WidgetParameterIndex.ImagePivot, value); InvalidateImage(); }
         }
 
         public Margin ImagePadding
         {
-            get { return Style.ImagePadding; }
-            set { WritableStyle.ImagePadding = value; InvalidateImage(); }
+            get { return m_style.Get(WidgetParameterIndex.ImagePadding, new Margin(0)); }
+            set { m_style.Set(this, WidgetParameterIndex.ImagePadding, value); InvalidateImage(); }
         }
 
         public WidgetBackgroundStyle ImageStyle
         {
-            get { return Style.ImageStyle; }
-            set { WritableStyle.ImageStyle = value; InvalidateImage(); }
+            get { return m_style.Get(WidgetParameterIndex.ImageStyle, WidgetBackgroundStyle.Image); }
+            set { m_style.Set(this, WidgetParameterIndex.ImageStyle, value); InvalidateImage(); }
         }
 
         public float ImageAlpha
         {
-            get { return Style.ImageOpacity; }
-            set { WritableStyle.ImageOpacity = value; UpdateColor(); }
+            get { return m_style.Get(WidgetParameterIndex.ImageOpacity, 1.0f); }
+            set { m_style.Set(this, WidgetParameterIndex.ImageOpacity, value); UpdateColor(); }
         }
 
         public int Color
         {
-            get { return Style.ImageColor; }
-            set { WritableStyle.ImageColor = value; UpdateColor(); }
+            get { return m_style.Get(WidgetParameterIndex.ImageColor, 0xffffff); }
+            set { m_style.Set(this, WidgetParameterIndex.ImageColor, value); UpdateColor(); }
         }
 
         public override float Alpha
@@ -92,7 +81,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="image">Image.</param>
         public WidgetImage(string image = "")
-            : this(default(WidgetStyleReference), WidgetBackgroundStyle.Image, image)
+            : this(default(WidgetStyleSheet), WidgetBackgroundStyle.Image, image)
         {
 
         }
@@ -103,8 +92,8 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetBackgroundStyle imageStyle = 0, string image = "")
-            : this(default(WidgetStyleReference), imageStyle, image)
+        public WidgetImage(WidgetBackgroundStyle imageStyle = WidgetBackgroundStyle.Image, string image = "")
+            : this(default(WidgetStyleSheet), imageStyle, image)
         {
            
         }
@@ -116,11 +105,14 @@ namespace NewWidgets.Widgets
         /// <param name="style">Style.</param>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetStyleReference style = default(WidgetStyleReference), WidgetBackgroundStyle imageStyle = 0, string image = "")
+        public WidgetImage(WidgetStyleSheet style = default(WidgetStyleSheet), WidgetBackgroundStyle imageStyle = 0, string image = "")
             : base(style.IsEmpty ? DefaultStyle : style)
         {
-            ImageStyle = imageStyle == 0 ? Style.ImageStyle : imageStyle;
-            Image = string.IsNullOrEmpty(image) ? Style.Image : image;
+            if (imageStyle != 0)
+                ImageStyle = imageStyle;
+
+            if (!string.IsNullOrEmpty(image))
+                Image = image;
         }
 
         private void InvalidateImage()

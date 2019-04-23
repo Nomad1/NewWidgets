@@ -2,13 +2,12 @@
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
-using NewWidgets.Widgets.Styles;
 
 namespace NewWidgets.Widgets
 {
     public class WidgetCheckBox : WidgetBackground
     {
-        public static readonly new WidgetStyleReference DefaultStyle = WidgetManager.RegisterDefaultStyle<WidgetCheckBoxStyleSheet>("default_checkbox");
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_checkbox", true);
 
         private WidgetImage m_image;
         private WidgetLabel m_linkedLabel;
@@ -16,16 +15,6 @@ namespace NewWidgets.Widgets
         private bool m_animating;
 
         public event Action<WidgetCheckBox> OnChecked;
-
-        private WidgetCheckBoxStyleSheet Style
-        {
-            get { return m_style.Get<WidgetCheckBoxStyleSheet>(); }
-        }
-
-        private WidgetCheckBoxStyleSheet WritableStyle
-        {
-            get { return m_style.Get<WidgetCheckBoxStyleSheet>(this); }
-        }
 
         public bool Checked
         {
@@ -54,8 +43,8 @@ namespace NewWidgets.Widgets
 
         public Margin ImagePadding
         {
-            get { return m_image.ImagePadding; }
-            set { m_image.ImagePadding = value; }
+            get { return m_style.Get(WidgetParameterIndex.ImagePadding, new Margin(0)); }
+            set { m_style.Set(this, WidgetParameterIndex.ImagePadding, value); }
         }
 
         /// <summary>
@@ -63,7 +52,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="isChecked">If set to <c>true</c> is checked.</param>
         public WidgetCheckBox(bool isChecked)
-            : this(default(WidgetStyleReference), isChecked)
+            : this(default(WidgetStyleSheet), isChecked)
         {
         }
 
@@ -72,10 +61,10 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="isChecked">If set to <c>true</c> is checked.</param>
-        public WidgetCheckBox(WidgetStyleReference style = default(WidgetStyleReference), bool isChecked = false)
+        public WidgetCheckBox(WidgetStyleSheet style = default(WidgetStyleSheet), bool isChecked = false)
             : base(style.IsEmpty ? DefaultStyle : style)
         {
-            m_image = new WidgetImage(Style.ImageStyle);
+            m_image = new WidgetImage(m_style.Get(WidgetParameterIndex.ButtonImageStyle, WidgetImage.DefaultStyle));
             m_image.Parent = this;
 
             Selected = isChecked;
