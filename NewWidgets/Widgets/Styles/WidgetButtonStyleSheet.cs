@@ -1,5 +1,4 @@
-﻿using NewWidgets.UI;
-using NewWidgets.Utility;
+﻿using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets.Styles
 {
@@ -17,48 +16,12 @@ namespace NewWidgets.Widgets.Styles
         [WidgetStyleValue("image_padding")]
         private Margin m_imagePadding = new Margin(0);
 
-        [WidgetStyleValue("image_style")]
-        private WidgetStyleReference m_imageStyle = WidgetImage.DefaultStyle;
+        [WidgetNestedStyle]
+        private WidgetImageStyleSheet m_imageStyle = new WidgetImageStyleSheet();
 
-        [WidgetStyleValue("text_style")]
-        private WidgetStyleReference m_textStyle = WidgetLabel.DefaultStyle;
-
-
-        [WidgetStyleValue("font")]
-        internal Font Font
-        {
-            get { return m_textStyle.Get<WidgetTextStyleSheet>().Font; }
-            set { m_textStyle.Get<WidgetTextStyleSheet>(this).Font = value; }
-        }
-
-        [WidgetStyleValue("font_size")]
-        internal float FontSize
-        {
-            get { return m_textStyle.Get<WidgetTextStyleSheet>().FontSize; }
-            set { m_textStyle.Get<WidgetTextStyleSheet>(this).FontSize = value; }
-        }
-
-        [WidgetStyleValue("text_color")]
-        internal int TextColor
-        {
-            get { return m_textStyle.Get<WidgetTextStyleSheet>().TextColor; }
-            set { m_textStyle.Get<WidgetTextStyleSheet>(this).TextColor = value; }
-        }
-
-        [WidgetStyleValue("text_align")]
-        internal WidgetAlign TextAlign
-        {
-            get { return m_textStyle.Get<WidgetTextStyleSheet>().TextAlign; }
-            set { m_textStyle.Get<WidgetTextStyleSheet>(this).TextAlign = value; }
-        }
-
-        [WidgetStyleValue("image")]
-        internal string Image
-        {
-            get { return m_imageStyle.Get<WidgetImageStyleSheet>().Image; }
-            set { m_imageStyle.Get<WidgetImageStyleSheet>(this).Image = value; }
-        }
-
+        [WidgetNestedStyle]
+        private WidgetTextStyleSheet m_textStyle = new WidgetTextStyleSheet();
+       
         public Margin TextPadding
         {
             get { return m_textPadding; }
@@ -79,12 +42,12 @@ namespace NewWidgets.Widgets.Styles
 
         public WidgetStyleReference ImageStyle
         {
-            get { return m_imageStyle; }
+            get { return new WidgetStyleReference(Name + ":image", m_imageStyle); }
         }
 
         public WidgetStyleReference TextStyle
         {
-            get { return m_textStyle; }
+            get { return new WidgetStyleReference(Name + ":text", m_textStyle); }
         }
     }
 }

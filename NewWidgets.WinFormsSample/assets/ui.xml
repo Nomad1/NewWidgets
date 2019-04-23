@@ -153,7 +153,7 @@
     <size>120;40</size>
         
     <font>default</font>
-    <font_size>0.75</font_size>
+    <font_size>0.6</font_size>
     <text_color>0xffffff</text_color>
   </style>
 
@@ -174,18 +174,34 @@
     <back_style>ImageFit</back_style>
     <back_image>checkbox_back_normal</back_image>
     <size>40;40</size>
+    <selected_style>default_checkbox_selected</selected_style>
     <hovered_style>default_checkbox_hovered</hovered_style>
     <disabled_style>default_checkbox_disabled</disabled_style>
         
-    <check_image>check_icon</check_image>
+    <image>check_icon</image>
     <image_color>#000032</image_color>
     <text_color>#cceeff</text_color>
+  </style>
+    
+  <style name="default_checkbox_selected" parent="default_checkbox">
+    <back_image>checkbox_back_normal</back_image>
+    <image>check_icon</image>
+    <image_color>#ffffff</image_color>
+    <text_color>#ffffff</text_color>
+    <hovered_style>default_checkbox_selected_hovered</hovered_style>
   </style>
     
   <style name="default_checkbox_hovered" parent="default_checkbox">
     <back_image>checkbox_back_hovered</back_image>
     <image_color>#ffffff</image_color>
     <text_color>#ffffff</text_color>
+  </style>
+    
+ <style name="default_checkbox_selected_hovered" parent="default_checkbox">
+    <back_image>checkbox_back_hovered</back_image>
+    <image>check_icon</image>
+    <image_color>#000032</image_color>
+    <text_color>#cceeff</text_color>
   </style>
 
   <style name="default_checkbox_disabled" parent="default_checkbox">
@@ -209,7 +225,7 @@
   <style name="text_button" class="button">
     <back_style>None</back_style>
     <font>default</font>
-    <font_size>1.0</font_size>
+    <font_size>0.6</font_size>
     <text_color>0xcceeff</text_color>
     <text_padding>4;2;4;2</text_padding>
     <hovered_style>text_button_hovered</hovered_style>

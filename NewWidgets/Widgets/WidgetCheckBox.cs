@@ -79,6 +79,8 @@ namespace NewWidgets.Widgets
             m_image.Parent = this;
 
             Selected = isChecked;
+
+            Resize(Size);
         }
 
         protected override void Resize(Vector2 size)

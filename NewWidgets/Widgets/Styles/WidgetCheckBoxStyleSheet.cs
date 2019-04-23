@@ -13,11 +13,11 @@ namespace NewWidgets.Widgets.Styles
         [WidgetStyleValue("image_padding")]
         private Margin m_imagePadding = new Margin(0);
 
-        [WidgetStyleValue("image_style")]
-        private WidgetStyleReference m_imageStyle = WidgetImage.DefaultStyle;
+        [WidgetNestedStyle]
+        private WidgetImageStyleSheet m_imageStyle = new WidgetImageStyleSheet();
 
-        [WidgetStyleValue("text_style")]
-        private WidgetStyleReference m_textStyle = WidgetLabel.DefaultStyle;
+        [WidgetNestedStyle]
+        private WidgetTextStyleSheet m_textStyle = new WidgetTextStyleSheet();
 
         public Margin TextPadding
         {
@@ -33,19 +33,12 @@ namespace NewWidgets.Widgets.Styles
 
         public WidgetStyleReference ImageStyle
         {
-            get { return m_imageStyle; }
+            get { return new WidgetStyleReference(Name + ":image", m_imageStyle); }
         }
 
         public WidgetStyleReference TextStyle
         {
-            get { return m_textStyle; }
-        }
-
-        [WidgetStyleValue("check_image")]
-        internal string CheckImage
-        {
-            get { return m_imageStyle.Get<WidgetImageStyleSheet>().Image; }
-            set { m_imageStyle.Get<WidgetImageStyleSheet>(this).Image = value; }
+            get { return new WidgetStyleReference(Name + ":text", m_textStyle); }
         }
     }
 }

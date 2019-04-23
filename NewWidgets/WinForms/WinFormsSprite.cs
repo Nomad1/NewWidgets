@@ -50,6 +50,8 @@ namespace NewWidgets.WinForms
 
         private uint m_cacheHash;
         private Bitmap m_cache;
+        private ColorMatrix m_colorMatrix;
+        private ImageAttributes m_imageAttributes;
 
         public string Id
         {
@@ -179,38 +181,45 @@ namespace NewWidgets.WinForms
             arr[1] = m_transform.GetScreenPoint(from + new Vector2(FrameSize.X, 0));
             arr[2] = m_transform.GetScreenPoint(from + new Vector2(0, FrameSize.Y));
 
-            ImageAttributes ia = new ImageAttributes();
-            ColorMatrix matrix = new ColorMatrix();
-            matrix.Matrix00 = ((m_color >> 16) & 0xff) / 255.0f;
-            matrix.Matrix11 = ((m_color >> 8) & 0xff) / 255.0f;
-            matrix.Matrix22 = ((m_color >> 0) & 0xff) / 255.0f;
-            matrix.Matrix33 = ((m_color >> 24) & 0xff) / 255.0f;
-            ia.SetColorMatrix(matrix);
+            if (m_imageAttributes == null)
+                m_imageAttributes = new ImageAttributes();
 
-            UpdateCache(); // make sure that cache is valid
+            if (m_colorMatrix == null)
+                m_colorMatrix = new ColorMatrix();
+
+            m_colorMatrix.Matrix00 = ((m_color >> 16) & 0xff) / 255.0f;
+            m_colorMatrix.Matrix11 = ((m_color >> 8) & 0xff) / 255.0f;
+            m_colorMatrix.Matrix22 = ((m_color >> 0) & 0xff) / 255.0f;
+            m_colorMatrix.Matrix33 = ((m_color >> 24) & 0xff) / 255.0f;
+            m_imageAttributes.SetColorMatrix(m_colorMatrix);
+
+            UpdateCache(arr[0].X - (int)arr[0].X, arr[0].Y - (int)arr[0].Y, arr[1].X - arr[0].X, arr[2].Y - arr[0].Y); // make sure that cache is valid
            
             {
-                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
+                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
+                graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
 
                 if (m_cache != null)
                 {
                     // round everything to ints to avoid blur and increase speed
 
+                    int x = (int)arr[0].X;
+                    int y = (int)arr[0].Y;
+
                     graphics.DrawImage(m_cache,
-                       new Point[] { new Point((int)(arr[0].X + 0.5f), (int)(arr[0].Y + 0.5f)), new Point((int)(arr[1].X + 0.5f), (int)(arr[1].Y + 0.5f)), new Point((int)(arr[2].X + 0.5f), (int)(arr[2].Y + 0.5f)) },
-                       new Rectangle(0, 0, m_cache.Width, m_cache.Height),
+                       new Rectangle (x, y, m_cache.Width, m_cache.Height),
+                       0, 0, m_cache.Width, m_cache.Height,
                      GraphicsUnit.Pixel,
-                     ia
+                     m_imageAttributes
                      );
                 }
             }
         }
 
-        private void UpdateCache()
+        private void UpdateCache(float x, float y, float width, float height)
         {
-            int nwidth = (int)System.Math.Ceiling(m_transform.ActualScale.X * FrameSize.X);
-            int nheight = (int)System.Math.Ceiling(m_transform.ActualScale.Y * FrameSize.Y);
-            uint cacheHash = ((uint)(m_frame & 0xff) << 24) | ((uint)nwidth << 12) | (uint)nheight;
+            uint cacheHash = ((uint)(x * 100)) ^ ((uint)(y * 100)) ^ ((uint)(width * 100) << 16) ^ ((uint)(height * 100) << 16); // kinda fast hash
 
             if (cacheHash != m_cacheHash)
             {
@@ -220,18 +229,17 @@ namespace NewWidgets.WinForms
                     m_cache = null;
                 }
 
-                if (nwidth > 0 && nheight > 0)
+                int nwidth = (int)System.Math.Ceiling(width + x);
+                int nheight = (int)System.Math.Ceiling(height + y);
+                m_cache = new Bitmap(nwidth, nheight);
+                using (Graphics g = Graphics.FromImage(m_cache))
                 {
-                    m_cache = new Bitmap(nwidth, nheight);
-                    using (Graphics g = Graphics.FromImage(m_cache))
-                    {
-                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.High;
-                        g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
-                        g.DrawImage(m_image,
-                        new RectangleF(0, 0, m_cache.Width, m_cache.Height),
-                        new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),
-                        GraphicsUnit.Pixel);
-                    }
+                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                    g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                    g.DrawImage(m_image,
+                    new RectangleF(x, y, width, height),
+                    new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),
+                    GraphicsUnit.Pixel);
                 }
                 m_cacheHash = cacheHash;
             }

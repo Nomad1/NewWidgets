@@ -29,7 +29,7 @@ namespace NewWidgets.Widgets
         }
     }
 
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    [AttributeUsage(AttributeTargets.Field)]
     public class WidgetStyleValueAttribute : Attribute
     {
         private readonly string m_name;
@@ -44,6 +44,57 @@ namespace NewWidgets.Widgets
             m_name = name;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class WidgetNestedStyleAttribute : Attribute
+    {
+        private readonly string m_preffix;
+
+        public string Preffix
+        {
+            get { return m_preffix; }
+        }
+    }
+
+    internal class WidgetMemberInfo
+    {
+        private readonly WidgetMemberInfo m_parent;
+        private readonly FieldInfo m_field;
+
+        public Type Type
+        {
+            get { return m_field.FieldType; }
+        }
+
+        public WidgetMemberInfo(WidgetMemberInfo parent, FieldInfo field)
+        {
+            m_parent = parent;
+            m_field = field;
+        }
+
+        public WidgetMemberInfo(FieldInfo field)
+        {
+            m_parent = null;
+            m_field = field;
+        }
+
+        public object GetValue(object obj)
+        {
+            if (m_parent != null)
+                obj = m_parent.GetValue(obj);
+
+            return m_field.GetValue(obj);
+        }
+
+        public void SetValue(object obj, object value)
+        {
+            if (m_parent != null)
+                obj = m_parent.GetValue(obj);
+
+            m_field.SetValue(obj, value);
+        }
+    }
+
 
     /// <summary>
     /// Reference class that allows lazy loading of styles.
@@ -148,30 +199,21 @@ namespace NewWidgets.Widgets
 
         // styles
         private static readonly IDictionary<string, WidgetStyleSheet> s_styles = new Dictionary<string, WidgetStyleSheet>();
-        private static readonly IDictionary<Type, IDictionary<string, MemberInfo>> s_styleAttributes = new Dictionary<Type, IDictionary<string, MemberInfo>>();
+        private static readonly IDictionary<Type, IDictionary<string, WidgetMemberInfo>> s_styleAttributes = new Dictionary<Type, IDictionary<string, WidgetMemberInfo>>();
 
 
         // Those guys are obsolete and should be replaced by direct Widget.DefaultStyle like calls
 
         [Obsolete("Use Widget.DefaultStyle instead")]
         public static WidgetStyleReference DefaultWidgetStyle { get { return Widget.DefaultStyle; } }
-        [Obsolete("Use WidgetCheckBox.DefaultStyle instead")]
-        public static WidgetStyleReference DefaultCheckBoxStyle { get { return WidgetCheckBox.DefaultStyle; } }
-        [Obsolete("Use WidgetBackground.DefaultStyle instead")]
-        public static WidgetStyleReference DefaultButtonStyle { get { return WidgetBackground.DefaultStyle; } }
-        [Obsolete("Use WidgetButton.DefaultStyle instead")]
-        public static WidgetStyleReference DefaultBackgroundStyle { get { return WidgetButton.DefaultStyle; } }
-        [Obsolete("Use WidgetPanel.DefaultStyle instead")]
-        public static WidgetStyleReference DefaultPanelStyle { get { return WidgetPanel.DefaultStyle; } }
         [Obsolete("Use WidgetTextEdit.DefaultStyle instead")]
         public static WidgetStyleReference DefaultTextEditStyle { get { return WidgetTextEdit.DefaultStyle; } }
-        [Obsolete("Use WidgetLabel.DefaultStyle instead")]
-        public static WidgetStyleReference DefaultLabelStyle { get { return WidgetLabel.DefaultStyle; } }
         [Obsolete("Use WidgetWindow.DefaultStyle instead")]
         public static WidgetStyleReference DefaultWindowStyle { get { return WidgetWindow.DefaultStyle; } }
-        [Obsolete("Use WidgetImage.DefaultStyle instead")]
-        public static WidgetStyleReference DefaultImageStyle { get { return WidgetImage.DefaultStyle; } }
 
+
+        [Obsolete("Use WidgetLabel.DefaultStyle instead")]
+        public static WidgetTextStyleSheet DefaultLabelStyle { get { return WidgetLabel.DefaultStyle.Get<WidgetTextStyleSheet>(); } }  // needed only for font size
         /// <summary>
         /// Gets the style by name
         /// </summary>
@@ -294,45 +336,51 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered style {0}", name);
         }
 
-        private static IDictionary<string, MemberInfo> InitStyleMap(WidgetStyleSheet style)
+        private static IDictionary<string, WidgetMemberInfo> InitStyleMap(WidgetStyleSheet style)
         {
             Type type = style.GetType();
 
-            IDictionary<string, MemberInfo> styleMap;
+            IDictionary<string, WidgetMemberInfo> styleMap;
 
             if (!s_styleAttributes.TryGetValue(type, out styleMap))
             {
-                styleMap = new Dictionary<string, MemberInfo>();
+                styleMap = new Dictionary<string, WidgetMemberInfo>();
+
                 s_styleAttributes[type] = styleMap;
 
-                while (type != null)
-                {
-                    FieldInfo[] fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-
-                    foreach (FieldInfo field in fields)
-                        foreach (WidgetStyleValueAttribute attribute in field.GetCustomAttributes<WidgetStyleValueAttribute>())
-                        {
-                            styleMap[attribute.Name] = field;
-                        }
-
-                    PropertyInfo[] properties = type.GetProperties(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-
-                    foreach (PropertyInfo field in properties)
-                        foreach (WidgetStyleValueAttribute attribute in field.GetCustomAttributes<WidgetStyleValueAttribute>())
-                        {
-                            styleMap[attribute.Name] = field;
-                        }
-
-                    type = type.BaseType;
-                }
+                InitStyleMapType(type, styleMap, null);
             }
 
             return styleMap;
         }
 
+        private static void InitStyleMapType(Type type, IDictionary<string, WidgetMemberInfo> styleMap, WidgetMemberInfo parent)
+        {
+            while (type != null)
+            {
+                FieldInfo[] fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
+
+                foreach (FieldInfo field in fields)
+                {
+                    foreach (WidgetStyleValueAttribute attribute in field.GetCustomAttributes<WidgetStyleValueAttribute>())
+                    {
+                        styleMap[attribute.Name] = new WidgetMemberInfo(parent, field);
+                    }
+
+                    foreach (WidgetNestedStyleAttribute attribute in field.GetCustomAttributes<WidgetNestedStyleAttribute>())
+                    {
+                        InitStyleMapType(field.FieldType, styleMap, new WidgetMemberInfo(parent, field)); // recursion for nested types!
+                    }
+                }
+
+                // process base type
+                type = type.BaseType;
+            }
+        }
+
         private static void InitStyle(WidgetStyleSheet style, XmlNode node)
         {
-            IDictionary<string, MemberInfo> styleMap = InitStyleMap(style);
+            IDictionary<string, WidgetMemberInfo> styleMap = InitStyleMap(style);
 
             foreach (XmlNode element in node.ChildNodes)
             {
@@ -349,7 +397,7 @@ namespace NewWidgets.Widgets
                     else
                         value = value.Trim('\r', '\n', '\t', ' ');
 
-                    MemberInfo field;
+                    WidgetMemberInfo field;
                     if (styleMap.TryGetValue(element.Name, out field))
                         InitField(style, field, value);
                     else
@@ -365,9 +413,9 @@ namespace NewWidgets.Widgets
             }
         }
 
-        private static void InitField(WidgetStyleSheet style, MemberInfo member, string value)
+        private static void InitField(WidgetStyleSheet style, WidgetMemberInfo member, string value)
         {
-            Type memberType = member is FieldInfo ? ((FieldInfo)member).FieldType : ((PropertyInfo)member).PropertyType;
+            Type memberType = member.Type;
 
             object memberValue;
 
@@ -390,36 +438,17 @@ namespace NewWidgets.Widgets
             else
                 memberValue = Convert.ChangeType(value, memberType); // fallback, may crash
 
-            if (member is FieldInfo)
-                ((FieldInfo)member).SetValue(style, memberValue);
-            else
-                ((PropertyInfo)member).SetValue(style, memberValue);
+            member.SetValue(style, memberValue);
         }
 
         private static void DeepCopy(WidgetStyleSheet styleFrom, WidgetStyleSheet styleTo)
         {
-            IDictionary<string, MemberInfo> styleMapFrom = InitStyleMap(styleFrom);
-            IDictionary<string, MemberInfo> styleMapTo = InitStyleMap(styleTo);
+            IDictionary<string, WidgetMemberInfo> styleMapFrom = InitStyleMap(styleFrom);
+            IDictionary<string, WidgetMemberInfo> styleMapTo = InitStyleMap(styleTo);
 
             foreach (var pair in styleMapTo)
             {
-                if (pair.Value is PropertyInfo)
-                    continue;
-
-                MemberInfo memberFrom;
-
-                if (!styleMapFrom.TryGetValue(pair.Key, out memberFrom))
-                    continue;
-
-                DeepCopyMember(styleFrom, memberFrom, styleTo, pair.Value);
-            }
-
-            foreach (var pair in styleMapTo)
-            {
-                if (!(pair.Value is PropertyInfo))
-                    continue;
-
-                MemberInfo memberFrom;
+                WidgetMemberInfo memberFrom;
 
                 if (!styleMapFrom.TryGetValue(pair.Key, out memberFrom))
                     continue;
@@ -428,19 +457,11 @@ namespace NewWidgets.Widgets
             }
         }
 
-        private static void DeepCopyMember(object from, MemberInfo member, object to, MemberInfo memberTo)
+        private static void DeepCopyMember(object from, WidgetMemberInfo memberFrom, object to, WidgetMemberInfo memberTo)
         {
-            object memberValue;
+            object memberValue = memberFrom.GetValue(from);
 
-            if (member is FieldInfo)
-                memberValue = ((FieldInfo)member).GetValue(from);
-            else
-                memberValue = ((PropertyInfo)member).GetValue(from);
-
-            if (memberTo is FieldInfo)
-                ((FieldInfo)memberTo).SetValue(to, memberValue);
-            else
-                ((PropertyInfo)memberTo).SetValue(to, memberValue);
+            memberTo.SetValue(to, memberValue);
         }
 
 #region String parsers
