@@ -100,6 +100,10 @@ namespace NewWidgets.Widgets
         ButtonTextStyle,
         [WidgetParameter("button_image_style", typeof(WidgetStyleSheet))]
         ButtonImageStyle,
+        [WidgetParameter("button_image_padding", typeof(Margin))]
+        ButtonImagePadding,
+        [WidgetParameter("button_text_padding", typeof(Margin))]
+        ButtonTextPadding,
 
         // Scroll view
 

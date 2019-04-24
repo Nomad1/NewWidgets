@@ -77,20 +77,20 @@ namespace NewWidgets.Widgets
 
         public WidgetButtonLayout Layout
         {
-            get { return GetProperty(WidgetParameterIndex.ButtonLayout, WidgetButtonLayout.ImageLeft); }
+            get { return GetProperty(WidgetParameterIndex.ButtonLayout, WidgetButtonLayout.Center); }
             set { SetProperty(WidgetParameterIndex.ButtonLayout, value); m_needLayout = true; }
         }
 
         public Margin ImagePadding
         {
-            get { return GetProperty(WidgetParameterIndex.ImagePadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.ImagePadding, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.ButtonImagePadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); m_needLayout = true; }
         }
 
         public Margin TextPadding
         {
-            get { return GetProperty(WidgetParameterIndex.TextPadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.TextPadding, value); m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.ButtonTextPadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.ButtonTextPadding, value); m_needLayout = true; }
         }
 
         // Button properties
@@ -151,10 +151,10 @@ namespace NewWidgets.Widgets
 
             m_needLayout = true;
 
-            m_label = new WidgetLabel(GetProperty(WidgetParameterIndex.ButtonTextStyle, style), text);
+            m_label = new WidgetLabel(GetProperty(WidgetParameterIndex.ButtonTextStyle, style.IsEmpty ? DefaultStyle : style), text);
             m_label.Parent = this;
 
-            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style));
+            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style.IsEmpty ? DefaultStyle : style));
             m_image.Parent = this;
 
             m_clickSound = "click";

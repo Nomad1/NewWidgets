@@ -199,7 +199,6 @@
     
  <style name="default_checkbox_selected_hovered" parent="default_checkbox">
     <back_image>checkbox_back_hovered</back_image>
-    <image>check_icon</image>
     <image_color>#000032</image_color>
     <text_color>#cceeff</text_color>
   </style>

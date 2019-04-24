@@ -115,6 +115,16 @@ namespace NewWidgets.Widgets
                 Image = image;
         }
 
+        public override bool SwitchStyle(WidgetStyleType styleType)
+        {
+            if (base.SwitchStyle(styleType))
+            {
+                InvalidateImage();
+                return true;
+            }
+            return false;
+        }
+
         private void InvalidateImage()
         {
             m_imageInited = false;
