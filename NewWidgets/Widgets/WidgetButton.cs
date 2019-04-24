@@ -151,10 +151,10 @@ namespace NewWidgets.Widgets
 
             m_needLayout = true;
 
-            m_label = new WidgetLabel(GetProperty(WidgetParameterIndex.ButtonTextStyle, WidgetLabel.DefaultStyle), text);
+            m_label = new WidgetLabel(GetProperty(WidgetParameterIndex.ButtonTextStyle, style), text);
             m_label.Parent = this;
 
-            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, WidgetImage.DefaultStyle));
+            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style));
             m_image.Parent = this;
 
             m_clickSound = "click";

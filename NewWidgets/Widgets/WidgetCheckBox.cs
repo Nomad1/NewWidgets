@@ -64,7 +64,7 @@ namespace NewWidgets.Widgets
         public WidgetCheckBox(WidgetStyleSheet style = default(WidgetStyleSheet), bool isChecked = false)
             : base(style.IsEmpty ? DefaultStyle : style)
         {
-            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, WidgetImage.DefaultStyle));
+            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style));
             m_image.Parent = this;
 
             Selected = isChecked;

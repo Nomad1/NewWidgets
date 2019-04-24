@@ -65,14 +65,15 @@ namespace NewWidgets.Widgets
         [WidgetParameter("richtext", typeof(bool))]
         RichText,
 
-        // image
+        // Image
+
         [WidgetParameter("image")]
         Image,
         [WidgetParameter("image_style", typeof(WidgetBackgroundStyle))]
         ImageStyle,
         [WidgetParameter("image_angle", typeof(float))]
         ImageAngle,
-        [WidgetParameter("image_pivot", typeof(Margin))]
+        [WidgetParameter("image_pivot", typeof(Vector2))]
         ImagePivot,
         [WidgetParameter("image_padding", typeof(Margin))]
         ImagePadding,
@@ -81,7 +82,8 @@ namespace NewWidgets.Widgets
         [WidgetParameter("image_opacity", typeof(float))]
         ImageOpacity,
 
-        // text edit
+        // Text edit
+
         [WidgetParameter("cursor_color", typeof(int))]
         CursorColor,
         [WidgetParameter("cursor_char")]
@@ -90,7 +92,8 @@ namespace NewWidgets.Widgets
         MaskChar,
 
 
-        // button
+        // Button
+
         [WidgetParameter("button_layout", typeof(WidgetButtonLayout))]
         ButtonLayout,
         [WidgetParameter("button_text_style", typeof(WidgetStyleSheet))]
@@ -98,7 +101,8 @@ namespace NewWidgets.Widgets
         [WidgetParameter("button_image_style", typeof(WidgetStyleSheet))]
         ButtonImageStyle,
 
-        // scroll view
+        // Scroll view
+
         [WidgetParameter("horizontal_scroll", typeof(WidgetStyleSheet))]
         HorizontalScrollStyle,
         [WidgetParameter("vertical_scroll", typeof(WidgetStyleSheet))]
