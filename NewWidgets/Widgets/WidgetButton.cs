@@ -169,7 +169,13 @@ namespace NewWidgets.Widgets
 
             m_needLayout = true;
 
-            m_label = new WidgetLabel(GetProperty(WidgetParameterIndex.ButtonTextStyle, style.IsEmpty ? DefaultStyle : style), text);
+            WidgetStyleSheet buttonTextStyle = GetProperty(WidgetParameterIndex.ButtonTextStyle, default(WidgetStyleSheet));
+
+            if (buttonTextStyle.IsEmpty)
+                m_label = new WidgetLabel(m_styles, text); // label will use the same stylesheet as the button
+            else
+                m_label = new WidgetLabel(buttonTextStyle, text);
+
             m_label.Parent = this;
 
             m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style.IsEmpty ? DefaultStyle : style));
@@ -276,7 +282,7 @@ namespace NewWidgets.Widgets
             base.DrawContents(canvas);
             
             if (!string.IsNullOrEmpty(Image))
-                m_image.Draw(Image);
+                m_image.Draw(canvas);
             
             if (!string.IsNullOrEmpty(Text))
                 m_label.Draw(canvas);
@@ -285,16 +291,16 @@ namespace NewWidgets.Widgets
         
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (Enabled)
+            //if (Enabled)
             {
-                if (press)
+                if (Enabled && press)
                 {
                     if (!m_overridePress)
                     {
                         return true;
                     }
                 } else
-                if (unpress)
+                if (Enabled && unpress)
                 {
                     if (!m_overridePress)
                     {

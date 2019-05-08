@@ -165,10 +165,17 @@
   <style name="default_button_disabled" parent="default_button">
     <back_image>button_white_normal_3</back_image>
     <back_opacity>0.5</back_opacity>
-    <color>0xaaaaaa</color>
-    <text_color>0xaaaaaa</text_color>
+    <back_color>0xaaaaaa</back_color>
+    <text_color>0x808080</text_color>
+    <hovered_style>default_button_disabled_hovered</hovered_style>
   </style>
-
+  
+ <style name="default_button_disabled_hovered" parent="default_button">
+    <back_image>button_white_hovered_3</back_image>
+    <text_color>0xaaaaaa</text_color>
+    <back_opacity>0.5</back_opacity>
+    <back_color>0xaaaaaa</back_color>
+  </style>
 
   <style name="default_checkbox" class="checkbox">
     <back_style>ImageFit</back_style>

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
@@ -16,7 +15,7 @@ namespace NewWidgets.Widgets
 
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
-        private readonly WidgetStyleSheet[] m_styles = new WidgetStyleSheet[(int)WidgetStyleType.Max];
+        internal protected readonly WidgetStyleSheet[] m_styles;
         private WidgetStyleType m_styleType;
 
         private float m_alpha = 1.0f; // the only property that could be changed for simple widget without affecting its stylesheet
@@ -88,17 +87,35 @@ namespace NewWidgets.Widgets
 
         public event TooltipDelegate OnTooltip;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.Widget"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
         protected Widget(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(null)
         {
+
             if (style.IsEmpty)
                 style = DefaultStyle;
-
             Size = style.Get(WidgetParameterIndex.Size, new Vector2(0, 0));
 
             m_styleType = WidgetStyleType.Normal;
 
+            m_styles = new WidgetStyleSheet[(int)WidgetStyleType.Max];
+
             LoadStyle(WidgetStyleType.Normal, style);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.Widget"/> class for internal use
+        /// </summary>
+        /// <param name="styles">Styles.</param>
+        internal protected Widget(WidgetStyleSheet[] styles)
+           : base(null)
+        {
+            Size = new Vector2(0, 0);
+            m_styleType = WidgetStyleType.Normal;
+            m_styles = styles; // use the same styles as parent
         }
 
         #region Styles
@@ -112,7 +129,7 @@ namespace NewWidgets.Widgets
         {
             for (int i = 0; i < m_styles.Length; i++)
                 if (!m_styles[i].IsEmpty)
-                    m_styles[i].Set(this, index, value);
+                    m_styles[i].Set(m_styles, index, value);
         }
 
         public T GetProperty<T>(string name, T defaultValue)
@@ -124,7 +141,7 @@ namespace NewWidgets.Widgets
         {
             for (int i = 0; i < m_styles.Length; i++)
                 if (!m_styles[i].IsEmpty)
-                    m_styles[i].Set(this, name, value);
+                    m_styles[i].Set(m_styles, name, value);
         }
 
         protected bool HasStyle(WidgetStyleType styleType)

@@ -113,13 +113,26 @@ namespace NewWidgets.Widgets
             Text = text;
         }
 
+        internal WidgetLabel(WidgetStyleSheet [] styles, string text = "")
+           : base(styles)
+        {
+            Text = text;
+        }
+
+        public override bool SwitchStyle(WidgetStyleType styleType)
+        {
+            if (base.SwitchStyle(styleType))
+            {
+                m_needLayout = true;
+                return true;
+            }
+            return false;
+        }
+
         public void Relayout()
         {
             if (m_label == null)
-            {
-                m_label = new LabelObject(this, Font, string.Empty,
-                    LabelAlign.Start, LabelAlign.Start, RichText);
-            }
+                m_label = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, RichText);
             
             m_label.Color = Color;
             m_label.Alpha = Alpha;
