@@ -106,7 +106,6 @@ namespace NewWidgets.Widgets
 
             if (s_exclusiveWidgets.Count > 0)
             {
-//                s_exclusiveWidgets.Last.Value.Touch(x, y, press, unpress, pointer);
                 return s_exclusiveWidgets.Last.Value.Touch(x, y, press, unpress, pointer);
             }
             
@@ -265,7 +264,7 @@ namespace NewWidgets.Widgets
 
             return result;
         }
-        
+
         public static Window GetTopmostWindow()
         {
             return WindowController.Instance.Windows[WindowController.Instance.Windows.Count - 1];

@@ -112,14 +112,18 @@ namespace NewWidgets.Widgets
         {
             base.DrawContents(canvas);
 
-            if (!string.IsNullOrEmpty(Image) && (Selected || m_animating))
-                m_image.Draw(Image);
+            if (m_image != null && (Checked || m_animating))
+                m_image.Draw(canvas);
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
             if (Enabled)
             {
+                if (press)
+                {
+                    return true;
+                } else
                 if (unpress)
                 {
                     Press();

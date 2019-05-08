@@ -164,7 +164,6 @@ namespace NewWidgets.Widgets
                 m_cursor = Font.GetSprites(CursorChar, Vector2.Zero)[0];
                 m_cursor.Color = CursorColor;
                 m_cursor.Scale = FontSize;
-                //m_cursor.Blink(2000);
                 m_cursor.Transform.Parent = Transform;
             }
 
@@ -199,7 +198,7 @@ namespace NewWidgets.Widgets
 
             if (m_cursor != null)
             {
-                m_cursor.Alpha = (int)(Math.Sin(WindowController.Instance.GetTime() / 1000.0f) * 255 + 128.5f); // blinks every 2 seconds
+                m_cursor.Alpha = (int)(Math.Sin(WindowController.Instance.GetTime() / 1000.0f) * 64 + 191); // blinks every 2 seconds from 127 to 255
                 m_cursor.Update();
             }
 

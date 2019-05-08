@@ -257,6 +257,22 @@ namespace NewWidgets.UI
             }
         }
 
+        public bool IsTopmost
+        {
+                get
+                {
+                    IWindowContainer windowParent = this.Parent as IWindowContainer;
+
+                    if (windowParent != null)
+                    {
+                        int max = windowParent.MaximumZIndex;
+                        if (this.ZIndex == max)
+                           return true;
+                    }
+                    return false;
+                }
+        }
+
         protected WindowObject(WindowObject parent, Transform transform = null)
         {
             m_parent = parent;

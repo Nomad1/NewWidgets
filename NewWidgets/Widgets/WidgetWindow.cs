@@ -52,7 +52,7 @@ namespace NewWidgets.Widgets
                 return true;
             }
 
-            return false;
+            return true; // Windows should always return true in the end!
         }
 
         private bool HandleGlobalTouch(float x, float y, bool press, bool unpress, int pointer)
