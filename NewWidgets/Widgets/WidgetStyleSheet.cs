@@ -25,6 +25,8 @@ namespace NewWidgets.Widgets
         DisabledStyle,
         [WidgetParameter("selected_style", typeof(WidgetStyleSheet))]
         SelectedStyle,
+        [WidgetParameter("selected_hovered_style", typeof(WidgetStyleSheet))]
+        SelectedHoveredStyle,
 
         // Background
 
@@ -104,6 +106,12 @@ namespace NewWidgets.Widgets
         ButtonImagePadding,
         [WidgetParameter("button_text_padding", typeof(Margin))]
         ButtonTextPadding,
+        [WidgetParameter("button_animate_scale", typeof(float))]
+        ButtonAnimateScale,
+        [WidgetParameter("button_animate_pivot", typeof(Vector2))]
+        ButtonAnimatePivot,
+        [WidgetParameter("button_animate_time", typeof(int))]
+        ButtonAnimateTime,
 
         // Scroll view
 

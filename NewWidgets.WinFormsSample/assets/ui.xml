@@ -177,29 +177,23 @@
     <selected_style>default_checkbox_selected</selected_style>
     <hovered_style>default_checkbox_hovered</hovered_style>
     <disabled_style>default_checkbox_disabled</disabled_style>
-        
-    <image>check_icon</image>
-    <image_color>#000032</image_color>
     <text_color>#cceeff</text_color>
+    <button_image_style>default_checkbox_image</button_image_style>
   </style>
     
   <style name="default_checkbox_selected" parent="default_checkbox">
     <back_image>checkbox_back_normal</back_image>
-    <image>check_icon</image>
-    <image_color>#ffffff</image_color>
     <text_color>#ffffff</text_color>
     <hovered_style>default_checkbox_selected_hovered</hovered_style>
   </style>
     
   <style name="default_checkbox_hovered" parent="default_checkbox">
     <back_image>checkbox_back_hovered</back_image>
-    <image_color>#ffffff</image_color>
     <text_color>#ffffff</text_color>
   </style>
     
  <style name="default_checkbox_selected_hovered" parent="default_checkbox">
     <back_image>checkbox_back_hovered</back_image>
-    <image_color>#000032</image_color>
     <text_color>#cceeff</text_color>
   </style>
 
@@ -208,6 +202,20 @@
     <image_color>#888888</image_color>
     <text_color>#888888</text_color>
   </style>
+    
+  <style name="default_checkbox_image">
+    <image>check_icon</image>
+    <image_color>#000032</image_color>
+    <hovered_style>default_checkbox_image_hovered</hovered_style>
+    <selected_style>default_checkbox_image</selected_style>
+    <selected_hovered_style>default_checkbox_image_hovered</selected_hovered_style>
+  </style>
+    
+  <style name="default_checkbox_image_hovered">
+    <image>check_icon</image>
+    <image_color>#ffffff</image_color>
+  </style>
+    
 
   <!-- Custom styles -->
 

@@ -262,18 +262,12 @@ namespace NewWidgets.Widgets
                 var selectedStyleReference = style.Get(WidgetParameterIndex.SelectedStyle, default(WidgetStyleSheet));
 
                 if (!selectedStyleReference.IsEmpty)
-                {
-                    WidgetStyleType targetStyleType = 0;
-                    switch (styleType)
-                    {
-                        case WidgetStyleType.Normal:
-                            targetStyleType = WidgetStyleType.Selected;
-                            break;
-                    }
+                    LoadStyle(WidgetStyleType.Selected, selectedStyleReference);
 
-                    if (targetStyleType != 0)
-                        LoadStyle(targetStyleType, selectedStyleReference);
-                }
+                var selectedHoveredStyleReference = style.Get(WidgetParameterIndex.SelectedHoveredStyle, default(WidgetStyleSheet));
+
+                if (!selectedHoveredStyleReference.IsEmpty)
+                    LoadStyle(WidgetStyleType.SelectedHovered, selectedHoveredStyleReference);
             }
         }
 

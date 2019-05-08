@@ -93,6 +93,24 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.ButtonTextPadding, value); m_needLayout = true; }
         }
 
+        public Vector2 AnimatePivot
+        {
+            get { return GetProperty(WidgetParameterIndex.ButtonAnimatePivot, new Vector2(0.5f, 0.5f)); }
+            set { SetProperty(WidgetParameterIndex.ButtonAnimatePivot, value); }
+        }
+
+        public int AnimateTime
+        {
+            get { return GetProperty(WidgetParameterIndex.ButtonAnimateTime, 100); }
+            set { SetProperty(WidgetParameterIndex.ButtonAnimateTime, value); }
+        }
+
+        public float AnimateScale
+        {
+            get { return GetProperty(WidgetParameterIndex.ButtonAnimateScale, 0.95f); }
+            set { SetProperty(WidgetParameterIndex.ButtonAnimateScale, value); }
+        }
+
         // Button properties
 
         public string ClickSound
@@ -329,12 +347,16 @@ namespace NewWidgets.Widgets
             if (immediate)
                 SchedulePress();
 
+            Vector2 animatePivot = AnimatePivot; // center point compensation
+            float animateTo = AnimateScale; // scales down to this value
+            int animateTime = AnimateTime; // animations takes animateTime*2 milliseconds
+
             m_animating = true;
             float startScale = Scale;
-            ScaleTo(startScale * 0.95f, 100,
+            ScaleTo(startScale * animateTo, animateTime,
                 delegate
                 {
-                    ScaleTo(startScale, 100,
+                    ScaleTo(startScale, animateTime,
                         delegate
                         {
                             m_animating = false;
@@ -343,14 +365,17 @@ namespace NewWidgets.Widgets
                         }
                     );
                 });
-            
-            // compensate non-center pivot point
-            Vector2 startPosition = Position;
-            Move(startPosition + (Size * startScale * 0.5f) * (1 - 0.95f), 100,
-                delegate
-                {
-                    Move(startPosition, 100, null);
-                });
+
+            // compensate non-center pivot point. Not needed if pivot is top-left
+            if (animatePivot.LengthSquared() > 0)
+            {
+                Vector2 startPosition = Position;
+                Move(startPosition + (Size * startScale * animatePivot) * (1.0f - animateTo), animateTime,
+                    delegate
+                    {
+                        Move(startPosition, animateTime, null);
+                    });
+            }
         }
 
         protected void SchedulePress()

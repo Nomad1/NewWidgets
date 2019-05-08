@@ -164,17 +164,18 @@ namespace NewWidgets.Widgets
         protected virtual void AnimatePress()
         {
             m_animating = true;
-            
+
+            int animateTime = 100;
             if (Checked)
             {
-                m_image.Position = ImagePadding.TopLeft + new Vector2(0, 10);
-                m_image.Move(ImagePadding.TopLeft, 100, AnimateFinished);
-                m_image.FadeTo(1.0f, 100, null);
+                m_image.Position = ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f);
+                m_image.Move(ImagePadding.TopLeft, animateTime, AnimateFinished);
+                m_image.FadeTo(1.0f, animateTime, null);
             } else
             {
                 m_image.Position = ImagePadding.TopLeft;
-                m_image.Move(ImagePadding.TopLeft + new Vector2(0, 10), 100, AnimateFinished);
-                m_image.FadeTo(0.0f, 100, null);
+                m_image.Move(ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f), animateTime, AnimateFinished);
+                m_image.FadeTo(0.0f, animateTime, null);
             }
         }
 

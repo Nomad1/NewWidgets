@@ -152,7 +152,6 @@ namespace NewWidgets.UI
             set { m_transform.UniformScale = value; }
         }
 
-
         /// <summary>
         /// Z-rotation in degrees
         /// </summary>
@@ -340,6 +339,8 @@ namespace NewWidgets.UI
 
         public virtual void Move(Vector2 point, int time, Action callback)
         {
+            Animator.RemoveAnimation(this, AnimationKind.Position);
+
             Vector2 current = Position;
 
             if ((point - current).LengthSquared() <= float.Epsilon)
@@ -354,6 +355,8 @@ namespace NewWidgets.UI
 
         public virtual void Rotate(float angle, int time, Action callback, bool normalize)
         {
+            Animator.RemoveAnimation(this, AnimationKind.Rotation);
+
             float current = Rotation;
 
             /* float delta = (angle - current) % 360;
@@ -381,6 +384,8 @@ namespace NewWidgets.UI
 
         public virtual void ScaleTo(Vector2 target, int time, Action callback)
         {
+            Animator.RemoveAnimation(this, AnimationKind.Scale);
+
             Vector2 current = Transform.FlatScale;
 
             if ((target - current).LengthSquared() <= float.Epsilon)
