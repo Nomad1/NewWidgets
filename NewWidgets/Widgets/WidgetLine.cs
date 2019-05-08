@@ -107,7 +107,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        private new void Relayout()
+        private void Relayout()
         {
             if (!m_simpleLine)
             {

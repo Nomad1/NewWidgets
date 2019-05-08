@@ -16,6 +16,8 @@ namespace NewWidgets.Widgets
 
         private bool m_imageInited;
 
+        private string m_lastTexture;
+
         public string Image
         {
             get { return GetProperty(WidgetParameterIndex.Image, ""); }
@@ -139,8 +141,13 @@ namespace NewWidgets.Widgets
         {
             m_imageInited = true;
 
-            if (m_imageObject != null) // TODO: check if image was not changed meaning no need to remove it
+            if (m_imageObject != null && m_lastTexture != texture) // TODO: check if image was not changed meaning no need to remove it
+            {
                 m_imageObject.Remove();
+                m_imageObject = null;
+            }
+
+            m_lastTexture = texture;
 
             if (string.IsNullOrEmpty(texture))
             {
@@ -149,11 +156,17 @@ namespace NewWidgets.Widgets
                 return;
             }
 
-            ISprite textureSprite = WindowController.Instance.CreateSprite(texture, Vector2.Zero);
-            if (textureSprite == null)
+            if (m_imageObject == null)
             {
-                WindowController.Instance.LogError("WidgetImage texture not found for sprite {0}", textureSprite);
-                return;
+
+                ISprite textureSprite = WindowController.Instance.CreateSprite(texture, Vector2.Zero);
+                if (textureSprite == null)
+                {
+                    WindowController.Instance.LogError("WidgetImage texture not found for sprite {0}", textureSprite);
+                    return;
+                }
+
+                m_imageObject = new ImageObject(this, textureSprite);
             }
 
             Vector2 size = new Vector2(Size.X - padding.Left - padding.Right, Size.Y - padding.Top - padding.Bottom);
@@ -165,52 +178,45 @@ namespace NewWidgets.Widgets
                 case WidgetBackgroundStyle.ImageFit:
                 case WidgetBackgroundStyle.ImageTopLeft:
                     {
-                        ImageObject image = new ImageObject(this, textureSprite);
 
                         if (style == WidgetBackgroundStyle.ImageTopLeft)
-                            image.Position = Vector2.Zero;
+                            m_imageObject.Position = Vector2.Zero;
                         else
-                            image.Position = center;
+                            m_imageObject.Position = center;
 
                         // Center and aspect fit. Good only for fixed size windows
-                        image.Sprite.PivotShift = pivot;
-                        image.Scale = size.X / image.Sprite.Size.X;
-                        image.Rotation = rotation;
+                        m_imageObject.Sprite.PivotShift = pivot;
+                        m_imageObject.Scale = size.X / m_imageObject.Sprite.Size.X;
+                        m_imageObject.Rotation = rotation;
 
-                        if (image.Scale * image.Sprite.Size.Y > size.Y)
-                            image.Scale = size.Y / image.Sprite.Size.Y;
+                        if (m_imageObject.Scale * m_imageObject.Sprite.Size.Y > size.Y)
+                            m_imageObject.Scale = size.Y / m_imageObject.Sprite.Size.Y;
 
-                        m_imageObject = image;
                         break;
                     }
                 case WidgetBackgroundStyle.ImageStretch:
                     {
-                        ImageObject image = new ImageObject(this, textureSprite);
-
-                        image.Position = center;
+                        m_imageObject.Position = center;
 
                         // Center and stretch
-                        image.Sprite.PivotShift = pivot;
-                        image.Transform.FlatScale = size / image.Sprite.Size;
-                        image.Rotation = rotation;
-
-                        m_imageObject = image;
+                        m_imageObject.Sprite.PivotShift = pivot;
+                        m_imageObject.Transform.FlatScale = size / m_imageObject.Sprite.Size;
+                        m_imageObject.Rotation = rotation;
                         break;
                     }
                 case WidgetBackgroundStyle.Image:
                     {
-                        ImageObject image = new ImageObject(this, textureSprite);
-                        image.Position = start;
+                        m_imageObject.Position = start;
 
                         // Center and no stretch
-                        image.Sprite.PivotShift = pivot;
-                        image.Rotation = rotation;
-
-                        m_imageObject = image;
+                        m_imageObject.Sprite.PivotShift = pivot;
+                        m_imageObject.Rotation = rotation;
                         break;
                     }
                 default:
                     WindowController.Instance.LogError("Invalid background style {0} specified for WidgetImage", style);
+                    m_imageObject.Remove();
+                    m_imageObject = null;
                     return;
             }
 
