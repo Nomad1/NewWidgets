@@ -1,67 +1,27 @@
-﻿using System;
-using System.Windows.Forms;
-using System.Drawing;
+﻿using System;using System.Windows.Forms;using System.Drawing;
 
 using NewWidgets.Widgets;
 using NewWidgets.WinForms;
 using NewWidgets.UI;
 
-namespace NewWidgets.WinFormsSample
-{
-    public partial class TestForm : Form
-    {
-        private WinFormsController m_windowController;
-
-        public TestForm()
-        {
-            InitializeComponent();
-
-            this.perspectiveViewPictureBox.MouseWheel += perspectiveViewPictureBox_MouseWheel;
-            this.KeyPreview = true;
-            this.zoomTrackBar.Visible = false;
-            this.perspectiveViewPictureBox.BackColor = Color.Black;
-
-            ResourceLoader loader = new ResourceLoader("en-en");
-            loader.RegisterString("login_title", "Connect to server");
-            loader.RegisterString("login_login", "Login");
+namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private WinFormsController m_windowController;        public TestForm()        {            InitializeComponent();            this.perspectiveViewPictureBox.MouseWheel += perspectiveViewPictureBox_MouseWheel;            this.KeyPreview = true;
+            this.zoomTrackBar.Visible = false;            this.perspectiveViewPictureBox.BackColor = Color.Black;
+            ResourceLoader loader = new ResourceLoader("en-en");            loader.RegisterString("login_title", "Connect to server");            loader.RegisterString("login_login", "Login");
             loader.RegisterString("login_password", "Password");
             loader.RegisterString("login_local", "Custom server");
             loader.RegisterString("login_register", "Register new account");
-            loader.RegisterString("login_connect", "Connect");
-            loader.RegisterString("dialog_title", "Dialog");
-            loader.RegisterString("dialog_text", "Dialog text that could be very long,\nwith |caaaaaadifferent|r |c336699colors|r, languages ({0}) and may even contain |tsettings_icon:64:64|t images.");
-            loader.RegisterString("button_yes", "Yes");
-            loader.RegisterString("button_no", "Yes!");
-            loader.RegisterString("tooltip_connect", "Start connection");
-
-            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, 2.0f, 0.6f, false, "assets");
-
-            m_windowController.OnInit += HandleOnInit;
-
-            m_windowController.RegisterSpriteAtlas("assets/font5.bin");
-
-            WidgetManager.LoadUI(System.IO.File.ReadAllText("assets/ui.xml"));
+            loader.RegisterString("login_connect", "Connect");            loader.RegisterString("dialog_title", "Dialog");            loader.RegisterString("dialog_text", "Dialog text that could be very long,\nwith |caaaaaadifferent|r |c336699colors|r, languages ({0}) and may even contain |tsettings_icon:64:64|t images.");            loader.RegisterString("button_yes", "Yes");            loader.RegisterString("button_no", "Yes!");            loader.RegisterString("tooltip_connect", "Start connection");            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, 2.0f, 0.6f, false, "assets");
+            m_windowController.OnInit += HandleOnInit;            m_windowController.RegisterSpriteAtlas("assets/font5.bin");            WidgetManager.LoadUI(System.IO.File.ReadAllText("assets/ui.xml"));
 
             updateTimer.Start();
         }
         
         private void HandleOnInit()
-        {
-            m_windowController.AddWindow(new TestWindow());
-        }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Q && (ModifierKeys & Keys.Alt) != 0)
-            {
-                Close();
-                return;
-            }
+        {            m_windowController.AddWindow(new TestWindow());
+        }        protected override void OnKeyDown(KeyEventArgs e)        {            if (e.KeyCode == Keys.Q && (ModifierKeys & Keys.Alt) != 0)            {                Close();                return;            }
 
             ProcessKey(e.KeyCode, e.KeyValue, e.Control, false);
-
-            base.OnKeyDown(e);
-        }
+            base.OnKeyDown(e);        }
 
         protected override void OnKeyUp(KeyEventArgs e)
         {
@@ -112,9 +72,7 @@ namespace NewWidgets.WinFormsSample
                             break;
                         }
                         break;
-                }
-
-            }
+                }            }
         }
 
         protected override void OnKeyPress(KeyPressEventArgs e)
@@ -127,10 +85,7 @@ namespace NewWidgets.WinFormsSample
 
         #region Events
 
-        private void zoomTrackBar_Scroll(object sender, EventArgs e)
-        {
-            perspectiveViewPictureBox.Invalidate();
-        }
+        private void zoomTrackBar_Scroll(object sender, EventArgs e)        {            perspectiveViewPictureBox.Invalidate();        }
 
         private void perspectiveViewPictureBox_MouseEnter(object sender, EventArgs e)
         {
@@ -148,35 +103,18 @@ namespace NewWidgets.WinFormsSample
             if (m_windowController != null)
                 m_windowController.Zoom(e.X, e.Y, e.Delta);
         }
-
-        private void perspectiveView_Paint(object sender, PaintEventArgs e)
-        {
-            Graphics g = e.Graphics;
+        private void perspectiveView_Paint(object sender, PaintEventArgs e)        {            Graphics g = e.Graphics;
 
             
             g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
 
             if (m_windowController != null)
-                m_windowController.Draw(g);
-        }
-
-        private void perspectivePictureBox_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (m_windowController != null)
-                m_windowController.Touch(e.X, e.Y, true, false, (int)e.Button);
-        }
-
-        private void perspectivePictureBox_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (m_windowController != null)
-                m_windowController.Touch(e.X, e.Y, false, true, (int)e.Button);
-        }
-
-        private void perspectivePictureBox_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (m_windowController != null)
-                m_windowController.Touch(e.X, e.Y, false, false, (int)e.Button);
-        }
+                m_windowController.Draw(g);        }        private void perspectivePictureBox_MouseDown(object sender, MouseEventArgs e)        {
+            if (m_windowController != null)                m_windowController.Touch(e.X, e.Y, true, false, (int)e.Button);        }
+        private void perspectivePictureBox_MouseUp(object sender, MouseEventArgs e)        {
+            if (m_windowController != null)                m_windowController.Touch(e.X, e.Y, false, true, (int)e.Button);        }
+        private void perspectivePictureBox_MouseMove(object sender, MouseEventArgs e)        {
+            if (m_windowController != null)                m_windowController.Touch(e.X, e.Y, false, false, (int)e.Button);        }
 
         private void updateTimer_Tick(object sender, EventArgs e)
         {
@@ -188,5 +126,4 @@ namespace NewWidgets.WinFormsSample
         }
 
         #endregion
-    }
-}
+    }}
