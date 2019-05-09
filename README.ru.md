@@ -1,3 +1,5 @@
+*Read this in other languages: [English](README.md), [Русский](README.ru.md)*
+
 # NewWidgets
 
 NewWidgets (временное название) это GUI подсистема на .Net, не зависимая от графического движка и базирующаяся на спрайтах. В качестве тестового примера сделан коннектор к WinForms для отрисовки графики. Планируется поддержка Unity, MonoGame, RunMobile (собственный движок), UIKit и других движков. Также планируется C++ порт.
@@ -17,7 +19,7 @@ NewWidgets (временное название) это GUI подсистема
 
 В примере WinFormsSample в классе TestForm есть пример реализации обработки этих событий. В случае WinForms во время Update() вызывается действие Invalidate() для графической области и уже ее событие OnPaint() вызывает операцию Draw(). В случае OpenGL или Direct3D имеет смысл вызывать в цикле рендера Update(), потом Draw() и затем glFlush()/SwapBuffers()/ID3D11DeviceContext::Flush().
 
-### Работа
+### Использование
 Пока нет визуального редактора для NewWidgets, разработка подразумевает создание контролов в коде:
 ```            
             WidgetPanel panel = new WidgetPanel(WidgetManager.DefaultWindowStyle);
