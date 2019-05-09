@@ -15,7 +15,7 @@ namespace NewWidgets.WinFormsSample
         private static readonly float s_dragEpsilon = 10.0f;
 
         protected WidgetPanel m_panel;
-
+        
         private WidgetLabel m_title;
         private WidgetText m_text;
 
@@ -55,8 +55,11 @@ namespace NewWidgets.WinFormsSample
             if (!string.IsNullOrEmpty(noText))
             {
                 m_noButton = new WidgetButton(noText);
+                //m_noButton.Image = "back_icon";
+                //m_noButton.ImagePadding = new Margin(10, 10, 48, 10);
+                //m_noButton.TextPadding = new Margin(48, 10, 10, 10);
                 m_noButton.Size = new Vector2(128, 48);
-
+                
                 m_noButton.Position = new Vector2(size.X * 2 / 3 - (m_noButton.Size.X) / 2, size.Y - m_noButton.Size.Y - 25);
                 m_noButton.OnPress += delegate { HandleButtonPress(1); };
                 m_panel.AddChild(m_noButton);
@@ -64,6 +67,8 @@ namespace NewWidgets.WinFormsSample
 
             m_yesButton = new WidgetButton(yesText);
             m_yesButton.Size = new Vector2(128, 48);
+            //m_yesButton.Image = "levels_icon";
+            //m_yesButton.ImagePadding = new Margin(10, 10, 10, 10);
             m_yesButton.Position = new Vector2(m_noButton == null ? size.X / 2 - (m_yesButton.Size.X) / 2 : size.X / 3 - m_yesButton.Size.X * 0.25f, size.Y - m_yesButton.Size.Y - 25);
             m_yesButton.OnPress += delegate { HandleButtonPress(0); };
             m_panel.AddChild(m_yesButton);
@@ -75,7 +80,7 @@ namespace NewWidgets.WinFormsSample
             m_closeButton.Position = new Vector2(size.X - m_closeButton.Size.X, 0);
             m_closeButton.OnPress += delegate { HandleButtonPress(2); };
             m_panel.AddChild(m_closeButton);
-
+            
             m_title = new WidgetLabel();
             m_title.Text = title;
             m_title.Size = new Vector2(size.X, 50);
@@ -83,6 +88,12 @@ namespace NewWidgets.WinFormsSample
             m_title.FontSize *= 1.5f;
             m_title.TextAlign = WidgetAlign.Top | WidgetAlign.HorizontalCenter;
             m_panel.AddChild(m_title);
+
+            
+            /*m_image = new WidgetImage("question_icon");
+            m_image.Size = new Vector2(48, 48);
+            m_image.Position = new Vector2(5, 5);
+            m_panel.AddChild(m_image);*/
 
             AddChild(m_panel);
 
@@ -113,12 +124,12 @@ namespace NewWidgets.WinFormsSample
         {
             if (!Controlling)
                 return false;
-
+            
             if (base.Touch(x, y, press, unpress, pointer))
                 return true;
-
+            
             bool hit = this.HitTest(x, y);
-            Vector2 local = new Vector2(x, y);//this.Sprite.Transform.GetClientPoint(new Vector2(x, y));
+            Vector2 local = new Vector2(x,y);//this.Sprite.Transform.GetClientPoint(new Vector2(x, y));
 
             if (!m_dragging && press && hit)
             {
@@ -152,10 +163,10 @@ namespace NewWidgets.WinFormsSample
         public static DialogWindow Show(string title, string text, string yesText, string noText = "")
         {
             DialogWindow dialog = new DialogWindow(title, text, yesText, noText);
-            dialog.Scale = WindowController.Instance.ScreenScale * WindowController.Instance.ScreenWidth / 2048.0f;
+            dialog.Scale = WindowController.Instance.ScreenScale *  WindowController.Instance.ScreenWidth / 2048.0f;
             dialog.OnAppear();
 
-            WindowController.Instance.ScheduleAction(() => WindowController.Instance.AddWindow(dialog), 1);
+            WindowController.Instance.ScheduleAction(() => WindowController.Instance.Windows.Add(dialog), 1);
 
             return dialog;
         }
@@ -180,8 +191,7 @@ namespace NewWidgets.WinFormsSample
             {
                 HandleButtonPress(1);
                 return true;
-            }
-            else
+            } else
                 if (key == SpecialKey.Enter)
             {
                 HandleButtonPress(0);

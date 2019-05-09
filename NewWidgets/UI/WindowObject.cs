@@ -78,8 +78,6 @@ namespace NewWidgets.UI
         Visible = 0x02,
         Enabled = 0x04,
         Changed = 0x08,
-        Selected = 0x10,
-        Hovered = 0x20,
 
         Default = Visible | Enabled | Changed
     }
@@ -185,30 +183,6 @@ namespace NewWidgets.UI
             }
         }
 
-        public virtual bool Hovered
-        {
-            get { return (m_flags & WindowObjectFlags.Hovered) == WindowObjectFlags.Hovered; }
-            set
-            {
-                if (value)
-                    m_flags |= WindowObjectFlags.Hovered;
-                else
-                    m_flags &= ~WindowObjectFlags.Hovered;
-            }
-        }
-
-        public virtual bool Selected
-        {
-            get { return (m_flags & WindowObjectFlags.Selected) == WindowObjectFlags.Selected; }
-            set
-            {
-                if (value)
-                    m_flags |= WindowObjectFlags.Selected;
-                else
-                    m_flags &= ~WindowObjectFlags.Selected;
-            }
-        }
-
         public bool Removing
         {
             get { return (m_flags & WindowObjectFlags.Removing) == WindowObjectFlags.Removing; }
@@ -236,7 +210,7 @@ namespace NewWidgets.UI
             get { return m_size; }
             set
             {
-                if (Vector2.DistanceSquared(value, Size) > float.Epsilon)
+                if (value.DistanceAvr(Size) > float.Epsilon)
                     Resize(value);
             }
         }
