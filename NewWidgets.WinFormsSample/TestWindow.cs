@@ -26,7 +26,7 @@ namespace NewWidgets.WinFormsSample
             Scale = WindowController.Instance.ScreenHeight / Size.Y;
 
             WidgetPanel panel = new WidgetWindow();
-            panel.Size = new Vector2(600, 560);
+            panel.Size = new Vector2(600, 760);
             panel.Scale = WindowController.Instance.ScreenScale;
             panel.Position = Size / 2 - panel.Size * panel.Scale / 2;
             AddChild(panel);
@@ -124,6 +124,15 @@ namespace NewWidgets.WinFormsSample
             logoImage.Size = new Vector2(64, 64);
             logoImage.Position = new Vector2(20, 15);
             panel.AddChild(logoImage);
+
+
+            WidgetTextField textTextField = new WidgetTextField(WidgetManager.GetStyle("default_textedit"));
+            textTextField.Size = new Vector2(500, 245);
+            textTextField.Position = new Vector2(50, 500);
+            textTextField.FontSize = WidgetManager.FontScale * 1.25f;
+            textTextField.Visible = true;
+            panel.AddChild(textTextField);
+
         }
 
         private void HandleLoginEntered(WidgetTextEdit edit, string text)

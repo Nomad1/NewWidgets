@@ -23,31 +23,31 @@ namespace NewWidgets.Widgets
         public Font Font
         {
             get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
-            set { SetProperty(WidgetParameterIndex.Font, value); m_needLayout = true; }
+            set { SetProperty(WidgetParameterIndex.Font, value); InivalidateLayout(); }
         }
 
         public float FontSize
         {
             get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
-            set { SetProperty(WidgetParameterIndex.FontSize, value); m_needLayout = true; }
+            set { SetProperty(WidgetParameterIndex.FontSize, value); InivalidateLayout(); }
         }
 
         public WidgetAlign TextAlign
         {
             get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
-            set { SetProperty(WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
+            set { SetProperty(WidgetParameterIndex.TextAlign, value); InivalidateLayout(); }
         }
 
         public float LineSpacing
         {
             get { return GetProperty(WidgetParameterIndex.LineSpacing, 5.0f); }
-            set { SetProperty(WidgetParameterIndex.LineSpacing, value); m_needLayout = true; }
+            set { SetProperty(WidgetParameterIndex.LineSpacing, value); InivalidateLayout(); }
         }
 
         public float MaxWidth
         {
             get { return m_maxWidth; }
-            set { m_maxWidth = value; m_needLayout = true; }
+            set { m_maxWidth = value; InivalidateLayout(); }
         }
 
         public string Text
@@ -60,14 +60,14 @@ namespace NewWidgets.Widgets
                 if (m_text == value)
                     return;
                 m_text = value;
-                m_needLayout = true;
+                InivalidateLayout();
             }
         }
 
         public bool RichText
         {
             get { return GetProperty(WidgetParameterIndex.RichText, true); }
-            set { SetProperty(WidgetParameterIndex.RichText, value); m_needLayout = true; }
+            set { SetProperty(WidgetParameterIndex.RichText, value); InivalidateLayout(); }
         }
 
         public int Color
@@ -113,11 +113,15 @@ namespace NewWidgets.Widgets
             m_needLayout = true;
         }
 
+        private void InivalidateLayout()
+        {
+            m_needLayout = true;
+        }
+
         protected override void Resize(Vector2 size)
         {
             base.Resize(size);
-
-            m_needLayout = true;
+            InivalidateLayout();
         }
 
         public void Relayout()
@@ -129,7 +133,6 @@ namespace NewWidgets.Widgets
             Vector2 maxSize = Vector2.Zero;
             Vector2[] sizes = new Vector2[lines.Length];
             LabelObject.TextSpan[][] colors = null;
-
 
             if (RichText)
                 colors = new LabelObject.TextSpan[lines.Length][];
@@ -247,7 +250,7 @@ namespace NewWidgets.Widgets
                 Size = new Vector2(Math.Max(Size.X, m_maxWidth), Math.Max(Size.Y, height));
             }
 
-            m_labels = new LabelObject[lines.Length];
+            m_labels = new LabelObject[lines.Length]; // TODO: reuse old labels?
 
             float y = 0;
 

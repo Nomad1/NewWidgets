@@ -2,7 +2,7 @@
 <ui>
   <!-- Fonts -->
 
-  <font name="default" resource="font5" spacing="-2" baseline="30" />
+  <font name="default" resource="font5" spacing="0" baseline="30" />
 
   <!-- Nine patches -->
 
@@ -23,7 +23,7 @@
   <!--three name="line_3" /-->
 
   <!-- Default Styles -->
-  <style name="default_window" class="window">
+  <style name="default_window">
     <back_style>NineImage</back_style>
     <back_image>window_9</back_image>
     <back_scale>0.75</back_scale>
@@ -31,7 +31,7 @@
     <clip>true</clip>
   </style>
 
-  <style name="default_panel" class="panel">
+  <style name="default_panel">
     <back_style>NineImage</back_style>
     <back_image>window_9</back_image>
     <back_scale>0.5</back_scale>
@@ -39,7 +39,7 @@
     <clip>true</clip>
   </style>
 
-  <style name="default_label" class="label">
+  <style name="default_label">
     <font>default</font>
     <font_size>0.6</font_size>
     <text_color>0xffffff</text_color>
@@ -47,13 +47,13 @@
     <clip>false</clip>
   </style>
     
-  <style name="default_text" class="text">
+  <style name="default_text">
     <font>default</font>
     <font_size>0.6</font_size>
     <text_color>0xffffff</text_color>
   </style>
 
-  <style name="default_textedit" class="textedit">
+  <style name="default_textedit">
     <back_style>NineImage</back_style>
     <back_image>panel_white_hovered_9</back_image>
     <back_scale>0.25</back_scale>
@@ -79,30 +79,31 @@
     <back_color>#ffee88</back_color>
   </style>
     
-    <style name="default_textedit_hovered" parent="default_textedit">
+  <style name="default_textedit_hovered" parent="default_textedit">
     <back_color>#ffee88</back_color>
   </style>
+
   <!-- ScrollView -->
 
-  <style name="scroll_horizontal" class="background">
+  <style name="scroll_horizontal">
     <back_style>NineImage</back_style>
     <back_image>scroll_horizontal</back_image>
     <back_scale>1.0</back_scale>
   </style>
 
-  <style name="scroll_indicator_horizontal" class="background">
+  <style name="scroll_indicator_horizontal">
     <back_style>NineImage</back_style>
     <back_image>scroll_indicator_horizontal</back_image>
     <back_scale>1.0</back_scale>
   </style>
 
-  <style name="scroll_vertical" class="background">
+  <style name="scroll_vertical">
     <back_style>NineImage</back_style>
     <back_image>scroll_vertical</back_image>
     <back_scale>1.0</back_scale>
   </style>
 
-  <style name="scroll_indicator_vertical" class="background">
+  <style name="scroll_indicator_vertical">
     <back_style>NineImage</back_style>
     <back_image>scroll_indicator_vertical</back_image>
     <back_scale>1.0</back_scale>
@@ -226,7 +227,7 @@
 
   <!-- Custom styles -->
 
-  <style name="back_pattern" class="background">
+  <style name="back_pattern">
     <back_style>ImageTiled</back_style>
     <back_depth>BackClipped</back_depth>
     <back_image>back_pattern</back_image>

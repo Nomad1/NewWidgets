@@ -70,6 +70,7 @@
     <Compile Include="Widgets\WidgetWindow.cs" />
     <Compile Include="Widgets\WidgetStyleSheet.cs" />
     <Compile Include="Widgets\ResourceLoader.cs" />
+    <Compile Include="Widgets\WidgetTextField.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -332,7 +332,7 @@ namespace NewWidgets.UI
             return false;
         }
 
-        public virtual bool Key(SpecialKey key, bool up, char character)
+        public virtual bool Key(SpecialKey key, bool up, char character) // TODO: change 'char character' to 'string @string' for Paste, glyphs, emoji, etc.
         {
             return false;
         }

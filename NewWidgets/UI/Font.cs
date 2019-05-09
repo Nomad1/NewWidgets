@@ -9,6 +9,7 @@ namespace NewWidgets.UI
     public class Font
     {
         private readonly Dictionary<char, Glyph> m_glyphs;
+        private readonly Glyph m_spaceGlyph;
         private readonly int m_spacing;
         private readonly int m_leading;
         private readonly ISprite m_fontSprite;
@@ -32,7 +33,7 @@ namespace NewWidgets.UI
 
         public int SpaceWidth
         {
-            get { return m_glyphs[' '].Width; }
+            get { return m_spaceGlyph.Width; }
         }
 
         public int Baseline
@@ -69,6 +70,7 @@ namespace NewWidgets.UI
                 m_glyphs[(char)fontSprite.FrameTag] = new Glyph((int)fontSprite.FrameSize.X, (int)fontSprite.FrameSize.Y, (char)fontSprite.FrameTag, i);
             }
 
+            m_spaceGlyph = m_glyphs[' '];
             m_height = maxHeight;
         }
 
@@ -80,7 +82,7 @@ namespace NewWidgets.UI
             {
                 Glyph glyph;
                 if (!m_glyphs.TryGetValue(text[i], out glyph))
-                    glyph = m_glyphs[' '];
+                    glyph = m_spaceGlyph;
 
                 ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, 0));
                 sprite.Frame = glyph.Frame;
@@ -104,7 +106,7 @@ namespace NewWidgets.UI
             {
                 Glyph glyph;
                 if (!m_glyphs.TryGetValue(text[i], out glyph))
-                    glyph = m_glyphs[' '];
+                    glyph = m_spaceGlyph;
 
                 if (result[i] != null)
                 {
@@ -129,9 +131,9 @@ namespace NewWidgets.UI
             {
                 Glyph glyph;
                 if (!m_glyphs.TryGetValue(text[i], out glyph))
-                    glyph = m_glyphs[' '];
+                    glyph = m_spaceGlyph;
 
-                result.X += m_spacing + glyph.Width;
+                result.X += glyph.Width + m_spacing;
             }
 
             if (text.Length > 0)
@@ -148,7 +150,7 @@ namespace NewWidgets.UI
             {
                 Glyph glyph;
                 if (!m_glyphs.TryGetValue(text[i], out glyph))
-                    glyph = m_glyphs[' '];
+                    glyph = m_spaceGlyph;
 
                 result[i] = glyph.Width + m_spacing;
             }

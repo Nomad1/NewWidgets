@@ -124,8 +124,11 @@ namespace NewWidgets.Widgets
         [WidgetParameter("vertical_indicator", typeof(WidgetStyleSheet))]
         VerticalIndicatorStyle,
 
+        // Text field
+        [WidgetParameter("scroll_style", typeof(WidgetStyleSheet))]
+        TextFieldScrollStyle,
 
-        Max = VerticalIndicatorStyle + 1
+        Max = TextFieldScrollStyle + 1
     }
 
     /// <summary>
