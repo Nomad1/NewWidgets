@@ -237,7 +237,10 @@ namespace NewWidgets.Widgets
                             targetStyleType = WidgetStyleType.SelectedHovered;
                             break;
                         case WidgetStyleType.Disabled:
-                            targetStyleType = WidgetStyleType.DisabledHovered;
+                            if (style.Name == m_styles[(int)WidgetStyleType.Normal].Name)
+                                targetStyleType = 0; // workaround to prevent using hovered style when disabled is set to same style as normal
+                            else
+                                targetStyleType = WidgetStyleType.DisabledHovered;
                             break;
                         case WidgetStyleType.SelectedDisabled:
                             targetStyleType = WidgetStyleType.SelectedDisabledHovered;

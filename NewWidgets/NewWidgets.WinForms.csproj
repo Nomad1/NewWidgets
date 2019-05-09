@@ -38,11 +38,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Widgets\Enums.cs" />
     <Compile Include="Widgets\IFocusableWidget.cs" />
-    <Compile Include="Widgets\ResourceLoader.cs" />
     <Compile Include="Widgets\Widget.cs" />
     <Compile Include="Widgets\WidgetButton.cs" />
     <Compile Include="Widgets\WidgetCheckBox.cs" />
-    <Compile Include="Widgets\WidgetContextMenu.cs" />
     <Compile Include="Widgets\WidgetImage.cs" />
     <Compile Include="Widgets\WidgetLabel.cs" />
     <Compile Include="Widgets\WidgetLine.cs" />
@@ -71,6 +69,7 @@
     <Compile Include="Widgets\WidgetManager.Styles.cs" />
     <Compile Include="Widgets\WidgetWindow.cs" />
     <Compile Include="Widgets\WidgetStyleSheet.cs" />
+    <Compile Include="Widgets\ResourceLoader.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

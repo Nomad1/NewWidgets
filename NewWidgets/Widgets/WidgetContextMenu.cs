@@ -1,4 +1,7 @@
 ﻿#if false
+// Nomad: this widget should be rewritten to new styles and refactored. Right now I'm disabling it
+
+
 using System;
 using System.Numerics;
 using NewWidgets.Utility;
