@@ -1,4 +1,4 @@
-using NewWidgets.UI;
+﻿using NewWidgets.UI;
 
 using System;
 using System.Collections.Generic;

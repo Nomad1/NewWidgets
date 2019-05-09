@@ -117,6 +117,7 @@ namespace NewWidgets.WinFormsSample
             m_loginButton.Position = new Vector2(panel.Size.X / 2 - m_loginButton.Size.X / 2, 460);
             m_loginButton.Enabled = false;
             m_loginButton.OnPress += delegate { HandleLoginPress(null); };
+            m_loginButton.Tooltip = "@tooltip_connect";
             panel.AddChild(m_loginButton);
 
             WidgetImage logoImage = new WidgetImage(WidgetBackgroundStyle.ImageFit, "settings_icon");
