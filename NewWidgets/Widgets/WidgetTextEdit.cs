@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 
 using NewWidgets.UI;
@@ -6,10 +6,10 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetTextEdit : Widget, IFocusableWidget
+    public class WidgetTextEdit : WidgetBackground, IFocusableWidget
     {
-        private char m_cursorChar = '|';
-        private bool m_focused;
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_textedit", true);
+
         private int m_cursorPosition;
 
         private LabelObject m_label;
@@ -17,14 +17,6 @@ namespace NewWidgets.Widgets
 
         private string m_preffix;
         private string m_text;
-        private Font m_font;
-        private float m_fontSize;
-        private int m_textColor;
-        private int m_focusedColor;
-        private char m_maskChar;
-        
-        private readonly Margin m_padding;
-        private readonly int m_cursorColor;
 
         public event Action<WidgetTextEdit, string> OnFocusLost;
         public event Action<WidgetTextEdit, string> OnTextEntered;
@@ -32,20 +24,64 @@ namespace NewWidgets.Widgets
 
         private bool m_needLayout;
 
-        private string m_focusImage;
-
         public Font Font
         {
-            get { return m_font; }
-            set { m_font = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
+            set { SetProperty(WidgetParameterIndex.Font, value); m_needLayout = true; }
         }
 
         public float FontSize
         {
-            get { return m_fontSize; }
-            set { m_fontSize = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
+            set { SetProperty(WidgetParameterIndex.FontSize, value); m_needLayout = true; }
         }
-        
+
+        public WidgetAlign TextAlign
+        {
+            get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
+            set { SetProperty(WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
+        }
+
+        public Margin TextPadding
+        {
+            get { return GetProperty(WidgetParameterIndex.TextPadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.TextPadding, value); m_needLayout = true; }
+        }
+
+        public int TextColor
+        {
+            get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
+            set
+            {
+                SetProperty(WidgetParameterIndex.TextColor, value);
+
+                if (m_label != null) // try to avoid settings m_needLayout
+                    m_label.Color = value;
+            }
+        }
+
+        public int CursorColor
+        {
+            get { return GetProperty(WidgetParameterIndex.CursorColor, 0xffffff); }
+            set
+            {
+                SetProperty(WidgetParameterIndex.CursorColor, value);
+
+                if (m_cursor != null) // try to avoid settings m_needLayout
+                    m_cursor.Color = value;
+            }
+        }
+
+        public string CursorChar
+        {
+            get { return GetProperty(WidgetParameterIndex.CursorChar, "|"); }
+            set
+            {
+                SetProperty(WidgetParameterIndex.CursorChar, value);
+                m_needLayout = true;
+            }
+        }
+
         public string Text
         {
             get { return m_text; }
@@ -59,37 +95,20 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public int TextColor
+        public string MaskChar
         {
-            get { return m_textColor; }
+            get { return GetProperty(WidgetParameterIndex.MaskChar, ""); }
             set
             {
-                m_textColor = value;
-                
-                UpdateColor();
+                SetProperty(WidgetParameterIndex.MaskChar, value);
+                m_needLayout = true;
             }
-        }
-        
-        public int FocusedColor
-        {
-            get { return m_focusedColor; }
-            set
-            {
-                m_focusedColor = value;
-
-                UpdateColor();
-            }
-        }
-
-        public char MaskChar
-        {
-            get { return m_maskChar; }
-            set { m_maskChar = value; m_needLayout = true; }
         }
 
         public bool IsFocused
         {
-            get { return m_focused; }
+            get { return Selected; }
+            private set { Selected = value; }
         }
 
         public bool IsFocusable
@@ -117,52 +136,38 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public WidgetTextEdit()
-            : this(WidgetManager.DefaultTextEditStyle)
-        {
-        }
-
-        public WidgetTextEdit(WidgetStyleSheet style)
-            : base(style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextEdit"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        public WidgetTextEdit(WidgetStyleSheet style = default(WidgetStyleSheet))
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
             m_text = string.Empty;
             m_preffix = string.Empty;
             m_needLayout = true;
-            
-            m_font = style.Font;
-            m_fontSize = style.FontSize;
-            m_textColor = style.GetParameterColor("text_color", 0x0);
-            m_focusedColor = style.GetParameterColor("focus_color", 0xffffff);
-            m_cursorColor = style.GetParameterColor("cursor_color", 0x0);
-
-            Size = style.Size;
-            ClipContents = true;
-            
-            m_focusImage = style.GetParameter("focus_image");
-            m_padding = style.Padding;
         }
 
         private void Relayout()
         {
             if (m_label == null)
             {
-                m_label = new LabelObject(this, m_font, string.Empty,
+                m_label = new LabelObject(this, Font, string.Empty,
                                           LabelAlign.Start, LabelAlign.Start);
-                m_label.Position = m_padding.TopLeft;
+                m_label.Position = TextPadding.TopLeft;
             }
 
-            m_label.Scale = m_fontSize;
+            m_label.Scale = FontSize;
 
             if (m_cursor == null)
             {
-                m_cursor = m_font.GetSprites(m_cursorChar.ToString(), Vector2.Zero)[0];
-                m_cursor.Color = m_cursorColor;
-                m_cursor.Scale = m_fontSize;
-                //m_cursor.Blink(2000);
+                m_cursor = Font.GetSprites(CursorChar, Vector2.Zero)[0];
+                m_cursor.Color = CursorColor;
+                m_cursor.Scale = FontSize;
                 m_cursor.Transform.Parent = Transform;
             }
 
-            Vector2 minSize = m_label.Size * m_fontSize + m_padding.Size;
+            Vector2 minSize = m_label.Size * FontSize + TextPadding.Size;
             if (minSize.X < Size.X)
                 minSize.X = Size.X;
             if (minSize.Y < Size.Y)
@@ -173,7 +178,6 @@ namespace NewWidgets.Widgets
             m_needLayout = false;
             
             UpdateCursor(0);
-            UpdateColor();
         }
 
         protected override void Resize(Vector2 size)
@@ -194,7 +198,7 @@ namespace NewWidgets.Widgets
 
             if (m_cursor != null)
             {
-                m_cursor.Alpha = (int)(Math.Sin(WindowController.Instance.GetTime() / 1000.0f) * 255 + 128.5f); // blinks every 2 seconds
+                m_cursor.Alpha = (int)(Math.Sin(WindowController.Instance.GetTime() / 1000.0f) * 64 + 191); // blinks every 2 seconds from 127 to 255
                 m_cursor.Update();
             }
 
@@ -208,13 +212,13 @@ namespace NewWidgets.Widgets
             if (m_label != null)
                 m_label.Draw(canvas);
 
-            if (m_focused)
+            if (IsFocused)
                 m_cursor.Draw(canvas);
         }
         
         public override bool Key(SpecialKey key, bool up, char character)
         {
-            if (!m_focused)
+            if (!IsFocused)
                 return false;
 
             if (up && key == SpecialKey.Back)
@@ -241,7 +245,7 @@ namespace NewWidgets.Widgets
                 return true;
             }
 
-            if ((key == SpecialKey.Letter || key == SpecialKey.Paste) && m_font.HaveSymbol(character))
+            if ((key == SpecialKey.Letter || key == SpecialKey.Paste) && Font.HaveSymbol(character))
             {
                 m_text = m_text.Insert(m_cursorPosition, character.ToString());
                 
@@ -306,7 +310,7 @@ namespace NewWidgets.Widgets
             if (m_needLayout)
                 return;
             
-            if (m_focused)
+            if (IsFocused)
             {
                 m_cursorPosition += change;
 
@@ -319,11 +323,11 @@ namespace NewWidgets.Widgets
                 m_label.Text = MaskText(m_text.Substring(0, m_cursorPosition) + '\0' + m_text.Substring(m_cursorPosition));
 
                 var frame = m_label.GetCharFrame(m_cursorPosition);
-                float nsize = Size.X / m_fontSize;
+                float nsize = Size.X / FontSize;
 
                 if (m_label.Size.X > nsize)
                 {
-                    float from = -m_label.Position.X / m_fontSize;
+                    float from = -m_label.Position.X / FontSize;
                     float to = from + nsize;
 
                     if (frame.X > from && frame.X < to)
@@ -332,90 +336,77 @@ namespace NewWidgets.Widgets
                     {
                         if (frame.X > from)
                         {
-                            float nx = (nsize - frame.X) * m_fontSize - m_padding.Width;
-                            if (nx > m_padding.Left)
-                                nx = m_padding.Left;
+                            float nx = (nsize - frame.X) * FontSize - TextPadding.Width;
+                            if (nx > TextPadding.Left)
+                                nx = TextPadding.Left;
 
-                            m_label.Position = new Vector2(nx, m_padding.Top);
+                            m_label.Position = new Vector2(nx, TextPadding.Top);
                         } else
                             if (frame.X < to)
                         {
-                            float nx = -frame.X * m_fontSize;
-                            if (nx > m_padding.Left)
-                                nx = m_padding.Left;
+                            float nx = -frame.X * FontSize;
+                            if (nx > TextPadding.Left)
+                                nx = TextPadding.Left;
 
-                            m_label.Position = new Vector2(nx, m_padding.Top);
+                            m_label.Position = new Vector2(nx, TextPadding.Top);
                         }
                     }
                 } else
-                    m_label.Position = m_padding.TopLeft;
+                    m_label.Position = TextPadding.TopLeft;
 
-                m_cursor.Position = m_label.Position + new Vector2(frame.X * m_fontSize - 2, 0);
+                m_cursor.Position = m_label.Position + new Vector2(frame.X * FontSize - 2, 0);
 
             } else
             {
                 m_label.Text = MaskText(m_text);
-                m_label.Position = m_padding.TopLeft;
+                m_label.Position = TextPadding.TopLeft;
             }
         }
 
         private string MaskText(string text)
         {
-            if (m_maskChar == 0)
+            if (string.IsNullOrEmpty(MaskChar))
                 return text;
 
             char [] result = text.ToCharArray();
             for (int i = 0; i < result.Length; i++)
-                if (!m_focused || i != m_cursorPosition)
-                    result[i] = '*';
+                if (!IsFocused || i != m_cursorPosition)
+                    result[i] = MaskChar[0];
 
             return new string(result);
         }
 
         public void SetFocused(bool value)
         {
-            if (m_focused == value)
+            if (IsFocused == value)
                 return;
 
-            m_focused = value;
-
-            if (!string.IsNullOrEmpty(m_focusImage))
-                BackgroundTexture = value ? m_focusImage : Style.BackgroundTexture;
+            IsFocused = value;
 
             //UpdateColor();
             m_cursorPosition = m_text.Length;
             UpdateCursor(0);
             
-            UpdateColor();
-            
             WidgetManager.UpdateFocus(this, value);
             //WidgetManager.UpdateFocus(this, true);
-        }
-        
-        private void UpdateColor()
-        {
-            if (m_label != null)
-                m_label.Color = m_focused ? m_focusedColor : m_textColor;
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (HitTest(x, y))
+            if (press)
             {
-                if (press)
+                bool wasFocused = IsFocused;
+
+                SetFocused(true);
+
+                Vector2 local = (this.Transform.GetClientPoint(new Vector2(x, y)) - m_label.Position) / FontSize;
+                ISprite[] sprites = m_label.InternalGetSprites();
+
+                if (sprites.Length > 0)
                 {
-                    bool wasFocused = m_focused;
+                    bool found = false;
 
-                    SetFocused(true);
-
-                    Vector2 local = (this.Transform.GetClientPoint(new Vector2(x, y)) - m_label.Position) / m_fontSize;
-                    ISprite[] sprites = m_label.InternalGetSprites();
-
-                    if (sprites.Length > 0)
-                    {
-                        bool found = false;
-
-                        if (!found && wasFocused)
+                    if (!found && wasFocused)
                         for (int i = 0; i < sprites.Length; i++)
                         {
                             if (local.X < sprites[i].Position.X + sprites[i].Size.X / 2)
@@ -424,25 +415,39 @@ namespace NewWidgets.Widgets
                                     UpdateCursor(i - m_cursorPosition);
                                 else
                                     if (i >= m_cursorPosition)
-                                        UpdateCursor(i - m_cursorPosition - 1);
+                                    UpdateCursor(i - m_cursorPosition - 1);
                                 found = true;
                                 break;
                             }
                         }
 
-                        if (!found)
-                        {
-                            int last = m_text.Length - 1;
-                            UpdateCursor(last - m_cursorPosition + 1);
-                        }
+                    if (!found)
+                    {
+                        int last = m_text.Length - 1;
+                        UpdateCursor(last - m_cursorPosition + 1);
                     }
                 }
-                return true;
             }
 
-            return base.Touch(x, y, press, unpress, pointer);
+            if (!press && !unpress && !Hovered)
+            {
+                Hovered = true;
+                WindowController.Instance.OnTouch += UnHoverTouch;
+            }
+            return true;
         }
-        
+
+        private bool UnHoverTouch(float x, float y, bool press, bool unpress, int pointer)
+        {
+            if (Hovered && !HitTest(x, y))
+            {
+                Hovered = false;
+                WindowController.Instance.OnTouch -= UnHoverTouch;
+            }
+            return false;
+        }
+
+
         public override void Remove()
         {
             WidgetManager.UpdateFocus(this, false);

@@ -1,13 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using NewWidgets.UI;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetPanel : Widget, IWindowContainer
+    public class WidgetPanel : WidgetBackground, IWindowContainer
     {
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_panel", true);
+
         private readonly WindowObjectArray<Widget> m_children;
-        
+
         public IList<Widget> Children
         {
             get { return m_children.List; }
@@ -23,19 +25,16 @@ namespace NewWidgets.Widgets
             get { return m_children.MaximumZIndex; }
         }
 
-        public WidgetPanel()
-            : this(WidgetManager.DefaultPanelStyle)
-        {
-        }
-
-        public WidgetPanel(WidgetStyleSheet style)
-            : base(style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetPanel"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        public WidgetPanel(WidgetStyleSheet style = default(WidgetStyleSheet))
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
             m_children = new WindowObjectArray<Widget>();
-
-            Size = style.Size;
         }
-      
+
         public override bool Update()
         {
             if (!base.Update())
@@ -52,7 +51,7 @@ namespace NewWidgets.Widgets
 
             m_children.Draw(canvas);
         }
-       
+
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
             bool processed = base.Touch(x, y, press, unpress, pointer);
@@ -66,7 +65,7 @@ namespace NewWidgets.Widgets
             if (m_children.Touch(x, y, press, unpress, pointer))
                 return true;
 
-            if (m_background.Touch(x, y, press, unpress, pointer))
+            if (m_background.Touch(x, y, press, unpress, pointer)) // make sure that click inside panel is not transparent
                 return true;
 
             return false;
@@ -104,7 +103,7 @@ namespace NewWidgets.Widgets
 
             return false;
         }
-        
+
         public void AddChild(Widget child)
         {
             m_children.Add(child);
@@ -116,7 +115,7 @@ namespace NewWidgets.Widgets
             if (child is Widget)
                 AddChild((Widget)child);
             else
-                throw new ArgumentException("child");
+                throw new ArgumentException(nameof(child));
         }
 
         public virtual void Clear()
@@ -126,7 +125,7 @@ namespace NewWidgets.Widgets
 
             m_children.Clear();
         }
-        
+
         public override void Remove()
         {
             Clear();

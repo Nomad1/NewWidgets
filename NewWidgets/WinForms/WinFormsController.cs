@@ -120,12 +120,12 @@ namespace NewWidgets.WinForms
             Widgets.WidgetManager.Init(fontScale);
 
             foreach (string file in Directory.GetFiles(m_imagePath, "*.png"))
-                RegisterSprite(Path.GetFileNameWithoutExtension(file), file, null, 1, 1);
+                RegisterSprite(Path.GetFileNameWithoutExtension(file), file, null);
         }
 
         private void RegisterSprite(string id, string file, WinFormsSprite.FrameData[] frames, int subdivideX = 1, int subdivideY = 1)
         {
-            Image image = null;
+            Image image;
 
             if (!m_images.TryGetValue(file, out image))
                 m_images[file] = image = Image.FromFile(file);
@@ -169,18 +169,20 @@ namespace NewWidgets.WinForms
                     BinaryReader reader = new BinaryReader(stream);
                     uint magic = reader.ReadUInt32();
 
-                    int origWidth = magic == 0xfcdeabcc ? 0 : reader.ReadInt16();
-                    int origHeight = magic == 0xfcdeabcc ? 0 : reader.ReadInt16();
+                    int origWidth = magic == 0xfcdeabcc || magic == 0xfddeabcc ? 0 : reader.ReadInt16();
+                    int origHeight = magic == 0xfcdeabcc || magic == 0xfddeabcc ? 0 : reader.ReadInt16();
 
-                    byte count = reader.ReadByte();
+                    int frames = magic == 0xfddeabcc ? reader.ReadInt16() : reader.ReadByte();
 
-                    for (int i = 0; i < count; i++)
+                    SpriteData[] sprites = new SpriteData[frames];
+
+                    for (int i = 0; i < frames; i++)
                     {
                         int x = reader.ReadInt16();
                         int y = reader.ReadInt16();
                         int width = reader.ReadInt16();
                         int height = reader.ReadInt16();
-                        if (magic == 0xfcdeabcc)
+                        if (magic == 0xfcdeabcc || magic == 0xfddeabcc)
                         {
                             origWidth = reader.ReadInt16();
                             origHeight = reader.ReadInt16();
@@ -188,17 +190,18 @@ namespace NewWidgets.WinForms
                         int offsetX = reader.ReadInt16();
                         int offsetY = reader.ReadInt16();
                         string texture = reader.ReadString();
-                        int tag = magic == 0xfadeabcc ? (short)-1 : reader.ReadInt16();
 
-                        List<WinFormsSprite.FrameData> frames;
+                        int tag = magic == 0xfadeabcc ? -1 : reader.ReadInt16();
+
+                        List<WinFormsSprite.FrameData> frameData;
 
                         if (string.IsNullOrEmpty(texture))
                             texture = spriteName;
 
-                        if (!atlas.TryGetValue(texture, out frames))
-                            atlas[texture] = frames = new List<WinFormsSprite.FrameData>();
+                        if (!atlas.TryGetValue(texture, out frameData))
+                            atlas[texture] = frameData = new List<WinFormsSprite.FrameData>();
 
-                        frames.Add(new WinFormsSprite.FrameData(x, y, width, height, offsetX, offsetY, tag));
+                        frameData.Add(new WinFormsSprite.FrameData(x, y, width, height, offsetX, offsetY, tag));
                     }
                 }
             }

@@ -49,7 +49,7 @@ namespace NewWidgets.UI
                 m_endCallback = endCallback;
             }
 
-            public bool Update(int elapsed)
+            public bool UpdateAnimator(int elapsed)
             {
                 elapsed = Math.Min(elapsed, m_timeLeft);
                 m_timeLeft -= elapsed;
@@ -121,12 +121,15 @@ namespace NewWidgets.UI
 
         }
 
-        private static void ReSchedule()
+        private static void ReSchedule(bool resetTimer = false)
         {
             if (!s_scheduled)
             {
                 WindowController.Instance.ScheduleAction(Update, 1);
                 s_scheduled = true;
+
+                if (resetTimer)
+                    s_lastUpdate = WindowController.Instance.GetTime();
             }
         }
 
@@ -136,12 +139,11 @@ namespace NewWidgets.UI
             int elapsed = (int)(WindowController.Instance.GetTime() - s_lastUpdate);
             if (elapsed > 0)
             {
-
                 LinkedListNode<BaseAnimatorTask> node = s_tasks.First;
                 while (node != null)
                 {
                     LinkedListNode<BaseAnimatorTask> next = node.Next;
-                    if (node.Value.Update(elapsed))
+                    if (node.Value.UpdateAnimator(elapsed))
                     {
                         s_tasks.Remove(node);
                         node.Value.Complete();   
@@ -179,7 +181,7 @@ namespace NewWidgets.UI
             BaseAnimatorTask task = new InterpolateAnimatorTask<T>(owner, kind, valueFrom, valueTo, time, tick, callback);
             s_tasks.AddLast(task);
 
-            ReSchedule();
+            ReSchedule(s_tasks.Count == 1);
         }
 
         public static void StartCustomAnimation(WindowObject owner, AnimationKind kind, object param, int time, Action<int, object> tick, Action callback)
@@ -190,7 +192,7 @@ namespace NewWidgets.UI
             BaseAnimatorTask task = new CustomAnimatorTask(owner, kind, param, time, tick, callback);
             s_tasks.AddLast(task);
 
-            ReSchedule();
+            ReSchedule(s_tasks.Count == 1);
         }
     }
 }

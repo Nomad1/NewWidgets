@@ -1,42 +1,31 @@
-﻿using System;
+using System;
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetCheckBox : Widget
+    public class WidgetCheckBox : WidgetBackground
     {
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_checkbox", true);
+
         private WidgetImage m_image;
-        private WidgetAlign m_imageAlign;
-        private Margin m_imagePadding;
         private WidgetLabel m_linkedLabel;
 
         private bool m_animating;
-        private bool m_checked;
-        private bool m_hovered;
-
-        private readonly WidgetStyleSheet m_hoveredStyle;
-        private readonly WidgetStyleSheet m_disabledStyle;
 
         public event Action<WidgetCheckBox> OnChecked;
 
         public bool Checked
         {
-            get { return m_checked; }
-            set { m_checked = value; }
+            get { return Selected; }
+            set { Selected = value; }
         }
 
         public string Image
         {
             get { return m_image.Image; }
             set { m_image.Image = value; }
-        }
-
-        public WidgetAlign ImageAlign
-        {
-            get { return m_imageAlign; }
-            set { m_imageAlign = value; }
         }
 
         public WidgetLabel LinkedLabel
@@ -54,51 +43,33 @@ namespace NewWidgets.Widgets
 
         public Margin ImagePadding
         {
-            get { return m_imagePadding; }
-            set { m_imagePadding = value; }
+            get { return GetProperty(WidgetParameterIndex.ButtonImagePadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); }
         }
 
-        public override bool Enabled
-        {
-            get
-            {
-                return base.Enabled;
-            }
-            set
-            {
-                base.Enabled = value;
-
-                if (m_disabledStyle != null)
-                    ApplyStyle(value ? Style : m_disabledStyle);
-            }
-        }
-        
-        public WidgetCheckBox()
-            : this(WidgetManager.DefaultCheckBoxStyle, false)
-        {
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetCheckBox"/> class.
+        /// </summary>
+        /// <param name="isChecked">If set to <c>true</c> is checked.</param>
         public WidgetCheckBox(bool isChecked)
-            : this(WidgetManager.DefaultCheckBoxStyle, isChecked)
+            : this(default(WidgetStyleSheet), isChecked)
         {
         }
-        
-        public WidgetCheckBox(WidgetStyleSheet style, bool isChecked)
-            : base(style)
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetCheckBox"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="isChecked">If set to <c>true</c> is checked.</param>
+        public WidgetCheckBox(WidgetStyleSheet style = default(WidgetStyleSheet), bool isChecked = false)
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
-            m_image = new WidgetImage(WidgetBackgroundStyle.ImageFit, style.GetParameter("check_image"));
+            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style.IsEmpty ? DefaultStyle : style));
             m_image.Parent = this;
-            m_image.Color = style.GetParameterColor("image_color", 0xffffff);
-            m_imagePadding = style.GetParameter<Margin>("image_padding");
 
-            m_imageAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
+            Selected = isChecked;
 
-            Size = style.Size;
-
-            m_checked = isChecked;
-
-            m_hoveredStyle = WidgetManager.GetStyle(style.GetParameter("hovered_style"));
-            m_disabledStyle = WidgetManager.GetStyle(style.GetParameter("disabled_style"));
+            Resize(Size);
         }
 
         protected override void Resize(Vector2 size)
@@ -107,9 +78,24 @@ namespace NewWidgets.Widgets
 
             if (m_image != null)
             {
-                m_image.Size = new Vector2(size.X - m_imagePadding.Width, size.Y - m_imagePadding.Height);
-                m_image.Position = m_imagePadding.TopLeft;
+                m_image.Size = new Vector2(size.X - ImagePadding.Width, size.Y - ImagePadding.Height);
+                m_image.Position = ImagePadding.TopLeft;
             }
+        }
+
+        public override bool SwitchStyle(WidgetStyleType styleType)
+        {
+            if (base.SwitchStyle(styleType))
+            {
+                if (m_image != null)
+                    m_image.SwitchStyle(styleType);
+
+                if (m_linkedLabel != null)
+                    m_linkedLabel.SwitchStyle(styleType);
+
+                return true;
+            }
+            return false;
         }
 
         public override bool Update()
@@ -121,40 +107,31 @@ namespace NewWidgets.Widgets
 
             return true;
         }
-        
-        protected override void ApplyStyle(WidgetStyleSheet style)
-        {
-            m_image.Image = style.GetParameter("check_image");
-            m_image.Color = style.GetParameterColor("image_color", 0xffffff);
-
-            if (m_linkedLabel != null)
-                m_linkedLabel.Color = style.GetParameterColor("text_color", 0xffffff);
-
-            base.ApplyStyle(style);
-        }
 
         protected override void DrawContents(object canvas)
         {
             base.DrawContents(canvas);
 
-            if (!string.IsNullOrEmpty(Image) && (m_checked || m_animating))
-                m_image.Draw(Image);
+            if (m_image != null && (Checked || m_animating))
+                m_image.Draw(canvas);
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
             if (Enabled)
             {
+                if (press)
+                {
+                    return true;
+                } else
                 if (unpress)
                 {
                     Press();
                     return true;
                 }
-                else if (!press && !unpress && !m_hovered && m_hoveredStyle != null)
+                else if (!press && !unpress && !Hovered)
                 {
-                    ApplyStyle(m_hoveredStyle);
-
-                    m_hovered = true;
+                    Hovered = true;
                     WindowController.Instance.OnTouch += UnHoverTouch;
                 }
             }
@@ -164,11 +141,9 @@ namespace NewWidgets.Widgets
 
         private bool UnHoverTouch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (m_hovered && !HitTest(x, y))
+            if (Hovered && !HitTest(x, y))
             {
-                ApplyStyle(Style);
-                
-                m_hovered = false;
+                Hovered = false;
                 WindowController.Instance.OnTouch -= UnHoverTouch;
             }
             return false;
@@ -181,7 +156,7 @@ namespace NewWidgets.Widgets
 
             //GameSound.PlaySound(m_clickSound);
 
-            m_checked = !m_checked;
+            Checked = !Checked;
             
             AnimatePress();
         }
@@ -189,17 +164,18 @@ namespace NewWidgets.Widgets
         protected virtual void AnimatePress()
         {
             m_animating = true;
-            
-            if (m_checked)
+
+            int animateTime = 100;
+            if (Checked)
             {
-                m_image.Position = m_imagePadding.TopLeft + new Vector2(0, 10);
-                m_image.Move(m_imagePadding.TopLeft, 100, AnimateFinished);
-                m_image.FadeTo(1.0f, 100, null);
+                m_image.Position = ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f);
+                m_image.Move(ImagePadding.TopLeft, animateTime, AnimateFinished);
+                m_image.FadeTo(1.0f, animateTime, null);
             } else
             {
-                m_image.Position = m_imagePadding.TopLeft;
-                m_image.Move(m_imagePadding.TopLeft + new Vector2(0, 10), 100, AnimateFinished);
-                m_image.FadeTo(0.0f, 100, null);
+                m_image.Position = ImagePadding.TopLeft;
+                m_image.Move(ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f), animateTime, AnimateFinished);
+                m_image.FadeTo(0.0f, animateTime, null);
             }
         }
 

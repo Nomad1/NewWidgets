@@ -1,4 +1,5 @@
-﻿using NewWidgets.UI;
+using NewWidgets.UI;
+
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -7,38 +8,40 @@ namespace NewWidgets.Widgets
 {
     public class WidgetText : Widget
     {
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_text", true);
+
         private static char[] s_separatorChars = { ' ', '\t' };
 
         private LabelObject[] m_labels;
 
         private string m_text;
-        private Font m_font;
-        private float m_fontSize;
-        private WidgetAlign m_textAlign;
-        private float m_lineSpacing;
 
         private float m_maxWidth;
 
         private bool m_needLayout;
 
-        private bool m_richText;
-
         public Font Font
         {
-            get { return m_font; }
-            set { m_font = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
+            set { SetProperty(WidgetParameterIndex.Font, value); m_needLayout = true; }
         }
 
         public float FontSize
         {
-            get { return m_fontSize; }
-            set { m_fontSize = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
+            set { SetProperty(WidgetParameterIndex.FontSize, value); m_needLayout = true; }
+        }
+
+        public WidgetAlign TextAlign
+        {
+            get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
+            set { SetProperty(WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
         }
 
         public float LineSpacing
         {
-            get { return m_lineSpacing; }
-            set { m_lineSpacing = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.LineSpacing, 5.0f); }
+            set { SetProperty(WidgetParameterIndex.LineSpacing, value); m_needLayout = true; }
         }
 
         public float MaxWidth
@@ -63,25 +66,19 @@ namespace NewWidgets.Widgets
 
         public bool RichText
         {
-            get { return m_richText; }
-            set { m_richText = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.RichText, true); }
+            set { SetProperty(WidgetParameterIndex.RichText, value); m_needLayout = true; }
         }
 
-        public WidgetAlign TextAlign
+        public int Color
         {
-            get { return m_textAlign; }
-            set { m_textAlign = value; m_needLayout = true; }
-        }
-
-        public override int Color
-        {
-            get { return base.Color; }
+            get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
             set
             {
-                base.Color = value;
+                SetProperty(WidgetParameterIndex.TextColor, value);
 
                 if (m_labels != null)
-                    foreach (LabelObject label in m_labels)
+                    foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
                         label.Color = value;
             }
         }
@@ -94,7 +91,7 @@ namespace NewWidgets.Widgets
                 base.Alpha = value;
 
                 if (m_labels != null)
-                    foreach (LabelObject label in m_labels)
+                    foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
                         label.Alpha = value;
             }
         }
@@ -104,23 +101,16 @@ namespace NewWidgets.Widgets
             get { return m_labels == null ? 0 : m_labels.Length; }
         }
 
-        public WidgetText(string text = "")
-            : this(WidgetManager.DefaultLabelStyle, text)
+        public WidgetText(string text)
+            : this(default(WidgetStyleSheet), text)
         {
         }
 
-        public WidgetText(WidgetStyleSheet style, string text = "")
-            : base(style)
+        public WidgetText(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
+            : base(style.IsEmpty? DefaultStyle : style)
         {
             m_text = text;
-            m_textAlign = WidgetAlign.Left | WidgetAlign.Top;
             m_needLayout = true;
-
-            m_lineSpacing = 5;
-            m_font = style.Font;
-            m_fontSize = style.FontSize;
-            m_richText = true;
-            base.Color = style.Color;
         }
 
         protected override void Resize(Vector2 size)
@@ -134,33 +124,33 @@ namespace NewWidgets.Widgets
         {
             string[] lines = m_text.Split(new string[] { "\r", "\n", "|n", "\\n" }, StringSplitOptions.None);
 
-            float lineHeight = (m_font.Height + m_lineSpacing) * m_fontSize; // TODO: spacing
+            float lineHeight = (Font.Height + LineSpacing) * FontSize; // TODO: spacing
 
             Vector2 maxSize = Vector2.Zero;
             Vector2[] sizes = new Vector2[lines.Length];
             LabelObject.TextSpan[][] colors = null;
 
 
-            if (m_richText)
+            if (RichText)
                 colors = new LabelObject.TextSpan[lines.Length][];
 
             for (int i = 0; i < lines.Length; i++)
             {
                 string line = lines[i];
 
-                if (m_richText)
-                    line = LabelObject.ParseRichText(line, Color, out colors[i], m_font.SpaceWidth + m_font.Spacing);
+                if (RichText)
+                    line = LabelObject.ParseRichText(line, Color, out colors[i], Font.SpaceWidth + Font.Spacing);
 
-                Vector2 size = m_font.MeasureString(line);
+                Vector2 size = Font.MeasureString(line);
 
-                size = new Vector2(size.X * m_fontSize, lineHeight);
+                size = new Vector2(size.X * FontSize, lineHeight);
                 maxSize = new Vector2(Math.Max(size.X, maxSize.X), size.Y + maxSize.Y);
 
                 sizes[i] = size;
                 lines[i] = line;
             }
 
-            if (m_maxWidth == 0 || m_maxWidth > maxSize.X)
+            if (m_maxWidth <= 0 || m_maxWidth > maxSize.X)
             {
                 Size = new Vector2(Math.Max(maxSize.X, Size.X), Math.Max(Size.Y, maxSize.Y));
             }
@@ -176,7 +166,7 @@ namespace NewWidgets.Widgets
                 {
                     if (sizes[i].X > m_maxWidth)
                     {
-                        float[] charSizes = m_font.MeasureChars(lines[i]);
+                        float[] charSizes = Font.MeasureChars(lines[i]);
 
                         float width = 0;
                         int lastSeparator = -1;
@@ -187,7 +177,7 @@ namespace NewWidgets.Widgets
                             if (Array.IndexOf(s_separatorChars, lines[i][j]) != -1)
                                 lastSeparator = j;
 
-                            width += charSizes[j] * m_fontSize;
+                            width += charSizes[j] * FontSize;
 
                             if (width > m_maxWidth)
                             {
@@ -199,11 +189,11 @@ namespace NewWidgets.Widgets
 
                                 width = 0;
                                 for (int k = start; k < lastSeparator; k++)
-                                    width += charSizes[k] * m_fontSize;
+                                    width += charSizes[k] * FontSize;
 
                                 newSizes.Add(new Vector2(width, lineHeight));
 
-                                if (m_richText)
+                                if (RichText)
                                     newColors.Add(new ArraySegment<LabelObject.TextSpan>(colors[i], start, lastSeparator - start));
 
                                 if (lines[i][lastSeparator] == ' ') // skip line start space
@@ -213,7 +203,7 @@ namespace NewWidgets.Widgets
                                 width = 0;
 
                                 for (int k = lastSeparator; k <= j; k++)
-                                    width += charSizes[k] * m_fontSize;
+                                    width += charSizes[k] * FontSize;
 
                                 lastSeparator = -1;
                             }
@@ -224,7 +214,7 @@ namespace NewWidgets.Widgets
                             newLines.Add(lines[i].Substring(start));
                             newSizes.Add(new Vector2(width, lineHeight));
 
-                            if (m_richText)
+                            if (RichText)
                                 newColors.Add(new ArraySegment<LabelObject.TextSpan>(colors[i], start, colors[i].Length - start));
                         }
 
@@ -233,14 +223,14 @@ namespace NewWidgets.Widgets
                     {
                         newLines.Add(lines[i]);
                         newSizes.Add(sizes[i]);
-                        if (m_richText)
+                        if (RichText)
                             newColors.Add(new ArraySegment<LabelObject.TextSpan>(colors[i]));
                     }
                 }
                 lines = newLines.ToArray();
                 sizes = newSizes.ToArray();
 
-                if (m_richText)
+                if (RichText)
                 {
                     LabelObject.TextSpan[][] newColorsArray = new LabelObject.TextSpan[newColors.Count][];
                     for (int i = 0; i < newColors.Count; i++)
@@ -263,20 +253,20 @@ namespace NewWidgets.Widgets
 
             for (int i = 0; i < lines.Length; i++)
             {
-                LabelObject label = new LabelObject(this, m_font, string.Empty, LabelAlign.Start, LabelAlign.Start, false);
+                LabelObject label = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, false);
                 label.Color = Color;
-                label.Scale = m_fontSize;
+                label.Scale = FontSize;
                 label.Alpha = Alpha;
                 label.Text = lines[i];
 
-                if (m_richText)
+                if (RichText)
                     label.SetColors(colors[i]);
 
                 float x = 0;
 
-                if ((m_textAlign & WidgetAlign.HorizontalCenter) == WidgetAlign.HorizontalCenter)
+                if ((TextAlign & WidgetAlign.HorizontalCenter) == WidgetAlign.HorizontalCenter)
                     x = (Size.X - sizes[i].X) / 2;
-                else if ((m_textAlign & WidgetAlign.Right) == WidgetAlign.Right)
+                else if ((TextAlign & WidgetAlign.Right) == WidgetAlign.Right)
                     x = Size.X - sizes[i].X;
 
                 label.Position = new Vector2(x, y);
@@ -296,7 +286,6 @@ namespace NewWidgets.Widgets
 
             if (m_needLayout)
                 Relayout();
-
 
             if (m_labels != null)
                 foreach (LabelObject label in m_labels)

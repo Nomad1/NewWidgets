@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
@@ -6,7 +6,7 @@ using NewWidgets.Utility;
 namespace NewWidgets.Widgets
 {
     [Flags]
-    public enum ButtonLayout
+    public enum WidgetButtonLayout
     {
         Center = 0,
         ImageLeft = 0x01,
@@ -15,31 +15,31 @@ namespace NewWidgets.Widgets
         TextRight = 0x08
     }
 
-    public class WidgetButton : Widget
+    public class WidgetButton : WidgetBackground
     {
-        private WidgetLabel m_label;
-        private Margin m_textPadding;
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_button", true);
 
+        private WidgetLabel m_label;
         private WidgetImage m_image;
-        private Margin m_imagePadding;
 
         private string m_clickSound;
 
-        private WidgetStyleSheet m_hoveredStyle;
-        private WidgetStyleSheet m_disabledStyle;
-
         private bool m_animating;
-        private bool m_hovered;
-        private bool m_selected;
         private bool m_overridePress;
 
         public event Action<WidgetButton> OnPress;
         public event Action<WidgetButton> OnHover;
         public event Action<WidgetButton> OnUnhover;
 
-        private ButtonLayout m_layout;
-
         private bool m_needLayout;
+
+        // Dynamic properties
+
+        public string Text
+        {
+            get { return m_label.Text; }
+            set { m_label.Text = value; m_needLayout = true; }
+        }
 
         public string Image
         {
@@ -47,28 +47,18 @@ namespace NewWidgets.Widgets
             set { m_image.Image = value; m_needLayout = true; }
         }
 
+        // Forwarded style properties
+
         public int ImageTint
         {
             get { return m_image.Color; }
             set { m_image.Color = value; }
         }
 
-        public ButtonLayout Layout
+        public int TextColor
         {
-            get { return m_layout; }
-            set { m_layout = value; m_needLayout = true; }
-        }
-
-        public Margin ImagePadding
-        {
-            get { return m_imagePadding; }
-            set { m_imagePadding = value; m_needLayout = true; }
-        }
-
-        public float FontSize
-        {
-            get { return m_label.FontSize; }
-            set { m_label.FontSize = value; m_needLayout = true; }
+            get { return m_label.Color; }
+            set { m_label.Color = value; }
         }
 
         public Font Font
@@ -77,23 +67,51 @@ namespace NewWidgets.Widgets
             set { m_label.Font = value; m_needLayout = true; }
         }
 
-        public string Text
+        public float FontSize
         {
-            get { return m_label.Text; }
-            set { m_label.Text = value; m_needLayout = true; }
+            get { return m_label.FontSize; }
+            set { m_label.FontSize = value; m_needLayout = true; }
         }
-        
-        public int TextColor
+
+        // Own style properties
+
+        public WidgetButtonLayout Layout
         {
-            get { return m_label.Color; }
-            set { m_label.Color = value; }
+            get { return GetProperty(WidgetParameterIndex.ButtonLayout, WidgetButtonLayout.Center); }
+            set { SetProperty(WidgetParameterIndex.ButtonLayout, value); m_needLayout = true; }
+        }
+
+        public Margin ImagePadding
+        {
+            get { return GetProperty(WidgetParameterIndex.ButtonImagePadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); m_needLayout = true; }
         }
 
         public Margin TextPadding
         {
-            get { return m_textPadding; }
-            set { m_textPadding = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.ButtonTextPadding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.ButtonTextPadding, value); m_needLayout = true; }
         }
+
+        public Vector2 AnimatePivot
+        {
+            get { return GetProperty(WidgetParameterIndex.ButtonAnimatePivot, new Vector2(0.5f, 0.5f)); }
+            set { SetProperty(WidgetParameterIndex.ButtonAnimatePivot, value); }
+        }
+
+        public int AnimateTime
+        {
+            get { return GetProperty(WidgetParameterIndex.ButtonAnimateTime, 100); }
+            set { SetProperty(WidgetParameterIndex.ButtonAnimateTime, value); }
+        }
+
+        public float AnimateScale
+        {
+            get { return GetProperty(WidgetParameterIndex.ButtonAnimateScale, 0.95f); }
+            set { SetProperty(WidgetParameterIndex.ButtonAnimateScale, value); }
+        }
+
+        // Button properties
 
         public string ClickSound
         {
@@ -103,46 +121,10 @@ namespace NewWidgets.Widgets
         
         public bool OverridePress
         {
-            get
-            {
-                return m_overridePress;
-            }
-            set
-            {
-                m_overridePress = value;
-            }
+            get { return m_overridePress; }
+            set { m_overridePress = value; }
         }
-        
-        public override bool Enabled
-        {
-            get
-            {
-                return base.Enabled;
-            }
-            set
-            {
-                base.Enabled = value;
-                
-                if (m_disabledStyle != null)
-                    DelayedApplyStyle(value ? Style : m_disabledStyle);
-            }
-        }
-
-        public bool Selected
-        {
-            get
-            {
-                return m_selected;
-            }
-            set
-            {
-                m_selected = value;
-
-                if (m_hoveredStyle != null)
-                    DelayedApplyStyle(value ? Style : m_hoveredStyle);
-            }
-        }
-
+       
         protected WidgetImage InternalImage
         {
             get { return m_image; }
@@ -152,37 +134,66 @@ namespace NewWidgets.Widgets
         {
             get { return m_label; }
         }
-        
-        public WidgetButton(string text = "")
-            : this(WidgetManager.DefaultButtonStyle, text)
+
+        public override float Alpha
+        {
+            get { return base.Alpha;}
+            set
+            {
+                base.Alpha = value;
+                if (m_image != null)
+                    m_image.Alpha = value;
+
+                if (m_label != null)
+                    m_label.Alpha = value;
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetButton"/> class.
+        /// </summary>
+        /// <param name="text">Text.</param>
+        public WidgetButton(string text)
+            : this(default(WidgetStyleSheet), text)
         {
         }
 
-        public WidgetButton(WidgetStyleSheet style, string text = "")
-            : base(style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetButton"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="text">Text.</param>
+        public WidgetButton(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
+           : base(style.IsEmpty ? DefaultStyle : style)
         {
+
             m_needLayout = true;
 
-            m_label = new WidgetLabel();
-            m_label.Color = style.GetParameterColor("text_color", 0x0);
-            m_label.FontSize = style.FontSize;
-            m_label.Font = style.Font;
-            m_label.Text = text;
+            WidgetStyleSheet buttonTextStyle = GetProperty(WidgetParameterIndex.ButtonTextStyle, default(WidgetStyleSheet));
+
+            if (buttonTextStyle.IsEmpty)
+                m_label = new WidgetLabel(m_styles, text); // label will use the same stylesheet as the button
+            else
+                m_label = new WidgetLabel(buttonTextStyle, text);
+
             m_label.Parent = this;
-            m_layout = ButtonLayout.Center;
-            m_textPadding = style.Padding;
 
-            m_image = new WidgetImage(WidgetBackgroundStyle.None, string.Empty);
+            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style.IsEmpty ? DefaultStyle : style));
             m_image.Parent = this;
-            m_image.Color = style.GetParameterColor("image_color", 0xffffff);
-            m_imagePadding = style.GetParameter<Margin>("image_padding");
-
-            m_hoveredStyle = WidgetManager.GetStyle(style.GetParameter("hovered_style"));
-            m_disabledStyle = WidgetManager.GetStyle(style.GetParameter("disabled_style"));
 
             m_clickSound = "click";
+        }
 
-            Size = style.Size;
+        public override bool SwitchStyle(WidgetStyleType styleType)
+        {
+            if (base.SwitchStyle(styleType))
+            {
+                m_label.SwitchStyle(styleType);
+                m_image.SwitchStyle(styleType);
+
+                return true;
+            }
+            return false;
         }
 
         protected override void Resize(Vector2 size)
@@ -197,38 +208,39 @@ namespace NewWidgets.Widgets
             if (m_label != null && (Size.X <= 0 || Size.Y <= 0))
             {
                 m_label.Relayout();
-                Size = new Vector2(Math.Max(m_textPadding.Width + m_label.Size.X, m_imagePadding.Width + m_image.Size.X), Math.Max(m_textPadding.Height + m_label.Size.Y, m_imagePadding.Height + m_image.Size.Y));
+
+                Size = new Vector2(Math.Max(TextPadding.Width + m_label.Size.X, ImagePadding.Width + m_image.Size.X), Math.Max(TextPadding.Height + m_label.Size.Y, ImagePadding.Height + m_image.Size.Y));
             }
 
             if (m_label != null && !string.IsNullOrEmpty(m_label.Text))
             {
-                if ((m_layout & ButtonLayout.TextLeft) != 0)
+                if ((Layout & WidgetButtonLayout.TextLeft) != 0)
                 {
-                    m_label.Size = new Vector2(Size.X - m_textPadding.Width, Size.Y - m_textPadding.Height);
-                    m_label.Position = m_textPadding.TopLeft;
+                    m_label.Size = new Vector2(Size.X - TextPadding.Width, Size.Y - TextPadding.Height);
+                    m_label.Position = TextPadding.TopLeft;
                     m_label.TextAlign = WidgetAlign.Left | WidgetAlign.Top;
                 }
                 else
                 {
                     m_label.TextAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
-                    m_label.Size = new Vector2(Size.X - m_textPadding.Width, Size.Y - m_textPadding.Height);
-                    m_label.Position = m_textPadding.TopLeft;
+                    m_label.Size = new Vector2(Size.X - TextPadding.Width, Size.Y - TextPadding.Height);
+                    m_label.Position = TextPadding.TopLeft;
                 }
             }
 
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
             {
-                if ((m_layout & ButtonLayout.ImageLeft) != 0)
+                if ((Layout & WidgetButtonLayout.ImageLeft) != 0)
                 {
-                    m_image.Size = new Vector2(Size.X - m_imagePadding.Width, Size.Y - m_imagePadding.Height);
+                    m_image.Size = new Vector2(Size.X - ImagePadding.Width, Size.Y - ImagePadding.Height);
                     m_image.ImageStyle = WidgetBackgroundStyle.ImageTopLeft;
                     m_image.ImagePivot = new Vector2(0, 0);
-                    m_image.Position = m_imagePadding.TopLeft;
+                    m_image.Position = ImagePadding.TopLeft;
                 }
                 else
                 {
-                    m_image.Size = new Vector2(Size.X - m_imagePadding.Width, Size.Y - m_imagePadding.Height);
-                    m_image.Position = m_imagePadding.TopLeft;
+                    m_image.Size = new Vector2(Size.X - ImagePadding.Width, Size.Y - ImagePadding.Height);
+                    m_image.Position = ImagePadding.TopLeft;
                     m_image.ImageStyle = WidgetBackgroundStyle.ImageFit;
                 }
             }
@@ -270,58 +282,25 @@ namespace NewWidgets.Widgets
             base.DrawContents(canvas);
             
             if (!string.IsNullOrEmpty(Image))
-                m_image.Draw(Image);
+                m_image.Draw(canvas);
             
             if (!string.IsNullOrEmpty(Text))
                 m_label.Draw(canvas);
         }
 
-        protected void DelayedApplyStyle(WidgetStyleSheet style)
-        {
-            Animator.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, 
-                delegate { 
-                    ApplyStyle(style);
-                });
-
-        }
-
-        protected override void ApplyStyle(WidgetStyleSheet style)
-        {
-            m_label.Color = style.GetParameterColor("text_color", 0x0);
-
-            string hoveredStyle = style.GetParameter("hovered_style");
-
-            if (hoveredStyle != null)
-                m_hoveredStyle = WidgetManager.GetStyle(hoveredStyle);
-
-            string disabledStyle = style.GetParameter("disabled_style");
-
-            if (disabledStyle != null)
-                m_disabledStyle = WidgetManager.GetStyle(disabledStyle);
-
-            int color = style.GetParameterColor("image_color", -1);
-
-            if (color != -1)
-                m_image.Color = color;
-
-
-            //TextAlign = style.Align;
-            
-            base.ApplyStyle(style);
-        }
         
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (Enabled)
+            //if (Enabled)
             {
-                if (press)
+                if (Enabled && press)
                 {
                     if (!m_overridePress)
                     {
                         return true;
                     }
                 } else
-                if (unpress)
+                if (Enabled && unpress)
                 {
                     if (!m_overridePress)
                     {
@@ -329,15 +308,9 @@ namespace NewWidgets.Widgets
                         return true;
                     }
                 }
-                else if (!press && !unpress && !m_hovered)
+                else if (!press && !unpress && !Hovered)
                 {
-                    if (!m_selected)
-                    {
-                        if (m_hoveredStyle != null)
-                            DelayedApplyStyle(m_hoveredStyle);
-                    }
-
-                    m_hovered = true;
+                    Hovered = true;
                     WindowController.Instance.OnTouch += UnHoverTouch;
 
                     if (OnHover != null)
@@ -350,15 +323,9 @@ namespace NewWidgets.Widgets
 
         private bool UnHoverTouch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (Enabled && m_hovered && !HitTest(x, y))
+            if (Hovered && !HitTest(x, y))
             {
-                if (!m_selected)
-                {
-                    if (m_hoveredStyle != null)
-                        DelayedApplyStyle(Style);
-                }
-
-                m_hovered = false;
+                Hovered = false;
                 WindowController.Instance.OnTouch -= UnHoverTouch;
 
                 if (OnUnhover != null)
@@ -386,12 +353,16 @@ namespace NewWidgets.Widgets
             if (immediate)
                 SchedulePress();
 
+            Vector2 animatePivot = AnimatePivot; // center point compensation
+            float animateTo = AnimateScale; // scales down to this value
+            int animateTime = AnimateTime; // animations takes animateTime*2 milliseconds
+
             m_animating = true;
             float startScale = Scale;
-            ScaleTo(startScale * 0.95f, 100,
+            ScaleTo(startScale * animateTo, animateTime,
                 delegate
                 {
-                    ScaleTo(startScale, 100,
+                    ScaleTo(startScale, animateTime,
                         delegate
                         {
                             m_animating = false;
@@ -400,14 +371,17 @@ namespace NewWidgets.Widgets
                         }
                     );
                 });
-            
-            // compensate non-center pivot point
-            Vector2 startPosition = Position;
-            Move(startPosition + (Size * startScale * 0.5f) * (1 - 0.95f), 100,
-                delegate
-                {
-                    Move(startPosition, 100, null);
-                });
+
+            // compensate non-center pivot point. Not needed if pivot is top-left
+            if (animatePivot.LengthSquared() > 0)
+            {
+                Vector2 startPosition = Position;
+                Move(startPosition + (Size * startScale * animatePivot) * (1.0f - animateTo), animateTime,
+                    delegate
+                    {
+                        Move(startPosition, animateTime, null);
+                    });
+            }
         }
 
         protected void SchedulePress()

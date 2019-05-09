@@ -36,19 +36,19 @@ namespace NewWidgets.WinFormsSample
         protected DialogWindow(string title, string text, string yesText, string noText)
             : base(WindowFlags.CustomAnim | WindowFlags.Blackout)
         {
-            m_panel = new WidgetPanel(WidgetManager.GetStyle("dialog_window"));
-			Vector2 size = m_panel.Size;
+            m_panel = new WidgetWindow(WidgetManager.GetStyle("dialog_window"));
+            Vector2 size = m_panel.Size;
 
-			m_text = new WidgetText(WidgetManager.DefaultLabelStyle);
-			m_text.Text = text;
-			m_text.Size = new Vector2(size.X, 0);
-			m_text.MaxWidth = size.X - 40;
-			m_text.FontSize = WidgetManager.DefaultLabelStyle.FontSize * 1.25f;
-			m_text.TextAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
-			m_text.Relayout();
-			size = m_panel.Size = m_panel.Size + new Vector2(0, m_text.Size.Y - 80);
-			m_text.Position = new Vector2(0, size.Y / 2 - m_text.Size.Y / 2);
-			m_panel.AddChild(m_text);
+            m_text = new WidgetText();
+            m_text.Text = text;
+            m_text.Size = new Vector2(size.X, 0);
+            m_text.MaxWidth = size.X - 40;
+            m_text.FontSize *= 1.25f;
+            m_text.TextAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
+            m_text.Relayout();
+            size = m_panel.Size = m_panel.Size + new Vector2(0, m_text.Size.Y - 80);
+            m_text.Position = new Vector2(0, size.Y / 2 - m_text.Size.Y / 2);
+            m_panel.AddChild(m_text);
 
             Size = size;
 
@@ -85,7 +85,7 @@ namespace NewWidgets.WinFormsSample
             m_title.Text = title;
             m_title.Size = new Vector2(size.X, 50);
             m_title.Position = new Vector2(0, 20);
-            m_title.FontSize = WidgetManager.DefaultLabelStyle.FontSize * 1.5f;
+            m_title.FontSize *= 1.5f;
             m_title.TextAlign = WidgetAlign.Top | WidgetAlign.HorizontalCenter;
             m_panel.AddChild(m_title);
 

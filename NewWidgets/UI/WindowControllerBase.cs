@@ -7,7 +7,7 @@ namespace NewWidgets.UI
     public delegate bool TouchDelegate(float x, float y, bool press, bool unpress, int pointer);
 
     public abstract class WindowController
-	{
+    {
         private static WindowController s_instance;
 
         public static WindowController Instance
@@ -38,13 +38,13 @@ namespace NewWidgets.UI
         /// Gets the height of the screen in pixels
         /// </summary>
         /// <value>The height of the screen.</value>
-		public abstract int ScreenHeight { get; }
+        public abstract int ScreenHeight { get; }
 
         /// <summary>
         /// Gets the screen scale for UI auto-scaling
         /// </summary>
         /// <value>The screen scale.</value>
-		public abstract float ScreenScale { get; }
+        public abstract float ScreenScale { get; }
 
         /// <summary>
         /// Gets the button scale to avoid huge buttons on tablets and small on phones
@@ -56,7 +56,7 @@ namespace NewWidgets.UI
         /// Gets a value indicating whether device is a mobile phone (less than 6" or something else)
         /// </summary>
         /// <value><c>true</c> if is small screen; otherwise, <c>false</c>.</value>
-		public abstract bool IsTouchScreen { get; }
+        public abstract bool IsTouchScreen { get; }
 
         /// <summary>
         /// Gets last mouse or touch position
@@ -72,7 +72,7 @@ namespace NewWidgets.UI
         /// List of currently displayed windows
         /// </summary>
         /// <value>The windows.</value>
-		public abstract IList<Window> Windows { get; }
+        public abstract IList<Window> Windows { get; }
 
         /// <summary>
         /// Adds new window to Windows collection
@@ -129,7 +129,7 @@ namespace NewWidgets.UI
         /// </summary>
         /// <param name="error">Error.</param>
         /// <param name="parameters">Parameters.</param>
-        public abstract void LogError(string error, params object [] parameters);
+        public abstract void LogError(string error, params object[] parameters);
 
         /// <summary>
         /// Schedule action

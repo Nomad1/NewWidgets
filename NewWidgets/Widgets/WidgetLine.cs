@@ -9,13 +9,16 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetLine : WidgetImage
+    public class WidgetLine : WidgetBackground
     {
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_line", true);
+
         private Vector2 m_from;
         private Vector2 m_to;
         private float m_gap;
         private float m_width;
         private int m_angleSnap;
+        private bool m_simpleLine;
 
         private bool m_needLayout;
 
@@ -49,8 +52,14 @@ namespace NewWidgets.Widgets
             set { m_width = value; m_needLayout = true; }
         }
 
+        public int Color
+        {
+            get { return BackgroundColor; }
+            set { BackgroundColor = value; }
+        }
+
         /// <summary>
-        /// Draws a white line
+        /// Draws a line
         /// </summary>
         /// <param name="from">From position</param>
         /// <param name="to">To position</param>
@@ -58,40 +67,71 @@ namespace NewWidgets.Widgets
         /// <param name="width">Width</param>
         /// <param name="angleSnap">Angle snap</param>
         public WidgetLine(Vector2 from, Vector2 to, float gap = 0, float width = 4, int angleSnap = 180)
-            : base(WidgetBackgroundStyle.ThreeImage, "line_3") // TODO: no constant images!
+            : base(DefaultStyle)
         {
-            ImagePivot = new Vector2(0.5f, 0f);
-            Alpha = 0.8f;
             m_from = from;
             m_to = to;
             m_gap = gap;
             m_width = width;    
             m_angleSnap = angleSnap;
             m_needLayout = true;
+            m_simpleLine = false;
         }
 
-        private new void Relayout()
+        /// <summary>
+        /// Draws a simple line
+        /// </summary>
+        /// <param name="style">Style.</param>
+        public WidgetLine(WidgetStyleSheet style = default(WidgetStyleSheet))
+           : base(style.IsEmpty ? DefaultStyle : style)
         {
-            Vector2 direction = m_from - m_to;
+            m_simpleLine = true;
+            m_from = Vector2.Zero;
+            m_to = Vector2.Zero;
+            m_gap = 0;
+            m_width = 2;
+            m_angleSnap = 0;
+            m_needLayout = true;
+        }
 
-            float distance = direction.Length();
+        protected override void Resize(Vector2 size)
+        {
+            base.Resize(size);
 
-            direction /= distance;
+            if (m_simpleLine)
+            {
+                m_from = new Vector2(0, size.Y / 2);
+                m_to = new Vector2(size.X, size.Y / 2);
+                m_width = size.Y / 2;
+                m_needLayout = true;
+            }
+        }
 
-            distance -= m_gap * 2;
+        private void Relayout()
+        {
+            if (!m_simpleLine)
+            {
+                Vector2 direction = m_from - m_to;
 
-            Size = new Vector2(distance, m_width);
+                float distance = direction.Length();
 
-            if (m_angleSnap != 0)
-                Rotation = (float)Math.Round(Math.Atan2(direction.Y, direction.X) * MathHelper.Rad2Deg / m_angleSnap, MidpointRounding.AwayFromZero) * m_angleSnap;
-            else
-                Rotation = (float)(Math.Atan2(direction.Y, direction.X) * MathHelper.Rad2Deg);
+                direction /= distance;
 
-            double angle = MathHelper.Deg2Rad * Rotation;
+                distance -= m_gap * 2;
 
-            direction = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
+                Size = new Vector2(distance, m_width);
 
-            Position = m_to + (direction) * m_gap;// - new Vector2(0, m_width / 2);
+                if (m_angleSnap != 0)
+                    Rotation = (float)Math.Round(Math.Atan2(direction.Y, direction.X) * MathHelper.Rad2Deg / m_angleSnap, MidpointRounding.AwayFromZero) * m_angleSnap;
+                else
+                    Rotation = (float)(Math.Atan2(direction.Y, direction.X) * MathHelper.Rad2Deg);
+
+                double angle = MathHelper.Deg2Rad * Rotation;
+
+                direction = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle));
+
+                Position = m_to + (direction) * m_gap;// - new Vector2(0, m_width / 2);
+            }
 
             m_needLayout = false;
         }

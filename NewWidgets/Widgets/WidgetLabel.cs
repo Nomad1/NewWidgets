@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Numerics;
 using NewWidgets.UI;
 
@@ -12,35 +12,46 @@ namespace NewWidgets.Widgets
 {
     public class WidgetLabel : Widget
     {
+        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_label", true);
+
         private LabelObject m_label;
 
         private string m_text;
-        private Font m_font;
-        private float m_fontSize;
-        private WidgetAlign m_textAlign;
 
         private bool m_needLayout;
         private bool m_needAnimate;
         private bool m_needAnimateRandom;
         
-        private bool m_richText;
-        
         public Font Font
         {
-            get { return m_font; }
-            set { m_font = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
+            set { SetProperty(WidgetParameterIndex.Font, value); m_needLayout = true; }
         }
 
         public float FontSize
         {
-            get { return m_fontSize; }
-            set { m_fontSize = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
+            set { SetProperty(WidgetParameterIndex.FontSize, value); m_needLayout = true; }
+        }
+
+        public WidgetAlign TextAlign
+        {
+            get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
+            set { SetProperty(WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
         }
 
         public bool RichText
         {
-            get { return m_richText; }
-            set { m_richText = value; if (m_label != null) m_label.RichText = value; m_needLayout = true; }
+            get { return GetProperty(WidgetParameterIndex.RichText, false); }
+            set
+            {
+                SetProperty(WidgetParameterIndex.RichText, value);
+
+                if (m_label != null)
+                    m_label.RichText = value;
+
+                m_needLayout = true;
+            }
         }
 
         public string Text
@@ -59,16 +70,16 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public WidgetAlign TextAlign
+        public int Color
         {
-            get { return m_textAlign; }
-            set { m_textAlign = value; m_needLayout = true; }
-        }
+            get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
+            set
+            {
+                SetProperty(WidgetParameterIndex.TextColor, value);
 
-        public override int Color
-        {
-            get { return base.Color; }
-            set { base.Color = value; if (m_label != null) m_label.Color = value; }
+                if (m_label != null) // try to avoid settings m_needLayout
+                    m_label.Color = value;
+            }
         }
 
         public override float Alpha
@@ -76,49 +87,60 @@ namespace NewWidgets.Widgets
             get { return base.Alpha; }
             set
             {
-                base.Alpha = value; if (m_label != null) m_label.Alpha = value;
+                base.Alpha = value;
+                if (m_label != null) // try to avoid settings m_needLayout
+                    m_label.Alpha = value;
             }
         }
-        
-        public WidgetLabel()
-            : this(WidgetManager.DefaultLabelStyle, string.Empty)
-        {
-        }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetLabel"/> class.
+        /// </summary>
+        /// <param name="text">Text.</param>
         public WidgetLabel(string text)
-            : this(WidgetManager.DefaultLabelStyle, text)
+            : this(default(WidgetStyleSheet), text)
         {
         }
-        
-        public WidgetLabel(WidgetStyleSheet style, string text)
-            : base(style)
-        {
-            m_needLayout = true;
-            m_text = text;
 
-            m_textAlign = WidgetAlign.Left | WidgetAlign.Top;
-            
-            m_font = style.Font;
-            m_fontSize = style.FontSize;
-			base.Color = style.GetParameterColor("text_color", 0x0);
-            m_richText = true;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetLabel"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="text">Text.</param>
+        public WidgetLabel(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
+           : base(style.IsEmpty ? DefaultStyle : style)
+        {
+            Text = text;
+        }
+
+        internal WidgetLabel(WidgetStyleSheet [] styles, string text = "")
+           : base(styles)
+        {
+            Text = text;
+        }
+
+        public override bool SwitchStyle(WidgetStyleType styleType)
+        {
+            if (base.SwitchStyle(styleType))
+            {
+                m_needLayout = true;
+                return true;
+            }
+            return false;
         }
 
         public void Relayout()
         {
             if (m_label == null)
-            {
-                m_label = new LabelObject(this, m_font, string.Empty,
-                    LabelAlign.Start, LabelAlign.Start, m_richText);
-            }
+                m_label = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, RichText);
             
-            m_label.Color = base.Color;
+            m_label.Color = Color;
             m_label.Alpha = Alpha;
-            m_label.Scale = m_fontSize;
+            m_label.Scale = FontSize;
             
             m_label.Text = m_text;
 
-            Vector2 minSize = m_label.Size * m_fontSize;
+            Vector2 minSize = m_label.Size * FontSize;
             if (minSize.X < Size.X)
                 minSize.X = Size.X;
             if (minSize.Y < Size.Y)
@@ -133,20 +155,20 @@ namespace NewWidgets.Widgets
 
         private void RelayoutText()
         {
-            Vector2 labelSize = m_label.Size * m_fontSize;
+            Vector2 labelSize = m_label.Size * FontSize;
 
             float x = 0;
 
-            if ((m_textAlign & WidgetAlign.HorizontalCenter) == WidgetAlign.HorizontalCenter)
+            if ((TextAlign & WidgetAlign.HorizontalCenter) == WidgetAlign.HorizontalCenter)
                 x = (Size.X - labelSize.X) / 2;
-            else if ((m_textAlign & WidgetAlign.Right) == WidgetAlign.Right)
+            else if ((TextAlign & WidgetAlign.Right) == WidgetAlign.Right)
                 x = Size.X - labelSize.X;
 
             float y = 0;
 
-            if ((m_textAlign & WidgetAlign.VerticalCenter) == WidgetAlign.VerticalCenter)
+            if ((TextAlign & WidgetAlign.VerticalCenter) == WidgetAlign.VerticalCenter)
                 y = (Size.Y - labelSize.Y) / 2;
-            else if ((m_textAlign & WidgetAlign.Bottom) == WidgetAlign.Bottom)
+            else if ((TextAlign & WidgetAlign.Bottom) == WidgetAlign.Bottom)
                 y = Size.Y - labelSize.Y;
 
             m_label.Position = new Vector2(x, y);

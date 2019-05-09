@@ -7,7 +7,7 @@ using NewWidgets.UI;
 
 namespace NewWidgets.Widgets
 {
-    public static class WidgetManager
+    public static partial class WidgetManager
     {
         // 
         private static float s_fontScale;
@@ -15,16 +15,6 @@ namespace NewWidgets.Widgets
 
         private static Widget s_currentTooltip;
 
-        // styles
-        private static WidgetStyleSheet s_defaultWidgetStyle;
-        private static WidgetStyleSheet s_defaultWindowStyle;
-        private static WidgetStyleSheet s_defaultPanelStyle;
-        private static WidgetStyleSheet s_defaultLabelStyle;
-        private static WidgetStyleSheet s_defaultButtonStyle;
-        private static WidgetStyleSheet s_defaultCheckBoxStyle;
-        private static WidgetStyleSheet s_defaultTextEditStyle;
-
-        private static readonly Dictionary<string, WidgetStyleSheet> s_styles = new Dictionary<string, WidgetStyleSheet>();
         private static readonly Dictionary<string, Font> s_fonts = new Dictionary<string, Font>();
 
         // focus
@@ -39,30 +29,6 @@ namespace NewWidgets.Widgets
         public static Font MainFont { get { return s_mainFont; } }
         public static float FontScale { get { return s_fontScale; } }
 
-        public static WidgetStyleSheet DefaultWidgetStyle { get { return s_defaultWidgetStyle; } }
-        public static WidgetStyleSheet DefaultCheckBoxStyle { get { return s_defaultCheckBoxStyle ?? s_defaultWidgetStyle; } }
-        public static WidgetStyleSheet DefaultButtonStyle { get { return s_defaultButtonStyle ?? s_defaultWidgetStyle; } }
-        public static WidgetStyleSheet DefaultPanelStyle { get { return s_defaultPanelStyle ?? s_defaultWidgetStyle; } }
-        public static WidgetStyleSheet DefaultTextEditStyle { get { return s_defaultTextEditStyle ?? s_defaultWidgetStyle; } }
-        public static WidgetStyleSheet DefaultLabelStyle { get { return s_defaultLabelStyle ?? s_defaultWidgetStyle; } }
-        public static WidgetStyleSheet DefaultWindowStyle { get { return s_defaultWindowStyle ?? s_defaultWidgetStyle; } }
-
-        //
-
-        public static WidgetStyleSheet GetStyle(string name)
-        {
-            if (!string.IsNullOrEmpty(name))
-            {
-                WidgetStyleSheet result;
-                if (s_styles.TryGetValue(name, out result))
-                    return result;
-            }
-
-            WindowController.Instance.LogError("WidgetManager got GetStyle request for not existing style {0}", name);
-
-            return null;  // TODO: return default style to avoid crash?
-        }
-
         public static Font GetFont(string name)
         {
             if (!string.IsNullOrEmpty(name))
@@ -72,7 +38,7 @@ namespace NewWidgets.Widgets
                     return result;
             }
 
-            WindowController.Instance.LogError("WidgetManager got GetStyle for not existing font {0}", name);
+            WindowController.Instance.LogError("WidgetManager got GetFont for not existing font {0}", name);
 
             return null; // TODO: return default font to avoid crash?
         }
@@ -83,17 +49,17 @@ namespace NewWidgets.Widgets
         /// <param name="fontScale">Font scale.</param>
         public static void Init(float fontScale)
         {
-            s_fontScale = (int)(8 * fontScale + 0.5f) / 8.0f; 
+            s_fontScale = fontScale; 
             s_styles.Clear();
 
             WindowController.Instance.OnTouch += HandleTouch;
-
-            s_defaultWidgetStyle = new WidgetStyleSheet();
         }
 
         public static void LoadUI(string uiData)
         {
+#if !DEBUG
             try
+#endif
             {
                 XmlDocument document = new XmlDocument();
                 document.LoadXml(uiData);
@@ -124,11 +90,13 @@ namespace NewWidgets.Widgets
                 }
 
             }
+#if !DEBUG
             catch (Exception ex)
             {
                 WindowController.Instance.LogError("Error loading ui data: " + ex);
                 throw;
             }
+#endif
         }
 
         private static bool HandleTouch(float x, float y, bool press, bool unpress, int pointer)
@@ -138,7 +106,6 @@ namespace NewWidgets.Widgets
 
             if (s_exclusiveWidgets.Count > 0)
             {
-//                s_exclusiveWidgets.Last.Value.Touch(x, y, press, unpress, pointer);
                 return s_exclusiveWidgets.Last.Value.Touch(x, y, press, unpress, pointer);
             }
             
@@ -188,45 +155,7 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered three patch {0}", name);
         }
 
-        private static void RegisterStyle(XmlNode node)
-        {
-            string name = node.Attributes.GetNamedItem("name").Value;
-
-            WidgetStyleSheet parent = node.Attributes.GetNamedItem("parent") == null ? null : GetStyle(node.Attributes.GetNamedItem("parent").Value);
-            if (parent == null)
-                parent = DefaultWidgetStyle;
-            
-            WidgetStyleSheet style = new WidgetStyleSheet(name, parent, node);
-
-            switch (name)
-            {
-            case "default":
-                s_defaultWidgetStyle = style;
-                break;
-            case "default_panel":
-                s_defaultPanelStyle = style;
-                break;
-            case "default_label":
-                s_defaultLabelStyle = style;
-                break;
-            case "default_button":
-                s_defaultButtonStyle = style;
-                break;
-            case "default_checkbox":
-                s_defaultCheckBoxStyle = style;
-                break;
-            case "default_textedit":
-                s_defaultTextEditStyle = style;
-                break;
-            case "default_window":
-                s_defaultWindowStyle = style;
-                break;
-            }
-            s_styles[name] = style;
-
-            WindowController.Instance.LogMessage("Registered style {0}", name);
-        }
-
+       
         public static bool HasFocus(IWindowContainer window)
         {
             if (window == null)
@@ -234,7 +163,7 @@ namespace NewWidgets.Widgets
 
             int windowHash = window.GetHashCode();
 
-            IFocusableWidget focusedWidget = null;
+            IFocusableWidget focusedWidget;
             if (s_focusedWidgets.TryGetValue(windowHash, out focusedWidget))
                 return focusedWidget != null;
             
@@ -250,7 +179,7 @@ namespace NewWidgets.Widgets
             
             int windowHash = window.GetHashCode();
 
-            IFocusableWidget focusedWidget = null;
+            IFocusableWidget focusedWidget;
             s_focusedWidgets.TryGetValue(windowHash, out focusedWidget);
             
             if (!focus)
@@ -335,10 +264,10 @@ namespace NewWidgets.Widgets
 
             return result;
         }
-        
+
         public static Window GetTopmostWindow()
         {
-            return (Window)WindowController.Instance.Windows[WindowController.Instance.Windows.Count - 1];
+            return WindowController.Instance.Windows[WindowController.Instance.Windows.Count - 1];
         }
         
         public static void SetExclusive(Widget widget)

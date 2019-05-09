@@ -1,7 +1,8 @@
 ﻿using System.Numerics;
+using System.Drawing;
+
 using NewWidgets.UI;
 using NewWidgets.Utility;
-using System.Drawing;
 
 namespace NewWidgets.Widgets
 {
@@ -25,7 +26,6 @@ namespace NewWidgets.Widgets
         public WidgetTooltip(WidgetStyleSheet style)
             : base(style)
         {
-            Size = style.Size;
         }
 
         public virtual void UpdatePosition(Vector2 position)

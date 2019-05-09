@@ -1,319 +1,297 @@
-﻿using System;
+﻿#define MEMORY_PRIORITY // undefine for speed priority
 
-using System.Collections.Generic;
-using System.Xml;
+
 using System.Numerics;
 
-using NewWidgets.UI;
 using NewWidgets.Utility;
+using NewWidgets.UI;
+using System.Collections.Generic;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetStyleSheet
+    internal enum WidgetParameterIndex
     {
-        private readonly WidgetBackgroundStyle m_backgroundStyle;
-        private readonly WidgetBackgroundDepth m_backgroundDepth;
-        private readonly string m_backgroundTexture;
-        private readonly float m_backgroundScale;
-        private readonly Vector2 m_backgroundPivot;
-        private readonly Margin m_backgroundPadding;
+        // Common
+        None,
+        [WidgetParameter("size", typeof(Vector2))]
+        Size,
+        [WidgetParameter("clip", typeof(bool))]
+        Clip,
+        [WidgetParameter("clip_margin", typeof(Margin))]
+        ClipMargin,
+        [WidgetParameter("hovered_style", typeof(WidgetStyleSheet))]
+        HoveredStyle,
+        [WidgetParameter("disabled_style", typeof(WidgetStyleSheet))]
+        DisabledStyle,
+        [WidgetParameter("selected_style", typeof(WidgetStyleSheet))]
+        SelectedStyle,
+        [WidgetParameter("selected_hovered_style", typeof(WidgetStyleSheet))]
+        SelectedHoveredStyle,
 
-        private readonly Font m_font;
-        private readonly float m_fontSize;
-        
-        private readonly int m_color;
-        
-        private readonly float m_opacity;
+        // Background
 
-        private readonly Vector2 m_size;
+        [WidgetParameter("back_style", typeof(WidgetBackgroundStyle))]
+        BackStyle,
+        [WidgetParameter("back_depth", typeof(WidgetBackgroundDepth))]
+        BackDepth,
+        [WidgetParameter("back_image")]
+        BackImage,
+        [WidgetParameter("back_scale", typeof(float))]
+        BackScale,
+        [WidgetParameter("back_angle", typeof(float))]
+        BackAngle,
+        [WidgetParameter("back_pivot", typeof(Vector2))]
+        BackPivot,
+        [WidgetParameter("back_padding", typeof(Margin))]
+        BackPadding,
+        [WidgetParameter("back_opacity", typeof(float))]
+        BackOpacity,
+        [WidgetParameter("back_color", typeof(int))]
+        BackColor,
 
-        private readonly Dictionary<string, string> m_parameters;
+        // Text
 
-        private readonly string m_name;
+        [WidgetParameter("font", typeof(Font))]
+        Font,
+        [WidgetParameter("font_size", typeof(float))]
+        FontSize,
+        [WidgetParameter("text_color", typeof(int))]
+        TextColor,
+        [WidgetParameter("line_spacing", typeof(float))]
+        LineSpacing,
+        [WidgetParameter("text_align", typeof(WidgetAlign))]
+        TextAlign,
+        [WidgetParameter("text_padding", typeof(Margin))]
+        [WidgetParameter("padding", typeof(Margin))]
+        TextPadding,
+        [WidgetParameter("richtext", typeof(bool))]
+        RichText,
 
-        private readonly bool m_clip;
+        // Image
 
-        private readonly Margin m_clipMargin;
+        [WidgetParameter("image")]
+        Image,
+        [WidgetParameter("image_style", typeof(WidgetBackgroundStyle))]
+        ImageStyle,
+        [WidgetParameter("image_angle", typeof(float))]
+        ImageAngle,
+        [WidgetParameter("image_pivot", typeof(Vector2))]
+        ImagePivot,
+        [WidgetParameter("image_padding", typeof(Margin))]
+        ImagePadding,
+        [WidgetParameter("image_color", typeof(int))]
+        ImageColor,
+        [WidgetParameter("image_opacity", typeof(float))]
+        ImageOpacity,
 
-        private readonly Margin m_padding;
-        
+        // Text edit
+
+        [WidgetParameter("cursor_color", typeof(int))]
+        CursorColor,
+        [WidgetParameter("cursor_char")]
+        CursorChar,
+        [WidgetParameter("mask_char")]
+        MaskChar,
+
+
+        // Button
+
+        [WidgetParameter("button_layout", typeof(WidgetButtonLayout))]
+        ButtonLayout,
+        [WidgetParameter("button_text_style", typeof(WidgetStyleSheet))]
+        ButtonTextStyle,
+        [WidgetParameter("button_image_style", typeof(WidgetStyleSheet))]
+        ButtonImageStyle,
+        [WidgetParameter("button_image_padding", typeof(Margin))]
+        ButtonImagePadding,
+        [WidgetParameter("button_text_padding", typeof(Margin))]
+        ButtonTextPadding,
+        [WidgetParameter("button_animate_scale", typeof(float))]
+        ButtonAnimateScale,
+        [WidgetParameter("button_animate_pivot", typeof(Vector2))]
+        ButtonAnimatePivot,
+        [WidgetParameter("button_animate_time", typeof(int))]
+        ButtonAnimateTime,
+
+        // Scroll view
+
+        [WidgetParameter("horizontal_scroll", typeof(WidgetStyleSheet))]
+        HorizontalScrollStyle,
+        [WidgetParameter("vertical_scroll", typeof(WidgetStyleSheet))]
+        VerticalcrollStyle,
+        [WidgetParameter("horizontal_indicator", typeof(WidgetStyleSheet))]
+        HorizontalIndicatorStyle,
+        [WidgetParameter("vertical_indicator", typeof(WidgetStyleSheet))]
+        VerticalIndicatorStyle,
+
+
+        Max = VerticalIndicatorStyle + 1
+    }
+
+    /// <summary>
+    /// Style sheet for various widget parameters
+    /// </summary>
+    public struct WidgetStyleSheet
+    {
+        private class ParameterData
+        {
+            public ParameterData Parent;
+#if MEMORY_PRIORITY
+            public readonly IDictionary<int, object> ObjectParameters;
+#else
+            public readonly object[] ObjectParameters; // internal storage for known indexed parameters
+#endif
+            public readonly IDictionary<string, string> DictionaryParameters; // external storage for custom parameters
+
+            public ParameterData(ParameterData parent)
+            {
+                Parent = parent;
+#if MEMORY_PRIORITY
+                ObjectParameters = new Dictionary<int, object>();
+#else
+                ObjectParameters = new object[(int)WidgetParameterIndex.Max];
+#endif
+                DictionaryParameters = new Dictionary<string, string>();
+            }
+
+            public object GetParameter(WidgetParameterIndex index)
+            {
+                object result;
+#if MEMORY_PRIORITY
+                ObjectParameters.TryGetValue((int)index, out result);
+#else
+                result = ObjectParameters[(int)index];
+#endif
+
+                if (result == null && Parent != null)
+                    result = Parent.GetParameter(index);
+
+                return result;
+            }
+
+            public string GetParameter(string name)
+            {
+                string result;
+
+                if (!DictionaryParameters.TryGetValue(name, out result))
+                {
+                    if (Parent != null)
+                        result = Parent.GetParameter(name);
+                }
+
+                return result;
+            }
+        }
+
+        private string m_name;
+        private int m_instancedFor; // This variable contains hash code of specific object for which this instance of style sheet was created
+                                    // raises assertion if zero and any setter is called
+
+        private ParameterData m_data;
+        // Internal properties
+
         public string Name
         {
             get { return m_name; }
+            internal set { m_name = value; }
         }
 
-        public WidgetBackgroundStyle BackgroundStyle
+        public bool IsEmpty
         {
-            get { return m_backgroundStyle; }
-        }
-        
-        public WidgetBackgroundDepth BackgroundDepth
-        {
-            get { return m_backgroundDepth; }
+            get { return m_data == null; }
         }
 
-        public Margin BackgroundPadding
+        internal int InstancedFor
         {
-            get { return m_backgroundPadding; }
+            get { return m_instancedFor; }
+            set { m_instancedFor = value; }
         }
 
-        public string BackgroundTexture
+        internal WidgetStyleSheet(string name, WidgetStyleSheet parent)
         {
-            get { return m_backgroundTexture; }
+            m_name = name;
+            m_data = new ParameterData(parent.m_data);
+            m_instancedFor = 0;
         }
 
-        public Vector2 BackgroundPivot
+        /// <summary>
+        /// This method is needed to repair hierarchy that could be broken because of premature load
+        /// </summary>
+        /// <param name="parent">Parent.</param>
+        internal void SetParent(WidgetStyleSheet parent)
         {
-            get { return m_backgroundPivot; }
-        }
-        
-        public float BackgroundScale
-        {
-            get { return /*WidgetManager.UIScale * */m_backgroundScale; }
-        }
-        
-        public float FontSize
-        {
-            get { return WidgetManager.FontScale * m_fontSize; }
+            m_data.Parent = parent.m_data;
         }
 
-        public float Opacity
+        private bool MakeWritable(object instance)
         {
-            get { return m_opacity; }
+            if (instance == null)
+                return false;
+
+            int instanceHash = instance.GetHashCode();
+
+            if (instanceHash == m_instancedFor)
+                return true;
+
+            m_instancedFor = instanceHash;
+            m_name = m_name + "_" + m_instancedFor;
+            m_data = new ParameterData(m_data);
+
+            return true;
         }
 
-        public Font Font
+        public override string ToString()
         {
-            get { return m_font; }
+            return string.Format("Style: {0}, instanced {1}", m_name, m_instancedFor != 0);
         }
 
-        public int Color
+        internal T Get<T>(WidgetParameterIndex index, T defaultValue)
         {
-            get { return m_color; }
-        }
-        
-        public Vector2 Size
-        {
-            get { return m_size/* * WidgetManager.UIScale*/; }
-        }
-        
-        public bool Clip
-        {
-            get { return m_clip; }
-        }
-        
-        public Margin ClipMargin
-        {
-            get { return m_clipMargin; }
+            object result = m_data.GetParameter(index);
+
+            if (result == null)
+                return defaultValue;
+
+            return (T)result;
         }
 
-        public Margin Padding
+        internal void Set(object instance, WidgetParameterIndex index, object value)
         {
-            get { return m_padding; }
+            if (instance != null)
+                MakeWritable(instance);
+
+            m_data.ObjectParameters[(int)index] = value;
         }
 
-        internal WidgetStyleSheet()
+        /// <summary>
+        /// Retrieve parameter by name
+        /// </summary>
+        /// <returns>The parameter.</returns>
+        /// <param name="name">Name.</param>
+        /// <param name="defaultValue">Default value.</param>
+        /// <typeparam name="T">The 1st type parameter.</typeparam>
+        public T Get<T>(string name, T defaultValue)
         {
-            m_clip = false;
-            m_size = new Vector2(0, 0);
-            m_name = "Default";
-            m_parameters = new Dictionary<string, string>();
-            m_color = 0xffffff;
-            m_backgroundPivot = new Vector2(0.5f, 0.5f);
-            m_opacity = 1.0f;
-            m_clipMargin = new Margin(2);
-            m_backgroundPadding = new Margin(0);
-            m_font = WidgetManager.MainFont;
-            m_fontSize = 1.0f;
-            m_backgroundScale = 1.0f;
-            m_backgroundStyle = WidgetBackgroundStyle.None;
-            m_backgroundTexture = "";
+            object result = m_data.GetParameter(name);
+
+            if (result == null)
+                return defaultValue;
+
+            return (T)result;
         }
 
-        internal WidgetStyleSheet(WidgetStyleSheet parent)
+        /// <summary>
+        /// Set the specified parameter by name
+        /// </summary>
+        /// <param name="instance">Instance.</param>
+        /// <param name="name">Name.</param>
+        /// <param name="value">Value.</param>
+        public void Set(object instance, string name, string value)
         {
-            m_clip = parent.Clip;
-            m_size = parent.Size;
-            m_name = parent.Name + "_" + GetHashCode();
-            m_parameters = new Dictionary<string, string>();
-            foreach (KeyValuePair<string, string> pair in parent.m_parameters)
-                m_parameters.Add(pair.Key, pair.Value);
-                
-            m_color = parent.Color;
-            m_opacity = parent.Opacity;
-            m_clipMargin = parent.ClipMargin;
-            m_font = parent.Font;
-            m_fontSize = parent.FontSize;
-            m_backgroundScale = parent.BackgroundScale;
-            m_backgroundDepth = parent.BackgroundDepth;
-            m_backgroundStyle = parent.BackgroundStyle;
-            m_backgroundTexture = parent.BackgroundTexture;
-            m_backgroundPivot = parent.BackgroundPivot;
-            m_backgroundPadding = parent.m_backgroundPadding;
-            m_padding = parent.Padding;
-        }
+            if (instance != null)
+                MakeWritable(instance);
 
-        internal WidgetStyleSheet(string name, WidgetStyleSheet parent, XmlNode node)
-            : this(parent)
-        {            
-            foreach (XmlNode element in node.ChildNodes)
-            {
-                try
-                {
-                    string value = element.InnerText;
-                    if (string.IsNullOrEmpty(value) && element.Attributes.GetNamedItem("value") != null)
-                        value = element.Attributes.GetNamedItem("value").Value;
-
-                    if (value == null)
-                        value = string.Empty;
-                    else
-                        value = value.Trim('\r', '\n', '\t', ' ');
-                    
-                    switch (element.Name)
-                    {
-                    case "back_style":
-                        m_backgroundStyle = (WidgetBackgroundStyle)Enum.Parse(typeof(WidgetBackgroundStyle), value);
-                        break;
-                    case "back_depth":
-                        m_backgroundDepth = (WidgetBackgroundDepth)Enum.Parse(typeof(WidgetBackgroundDepth), value);
-                        break;
-                    case "back_image":
-                        m_backgroundTexture = value;
-                        break;
-                    case "back_scale":
-                        m_backgroundScale = FloatParse(value);
-                        break;
-                    case "back_pivot":
-                        {
-                            string[] values = value.Split(';');
-                            float x = FloatParse(values[0]);
-                            float y = FloatParse(values[1]);
-                            m_backgroundPivot = new Vector2(x, y);
-                            break;
-                        }
-                        case "font":
-                        m_font = WidgetManager.GetFont(value);
-                        break;
-                    case "font_size":
-                        m_fontSize = FloatParse(value);
-                        break;
-                    case "clip":
-                        m_clip = bool.Parse(value);
-                        break;
-                    case "color":
-                        m_color = ColorParse(value);
-                        break;
-                    case "opacity":
-                        m_opacity = FloatParse(value);
-                        break;
-                    case "size":
-                        m_size = Vector2Parse(value);
-                        break;
-                    case "clip_margin":
-                        m_clipMargin = MarginParse(value);
-                        break;
-                    case "padding":
-                        m_padding = MarginParse(value);
-                        break;
-                    case "back_padding":
-                        m_backgroundPadding = MarginParse(value);
-                        break;
-                    default:
-                        m_parameters[element.Name] = value;
-                        break;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    WindowController.Instance.LogError("Error parsing style {0}, element {1}: {2}", name, element.Name, ex);
-                    throw;
-                }
-            }
-        }
-
-        protected static float FloatParse(string value)
-        {
-            return float.Parse(value.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
-        }
-
-        protected static int ColorParse(string value)
-        {
-            if (value.Length >= 7 && value[0] == '#')
-                return int.Parse(value.Substring(1), System.Globalization.NumberStyles.HexNumber);
-            if (value.Length >= 8 && value[0] == '0' && value[1] == 'x')
-                return int.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
-
-            return int.Parse(value);
-        }
-
-        protected static Vector2 Vector2Parse(string value)
-        {
-            string[] values = value.Split(';');
-            float x = FloatParse(values[0]);
-            float y = FloatParse(values[1]);
-            return new Vector2(x, y);
-        }
-
-        protected static Margin MarginParse(string value)
-        {
-            string[] values = value.Split(';');
-            if (values.Length == 1)
-            {
-                float a = FloatParse(values[0]);
-                return new Margin(a, a, a, a);
-            }    
-
-            float l = FloatParse(values[0]);
-            float t = FloatParse(values[1]);
-            float r = FloatParse(values[2]);
-            float b = FloatParse(values[3]);
-
-            return new Margin(l, t, r, b);
-        }
-
-        public string GetParameter(string name)
-        {
-            if (m_parameters != null)
-            {
-                string result;
-                if (m_parameters.TryGetValue(name, out result))
-                    return result;
-            }
-            return null;
-        }
-
-        public T GetParameter<T>(string name)
-        {
-            if (m_parameters != null)
-            {
-                string result;
-                if (m_parameters.TryGetValue(name, out result))
-                {
-                    if (typeof(T) == typeof(Single))
-                        return (T)(object)FloatParse(result); // bo-oxing (
-                    else if (typeof(T) == typeof(Margin))
-                        return (T)(object)MarginParse(result);
-                    else if (typeof(T) == typeof(Vector2))
-                        return (T)(object)Vector2Parse(result);
-                    
-                    return (T)Convert.ChangeType(result, typeof(T));
-                }
-            }
-            return default(T);
-        }
-        
-        public int GetParameterColor(string name, int def)
-        {
-            if (m_parameters != null)
-            {
-                string result;
-                if (m_parameters.TryGetValue(name, out result))
-                {
-                    return ColorParse(result);
-                }
-            }
-            return def;
+            m_data.DictionaryParameters[name] = value;
         }
     }
-    
 }
