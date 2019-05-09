@@ -1,51 +1,53 @@
++*Read this in other languages: [English](README.md), [Русский](README.ru.md)*
+
 # NewWidgets
 
-NewWidgets (временное название) это GUI подсистема на .Net, не зависимая от графического движка и базирующаяся на спрайтах. В качестве тестового примера сделан коннектор к WinForms для отрисовки графики. Планируется поддержка Unity, MonoGame, RunMobile (собственный движок), UIKit и других движков. Также планируется C++ порт.
+NewWidgets (temporary name) is a GUI subsystem written with .Net and aimed to be sprite-based and graphics engine independent. As a test example a WinForms renderer is implemented. Support is planned for Unity, MonoGame, RunMobile (own engine), UIKit and other engines among with plain C++ port.
 
-Для работы с математикой используются System.Numerics.Vectors, но синтаксис совместим с OpenTK, MonoGame и другими реализациями, поэтому достаточно будет изменения заголовков и директив using в соответствующих файлах.
+Right now System.Numerics.Vectors is used to work with mathematics and 2D and 3D vectors, but the syntax is compatible with OpenTK, MonoGame and other implementations, so it will be enough to change the headers and `using` directives in corresponding files.
 
-### Портирование
-Поддержка для сторонних движков требует реализации интерфейса для спрайтов ISprite и абстрактного класса WindowController. Реализация ISprite икапсулирует платформо-зависимый спрайт и предоставляет интерфейс его использования (положение, вращение, масштабирование, цвет, прозрачность, проверка принадлежности точки спрайту). Все трансформации выполняются через вспомогательный класс Transform, который поддерживает восходящую иерархию (содержит указатель на родительский Transform). Реализация WindowControllerBase должна содержать вспомогательные функции системы - логирование, воспроизведение звука, создание спрайта, информацию о размере экрана. Примеры реализации классов для WinForms можно увидеть в каталоке WinForms и файлах WinFromsSprite и WinFormsController.
+### Porting
+Support for third-party engines requires interface implementation for ISprite and the WindowController abstract class. ISprite encapsulates a platform-dependent sprite and provides an interface for its use (position, rotation, scaling, color, transparency, hit-test). All transformations are performed through the auxiliary class Transform, which supports the ascending hierarchy (contains a pointer to the parent Transform). The implementation of WindowControllerBase should contain basic system helper functions - logging, creation of a sprite, screen geometry info. Sample WinForms implementation is in the WinForms directory and the WinFromsSprite and WinFormsController files.
 
-### Интеграция
-Для использования библиотеки надо создать экземпляр соответствующего WindowController, зарегистрировать в нем используемые спрайты, а также реализовать обработку событий с вызовом следующих методов WindowController:
-- `Key(int code, bool up, char character)` - действие клавиатуры. Поддерживаются как специальные клавиши, так и букво-символьные, отдельная обработка для нажатия и отпускания;
-- `Touch(float x, float y, bool press, bool unpress, int pointer)` - действие указателя мыши или тачскрина (MouseUp/MouseDown/MouseMove и аналогичные события для тачскрина);
-- `Zoom(float x, float y, float value)` - действие масштабирования или прокрутки;
-- `Draw()` - отрисовка;
-- `Update()` - обновление анимаций и внутренних состояний (есть смысл вызывать с таймером на 60fps);
+### Integration
+To use the library, you need to create an instance of the corresponding WindowController, register the sprites in it and implement following events handling:
+- `Key (int code, bool up, char character)` - keyboard action. It supports both special keys and letter-character, separate processing for pressing and releasing;
+- `Touch (float x, float y, bool press, bool unpress, int pointer)` - mouse pointer or touchscreen action (MouseUp / MouseDown / MouseMove and similar touchscreen events);
+- `Zoom (float x, float y, float value)` - scaling or scrolling action;
+- `Draw()` - drawing;
+- `Update()` - update animations and internal states (it makes sense to call with a timer at 60fps);
 
-В примере WinFormsSample в классе TestForm есть пример реализации обработки этих событий. В случае WinForms во время Update() вызывается действие Invalidate() для графической области и уже ее событие OnPaint() вызывает операцию Draw(). В случае OpenGL или Direct3D имеет смысл вызывать в цикле рендера в начале Update(), потом Draw() и затем glFlush()/SwapBuffers()/ID3D11DeviceContext::Flush().
+Take a look at the the WinFormsSample TestForm class as an example of thosese events handling. In the case of WinForms during Update() the Invalidate() action for the graphics area is invoked and its OnPaint() event already triggers the Draw() operation. In the case of OpenGL or Direct3D, it makes sense to call Update() in the render cycle, then Draw() and glFlush/SwapBuffers/ID3D11DeviceContext::Flush.
 
-### Работа
-Пока нет визуального редактора для NewWidgets, разработка подразумевает создание контролов в коде:
-```            
-            WidgetPanel panel = new WidgetPanel(WidgetManager.DefaultWindowStyle);
-            panel.Size = new Vector2(600, 560);
-            panel.Scale = WindowControllerBase.Instance.ScreenScale;
-            panel.Position = this.Size / 2 - panel.Size * panel.Scale / 2;
-            this.AddChild(panel);
+### Usage
+While there is no visual editor yet so controls should be created in the code:
+```
+            WidgetPanel panel = new WidgetPanel (WidgetManager.DefaultWindowStyle);
+            panel.Size = new Vector2 (600, 560);
+            panel.Scale = WindowControllerBase.Instance.ScreenScale;
+            panel.Position = this.Size / 2 - panel.Size * panel.Scale / 2;
+            this.AddChild (panel);
 
-            WidgetLabel loginLabel = new WidgetLabel();
-            loginLabel.Text = ResourceLoader.Instance.GetString("login_login");
-            loginLabel.Position = new Vector2(50, 160);
-            loginLabel.FontSize = WidgetManager.DefaultLabelStyle.FontSize * 1.25f;
-            panel.AddChild(loginLabel);
+            WidgetLabel loginLabel = new WidgetLabel();
+            loginLabel.Text = ResourceLoader.Instance.GetString ("login_login");
+            loginLabel.Position = new Vector2 (50, 160);
+            loginLabel.FontSize = WidgetManager.DefaultLabelStyle.FontSize * 1.25f;
+            panel.AddChild (loginLabel);
 
 ```
-Это может быть не очень удобно, но в целом не должно составлять трудности для опытного программиста.
+This may not be not the most convenient way but in general should not be a problem for experienced programmers.
 
-### Архитектура
-В библиотеке используется три слоя абстракции, каждый из которых позволяет создавать интерфейс пользователя различной сложности для различных задач.
+### Architecture
+The library uses three layers of abstraction, each of which allows creation of UI with varying complexity for different tasks. However it is advised to use Widget layer instead of raw sprites.
 
-#### Слой ISprite
-Базовый класс спрайтов содержит все необходимое для создания самого простого интерфейса: в нем есть возможность отображать спрайтеы на экране, делать вложенность и группировку за счет использования Transform и их иерархии, проверять совпало ли нажатие клавиши мыши с положением спрайта с методом HitTest(). Также спрайт может содержать несколько кадров, что позволяет делать анимации, а за счет изменения параметров Alpha и Color возможны эффекты с прозрачностью и цветами.
+#### ISprite Layer
+The base class of sprites contains everything you need to create the simplest interface: it has the ability to display sprites on the screen, do nesting and grouping by using Transform hierarchy, check whether the pointer (mouse or touchscreen) action hits the sprite (HitTest method). Also the sprite can contain several frames allowing animation usage among with Alpha and Color animations.
 
-#### Слой WindowObject
-Для организованной работы с интерфейсом существуют классы WindowObject и Window с коллекцией WindowObjectArray. Они поддерживают полноценную (нисходящую) иерархию, создание контейнеров, обработку события OnTouch и пр. С помощью данных объектов можно реализовывать интерфейсы на основе изображений (класс ImageObject), собственные компоненты, использовать текстовое отображение (класс LabelObject). Объекты ImageObject и LabelObject базируются на спрайтах. В случае LabelObject необходим ISprite, у которого разные кадры это разные символы шрифта. 
+#### WindowObject Layer
+For organized work with the interface there are WindowObject and Window classes with WindowObjectArray collection. They support the full downward hierarchy, containers, OnTouch events, etc. With these objects, you can implement image-based interfaces (ImageObject class), custom components, use text display (LabelObject class). ImageObject and LabelObject are based on sprites. To use LabelObject you'll need a sprite containing needed characters as a frames.
 
-#### Слой Widgets
-Набор компонентов Widgets позволяет работать на высоком уровне абстракции, создавая привычные кнопки, чекбоксы, панели и области прокрутки. Все компоненты наследуются от WindowObject, позволяют организовывать произвольную структуру компонентов или портировать интерфейсы из других систем. Также поддерживается собственная система стилей с наследованием, которая позволяет описывать параметры компонентов в виде XML:
+#### Widgets Layer
+A set of Widgets components allows you to work at a high level of abstraction, creating buttons, checkboxes, panels and scrolling areas. All components are inherited from WindowObject allowing you to organize an arbitrary structure of components or port interfaces from other systems. It also supports stylesheet system with style inheritance and stored in XML form:
 ```
  <style name="text_button">
     <back_style>None</back_style>
@@ -61,28 +63,28 @@ NewWidgets (временное название) это GUI подсистема
     <text_color>#ffffff</text_color>
   </style>
 ```
-Для управления стилями, а также глобальных операций (отображение Tooltip поверх всех окон) используется класс WindgetManager.
-Отдельно можно отметить класс WidgetText, поддерживающий многострочный вывод текста, с переносом строк (без символа переноса), цветовое форматирование, вставку изображений в текст.
+WidgetManager class is used to control styles and performing some global operations alike tooltips and focusing.
+Also there is rich-text enabled WidgetText class supporting multi-line texts with automatic line wrapping, color formatting and inline images.
 
-### Проблемы и задачи
+### Problems and Tasks
 
-На данный момент у проекта есть следующие проблемы, которые планируется решить в ближайшее время:
-* отсутствие документации и примеров;
-* отсутствие тестов;
-* минимальное количество документации в коде;
-* не полная работоспособность компонентов, отсутствие специфичных контролов (Radio Button, List, ComboBox, Tab Control, etc.);
-* архитектурные недочеты;
-* почти полностью отсутствует работа с фокусом;
-* проблемы в наследовании стилей и не полное покрытие ими свойств компонентов;
-* поддержка нативных буферов обмена и выделения в целом;
-* прочие не идентифицированные проблемы;
-* отсутствие коммьюнити и живых проектов с NewWidgets;
-* дурацкое название;
+At the moment, the project has huge list off issues with some of them listed below:
+* lack of documentation and examples;
+* lack of tests;
+* minimal amount of code comments;
+* lack of different specific controls: Radio Button, List, ComboBox, Tab Control, etc.;
+* architectural flaws;
+* poor focus handling;
+* (done) problems with style inheritance and their property coverage (resolved in version 1.5);
+* support for native clipboard and text selection;
+* other unidentified problems;
+* lack of community and live projects with NewWidgets;
+* stupid name;
 
-Долгосрочные задачи:
-* коннекторы для Unity, MonoGame;
-* коннекторы для нативных интерфейсов в iOS (UIKit) и Android;
-* порт на C++;
-* сериализация интерфейса в текстовый формат;
-* WYSIWYG редактор;
-* мировое господство;
+Long-term objectives:
+* connectors for Unity, MonoGame;
+* connectors for native interfaces in iOS (UIKit) and Android;
+* C++ port;
+* serialization of UI to/from interface files;
+* WYSIWYG editor;
+* world domination;
