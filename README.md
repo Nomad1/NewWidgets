@@ -11,7 +11,7 @@ Support for third-party engines requires interface implementation for ISprite an
 
 ### Integration
 To use the library, you need to create an instance of the corresponding WindowController, register the sprites in it and implement following events handling:
-- `Key (int code, bool up, char character)` - keyboard action. It supports both special keys and letter-character, separate processing for pressing and releasing;
+- `Key (int code, bool up, string keyString)` - keyboard action. It supports both special keys, ligatures and single-letter characters, separate processing for up and down actions;
 - `Touch (float x, float y, bool press, bool unpress, int pointer)` - mouse pointer or touchscreen action (MouseUp / MouseDown / MouseMove and similar touchscreen events);
 - `Zoom (float x, float y, float value)` - scaling or scrolling action;
 - `Draw()` - drawing;
