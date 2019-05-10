@@ -5,7 +5,7 @@ using NewWidgets.WinForms;
 using NewWidgets.UI;
 
 namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private WinFormsController m_windowController;        public TestForm()        {            InitializeComponent();            this.perspectiveViewPictureBox.MouseWheel += perspectiveViewPictureBox_MouseWheel;            this.KeyPreview = true;
-            this.zoomTrackBar.Visible = false;            this.perspectiveViewPictureBox.BackColor = Color.Black;
+            this.perspectiveViewPictureBox.BackColor = Color.Black;
             ResourceLoader loader = new ResourceLoader("en-en");            loader.RegisterString("login_title", "Connect to server");            loader.RegisterString("login_login", "Login");
             loader.RegisterString("login_password", "Password");
             loader.RegisterString("login_local", "Custom server");

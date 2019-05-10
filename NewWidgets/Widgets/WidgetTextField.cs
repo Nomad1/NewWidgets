@@ -401,13 +401,6 @@ namespace NewWidgets.Widgets
                 }
             }
 
-            switch (key)
-            {
-                case SpecialKey.Up:
-                case SpecialKey.Down:
-                    return false;
-            }
-
             return true;
         }
 
