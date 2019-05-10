@@ -125,11 +125,27 @@ namespace NewWidgets.Widgets
             return m_styles[(int)m_styleType].Get(index, defaultValue);
         }
 
+        internal T GetProperty<T>(WidgetStyleType style, WidgetParameterIndex index, T defaultValue)
+        {
+            if (!HasStyle(style))
+                style = m_styleType;
+
+            return m_styles[(int)style].Get(index, defaultValue);
+        }
+
         internal void SetProperty<T>(WidgetParameterIndex index, T value)
         {
             for (int i = 0; i < m_styles.Length; i++)
                 if (!m_styles[i].IsEmpty)
                     m_styles[i].Set(m_styles, index, value);
+        }
+
+        internal void SetProperty<T>(WidgetStyleType style, WidgetParameterIndex index, T value)
+        {
+            if (!HasStyle(style))
+                throw new ArgumentException("Widget doesn't have style " + style + " assigned!");
+
+            m_styles[(int)style].Set(m_styles, index, value);
         }
 
         public T GetProperty<T>(string name, T defaultValue)

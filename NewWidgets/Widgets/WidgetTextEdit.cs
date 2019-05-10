@@ -35,25 +35,25 @@ namespace NewWidgets.Widgets
         public Font Font
         {
             get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
-            set { SetProperty(WidgetParameterIndex.Font, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.Font, value); InvalidateLayout(); }
         }
 
         public float FontSize
         {
             get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
-            set { SetProperty(WidgetParameterIndex.FontSize, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.FontSize, value); InvalidateLayout(); }
         }
 
         public WidgetAlign TextAlign
         {
             get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
-            set { SetProperty(WidgetParameterIndex.TextAlign, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.TextAlign, value); InvalidateLayout(); }
         }
 
         public Margin TextPadding
         {
             get { return GetProperty(WidgetParameterIndex.TextPadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.TextPadding, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.TextPadding, value); InvalidateLayout(); }
         }
 
         public int TextColor
@@ -64,6 +64,18 @@ namespace NewWidgets.Widgets
                 SetProperty(WidgetParameterIndex.TextColor, value);
 
                 if (m_label != null) // try to avoid InivalidateLayout
+                    m_label.Color = value;
+            }
+        }
+
+        public int FocusedTextColor
+        {
+            get { return GetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, 0xffffff); }
+            set
+            {
+                SetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, value);
+
+                if (StyleType == WidgetStyleType.Selected && m_label != null) // try to avoid InvalidateLayout
                     m_label.Color = value;
             }
         }
@@ -91,7 +103,7 @@ namespace NewWidgets.Widgets
                     m_cursor.Remove();
                     m_cursor = null;
                 }
-                InivalidateLayout();
+                InvalidateLayout();
             }
         }
 
@@ -104,7 +116,7 @@ namespace NewWidgets.Widgets
                     return;
                 m_text = value;
                 m_cursorPosition = value.Length;
-                InivalidateLayout();
+                InvalidateLayout();
             }
         }
 
@@ -114,7 +126,7 @@ namespace NewWidgets.Widgets
             set
             {
                 SetProperty(WidgetParameterIndex.MaskChar, value);
-                InivalidateLayout();
+                InvalidateLayout();
             }
         }
 
@@ -145,7 +157,7 @@ namespace NewWidgets.Widgets
                 m_preffix = value;
                 m_cursorPosition += shift;
                 m_text = m_preffix + text;
-                InivalidateLayout();
+                InvalidateLayout();
             }
         }
 
@@ -161,7 +173,7 @@ namespace NewWidgets.Widgets
             m_needLayout = true;
         }
 
-        private void InivalidateLayout()
+        private void InvalidateLayout()
         {
             m_needLayout = true;
         }
@@ -169,14 +181,14 @@ namespace NewWidgets.Widgets
         protected override void Resize(Vector2 size)
         {
             base.Resize(size);
-            InivalidateLayout();
+            InvalidateLayout();
         }
 
         public override bool SwitchStyle(WidgetStyleType styleType)
         {
             if (base.SwitchStyle(styleType))
             {
-                InivalidateLayout();
+                InvalidateLayout();
                 return true;
             }
             return false;

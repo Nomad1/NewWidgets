@@ -117,6 +117,7 @@
     <Compile Include="Widgets\WidgetManager.Styles.cs" />
     <Compile Include="Widgets\WidgetWindow.cs" />
     <Compile Include="Widgets\WidgetStyleSheet.cs" />
+    <Compile Include="Widgets\WidgetTextField.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

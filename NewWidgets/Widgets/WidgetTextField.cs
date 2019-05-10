@@ -33,25 +33,25 @@ namespace NewWidgets.Widgets
         public Font Font
         {
             get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
-            set { SetProperty(WidgetParameterIndex.Font, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.Font, value); InvalidateLayout(); }
         }
 
         public float FontSize
         {
             get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
-            set { SetProperty(WidgetParameterIndex.FontSize, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.FontSize, value); InvalidateLayout(); }
         }
 
         public Margin TextPadding
         {
             get { return GetProperty(WidgetParameterIndex.TextPadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.TextPadding, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.TextPadding, value); InvalidateLayout(); }
         }
 
         public float LineSpacing
         {
             get { return GetProperty(WidgetParameterIndex.LineSpacing, 5.0f); }
-            set { SetProperty(WidgetParameterIndex.LineSpacing, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.LineSpacing, value); InvalidateLayout(); }
         }
 
         public int CursorColor
@@ -77,7 +77,7 @@ namespace NewWidgets.Widgets
                     m_cursor.Remove();
                     m_cursor = null;
                 }
-                InivalidateLayout();
+                InvalidateLayout();
             }
         }
 
@@ -89,7 +89,7 @@ namespace NewWidgets.Widgets
                 if (m_text == value)
                     return;
                 m_text = value;
-                InivalidateLayout();
+                InvalidateLayout();
                 m_cursorPosition = value.Length;
             }
         }
@@ -113,6 +113,19 @@ namespace NewWidgets.Widgets
                 SetProperty(WidgetParameterIndex.TextColor, value);
 
                 if (m_labels != null)
+                    foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
+                        label.Color = value;
+            }
+        }
+
+        public int FocusedTextColor
+        {
+            get { return GetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, 0xffffff); }
+            set
+            {
+                SetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, value);
+
+                if (StyleType == WidgetStyleType.Selected  && m_labels != null)
                     foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
                         label.Color = value;
             }
@@ -149,7 +162,7 @@ namespace NewWidgets.Widgets
             ClipMargin = TextPadding;
         }
 
-        private void InivalidateLayout()
+        private void InvalidateLayout()
         {
             m_needLayout = true;
         }
@@ -157,14 +170,14 @@ namespace NewWidgets.Widgets
         protected override void Resize(Vector2 size)
         {
             base.Resize(size);
-            InivalidateLayout();
+            InvalidateLayout();
         }
 
         public override bool SwitchStyle(WidgetStyleType styleType)
         {
             if (base.SwitchStyle(styleType))
             {
-                InivalidateLayout();
+                InvalidateLayout();
                 return true;
             }
             return false;
