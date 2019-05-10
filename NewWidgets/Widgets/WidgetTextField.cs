@@ -457,17 +457,17 @@ namespace NewWidgets.Widgets
 
                 m_cursorPosition = position;
 
-                float cursorY = m_lineHeight * m_cursorLine;
                 float cursorX;
+                float cursorY = m_lineHeight * m_cursorLine;
 
                 string line = m_lines[m_cursorLine];
 
                 var frame = m_labels[m_cursorLine].GetCharFrame(m_cursorLinePosition == line.Length ? line.Length - 1 : m_cursorLinePosition);
 
                 if (m_cursorLinePosition == line.Length)
-                    cursorX = frame.X + frame.Width + Font.Spacing;
+                    cursorX = frame.Right;
                 else
-                    cursorX = frame.X;
+                    cursorX = frame.Left;
 
                 cursorX *= FontSize;
 

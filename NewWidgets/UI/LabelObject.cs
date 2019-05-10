@@ -68,7 +68,7 @@ namespace NewWidgets.UI
         public bool RichText
         {
             get { return m_richText; }
-            set { m_richText = value; }
+            set { Init(m_text, value); }
         }
 
         public LabelObject(WindowObject parent, Font font, string text, LabelAlign horizontalAlign, LabelAlign verticalAlign, bool richText = false)
@@ -77,7 +77,6 @@ namespace NewWidgets.UI
             m_color = 0xffffff;
             m_alpha = 1.0f;
             m_font = font;
-            m_richText = richText;
 
             float x = 1;
             float y = 1;
@@ -249,12 +248,19 @@ namespace NewWidgets.UI
             return new string(chars, 0, length);
         }
 
-        private void Init(string text, bool richText = false)
+        /// <summary>
+        /// Init the specified text and richText. This method also works as initializer for m_text and m_richText fields.
+        /// Try to avoid setting them without this call
+        /// </summary>
+        /// <param name="text">Text.</param>
+        /// <param name="richText">If set to <c>true</c> rich text.</param>
+        private void Init(string text, bool richText)
         {
-            if (text == m_text)
+            if (text == m_text && m_richText == richText)
                 return;
 
             m_text = text;
+            m_richText = richText;
 
             TextSpan[] colors = null;
 
@@ -268,8 +274,6 @@ namespace NewWidgets.UI
             if (richText)
                 m_sprites = null;
 
-            // TODO: clean old sprites?
-
             m_font.GetSprites(text, position, ref m_sprites);
 
             SetColors(colors);
@@ -280,13 +284,10 @@ namespace NewWidgets.UI
             if (!base.Update())
                 return false;
 
-            if (Visible)
+            if (Visible && m_sprites != null)
             {
-                if (m_sprites != null)
-                    foreach (ISprite sprite in m_sprites)
-                    {
-                        sprite.Update();
-                    }
+                foreach (ISprite sprite in m_sprites)
+                    sprite.Update();
             }
 
             return true;

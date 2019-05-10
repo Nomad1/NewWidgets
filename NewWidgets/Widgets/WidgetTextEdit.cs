@@ -14,6 +14,7 @@ namespace NewWidgets.Widgets
         public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_textedit", true);
 
         private int m_cursorPosition;
+        private Vector2 m_contentOffset;
 
         private LabelObject m_label;
         private ImageObject m_cursor;
@@ -171,6 +172,7 @@ namespace NewWidgets.Widgets
             m_text = string.Empty;
             m_preffix = string.Empty;
             m_needLayout = true;
+            ClipMargin = TextPadding;
         }
 
         private void InvalidateLayout()
@@ -216,14 +218,14 @@ namespace NewWidgets.Widgets
                 m_cursor.Transform.Parent = Transform;
             }
 
-            // Nomad: I'm not sure it is normal to resize text edit depending on it's content. It looks like leftovers from WidgetLabel copy-paste
+           /* // Nomad: I'm not sure it is normal to resize text edit depending on it's content. It looks like leftovers from WidgetLabel copy-paste
             Vector2 minSize = m_label.Size * FontSize + TextPadding.Size;
             if (minSize.X < Size.X)
                 minSize.X = Size.X;
             if (minSize.Y < Size.Y)
                 minSize.Y = Size.Y;
 
-            Size = minSize;
+            Size = minSize;*/
 
             m_needLayout = false;
             
@@ -387,53 +389,34 @@ namespace NewWidgets.Widgets
                 if (m_cursorPosition > m_text.Length)
                     m_cursorPosition = m_text.Length;
 
+                float cursorY = 0;
                 float cursorX;
+
                 var frame = m_label.GetCharFrame(m_cursorPosition == m_text.Length ? m_text.Length - 1 : m_cursorPosition);
 
                 if (m_cursorPosition == m_text.Length)
-                    cursorX = frame.X + frame.Width + Font.Spacing;
+                    cursorX = frame.Right;
                 else
-                    cursorX = frame.X;
+                    cursorX = frame.Left;
 
-                float nsize = Size.X / FontSize;
+                cursorX *= FontSize;
 
-                if (m_label.Size.X > nsize) // scrolling
-                {
-                    float from = -m_label.Position.X / FontSize;
-                    float to = from + nsize;
+                if (cursorX + (frame.Width + Font.SpaceWidth) * FontSize + m_contentOffset.X > Size.X)
+                    m_contentOffset.X = Size.X - cursorX - (frame.Width + Font.SpaceWidth) * FontSize;
+                else
+                    if (cursorX + m_contentOffset.X < 0)
+                    m_contentOffset.X = -cursorX;
 
-                    if (cursorX > from && cursorX < to)
-                    {
-                    } else
-                    {
-                        if (cursorX > from)
-                        {
-                            float nx = (nsize - cursorX) * FontSize - TextPadding.Width;
-                            if (nx > TextPadding.Left)
-                                nx = TextPadding.Left;
+                m_cursor.Position = TextPadding.TopLeft + m_contentOffset + new Vector2(cursorX - (m_cursor.Sprite.FrameSize.X / 2) * FontSize, cursorY - 4 * FontSize); // Nomad: 4 is magic constant. Don't like it at all 
 
-                            m_label.Position = new Vector2(nx, TextPadding.Top);
-                        } else
-                            if (cursorX < to)
-                        {
-                            float nx = -cursorX * FontSize;
-                            if (nx > TextPadding.Left)
-                                nx = TextPadding.Left;
-
-                            m_label.Position = new Vector2(nx, TextPadding.Top);
-                        }
-                    }
-                } else
-                    m_label.Position = TextPadding.TopLeft;
-
-                m_cursor.Position = m_label.Position + new Vector2((cursorX - m_cursor.Sprite.FrameSize.X / 2) * FontSize, 0 - 5 * FontSize); // Nomad: 5 is magic constant. Don't like it at all 
-
-                //m_cursor.Position = m_label.Position + new Vector2((cursorX - Font.SpaceWidth * 0.5f) * FontSize + 1, 0);
-
-            } else
-            {
-                m_label.Position = TextPadding.TopLeft;
             }
+
+            UpdateTextPosition();
+        }
+
+        private void UpdateTextPosition()
+        {
+            m_label.Position = TextPadding.TopLeft + m_contentOffset;
         }
 
         private static string MaskText(string text, string maskChar)
