@@ -21,6 +21,9 @@ namespace NewWidgets.UI
         Enter = 8,
         Tab = 9,
 
+        Home = 10,
+        End = 11,
+
         Slash,
         BackSlash,
         Semicolon,
@@ -35,6 +38,7 @@ namespace NewWidgets.UI
         Grave,
         Backspace,
         Delete,
+        EraseLine, // combination of Ctrl+Backspace or Cmd+Backspace
 
         Letter,
 
@@ -332,7 +336,13 @@ namespace NewWidgets.UI
             return false;
         }
 
-        public virtual bool Key(SpecialKey key, bool up, char character) // TODO: change 'char character' to 'string @string' for Paste, glyphs, emoji, etc.
+        [Obsolete("Migrate to string version!")]
+        public virtual bool Key(SpecialKey key, bool up, char character)
+        {
+            throw new NotSupportedException();
+        }
+
+        public virtual bool Key(SpecialKey key, bool up, string keyString)
         {
             return false;
         }

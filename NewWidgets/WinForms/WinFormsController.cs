@@ -320,7 +320,7 @@ namespace NewWidgets.WinForms
                 if (((Window)Windows[i]).Modal)
                 {
                     if (press || unpress)
-                        Windows[i].Key(SpecialKey.Back, true, '\0');
+                        Windows[i].Key(SpecialKey.Back, true, "");
                     break;
                 }
             }
@@ -328,13 +328,13 @@ namespace NewWidgets.WinForms
             return false;
         }
 
-        public bool Key(int code, bool up, char character)
+        public bool Key(SpecialKey key, bool up, string keyString)
         {
-            SpecialKey key = (SpecialKey)code;
-
+            //if (Windows.Count > 0)
+                //return Windows[Windows.Count -].Key(key, up, character)
             for (int i = Windows.Count - 1; i >= 0; /*i--*/)
             {
-                if (Windows[i].Key(key, up, character))
+                if (Windows[i].Key(key, up, keyString))
                     return true;
 
                 break;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-
+using System.Text;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
@@ -21,7 +21,7 @@ namespace NewWidgets.Widgets
         private string[] m_lines;
 
         private Vector2 m_contentSize;
-        private Vector2 m_contentPosition;
+        private Vector2 m_contentOffset;
         private int m_lineHeight;
 
         private bool m_needLayout;
@@ -45,13 +45,13 @@ namespace NewWidgets.Widgets
         public Margin TextPadding
         {
             get { return GetProperty(WidgetParameterIndex.TextPadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.TextPadding, value); SetTextPosition(m_contentPosition); }
+            set { SetProperty(WidgetParameterIndex.TextPadding, value); InivalidateLayout(); }
         }
 
         public float LineSpacing
         {
             get { return GetProperty(WidgetParameterIndex.LineSpacing, 5.0f); }
-            set { SetProperty(WidgetParameterIndex.LineSpacing, value); SetTextPosition(m_contentPosition); }
+            set { SetProperty(WidgetParameterIndex.LineSpacing, value); InivalidateLayout(); }
         }
 
         public int CursorColor
@@ -105,7 +105,7 @@ namespace NewWidgets.Widgets
             get { return true; }
         }
 
-        public int Color
+        public int TextColor
         {
             get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
             set
@@ -146,6 +146,7 @@ namespace NewWidgets.Widgets
         {
             m_text = string.Empty;
             m_needLayout = true;
+            ClipMargin = TextPadding;
         }
 
         private void InivalidateLayout()
@@ -159,9 +160,19 @@ namespace NewWidgets.Widgets
             InivalidateLayout();
         }
 
+        public override bool SwitchStyle(WidgetStyleType styleType)
+        {
+            if (base.SwitchStyle(styleType))
+            {
+                InivalidateLayout();
+                return true;
+            }
+            return false;
+        }
+
         private void Relayout()
         {
-            m_lines = m_text.Split(new string[] { "\r", "\n", "|n", "\\n" }, StringSplitOptions.None);
+            m_lines = m_text.Split(new string[] { "\r", "\n" }, StringSplitOptions.None);
 
             if (m_lines.Length == 0)
                 m_lines = new string[] { "" };
@@ -197,7 +208,7 @@ namespace NewWidgets.Widgets
                 if (m_labels[i] == null)
                     m_labels[i] = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, false);
 
-                m_labels[i].Color = Color;
+                m_labels[i].Color = TextColor;
                 m_labels[i].Scale = FontSize;
                 m_labels[i].Alpha = Alpha;
                 m_labels[i].Text = m_lines[i];
@@ -250,7 +261,7 @@ namespace NewWidgets.Widgets
                 m_cursor.Draw(canvas);
         }
 
-        public override bool Key(SpecialKey key, bool up, char character)
+        public override bool Key(SpecialKey key, bool up, string keyString)
         {
             if (!IsFocused)
                 return false;
@@ -279,22 +290,31 @@ namespace NewWidgets.Widgets
                 return true;
             }
 
-            if ((key == SpecialKey.Letter || key == SpecialKey.Paste) && Font.HaveSymbol(character))
+            if ((key == SpecialKey.Letter || key == SpecialKey.Paste)/* && Font.HaveSymbol(character)*/)
             {
-                string toAdd = character.ToString();
+                StringBuilder stringToAdd = new StringBuilder(keyString.Length);
 
-                if (m_cursorPosition == m_text.Length)
-                    m_text += toAdd;
-                else
-                    m_text = m_text.Insert(m_cursorPosition, toAdd);
+                for (int i = 0; i < keyString.Length; i++)
+                    if (Font.HaveSymbol(keyString[i]))
+                        stringToAdd.Append(keyString[i]);
 
-                if (OnTextChanged != null)
-                    OnTextChanged(this, m_text);
+                if (stringToAdd.Length > 0)
+                {
+                    string toAdd = stringToAdd.ToString();
 
-                m_cursorPosition += toAdd.Length;
-                m_cursorLinePosition += toAdd.Length;
-                Relayout();
-                return true;
+                    if (m_cursorPosition == m_text.Length)
+                        m_text += toAdd;
+                    else
+                        m_text = m_text.Insert(m_cursorPosition, toAdd);
+
+                    if (OnTextChanged != null)
+                        OnTextChanged(this, m_text);
+
+                    m_cursorPosition += toAdd.Length;
+                    m_cursorLinePosition += toAdd.Length;
+                    Relayout();
+                    return true;
+                }
             }
 
             if (!up)
@@ -350,6 +370,13 @@ namespace NewWidgets.Widgets
                         if (m_cursorPosition <= m_text.Length - 1)
                             UpdateCursor(1, 0);
                         break;
+                    case SpecialKey.Home:
+                        if (m_cursorLinePosition > 0)
+                            UpdateCursor(-m_cursorLinePosition, 0);
+                        break;
+                    case SpecialKey.End:
+                            UpdateCursor(int.MaxValue, 0);
+                        break;
                     case SpecialKey.Up:
                         if (m_cursorLine > 0)
                             UpdateCursor(0, -1);
@@ -383,6 +410,7 @@ namespace NewWidgets.Widgets
                 if (lineChange != 0)
                 {
                     m_cursorLine += lineChange;
+                    m_contentOffset.X = 0;
                 }
                 else
                 {
@@ -435,56 +463,28 @@ namespace NewWidgets.Widgets
                 else
                     cursorX = frame.X;
 
-                // TODO: find cursor line and position in line
+                cursorX *= FontSize;
 
-                /*
-
-                var frame = m_label.GetCharFrame(m_cursorPosition);
-                float nsize = Size.X / FontSize;
-
-                if (m_label.Size.X > nsize)
-                {
-                    float from = -m_label.Position.X / FontSize;
-                    float to = from + nsize;
-
-                    if (frame.X > from && frame.X < to)
-                    {
-                    }
-                    else
-                    {
-                        if (frame.X > from)
-                        {
-                            float nx = (nsize - frame.X) * FontSize - TextPadding.Width;
-                            if (nx > TextPadding.Left)
-                                nx = TextPadding.Left;
-
-                            m_label.Position = new Vector2(nx, TextPadding.Top);
-                        }
-                        else
-                            if (frame.X < to)
-                        {
-                            float nx = -frame.X * FontSize;
-                            if (nx > TextPadding.Left)
-                                nx = TextPadding.Left;
-
-                            m_label.Position = new Vector2(nx, TextPadding.Top);
-                        }
-                    }
-                }
+                if (cursorY + m_lineHeight + m_contentOffset.Y > Size.Y)
+                    m_contentOffset.Y = (Size.Y - cursorY - m_lineHeight);
                 else
-                    m_label.Position = TextPadding.TopLeft;*/
+                    if (cursorY + m_contentOffset.Y < 0)
+                        m_contentOffset.Y = -cursorY;
 
-                SetTextPosition(Vector2.Zero);
+                if (cursorX + (frame.Width + Font.SpaceWidth) * FontSize + m_contentOffset.X > Size.X)
+                    m_contentOffset.X = Size.X - cursorX - (frame.Width + Font.SpaceWidth) *FontSize;
+                else
+                    if (cursorX + m_contentOffset.X < 0)
+                    m_contentOffset.X = -cursorX;
 
-                m_cursor.Position = m_contentPosition + new Vector2((cursorX - m_cursor.Sprite.FrameSize.X / 2) * FontSize, cursorY - 5 * FontSize); // Nomad: 5 is magic constant. Don't like it at all 
-            } else
-                SetTextPosition(Vector2.Zero);
+                m_cursor.Position = TextPadding.TopLeft + m_contentOffset + new Vector2(cursorX - (m_cursor.Sprite.FrameSize.X / 2) * FontSize, cursorY - 4 * FontSize); // Nomad: 4 is magic constant. Don't like it at all 
+            }
+                
+            UpdateTextPosition();
         }
 
-        private void SetTextPosition(Vector2 offset)
+        private void UpdateTextPosition()
         {
-            m_contentPosition = TextPadding.TopLeft + offset;
-
             float y = 0;
 
             for (int i = 0; i < m_labels.Length; i++)
@@ -500,7 +500,7 @@ namespace NewWidgets.Widgets
                 //else
                     x = 0;
 
-                label.Position = m_contentPosition + new Vector2(x, y);
+                label.Position = TextPadding.TopLeft + m_contentOffset + new Vector2(x, y);
 
                 m_labels[i] = label;
 
@@ -543,11 +543,13 @@ namespace NewWidgets.Widgets
                     }
                 }
 
-                Vector2 local = Transform.GetClientPoint(new Vector2(x, y)) - m_contentPosition;
+                Vector2 local = Transform.GetClientPoint(new Vector2(x, y)) - m_contentOffset;
 
                 if (label == null)
                 {
                     m_cursorLine = (int)Math.Floor(local.Y / m_lineHeight);
+
+                    m_contentOffset.X = 0;
 
                     if (m_cursorLine < 0)
                     {

@@ -90,15 +90,15 @@ namespace NewWidgets.Widgets
             return false;
         }
 
-        public override bool Key(SpecialKey key, bool up, char character)
+        public override bool Key(SpecialKey key, bool up, string keyString)
         {
             if (!Enabled)
                 return true;
 
-            if (m_children.Key(key, up, character))
+            if (m_children.Key(key, up, keyString))
                 return true;
 
-            if (m_background.Key(key, up, character))
+            if (m_background.Key(key, up, keyString))
                 return true;
 
             return false;

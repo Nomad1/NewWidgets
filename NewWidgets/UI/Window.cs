@@ -143,12 +143,12 @@ namespace NewWidgets.UI
             return false;
         }
 
-        public override bool Key (SpecialKey key, bool up, char character)
+        public override bool Key (SpecialKey key, bool up, string keyString)
         {
             if (!Controlling)
                 return true;
             
-            if (m_children.Key(key, up, character))
+            if (m_children.Key(key, up, keyString))
                 return true;
             
             if (Modal && key == SpecialKey.Back && up)

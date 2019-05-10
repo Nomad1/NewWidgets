@@ -174,7 +174,7 @@ namespace NewWidgets.WinFormsSample
             Move(new Vector2(WindowController.Instance.ScreenWidth, Position.Y), AppearDuration, null);
         }
 
-        public override bool Key(SpecialKey key, bool up, char character)
+        public override bool Key(SpecialKey key, bool up, string keyString)
         {
             if (key == SpecialKey.Back)
             {
@@ -188,7 +188,7 @@ namespace NewWidgets.WinFormsSample
                 return true;
             }
 
-            return base.Key(key, up, character);
+            return base.Key(key, up, keyString);
         }
     }
 }

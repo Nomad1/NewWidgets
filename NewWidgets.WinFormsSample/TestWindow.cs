@@ -101,6 +101,7 @@ namespace NewWidgets.WinFormsSample
             m_localEdit.FontSize = WidgetManager.FontScale * 1.25f;
             m_localEdit.Visible = m_localCheckBox.Checked && m_localCheckBox.Visible;
             m_localEdit.OnTextEntered += delegate { HandleLoginPress(null); };
+            m_localEdit.OnValidateInput += HandleValidateIpInput;
             panel.AddChild(m_localEdit);
             m_localEdit.SetFocused(false);
 
@@ -127,12 +128,19 @@ namespace NewWidgets.WinFormsSample
 
 
             WidgetTextField textTextField = new WidgetTextField(WidgetManager.GetStyle("default_textedit"));
-            textTextField.Size = new Vector2(500, 245);
-            textTextField.Position = new Vector2(50, 500);
+            textTextField.Size = new Vector2(500, 225);
+            textTextField.Position = new Vector2(50, 520);
             textTextField.FontSize = WidgetManager.FontScale * 1.25f;
             textTextField.Visible = true;
+            textTextField.Text = "WidgetTextField textTextField = new WidgetTextField(WidgetManager.GetStyle(\"default_textedit\"));\n            textTextField.Size = new Vector2(500, 225);\n            textTextField.Position = new Vector2(50, 520);\n            textTextField.FontSize = WidgetManager.FontScale * 1.25f;\n            textTextField.Visible = true";
             panel.AddChild(textTextField);
+        }
 
+        private bool HandleValidateIpInput(string oldText, string input)
+        {
+            if (input.Length == 1 && !char.IsDigit(input[0]) && input[0] != '.')
+                return false;
+            return true;
         }
 
         private void HandleLoginEntered(WidgetTextEdit edit, string text)

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Numerics;
-
+using System.Text;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
@@ -27,8 +27,8 @@ namespace NewWidgets.Widgets
         public event Action<WidgetTextEdit, string> OnTextEntered;
         public event Action<WidgetTextEdit, string> OnTextChanged;
         /// <summary>
-        /// Occurs when key is pressed and nex text is to be added. First parameter is source string second in inout string
-        /// returns true if string is valid and false if not
+        /// Occurs when key is pressed and nex text is to be added. First parameter is source string second is input string
+        /// Delegate should return true if string is valid and false if not
         /// </summary>
         public event Func<string, string, bool> OnValidateInput;
 
@@ -172,6 +172,16 @@ namespace NewWidgets.Widgets
             InivalidateLayout();
         }
 
+        public override bool SwitchStyle(WidgetStyleType styleType)
+        {
+            if (base.SwitchStyle(styleType))
+            {
+                InivalidateLayout();
+                return true;
+            }
+            return false;
+        }
+
         private void Relayout()
         {
             if (m_label == null)
@@ -182,7 +192,9 @@ namespace NewWidgets.Widgets
             else
                 m_label.Text = MaskText(m_text, MaskChar);
 
+            m_label.Color = TextColor;
             m_label.Scale = FontSize;
+            m_label.Alpha = Alpha;
 
             if (m_cursor == null)
             {
@@ -237,7 +249,7 @@ namespace NewWidgets.Widgets
                 m_cursor.Draw(canvas);
         }
         
-        public override bool Key(SpecialKey key, bool up, char character)
+        public override bool Key(SpecialKey key, bool up, string keyString)
         {
             if (!IsFocused)
                 return false;
@@ -266,26 +278,36 @@ namespace NewWidgets.Widgets
                 return true;
             }
 
-
-            if ((key == SpecialKey.Letter || key == SpecialKey.Paste) && Font.HaveSymbol(character))
+            if ((key == SpecialKey.Letter || key == SpecialKey.Paste)/* && Font.HaveSymbol(character)*/)
             {
-                string toAdd = character.ToString();
+                // filter non-printable chars
 
-                // Input string validation. Only called on paste and input
-                if (OnValidateInput != null && !OnValidateInput(m_text, toAdd))
+                StringBuilder stringToAdd = new StringBuilder(keyString.Length);
+
+                for (int i = 0; i < keyString.Length; i++)
+                    if (Font.HaveSymbol(keyString[i]))
+                        stringToAdd.Append(keyString[i]);
+
+                if (stringToAdd.Length > 0)
+                {
+                    string toAdd = stringToAdd.ToString();
+
+                    // Input string validation. Only called on paste and input
+                    if (OnValidateInput != null && !OnValidateInput(m_text, toAdd))
+                        return true;
+
+                    if (m_cursorPosition == m_text.Length)
+                        m_text += toAdd;
+                    else
+                        m_text = m_text.Insert(m_cursorPosition, toAdd);
+
+                    if (OnTextChanged != null)
+                        OnTextChanged(this, m_text);
+
+                    m_cursorPosition += toAdd.Length;
+                    Relayout();
                     return true;
-
-                if (m_cursorPosition == m_text.Length)
-                    m_text += toAdd;
-                else
-                    m_text = m_text.Insert(m_cursorPosition, toAdd);
-
-                if (OnTextChanged != null)
-                    OnTextChanged(this, m_text);
-
-                m_cursorPosition += toAdd.Length;
-                Relayout();
-                return true;
+                }
             }
 
             if (!up)
@@ -368,7 +390,7 @@ namespace NewWidgets.Widgets
                     float from = -m_label.Position.X / FontSize;
                     float to = from + nsize;
 
-                    if (cursorX > from && frame.X < to)
+                    if (cursorX > from && cursorX < to)
                     {
                     } else
                     {
@@ -382,7 +404,7 @@ namespace NewWidgets.Widgets
                         } else
                             if (cursorX < to)
                         {
-                            float nx = -frame.X * FontSize;
+                            float nx = -cursorX * FontSize;
                             if (nx > TextPadding.Left)
                                 nx = TextPadding.Left;
 

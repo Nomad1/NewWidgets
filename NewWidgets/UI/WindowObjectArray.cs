@@ -178,14 +178,14 @@ namespace NewWidgets.UI
             return false;
         }
 
-        public bool Key(SpecialKey key, bool up, char character)
+        public bool Key(SpecialKey key, bool up, string keyString)
         {
             T[] array = EnsureArray();
 
             for (int i = array.Length - 1; i >= 0; i--)
                 if (array[i] != null && array[i].Visible)
                 {
-                    if (array[i].Key(key, up, character))
+                    if (array[i].Key(key, up, keyString))
                         return true;
                 }
 

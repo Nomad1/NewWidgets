@@ -19,68 +19,76 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
         private void HandleOnInit()
         {            m_windowController.AddWindow(new TestWindow());
         }        protected override void OnKeyDown(KeyEventArgs e)        {            if (e.KeyCode == Keys.Q && (ModifierKeys & Keys.Alt) != 0)            {                Close();                return;            }
-
-            ProcessKey(e.KeyCode, e.KeyValue, e.Control, false);
+            e.SuppressKeyPress = ProcessKey(e.KeyCode, e.KeyValue, (ModifierKeys & Keys.Control) != 0, e.Shift, false);
             base.OnKeyDown(e);        }
 
         protected override void OnKeyUp(KeyEventArgs e)
         {
-            ProcessKey(e.KeyCode, e.KeyValue, e.Control, true);
-
-            base.OnKeyUp(e);
+            e.SuppressKeyPress = ProcessKey(e.KeyCode, e.KeyValue, (ModifierKeys & Keys.Control) != 0, e.Shift, true);
+            base.OnKeyUp(e);
         }
 
-        private void ProcessKey(Keys key, int value, bool control, bool up)
+        private bool ProcessKey(Keys key, int value, bool control, bool shift, bool up)
         {
             if (m_windowController != null)
             {
                 switch (key)
                 {
                     case Keys.Left:
-                        m_windowController.Key((int)SpecialKey.Left, up, '\0');
-                        break;
+                        m_windowController.Key(SpecialKey.Left, up, "");
+                        return true;
                     case Keys.Right:
-                        m_windowController.Key((int)SpecialKey.Right, up, '\0');
-                        break;
+                        m_windowController.Key(SpecialKey.Right, up, "");
+                        return true;
                     case Keys.Up:
-                        m_windowController.Key((int)SpecialKey.Up, up, '\0');
-                        break;
+                        m_windowController.Key(SpecialKey.Up, up, "");
+                        return true;
                     case Keys.Down:
-                        m_windowController.Key((int)SpecialKey.Down, up, '\0');
-                        break;
+                        m_windowController.Key(SpecialKey.Down, up, "");
+                        return true;
                     case Keys.Space:
-                        m_windowController.Key((int)SpecialKey.Select, up, ' ');
-                        break;
+                        m_windowController.Key(SpecialKey.Select, up, " ");
+                        return false;
                     case Keys.Enter:
-                        m_windowController.Key((int)SpecialKey.Enter, up, '\n');
-                        break;
+                        m_windowController.Key(SpecialKey.Enter, up, "\n");
+                        return true;
                     case Keys.Tab:
-                        m_windowController.Key((int)SpecialKey.Tab, up, '\t');
-                        break;
+                        m_windowController.Key(SpecialKey.Tab, up, "\t");
+                        return true;
                     case Keys.Delete:
-                        m_windowController.Key((int)SpecialKey.Delete, up, '\0');
-                        break;
-                    default:
-
-                        if (value == '\b')
+                        m_windowController.Key(SpecialKey.Delete, up, "");
+                        return true;
+                    case Keys.Home:                        m_windowController.Key(SpecialKey.Home, up, "");                        return true;                    case Keys.End:                         m_windowController.Key(SpecialKey.End, up, "");
+                        return true;
+                    case Keys.Insert:                        if (shift)                             m_windowController.Key(SpecialKey.Paste, up, Clipboard.GetText());
+                        return true;
+                    case Keys.V: // never called. WinForms is a cruel beast (                        if (control)
+                        {                            m_windowController.Key(SpecialKey.Paste, up, Clipboard.GetText());                            return true;
+                         }                         break;
+                    default:                        if (value == '\b')
                         {
-                            m_windowController.Key((int)SpecialKey.Backspace, up, '\0');
-
-                            if (control)
-                                for (int i = 0; i < 31; i++)
-                                    m_windowController.Key((int)SpecialKey.Backspace, up, '\0');
-                            break;
+                            if (control)                                m_windowController.Key(SpecialKey.EraseLine, up, "");                            else
+                                m_windowController.Key(SpecialKey.Backspace, up, "");
+                            return true;
                         }
                         break;
-                }            }
-        }
+                }            }            return false;
+        }
 
         protected override void OnKeyPress(KeyPressEventArgs e)
         {
             if (m_windowController != null)
-                m_windowController.Key((int)SpecialKey.Letter, true, (char)e.KeyChar);
+                m_windowController.Key(SpecialKey.Letter, true, e.KeyChar.ToString());
 
             base.OnKeyPress(e);
+        }        private const int WM_PASTE = 0x0302;        protected override void WndProc(ref Message m)
+        {
+            if (m.Msg == WM_PASTE)
+            {
+                if (m_windowController.Key(SpecialKey.Paste, false, Clipboard.GetText()))                    return;
+            }
+
+            base.WndProc(ref m);
         }
 
         #region Events
