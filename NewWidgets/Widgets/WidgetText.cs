@@ -126,7 +126,7 @@ namespace NewWidgets.Widgets
 
         public void Relayout()
         {
-            string[] lines = m_text.Split(new string[] { "\r", "\n", "|n", "\\n" }, StringSplitOptions.None);
+            string[] lines = string.IsNullOrEmpty(m_text) ? new string[0]: m_text.Split(new string[] { "\r", "\n", "|n", "\\n" }, StringSplitOptions.None);
 
             float lineHeight = (Font.Height + LineSpacing) * FontSize; // TODO: spacing
 

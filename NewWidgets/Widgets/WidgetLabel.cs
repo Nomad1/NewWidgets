@@ -137,8 +137,9 @@ namespace NewWidgets.Widgets
             m_label.Color = Color;
             m_label.Alpha = Alpha;
             m_label.Scale = FontSize;
-            
-            m_label.Text = m_text;
+
+            if (!string.IsNullOrEmpty(m_text))
+                m_label.Text = m_text;
 
             Vector2 minSize = m_label.Size * FontSize;
             if (minSize.X < Size.X)

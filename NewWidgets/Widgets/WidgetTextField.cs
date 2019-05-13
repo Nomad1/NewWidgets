@@ -465,9 +465,9 @@ namespace NewWidgets.Widgets
                 var frame = m_labels[m_cursorLine].GetCharFrame(m_cursorLinePosition == line.Length ? line.Length - 1 : m_cursorLinePosition);
 
                 if (m_cursorLinePosition == line.Length)
-                    cursorX = frame.Right;
+                    cursorX = frame.X + frame.Width;
                 else
-                    cursorX = frame.Left;
+                    cursorX = frame.X;
 
                 cursorX *= FontSize;
 
