@@ -459,6 +459,11 @@ namespace NewWidgets.Widgets
             m_contentView.AddChild(child);
         }
 
+        public bool RemoveChild(WindowObject child)
+        {
+            return m_contentView.RemoveChild(child);
+        }
+
         void IWindowContainer.AddChild(WindowObject child)
         {
             if (child is Widget)

@@ -106,8 +106,26 @@ namespace NewWidgets.Widgets
 
         public void AddChild(Widget child)
         {
+            var parentContainer = child.Parent as IWindowContainer;
+            if (parentContainer != null)
+                parentContainer.RemoveChild(child);
+
             m_children.Add(child);
             child.Parent = this;
+        }
+
+        public bool RemoveChild(WindowObject child)
+        {
+            var childWidget = child as Widget;
+            if (child.Parent != this)
+                return false;
+
+            if (childWidget == null)
+                throw new ArgumentException(nameof(child));
+
+            m_children.Remove(childWidget);
+
+            return true;
         }
 
         void IWindowContainer.AddChild(WindowObject child)
