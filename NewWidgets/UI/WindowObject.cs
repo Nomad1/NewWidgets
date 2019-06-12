@@ -104,6 +104,7 @@ namespace NewWidgets.UI
         private object m_lastList;
 
         public event TouchDelegate OnTouch;
+        public event Action<WindowObject, bool> OnVisibilityChange;
 
         internal object LastList
         {
@@ -174,6 +175,8 @@ namespace NewWidgets.UI
                     m_flags |= WindowObjectFlags.Visible;
                 else
                     m_flags &= ~WindowObjectFlags.Visible;
+                if (OnVisibilityChange != null)
+                    OnVisibilityChange(this, value);
             }
         }
 
