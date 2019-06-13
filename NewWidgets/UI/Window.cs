@@ -24,6 +24,7 @@ namespace NewWidgets.UI
         ICollection<WindowObject> Children { get; }
         int MaximumZIndex { get; }
         void AddChild(WindowObject child);
+        bool RemoveChild(WindowObject child);
     }
 
     public interface IFocusable
@@ -239,10 +240,24 @@ namespace NewWidgets.UI
         
         public void AddChild(WindowObject child)
         {
+            var parentContainer = child.Parent as IWindowContainer;
+            if (parentContainer != null)
+                parentContainer.RemoveChild(child);
+
             m_children.Add (child);
             child.Parent = this;
         }
-        
+
+        public bool RemoveChild(WindowObject child)
+        {
+            if (child.Parent != this)
+                return false;
+
+            m_children.Remove(child);
+
+            return true;
+        }
+
         /*public override void Remove()
         {
             foreach (WindowObject obj in m_children.List)
