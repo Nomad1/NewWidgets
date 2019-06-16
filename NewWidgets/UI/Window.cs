@@ -241,7 +241,7 @@ namespace NewWidgets.UI
         public void AddChild(WindowObject child)
         {
             var parentContainer = child.Parent as IWindowContainer;
-            if (parentContainer != null)
+            if (parentContainer != null && parentContainer != this)
                 parentContainer.RemoveChild(child);
 
             m_children.Add (child);
