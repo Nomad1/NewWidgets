@@ -26,6 +26,7 @@ namespace NewWidgets.Widgets
         public WidgetTooltip(WidgetStyleSheet style)
             : base(style)
         {
+            Scale = WindowController.Instance.ScreenScale;
         }
 
         public virtual void UpdatePosition(Vector2 position)
@@ -88,7 +89,7 @@ namespace NewWidgets.Widgets
         {
             Hide();
 
-            tooltip.ZIndex = int.MaxValue;
+            tooltip.ZIndex = WidgetManager.GetTopmostWindow().MaximumZIndex + 100;
             WidgetManager.GetTopmostWindow().AddChild(tooltip);
             tooltip.Update(); // make sure all sizes are settled up
 

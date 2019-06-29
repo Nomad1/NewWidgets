@@ -34,7 +34,7 @@ namespace NewWidgets.Widgets
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (press || unpress)
+            if (Visible && (press || unpress))
                 BringToFront();
 
             if (base.Touch(x, y, press, unpress, pointer))
