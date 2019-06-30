@@ -40,7 +40,7 @@ namespace NewWidgets.Widgets
 
         public float LineSpacing
         {
-            get { return GetProperty(WidgetParameterIndex.LineSpacing, 5.0f); }
+            get { return GetProperty(WidgetParameterIndex.LineSpacing, 1.0f); }
             set { SetProperty(WidgetParameterIndex.LineSpacing, value); InivalidateLayout(); }
         }
 
