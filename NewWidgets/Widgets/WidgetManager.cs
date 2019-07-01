@@ -15,6 +15,9 @@ namespace NewWidgets.Widgets
 
         private static Widget s_currentTooltip;
 
+        // this window is used for tooltips and other top-level controls. If not set, last one of Windows collection is to be used instead
+        private static Window s_topLevelWindow;
+
         private static readonly Dictionary<string, Font> s_fonts = new Dictionary<string, Font>();
 
         // focus
@@ -53,6 +56,11 @@ namespace NewWidgets.Widgets
             s_styles.Clear();
 
             WindowController.Instance.OnTouch += HandleTouch;
+        }
+
+        public static void RegisterTopLevelWindow(Window window)
+        {
+            s_topLevelWindow = window;
         }
 
         public static void LoadUI(string uiData)
@@ -267,7 +275,7 @@ namespace NewWidgets.Widgets
 
         public static Window GetTopmostWindow()
         {
-            return WindowController.Instance.Windows[WindowController.Instance.Windows.Count - 1];
+            return s_topLevelWindow ?? WindowController.Instance.Windows[WindowController.Instance.Windows.Count - 1];
         }
         
         public static void SetExclusive(Widget widget)
