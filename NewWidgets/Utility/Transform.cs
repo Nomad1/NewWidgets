@@ -310,6 +310,16 @@ namespace NewWidgets.Utility
             return new Vector2(result.X, result.Y);
         }
 
+
+        public void SetMatrix(Matrix4x4 matrix)
+        {
+            m_matrix = matrix;
+
+            m_changed = false;
+            m_version++;
+            m_parentVersion = m_parent != null ? m_parent.m_version : 0;
+        }
+
         /// <summary>
         /// This method bakes transform values to 4x4 matrix
         /// </summary>

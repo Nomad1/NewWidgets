@@ -26,7 +26,6 @@ namespace NewWidgets.Widgets
         public WidgetTooltip(WidgetStyleSheet style)
             : base(style)
         {
-            Scale = WindowController.Instance.ScreenScale;
         }
 
         public virtual void UpdatePosition(Vector2 position)
