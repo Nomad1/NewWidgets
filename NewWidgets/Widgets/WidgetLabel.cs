@@ -25,7 +25,18 @@ namespace NewWidgets.Widgets
         public Font Font
         {
             get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
-            set { SetProperty(WidgetParameterIndex.Font, value); m_needLayout = true; }
+            set
+            {
+                SetProperty(WidgetParameterIndex.Font, value);
+
+                if (m_label != null)
+                {
+                    m_label.Remove();
+                    m_label = null;
+                }
+
+                m_needLayout = true;
+            }
         }
 
         public float FontSize
@@ -37,7 +48,18 @@ namespace NewWidgets.Widgets
         public WidgetAlign TextAlign
         {
             get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
-            set { SetProperty(WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
+            set
+            {
+                SetProperty(WidgetParameterIndex.TextAlign, value);
+
+                if (m_label != null)
+                {
+                    m_label.Remove();
+                    m_label = null;
+                }
+
+                m_needLayout = true;
+            }
         }
 
         public bool RichText
