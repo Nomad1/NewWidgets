@@ -18,26 +18,41 @@ namespace NewWidgets.Widgets
 
         private string m_text;
 
-        private bool m_needLayout;
-        private bool m_needAnimate;
-        private bool m_needAnimateRandom;
+        private bool m_needLayout; // flag to indicate that inner label size/opacity/formatting has changed
+        private bool m_needRecreate; // flag to indicate that we need a new inner label
+        private bool m_needAnimate; // flag to indicate that animation is in progress
+        private bool m_needAnimateRandom; // animation type
         
         public Font Font
         {
             get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
-            set { SetProperty(WidgetParameterIndex.Font, value); m_needLayout = true; }
+            set
+            {
+                SetProperty(WidgetParameterIndex.Font, value);
+                m_needLayout = true;
+                m_needRecreate = true; // there is no way to change the font without label recreation
+            }
         }
 
         public float FontSize
         {
             get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
-            set { SetProperty(WidgetParameterIndex.FontSize, value); m_needLayout = true; }
+            set
+            {
+                SetProperty(WidgetParameterIndex.FontSize, value);
+                m_needLayout = true;
+            }
         }
 
         public WidgetAlign TextAlign
         {
             get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
-            set { SetProperty(WidgetParameterIndex.TextAlign, value); m_needLayout = true; }
+            set
+            {
+                SetProperty(WidgetParameterIndex.TextAlign, value);
+                m_needLayout = true;
+                m_needRecreate = true; // there is no way to change text alignment without label recreation
+            }
         }
 
         public bool RichText
@@ -47,7 +62,7 @@ namespace NewWidgets.Widgets
             {
                 SetProperty(WidgetParameterIndex.RichText, value);
 
-                if (m_label != null)
+                if (m_label != null) // try to avoid settings m_needLayout
                     m_label.RichText = value;
 
                 m_needLayout = true;
@@ -131,6 +146,12 @@ namespace NewWidgets.Widgets
 
         public void Relayout()
         {
+            if (m_label != null && m_needRecreate)
+            {
+                m_label.Remove();
+                m_label = null;
+            }
+
             if (m_label == null)
                 m_label = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, RichText);
             
@@ -194,9 +215,7 @@ namespace NewWidgets.Widgets
                 m_label.Update();
 
             if (m_needAnimate)
-            {
                 DoAnimateAppear(m_needAnimateRandom);
-            }
 
             return true;
         }
@@ -245,22 +264,20 @@ namespace NewWidgets.Widgets
 
             Alpha = 1.0f;
 
-            Random random = new Random();
-
             for (int i = 0; i < m_label.InternalGetSprites().Length; i++)
             {
                 ISprite sprite = m_label.InternalGetSprites()[i];
                 sprite.Alpha = 0;
 
-                // Different letters appear with random delay vs constant fade in
+                // Different letters appear with random delay vs constant fade-in
 
                 // TODO: Unreadable, refactor
-                int time = isRandom ? 100 + random.Next() % 200 : 100 + i * 500 / m_label.InternalGetSprites().Length;
+                int time = isRandom ? 100 + MathHelper.GetRandomInt(0, 200) : 100 + i * 500 / m_label.InternalGetSprites().Length;
 
                 Animator.StartAnimation(this, (AnimationKind)((int)AnimationKind.Custom + i), 0, 255, time,
                 delegate (float x, int from, int to)
                 {
-                    sprite.Alpha = MathHelper.LinearInterpolationInt(x, (int)from, (int)to);
+                    sprite.Alpha = MathHelper.LinearInterpolationInt(x, from, to);
                 },
                 null);
             }

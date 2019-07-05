@@ -11,6 +11,8 @@ namespace NewWidgets.Utility
         public static readonly double Deg2Rad = Math.PI / 180.0;
         public static readonly double Rad2Deg = 180.0 / Math.PI;
 
+        private static readonly Random s_random = new Random();
+
         public static int Clamp(int value, int min, int max)
         {
             return value < min ? min : value > max ? max : value;
@@ -111,6 +113,11 @@ namespace NewWidgets.Utility
         public static int LinearInterpolationInt(float x, int from, int to)
         {
             return Clamp((int)(from + (to - from) * x + 0.5f), Math.Min(from, to), Math.Max(from, to));
+        }
+
+        public static int GetRandomInt(int from, int to)
+        {
+            return s_random.Next(to - from) + from;
         }
     }
 }
