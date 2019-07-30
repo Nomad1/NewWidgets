@@ -299,6 +299,23 @@ namespace NewWidgets.Utility
         }
 
         /// <summary>
+        /// Unproject 3d point
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public Vector3 GetScreenPoint3(Vector3 source)
+        {
+            PrepareMatrix();
+            Vector3 result;
+
+            if (m_parent == null)
+                result = MathHelper.Transform(source, ref m_localMatrix);
+            else
+                result = MathHelper.Transform(source, ref m_matrix);
+            return result;
+        }
+
+        /// <summary>
         /// Project point
         /// </summary>
         /// <param name="source"></param>
