@@ -101,7 +101,7 @@ namespace NewWidgets.WinForms
         }
 
         public event Action OnInit;
-        public override event TouchDelegate OnTouch;
+        public sealed override event TouchDelegate OnTouch;
 
 
         public WinFormsController(int width, int height, float scale, float fontScale, bool isSmallScreen, string imagePath)
@@ -131,7 +131,10 @@ namespace NewWidgets.WinForms
                 m_images[file] = image = Image.FromFile(file);
 
             if (image == null)
+            {
                 LogError("Failed to load sprite {0}", id);
+                return;
+            }
 
             if (frames == null)
             {
@@ -330,15 +333,17 @@ namespace NewWidgets.WinForms
 
         public bool Key(SpecialKey key, bool up, string keyString)
         {
-            //if (Windows.Count > 0)
-                //return Windows[Windows.Count -].Key(key, up, character)
-            for (int i = Windows.Count - 1; i >= 0; /*i--*/)
+            if (Windows.Count > 0 && Windows[Windows.Count - 1].Key(key, up, keyString))
+                return true;
+
+/*
+            for (int i = Windows.Count - 1; i >= 0; i--)
             {
                 if (Windows[i].Key(key, up, keyString))
                     return true;
 
                 break;
-            }
+            }*/
 
             return false;
         }

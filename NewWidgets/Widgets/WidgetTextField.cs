@@ -437,13 +437,13 @@ namespace NewWidgets.Widgets
 
                 // validation
 
-                if (m_cursorLine < 0)
-                    m_cursorLine = 0;
-
                 if (m_cursorLine > m_lines.Length - 1)
                     m_cursorLine = m_lines.Length - 1;
 
-                if (m_cursorLinePosition > m_lines[m_cursorLine].Length)
+                if (m_cursorLine < 0)
+                    m_cursorLine = 0;
+
+                if (m_cursorLinePosition > m_lines[m_cursorLine].Length) // m_lines length should always be 1 or more, no crime here. TODO: check it
                     m_cursorLinePosition = m_lines[m_cursorLine].Length;
 
                 // calculate global text position

@@ -62,7 +62,6 @@ namespace NewWidgets.WinForms
         {
             get { return m_size; }
         }
-
         public Vector2 PivotShift
         {
             get { return m_pivotShift; }

@@ -129,7 +129,7 @@ namespace NewWidgets.Widgets
                     Press();
                     return true;
                 }
-                else if (!press && !unpress && !Hovered)
+                else if (!Hovered)
                 {
                     Hovered = true;
                     WindowController.Instance.OnTouch += UnHoverTouch;

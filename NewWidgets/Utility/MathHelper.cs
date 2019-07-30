@@ -72,9 +72,9 @@ namespace NewWidgets.Utility
             m2 = m2 * m1;
         }
 
-        public static void Mul(Matrix4x4 m1, Matrix4x4 m2, ref Matrix4x4 nresult)
+        public static void Mul(Matrix4x4 m2, Matrix4x4 m1, ref Matrix4x4 nresult)
         {
-            nresult = Matrix4x4.Multiply(m2, m1);
+            nresult = Matrix4x4.Multiply(m1, m2); // we're using reverse multiplying order here intentionaly
         }
 
         public static Vector3 Transform(Vector3 vector, ref Matrix4x4 matrix)

@@ -177,50 +177,50 @@ namespace NewWidgets.Widgets
             
             return false;
         }
-        
+
         internal static void UpdateFocus(IFocusableWidget widget, bool focus)
         {
             IWindowContainer window = ((WindowObject)widget).Window;
 
             if (window == null)
                 return; // no window, no crime
-            
+
             int windowHash = window.GetHashCode();
 
             IFocusableWidget focusedWidget;
             s_focusedWidgets.TryGetValue(windowHash, out focusedWidget);
-            
-            if (!focus)
+
+            // Nomad: PVS analyzer indicated some amount of fuzzy logic here.
+            // I think that whole focusing and unfocusing logic should be refactored
+
+            if (widget == focusedWidget)
             {
-                if (widget == focusedWidget)
+                if (!focus && focusedWidget != null)
                 {
+                    focusedWidget.SetFocused(false);
                     s_focusedWidgets.Remove(windowHash);
                 }
+
                 return;
             }
 
-            if (focus && widget == focusedWidget)
-            {
-                return;
-            }
-
-            if (focusedWidget != null && focus)
+            if (focusedWidget != null)
             {
                 IFocusableWidget oldWidget = focusedWidget;
                 s_focusedWidgets.Remove(windowHash);
                 oldWidget.SetFocused(false);
             }
 
-            if (focus)
-            {
-                focusedWidget = widget;
-                focusedWidget.SetFocused(true);
-            }
+            focusedWidget = widget;
 
             if (focusedWidget == null)
                 s_focusedWidgets.Remove(windowHash);
             else
+            {
+                if (focus)
+                    focusedWidget.SetFocused(true);
                 s_focusedWidgets[windowHash] = focusedWidget;
+            }
         }
 
         internal static bool FocusNext(IFocusableWidget widget)

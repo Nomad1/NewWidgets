@@ -386,8 +386,10 @@ namespace NewWidgets.Widgets
 
         protected void SchedulePress()
         {
-            if (OnPress != null)
-                WindowController.Instance.ScheduleAction(delegate { OnPress(this); }, 1);
+            var onPress = OnPress;
+
+            if (onPress != null)
+                WindowController.Instance.ScheduleAction(delegate { onPress(this); }, 1);
         }
     }
 }
