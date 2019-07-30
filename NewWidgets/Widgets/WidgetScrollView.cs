@@ -433,10 +433,13 @@ namespace NewWidgets.Widgets
 
         public override bool Zoom(float x, float y, float value)
         {
-            bool processed = base.Zoom(x, y, value);
+            //While it's not required for Widget descendants, all WidgetScrollView descendants should use
+            //the following lines:
 
-            if (processed)
-                return true;
+            //bool processed = base.Zoom(x, y, value);
+
+            //if (processed)
+            //    return true;
 
             if (!Enabled)
                 return true;

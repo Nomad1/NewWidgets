@@ -78,6 +78,8 @@ namespace NewWidgets.Widgets
                 }
             }
 
+
+            // we're still returning true here to avoid clicks on non-active windows
             return true;
         }
     }

@@ -8,7 +8,7 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.WinForms
 {
-    public class WinFormsSprite : ISprite
+    public class WinFormsSprite : ISprite //TODO: V3072 https://www.viva64.com/en/w/v3072/ The 'WinFormsSprite' class containing IDisposable members does not itself implement IDisposable. Inspect: m_imageAttributes.
     {
         public struct FrameData
         {
