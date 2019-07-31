@@ -202,6 +202,27 @@ namespace NewWidgets.Utility
             }
         }
 
+        /// <summary>
+        /// Gets the local matrix.
+        /// </summary>
+        /// <value>The local matrix.</value>
+        public Matrix4x4 LocalMatrix
+        {
+            get
+            {
+                if (IsChanged)
+                {
+                    UpdateMatrix();
+                }
+
+                return m_localMatrix;
+            }
+        }
+
+        /// <summary>
+        /// Gets the inverted atrix.
+        /// </summary>
+        /// <value>The inverted atrix.</value>
         public Matrix4x4 IMatrix
         {
             get
@@ -217,7 +238,6 @@ namespace NewWidgets.Utility
         }
         
         // 2d actual values
-
 
         public Vector2 ActualPosition
         {
@@ -327,6 +347,16 @@ namespace NewWidgets.Utility
             return new Vector2(result.X, result.Y);
         }
 
+        /// <summary>
+        /// Project point
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public Vector3 GetClientPoint3(Vector3 source)
+        {
+            PrepareIMatrix();
+            return MathHelper.Transform(source, ref m_imatrix);
+        }
 
         public void SetMatrix(Matrix4x4 matrix)
         {
