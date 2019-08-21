@@ -85,13 +85,14 @@ namespace NewWidgets.UI
 
         public void Add(T obj)
         {
-            if (obj.LastList == this && Array.IndexOf(EnsureArray(), obj) != -1)
+            int tempIndex = m_list.Count == 0 ? 0 : (m_list.Last.Value.Key + 1);
+            obj.TempZIndex = tempIndex;
+
+            if (obj.LastList == this && Array.IndexOf(EnsureArray(), obj) != -1) // if we're adding a child second time, it will be raised to the top of visibility. TODO: remove this
             {
-                obj.TempZIndex = m_list.Last.Value.Key + 1;
+                // already added, nothing changes
                 return;
             }
-            else
-                obj.TempZIndex = 0;
 
             m_list.Add(obj.ZIndex, obj);
             obj.LastList = this;
