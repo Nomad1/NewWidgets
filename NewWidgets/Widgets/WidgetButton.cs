@@ -345,12 +345,12 @@ namespace NewWidgets.Widgets
             AnimatePress(immediate);
         }
 
-        protected virtual void AnimatePress(bool immediate = false)
+        protected virtual void AnimatePress(bool immediate = false, bool animateOnly = false)
         {
             if (m_animating)
                 return;
 
-            if (immediate)
+            if (immediate && !animateOnly)
                 SchedulePress();
 
             Vector2 animatePivot = AnimatePivot; // center point compensation
@@ -366,7 +366,7 @@ namespace NewWidgets.Widgets
                         delegate
                         {
                             m_animating = false;
-                            if (!immediate)
+                            if (!immediate && !animateOnly)
                                 SchedulePress();
                         }
                     );
