@@ -275,9 +275,16 @@ namespace NewWidgets.Widgets
         /// <returns>The parse.</returns>
         /// <param name="value">Value.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public static T EnumParse<T>(string value) where T:Enum
+        public static T EnumParse<T>(string value)
         {
-            return (T)EnumParse(typeof(T), value);
+            int result = 0; // TODO: GetUnderlyingType()?
+
+            string[] strings = value.Split('|');
+
+            foreach (string str in strings)
+                result |= (int)Enum.Parse(typeof(T), str, true);
+
+            return (T)Enum.ToObject(typeof(T), result);
         }
 
         /// <summary>
