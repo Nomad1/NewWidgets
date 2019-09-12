@@ -275,9 +275,9 @@ namespace NewWidgets.Widgets
         /// <returns>The parse.</returns>
         /// <param name="value">Value.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public static T EnumParse<T>(string value)
+        public static T EnumParse<T>(string value) where T:Enum
         {
-            return (T)Enum.Parse(typeof(T), value, true);
+            return (T)EnumParse(typeof(T), value);
         }
 
         /// <summary>
@@ -288,7 +288,14 @@ namespace NewWidgets.Widgets
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         public static Enum EnumParse(Type enumType, string value)
         {
-            return (Enum)Enum.Parse(enumType, value, true);
+            int result = 0; // TODO: GetUnderlyingType()?
+
+            string[] strings = value.Split('|');
+
+            foreach (string str in strings)
+                result |= (int)Enum.Parse(enumType, str, true);
+
+            return (Enum)Enum.ToObject(enumType, result);
         }
 
         public static string GetAttribute(XmlNode node, string name)
