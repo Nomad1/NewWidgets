@@ -67,12 +67,26 @@ namespace NewWidgets.Widgets
         /// <param name="width">Width</param>
         /// <param name="angleSnap">Angle snap</param>
         public WidgetLine(Vector2 from, Vector2 to, float gap = 0, float width = 4, int angleSnap = 180)
-            : base(DefaultStyle)
+            : this(DefaultStyle, from, to, gap, width, angleSnap)
+        {
+        }
+
+        /// <summary>
+        /// Draws a line
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="from">From.</param>
+        /// <param name="to">To.</param>
+        /// <param name="gap">Gap.</param>
+        /// <param name="width">Width.</param>
+        /// <param name="angleSnap">Angle snap.</param>
+        public WidgetLine(WidgetStyleSheet style, Vector2 from, Vector2 to, float gap = 0, float width = 4, int angleSnap = 180)
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
             m_from = from;
             m_to = to;
             m_gap = gap;
-            m_width = width;    
+            m_width = width;
             m_angleSnap = angleSnap;
             m_needLayout = true;
             m_simpleLine = false;
