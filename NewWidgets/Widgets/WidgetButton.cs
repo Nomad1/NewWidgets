@@ -262,7 +262,7 @@ namespace NewWidgets.Widgets
             if (!base.Update())
                 return false;
             
-            if (m_image != null)
+            if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
             {
                 m_image.Alpha = Alpha;
                 m_image.Update();
