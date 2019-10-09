@@ -212,7 +212,7 @@ namespace NewWidgets.Widgets
                             }
                         }
 
-                        if (start != charSizes.Length - 1)
+                        if (start < charSizes.Length)
                         {
                             newLines.Add(lines[i].Substring(start));
                             newSizes.Add(new Vector2(width, lineHeight));
