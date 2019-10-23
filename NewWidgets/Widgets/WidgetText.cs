@@ -124,6 +124,16 @@ namespace NewWidgets.Widgets
             InivalidateLayout();
         }
 
+        public override bool SwitchStyle(WidgetStyleType styleType)
+        {
+            if (base.SwitchStyle(styleType))
+            {
+                InivalidateLayout();
+                return true;
+            }
+            return false;
+        }
+
         public void Relayout()
         {
             string[] lines = string.IsNullOrEmpty(m_text) ? new string[0]: m_text.Split(new string[] { "\r", "\n", "|n", "\\n" }, StringSplitOptions.None);

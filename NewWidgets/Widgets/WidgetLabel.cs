@@ -29,7 +29,7 @@ namespace NewWidgets.Widgets
             set
             {
                 SetProperty(WidgetParameterIndex.Font, value);
-                m_needLayout = true;
+                InivalidateLayout();
                 m_needRecreate = true; // there is no way to change the font without label recreation
             }
         }
@@ -40,7 +40,7 @@ namespace NewWidgets.Widgets
             set
             {
                 SetProperty(WidgetParameterIndex.FontSize, value);
-                m_needLayout = true;
+                InivalidateLayout();
             }
         }
 
@@ -50,7 +50,7 @@ namespace NewWidgets.Widgets
             set
             {
                 SetProperty(WidgetParameterIndex.TextAlign, value);
-                m_needLayout = true;
+                InivalidateLayout();
                 m_needRecreate = true; // there is no way to change text alignment without label recreation
             }
         }
@@ -65,7 +65,7 @@ namespace NewWidgets.Widgets
                 if (m_label != null) // try to avoid settings m_needLayout
                     m_label.RichText = value;
 
-                m_needLayout = true;
+                InivalidateLayout();
             }
         }
 
@@ -81,7 +81,7 @@ namespace NewWidgets.Widgets
                     return;
                 
                 m_text = value;
-                m_needLayout = true;
+                InivalidateLayout();
             }
         }
 
@@ -134,11 +134,22 @@ namespace NewWidgets.Widgets
             Text = text;
         }
 
+        private void InivalidateLayout()
+        {
+            m_needLayout = true;
+        }
+
+        protected override void Resize(Vector2 size)
+        {
+            base.Resize(size);
+            InivalidateLayout();
+        }
+
         public override bool SwitchStyle(WidgetStyleType styleType)
         {
             if (base.SwitchStyle(styleType))
             {
-                m_needLayout = true;
+                InivalidateLayout();
                 return true;
             }
             return false;
@@ -194,13 +205,6 @@ namespace NewWidgets.Widgets
                 y = Size.Y - labelSize.Y;
 
             m_label.Position = new Vector2(x, y);
-        }
-
-        protected override void Resize(Vector2 size)
-        {
-            base.Resize(size);
-
-            m_needLayout = true;
         }
 
         public override bool Update()
