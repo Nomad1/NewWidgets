@@ -57,8 +57,10 @@ namespace NewWidgets.Widgets
             {
                 if (!string.IsNullOrEmpty(value) && value[0] == '@')
                     value = ResourceLoader.Instance.GetString(value);
+
                 if (m_text == value)
                     return;
+
                 m_text = value;
                 InivalidateLayout();
             }
@@ -109,8 +111,7 @@ namespace NewWidgets.Widgets
         public WidgetText(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
             : base(style.IsEmpty? DefaultStyle : style)
         {
-            m_text = text;
-            m_needLayout = true;
+            Text = text;
         }
 
         private void InivalidateLayout()
