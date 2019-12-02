@@ -124,7 +124,7 @@ namespace NewWidgets.Widgets
         {
             string name = node.Attributes.GetNamedItem("name").Value;
             string resource = node.Attributes.GetNamedItem("resource").Value;
-            int spacing = int.Parse(node.Attributes.GetNamedItem("spacing").Value);
+            float spacing = FloatParse(node.Attributes.GetNamedItem("spacing").Value);
             int baseline = int.Parse(node.Attributes.GetNamedItem("baseline").Value);
 
             int leading = 0;

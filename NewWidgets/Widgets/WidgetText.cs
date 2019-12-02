@@ -153,7 +153,7 @@ namespace NewWidgets.Widgets
                 string line = lines[i];
 
                 if (RichText)
-                    line = LabelObject.ParseRichText(line, Color, out colors[i], Font.SpaceWidth + Font.Spacing);
+                    line = LabelObject.ParseRichText(line, Color, out colors[i], (int)(Font.SpaceWidth + Font.Spacing));
 
                 Vector2 size = Font.MeasureString(line);
 

@@ -265,7 +265,7 @@ namespace NewWidgets.UI
             TextSpan[] colors = null;
 
             if (richText && text.Contains("|"))
-                text = ParseRichText(text, m_color, out colors, m_font.SpaceWidth + m_font.Spacing);
+                text = ParseRichText(text, m_color, out colors, (int)(m_font.SpaceWidth + m_font.Spacing));
 
             this.Size = m_font.MeasureString(text);
 

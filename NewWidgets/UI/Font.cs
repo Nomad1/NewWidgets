@@ -10,7 +10,7 @@ namespace NewWidgets.UI
     {
         private readonly Dictionary<char, Glyph> m_glyphs;
         private readonly Glyph m_spaceGlyph;
-        private readonly int m_spacing;
+        private readonly float m_spacing;
         private readonly int m_leading;
         private readonly ISprite m_fontSprite;
         private readonly int m_height;
@@ -21,7 +21,7 @@ namespace NewWidgets.UI
             get { return m_height; }
         }
         
-        public int Spacing
+        public float Spacing
         {
             get { return m_spacing; }
         }
@@ -46,12 +46,12 @@ namespace NewWidgets.UI
             get { return m_fontSprite; }
         }
 
-        public Font(string font, int spacing, int leading, int baseline)
+        public Font(string font, float spacing, int leading, int baseline)
             : this(WindowController.Instance.CreateSprite(font, Vector2.Zero), spacing, leading, baseline)
         {
         }
 
-        public Font(ISprite fontSprite, int spacing, int leading, int baseline)
+        public Font(ISprite fontSprite, float spacing, int leading, int baseline)
         {
             m_baseline = baseline;
             m_fontSprite = fontSprite;
