@@ -84,7 +84,7 @@ namespace NewWidgets.UI
                 if (!m_glyphs.TryGetValue(text[i], out glyph))
                     glyph = m_spaceGlyph;
 
-                ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, 0));
+                ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, m_baseline));
                 sprite.Frame = glyph.Frame;
                 result[i] = sprite;
 
@@ -115,7 +115,7 @@ namespace NewWidgets.UI
                 }
                 else
                 {
-                    ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, 0));
+                    ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, m_baseline));
                     sprite.Frame = glyph.Frame;
                     result[i] = sprite;
                 }
