@@ -127,6 +127,11 @@ namespace NewWidgets.Widgets
             float spacing = FloatParse(node.Attributes.GetNamedItem("spacing").Value);
             int baseline = int.Parse(node.Attributes.GetNamedItem("baseline").Value);
 
+            int shift = 0;
+
+            if (node.Attributes.GetNamedItem("shift") != null)
+                shift = int.Parse(node.Attributes.GetNamedItem("shift").Value);
+
             int leading = 0;
 
             if (node.Attributes.GetNamedItem("leading") != null)
@@ -135,7 +140,7 @@ namespace NewWidgets.Widgets
             //IWindowController.Instance.RegisterSpriteTemplate(resource, 1.0f, 0.0f, 0.0f, 0);
             //IWindowController.Instance.RegisterSpriteAnimation(resource, 0, resource, resource, 0, 0, 0, 0);
 
-            Font font = new Font(resource, spacing, leading, baseline);
+            Font font = new Font(resource, spacing, leading, baseline, shift);
 
             s_fonts[name] = font;
 

@@ -15,6 +15,7 @@ namespace NewWidgets.UI
         private readonly ISprite m_fontSprite;
         private readonly int m_height;
         private readonly int m_baseline;
+        private readonly int m_shift;
 
         public int Height
         {
@@ -36,6 +37,11 @@ namespace NewWidgets.UI
             get { return m_spaceGlyph.Width; }
         }
 
+        public int Shift
+        {
+            get { return m_shift; }
+        }
+
         public int Baseline
         {
             get { return m_baseline; }
@@ -46,14 +52,15 @@ namespace NewWidgets.UI
             get { return m_fontSprite; }
         }
 
-        public Font(string font, float spacing, int leading, int baseline)
-            : this(WindowController.Instance.CreateSprite(font, Vector2.Zero), spacing, leading, baseline)
+        public Font(string font, float spacing, int leading, int baseline, int shift)
+            : this(WindowController.Instance.CreateSprite(font, Vector2.Zero), spacing, leading, baseline, shift)
         {
         }
 
-        public Font(ISprite fontSprite, float spacing, int leading, int baseline)
+        public Font(ISprite fontSprite, float spacing, int leading, int baseline, int shift)
         {
             m_baseline = baseline;
+            m_shift = shift;
             m_fontSprite = fontSprite;
             m_spacing = spacing;
             m_leading = leading;
@@ -84,7 +91,7 @@ namespace NewWidgets.UI
                 if (!m_glyphs.TryGetValue(text[i], out glyph))
                     glyph = m_spaceGlyph;
 
-                ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, m_baseline));
+                ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, m_shift));
                 sprite.Frame = glyph.Frame;
                 result[i] = sprite;
 
@@ -115,7 +122,7 @@ namespace NewWidgets.UI
                 }
                 else
                 {
-                    ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, m_baseline));
+                    ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, m_shift));
                     sprite.Frame = glyph.Frame;
                     result[i] = sprite;
                 }
