@@ -172,17 +172,27 @@ namespace NewWidgets.Widgets
                 return result;
             }
 
-            public string GetParameter(string name)
+            public object GetParameter(string name)
             {
                 string result;
 
-                if (!DictionaryParameters.TryGetValue(name, out result))
+                if (DictionaryParameters.TryGetValue(name, out result))
+                    return result; // returns string, not object!
+
+                WidgetParameterIndex index = WidgetManager.GetParameterIndexByName(name);
+
+                if (index != WidgetParameterIndex.None)
                 {
-                    if (Parent != null)
-                        result = Parent.GetParameter(name);
+                    object objectResult;
+
+                    if (ObjectParameters.TryGetValue((int)index, out objectResult))
+                        return objectResult;
                 }
 
-                return result;
+                if (Parent != null)
+                    return Parent.GetParameter(name);
+
+                return null;
             }
         }
 
@@ -277,7 +287,7 @@ namespace NewWidgets.Widgets
         {
             object result = m_data.GetParameter(name);
 
-            if (result == null)
+            if (result == null || result.GetType() != typeof(T))
                 return defaultValue;
 
             return (T)result;

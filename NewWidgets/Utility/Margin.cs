@@ -67,6 +67,11 @@ namespace NewWidgets.Utility
         {
             return string.Format("{0}, {1}, {2}, {3}", TopLeft, BottomRight, Width, Height);
         }
+
+        public static bool IsEmpty(Margin margin)
+        {
+            return margin.Left == 0 && margin.Top == 0 && margin.Bottom == 0 && margin.Right == 0;
+        }
     }
 
 }

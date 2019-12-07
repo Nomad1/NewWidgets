@@ -173,6 +173,16 @@ namespace NewWidgets.Widgets
             }
         }
 
+        internal static WidgetParameterIndex GetParameterIndexByName(string name)
+        {
+            Tuple<WidgetParameterIndex, Type> field;
+
+            if (s_styleAttributes.TryGetValue(name, out field))
+                return field.Item1;
+
+            return 0;
+        }
+
         internal static object ParseValue(Type targetType, string value)
         {
             object memberValue;
