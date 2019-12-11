@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Numerics;
@@ -180,6 +181,12 @@ namespace NewWidgets.WinForms
             arr[1] = m_transform.GetScreenPoint(from + new Vector2(FrameSize.X, 0));
             arr[2] = m_transform.GetScreenPoint(from + new Vector2(0, FrameSize.Y));
 
+            int x = (int)Math.Floor(arr[0].X);
+            int y = (int)Math.Floor(arr[0].Y);
+
+            if (!UpdateCache(arr[0].X - x, arr[0].Y - y, arr[1].X - arr[0].X, arr[2].Y - arr[0].Y)) // make sure that cache is valid
+                return;
+
             if (m_imageAttributes == null)
                 m_imageAttributes = new ImageAttributes();
 
@@ -192,28 +199,20 @@ namespace NewWidgets.WinForms
             m_colorMatrix.Matrix33 = ((m_color >> 24) & 0xff) / 255.0f;
             m_imageAttributes.SetColorMatrix(m_colorMatrix);
 
-            if (!UpdateCache(arr[0].X - (int)arr[0].X, arr[0].Y - (int)arr[0].Y, arr[1].X - arr[0].X, arr[2].Y - arr[0].Y)) // make sure that cache is valid
-                return;
-           
+            if (m_cache != null) // should always be non-null
             {
                 graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
                 graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
                 graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
 
-                if (m_cache != null)
-                {
-                    // round everything to ints to avoid blur and increase speed
+                // round everything to ints to avoid blur and increase speed
 
-                    int x = (int)arr[0].X;
-                    int y = (int)arr[0].Y;
-
-                    graphics.DrawImage(m_cache,
-                       new Rectangle (x, y, m_cache.Width, m_cache.Height),
-                       0, 0, m_cache.Width, m_cache.Height,
-                     GraphicsUnit.Pixel,
-                     m_imageAttributes
-                     );
-                }
+                graphics.DrawImage(m_cache,
+                   new Rectangle(x, y, m_cache.Width, m_cache.Height),
+                   0, 0, m_cache.Width, m_cache.Height,
+                 GraphicsUnit.Pixel,
+                 m_imageAttributes
+                 );
             }
         }
 
