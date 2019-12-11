@@ -205,14 +205,16 @@ namespace NewWidgets.WinForms
                 graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
                 graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
 
-                // round everything to ints to avoid blur and increase speed
+                if (m_color == 0xffffffff)
+                    graphics.DrawImageUnscaled(m_cache, x, y);
+                else
+                    graphics.DrawImage(m_cache,
+                       new Rectangle(x, y, m_cache.Width, m_cache.Height),
+                       0, 0, m_cache.Width, m_cache.Height,
+                     GraphicsUnit.Pixel,
+                     m_imageAttributes
+                     );
 
-                graphics.DrawImage(m_cache,
-                   new Rectangle(x, y, m_cache.Width, m_cache.Height),
-                   0, 0, m_cache.Width, m_cache.Height,
-                 GraphicsUnit.Pixel,
-                 m_imageAttributes
-                 );
             }
         }
 
@@ -233,11 +235,13 @@ namespace NewWidgets.WinForms
 
                 int nwidth = (int)System.Math.Ceiling(width + x);
                 int nheight = (int)System.Math.Ceiling(height + y);
-                m_cache = new Bitmap(nwidth, nheight);
+                m_cache = new Bitmap(nwidth, nheight, PixelFormat.Format32bppArgb);
+
                 using (Graphics g = Graphics.FromImage(m_cache))
                 {
                     g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighQuality;
+                    g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
+
                     g.DrawImage(m_image,
                     new RectangleF(x, y, width, height),
                     new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),

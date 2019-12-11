@@ -373,7 +373,7 @@ namespace NewWidgets.WinForms
             m_windows.Draw(canvas);
         }
 
-        public void Update()
+        public bool Update()
         {
             LinkedListNode<Tuple<Action, DateTime>> node = m_delayedActions.First;
             while (node != null)
@@ -398,7 +398,7 @@ namespace NewWidgets.WinForms
             if (Windows.Count == 0 && OnInit != null)
                 OnInit();
 
-            m_windows.Update();
+            return m_windows.Update();
         }
 
         public override void AddWindow(Window window)

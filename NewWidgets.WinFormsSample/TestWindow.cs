@@ -12,12 +12,14 @@ namespace NewWidgets.WinFormsSample
         private static string DefaultLogin = "login";
         private static string DefaultPassword = "password";
 
-        private WidgetTextEdit m_loginEdit;
-        private WidgetTextEdit m_passEdit;
+        private readonly WidgetTextEdit m_loginEdit;
+        private readonly WidgetTextEdit m_passEdit;
 
-        private WidgetTextEdit m_localEdit;
-        private WidgetCheckBox m_localCheckBox;
-        private WidgetButton m_loginButton;
+        private readonly WidgetTextEdit m_localEdit;
+        private readonly WidgetCheckBox m_localCheckBox;
+        private readonly WidgetButton m_loginButton;
+
+        private readonly WidgetLabel m_fpsLabel;
 
         public TestWindow()
             : base(WindowFlags.None)
@@ -134,6 +136,12 @@ namespace NewWidgets.WinFormsSample
             textTextField.Visible = true;
             textTextField.Text = "WidgetTextField textTextField = new WidgetTextField(WidgetManager.GetStyle(\"default_textedit\"));\n            textTextField.Size = new Vector2(500, 225);\n            textTextField.Position = new Vector2(50, 520);\n            textTextField.FontSize = WidgetManager.FontScale * 1.25f;\n            textTextField.Visible = true";
             panel.AddChild(textTextField);
+
+            m_fpsLabel = new WidgetLabel();
+            m_fpsLabel.Text = "1";
+            m_fpsLabel.Position = new Vector2(440, 20);
+            m_fpsLabel.FontSize = WidgetManager.FontScale * 0.75f;
+            panel.AddChild(m_fpsLabel);
         }
 
         private bool HandleValidateIpInput(string oldText, string input)
@@ -190,6 +198,11 @@ namespace NewWidgets.WinFormsSample
         {
             m_loginEdit.SetFocused(true);
             m_loginButton.Enabled = true;
+        }
+
+        public void SetFpsValue(float updateFps, float drawFps)
+        {
+            m_fpsLabel.Text = string.Format("FPS: {0:F1}/{1:F1}", drawFps, updateFps);
         }
     }
 }

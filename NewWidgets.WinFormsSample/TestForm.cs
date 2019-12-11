@@ -3,9 +3,16 @@
 using NewWidgets.Widgets;
 using NewWidgets.WinForms;
 using NewWidgets.UI;
+using System.Diagnostics;
 
-namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private WinFormsController m_windowController;        public TestForm()        {            InitializeComponent();            this.perspectiveViewPictureBox.MouseWheel += perspectiveViewPictureBox_MouseWheel;            this.KeyPreview = true;
+namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private readonly WinFormsController m_windowController;        private readonly System.Threading.Timer m_updateTimer;        private readonly Delegate m_updateDelegate;        private TestWindow m_window;        private long m_lastFrameUpdate;
+        private long m_lastFrameDraw;
+
+        private float m_averageFrameUpdateTime;
+        private float m_averageFrameTime;
+        public TestForm()        {            InitializeComponent();            this.KeyPreview = true;
             this.perspectiveViewPictureBox.BackColor = Color.Black;
+            perspectiveViewPictureBox.Paint += delegate { UpdateDrawFps(); };
             ResourceLoader loader = new ResourceLoader("en-en");            loader.RegisterString("login_title", "Connect to server");            loader.RegisterString("login_login", "Login");
             loader.RegisterString("login_password", "Password");
             loader.RegisterString("login_local", "Custom server");
@@ -13,11 +20,23 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
             loader.RegisterString("login_connect", "Connect");            loader.RegisterString("dialog_title", "Dialog");            loader.RegisterString("dialog_text", "Dialog text that could be very long,\nwith |caaaaaadifferent|r |c336699colors|r, languages ({0}) and may even contain |tsettings_icon:64:64|t images.");            loader.RegisterString("button_yes", "Yes");            loader.RegisterString("button_no", "Yes!");            loader.RegisterString("tooltip_connect", "Start connection");            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, 1.5f, 0.6f, false, "assets");
             m_windowController.OnInit += HandleOnInit;            m_windowController.RegisterSpriteAtlas("assets/font5.bin");            WidgetManager.LoadUI(System.IO.File.ReadAllText("assets/ui.xml"));
 
-            updateTimer.Start();
+            this.perspectiveViewPictureBox.Init(m_windowController);
+             
+            m_updateDelegate = new Action(DoUpdate);
+
+            const int targetFps = 60;
+            m_averageFrameTime = m_averageFrameUpdateTime = 1000.0f / targetFps;
+            m_lastFrameDraw = m_lastFrameUpdate = Environment.TickCount; // unprecise timer
+            m_updateTimer = new System.Threading.Timer(delegate { BeginInvoke(m_updateDelegate); UpdateUpdateFps(); }, null, 500, (int)m_averageFrameTime);
         }
-        
+
         private void HandleOnInit()
-        {            m_windowController.AddWindow(new TestWindow());
+        {            m_window = new TestWindow();            m_windowController.AddWindow(m_window);
+        }        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            m_updateTimer.Dispose();
+            Application.DoEvents(); // we need ti to make sure all timers has been finished
+            base.OnFormClosing(e);
         }        protected override void OnKeyDown(KeyEventArgs e)        {            if (e.KeyCode == Keys.Q && (ModifierKeys & Keys.Alt) != 0)            {                Close();                return;            }
             e.SuppressKeyPress = ProcessKey(e.KeyCode, e.KeyValue, (ModifierKeys & Keys.Control) != 0, e.Shift, false);
             base.OnKeyDown(e);        }
@@ -91,47 +110,93 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
             base.WndProc(ref m);
         }
 
-        #region Events
-
-        private void zoomTrackBar_Scroll(object sender, EventArgs e)        {            perspectiveViewPictureBox.Invalidate();        }
-
-        private void perspectiveViewPictureBox_MouseEnter(object sender, EventArgs e)
-        {
-            perspectiveViewPictureBox.Focus();
-        }
-
-        private void perspectiveViewPictureBox_MouseWheel(object sender, MouseEventArgs e)
-        {
-           /* int zoom = zoomTrackBar.Value + e.Delta / 40;
-            if (zoom < zoomTrackBar.Minimum)
-                zoom = zoomTrackBar.Minimum;
-            if (zoom > zoomTrackBar.Maximum)
-                zoom = zoomTrackBar.Maximum;
-            zoomTrackBar.Value = zoom;*/
-            if (m_windowController != null)
-                m_windowController.Zoom(e.X, e.Y, e.Delta);
-        }
-        private void perspectiveView_Paint(object sender, PaintEventArgs e)        {            Graphics g = e.Graphics;
-
-            
-            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.HighSpeed;
-
-            if (m_windowController != null)
-                m_windowController.Draw(g);        }        private void perspectivePictureBox_MouseDown(object sender, MouseEventArgs e)        {
-            if (m_windowController != null)                m_windowController.Touch(e.X, e.Y, true, false, (int)e.Button);        }
-        private void perspectivePictureBox_MouseUp(object sender, MouseEventArgs e)        {
-            if (m_windowController != null)                m_windowController.Touch(e.X, e.Y, false, true, (int)e.Button);        }
-        private void perspectivePictureBox_MouseMove(object sender, MouseEventArgs e)        {
-            if (m_windowController != null)                m_windowController.Touch(e.X, e.Y, false, false, (int)e.Button);        }
-
-        private void updateTimer_Tick(object sender, EventArgs e)
+        private void DoUpdate()
         {
             if (m_windowController != null)
             {
                 m_windowController.Update();
-                perspectiveViewPictureBox.Invalidate();
+                m_window.SetFpsValue(1000.0f / m_averageFrameUpdateTime, 1000.0f / m_averageFrameTime);
+
+                perspectiveViewPictureBox.Invalidate(); // total window repaint. Slow as hell in WinForms
             }
         }
 
-        #endregion
-    }}
+        private void UpdateDrawFps()
+        {
+            long time = Environment.TickCount;
+
+            int frameTime = (int)(time - m_lastFrameDraw);
+
+            // calculate average frame time for last N frames
+            int diminishing = 120 - 1;
+
+            m_averageFrameTime = (m_averageFrameTime * diminishing + frameTime) / (float)(diminishing + 1);
+            m_lastFrameDraw = time;
+        }
+
+        private void UpdateUpdateFps()
+        {
+            long time = Environment.TickCount;
+
+            int frameTime = (int)(time - m_lastFrameUpdate);
+
+            // calculate average frame time for last N frames
+            int diminishing = 120 - 1;
+
+            m_averageFrameUpdateTime = (m_averageFrameUpdateTime * diminishing + frameTime) / (float)(diminishing + 1);
+            m_lastFrameUpdate = time;
+        }
+
+        class WindowControllerPaintBox : Control
+        {
+            private WinFormsController m_controller;
+
+            public WindowControllerPaintBox()
+            {
+                this.DoubleBuffered = true;
+            }
+
+            public void Init(WinFormsController windowController)
+            {
+                m_controller = windowController;
+            }
+
+            protected override void OnPaint(PaintEventArgs e)
+            {
+                if (m_controller != null)
+                    m_controller.Draw(e.Graphics);
+
+                base.OnPaint(e);
+            }
+
+            protected override void OnMouseDown(MouseEventArgs e)
+            {
+                if (m_controller != null)
+                    m_controller.Touch(e.X, e.Y, true, false, (int)e.Button);
+            }
+
+            protected override void OnMouseUp(MouseEventArgs e)
+            {
+                if (m_controller != null)
+                    m_controller.Touch(e.X, e.Y, false, true, (int)e.Button);
+            }
+
+            protected override void OnMouseMove(MouseEventArgs e)
+            {
+                if (m_controller != null)
+                    m_controller.Touch(e.X, e.Y, false, false, (int)e.Button);
+            }
+
+            protected override void OnMouseEnter(EventArgs e)
+            {
+                Focus();
+            }
+
+            protected override void OnMouseWheel(MouseEventArgs e)
+            {
+                if (m_controller != null)
+                    m_controller.Zoom(e.X, e.Y, e.Delta);
+            }
+
+        }
+    }    }
