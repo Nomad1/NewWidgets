@@ -261,15 +261,6 @@ namespace NewWidgets.UI
             return true;
         }
 
-        /*public override void Remove()
-        {
-            foreach (WindowObject obj in m_children.List)
-                if (obj is NativeButtonObject) // TODO: remove all!
-                    obj.Remove();
-
-            base.Remove();
-        }*/
-
         public static bool FindChildren(IWindowContainer container, Func<WindowObject, bool> checker, IList<WindowObject> result, bool one = false)
         {
             if (result == null)

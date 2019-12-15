@@ -123,6 +123,7 @@
     <Compile Include="Widgets\WidgetWindow.cs" />
     <Compile Include="Widgets\WidgetStyleSheet.cs" />
     <Compile Include="Widgets\WidgetTextField.cs" />
+    <Compile Include="UI\SimpleWindow.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
