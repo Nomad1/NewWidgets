@@ -379,7 +379,7 @@ namespace NewWidgets.Utility
                 MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_localMatrix);
 
             if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
-                MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is most expensive thing in whole engine
+                MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is the most expensive thing in whole engine
 
             m_iMatrixChanged = true;
 
