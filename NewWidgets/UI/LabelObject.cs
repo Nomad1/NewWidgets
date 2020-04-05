@@ -160,7 +160,7 @@ namespace NewWidgets.UI
 
                     switch (code)
                     {
-                        case 'c':
+                        case 'c': // color
                             if (i < text.Length - 9)
                             {
                                 string colorString = text.Substring(i + 2, 6);
@@ -174,23 +174,23 @@ namespace NewWidgets.UI
                                 }
                             }
                             break;
-                        case 'r':
+                        case 'r': // restore color
                             currentColor = new TextSpan(defaultColor);
                             i++;
                             continue;
-                        case '|':
+                        case '|': // symbol |
                             i++;
                             chars[length] = '|';
                             colors[length] = currentColor;
                             length++;
                             continue;
-                        case 'n':
+                        case 'n': // new line
                             i++;
                             chars[length] = '\n';
                             colors[length] = currentColor;
                             length++;
                             continue;
-                        case 't':
+                        case 't': // image
                             if (i < text.Length - 4)
                             {
                                 // we wait for string alike

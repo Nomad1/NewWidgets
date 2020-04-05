@@ -166,7 +166,7 @@ namespace NewWidgets.Widgets
 
             if (m_maxWidth <= 0 || m_maxWidth > maxSize.X)
             {
-                Size = new Vector2(Math.Max(maxSize.X, Size.X), Math.Max(Size.Y, maxSize.Y));
+                Size = new Vector2((TextAlign & (WidgetAlign.HorizontalCenter | WidgetAlign.Right)) != 0 && m_maxWidth > 0 ? m_maxWidth : Math.Max(maxSize.X, Size.X), Math.Max(Size.Y, maxSize.Y));
             }
             else
             {
