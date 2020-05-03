@@ -1,5 +1,4 @@
-﻿using System;
-using NewWidgets.Utility;
+﻿using NewWidgets.Utility;
 using System.Numerics;
 
 namespace NewWidgets.UI

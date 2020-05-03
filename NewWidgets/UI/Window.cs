@@ -40,7 +40,7 @@ namespace NewWidgets.UI
         private readonly WindowObjectArray<WindowObject> m_children;
 
         private WindowFlags m_flags;
-        
+
         public WindowFlags Flags
         {
             get { return m_flags; }
@@ -57,13 +57,13 @@ namespace NewWidgets.UI
             get { return (m_flags & WindowFlags.Controlling) != 0; }
             set { m_flags = value ? m_flags | WindowFlags.Controlling : m_flags & ~WindowFlags.Controlling; }
         }
-        
+
         public bool IsFocusable
         {
             get { return (m_flags & WindowFlags.Focusable) != 0; }
             set { m_flags = value ? m_flags | WindowFlags.Focusable : m_flags & ~WindowFlags.Focusable; }
         }
-        
+
         public bool IsFocused
         {
             get { return (m_flags & WindowFlags.Focused) != 0; }
@@ -81,7 +81,7 @@ namespace NewWidgets.UI
         }
 
         public Window(WindowFlags flags)
-            :base(null)
+            : base(null)
         {
             m_flags = flags | WindowFlags.Controlling;
 
@@ -91,30 +91,30 @@ namespace NewWidgets.UI
                 Scale = WindowController.Instance.ScreenWidth / Size.X;
             }
 
-            m_children = new WindowObjectArray<WindowObject> ();
+            m_children = new WindowObjectArray<WindowObject>();
         }
 
-        public override bool Update ()
+        public override bool Update()
         {
-            if (!base.Update ())
+            if (!base.Update())
                 return false;
 
-            HasChanges = m_children.Update ();
+            HasChanges = m_children.Update();
 
             return true;
         }
 
-        public override void Draw (object canvas)
+        public override void Draw(object canvas)
         {
-            base.Draw (canvas);
-         
+            base.Draw(canvas);
+
             if (Visible)
                 m_children.Draw(canvas);
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            bool processed = base.Touch (x, y, press, unpress, pointer);
+            bool processed = base.Touch(x, y, press, unpress, pointer);
 
             if (processed)
                 return true;
@@ -127,8 +127,8 @@ namespace NewWidgets.UI
 
             return false;
         }
-        
-        public override bool Zoom (float x, float y, float value)
+
+        public override bool Zoom(float x, float y, float value)
         {
             //While it's not required for Widget descendants, all Window descendants should use
             //the following lines:
@@ -147,17 +147,17 @@ namespace NewWidgets.UI
             return false;
         }
 
-        public override bool Key (SpecialKey key, bool up, string keyString)
+        public override bool Key(SpecialKey key, bool up, string keyString)
         {
             if (!Controlling)
                 return true;
-            
+
             if (m_children.Key(key, up, keyString))
                 return true;
-            
+
             if (Modal && key == SpecialKey.Back && up)
             {
-                Remove ();
+                Remove();
                 return true;
             }
 
@@ -174,25 +174,25 @@ namespace NewWidgets.UI
                 else if ((key == SpecialKey.Select || key == SpecialKey.Enter))
                 {
                     foreach (WindowObject child in m_children.List)
-                        if (child is IFocusable&& ((IFocusable)child).IsFocusable && ((IFocusable)child).IsFocused)
+                        if (child is IFocusable && ((IFocusable)child).IsFocusable && ((IFocusable)child).IsFocused)
                         {
                             ((IFocusable)child).Press();
                             return true;
                         }
                 }
             }
-            
-            
+
+
             return false;
         }
-        
+
         public bool FocusNext(bool next)
         {
             LinkedListNode<IFocusable> current = null;
             LinkedList<IFocusable> focusable = new LinkedList<IFocusable>();
-            
+
             IList<WindowObject> children = m_children.List;
-            
+
             IFocusable focusedChild = null;
 
             for (int i = 0; i < children.Count; i++)
@@ -240,14 +240,14 @@ namespace NewWidgets.UI
             }
             return false;
         }
-        
+
         public void AddChild(WindowObject child)
         {
             var parentContainer = child.Parent as IWindowContainer;
             if (parentContainer != null && parentContainer != this)
                 parentContainer.RemoveChild(child);
 
-            m_children.Add (child);
+            m_children.Add(child);
             child.Parent = this;
         }
 
@@ -270,7 +270,7 @@ namespace NewWidgets.UI
             {
                 if (!obj.Visible)
                     continue;
-                
+
                 if (checker(obj))
                 {
                     result.Add(obj);
@@ -284,11 +284,11 @@ namespace NewWidgets.UI
                         return true;
                 }
             }
-            
+
             return false;
         }
 
-        public WindowObject FindChild(Func<WindowObject,bool> checker)
+        public WindowObject FindChild(Func<WindowObject, bool> checker)
         {
             WindowObject[] result = new WindowObject[1];
             if (FindChildren(this, checker, result, false))
