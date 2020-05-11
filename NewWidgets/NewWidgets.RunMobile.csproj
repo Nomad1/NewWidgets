@@ -47,11 +47,8 @@
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release.Numerics|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Release.Numerics\</OutputPath>
     <DefineConstants>RUNMOBILE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Optimize>true</Optimize>
