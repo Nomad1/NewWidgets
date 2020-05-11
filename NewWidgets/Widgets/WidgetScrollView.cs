@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Drawing;
 
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
 #if RUNMOBILE
 using RunMobile.Utility;
+#else
+using System.Drawing;
 #endif
 
 namespace NewWidgets.Widgets
