@@ -137,9 +137,23 @@ namespace NewWidgets.Widgets
             private set { Selected = value; }
         }
 
+        public override bool Enabled
+        {
+            get
+            {
+                return base.Enabled;
+            }
+            set
+            {
+                if (value && IsFocused)
+                    SetFocused(false);
+                base.Enabled = value;
+            }
+        }
+
         public bool IsFocusable
         {
-            get { return true; }
+            get { return Enabled; }
         }
         
         public string Preffix
@@ -268,9 +282,11 @@ namespace NewWidgets.Widgets
             if (!IsFocused)
                 return false;
 
+            if (!Enabled)
+                return false;
+
             if (up && key == SpecialKey.Back)
             {
-                //SetFocused(false);
                 if (OnTextEntered != null)
                     OnTextEntered(this, string.Empty);
                 return true;
@@ -278,7 +294,6 @@ namespace NewWidgets.Widgets
 
             if (up && (key == SpecialKey.Enter))
             {
-                //SetFocused(false);
                 if (OnTextEntered != null)
                     OnTextEntered(this, m_text);
                 return true;
@@ -286,6 +301,9 @@ namespace NewWidgets.Widgets
 
             if (up && key == SpecialKey.Tab)
             {
+                if (OnTextEntered != null)
+                    OnTextEntered(this, m_text);
+
                 if (WidgetManager.FocusNext(this) && OnFocusLost != null)
                     OnFocusLost(this, m_text);
                 
@@ -435,6 +453,9 @@ namespace NewWidgets.Widgets
         public void SetFocused(bool value)
         {
             if (IsFocused == value)
+                return;
+
+            if (!Enabled)
                 return;
 
             IsFocused = value;

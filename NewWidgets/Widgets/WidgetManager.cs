@@ -168,7 +168,14 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered three patch {0}", name);
         }
 
-       
+        public static void SetFocus(IFocusableWidget widget, bool value = true)
+        {
+            WindowController.Instance.ScheduleAction(delegate
+            {
+                widget.SetFocused(value);
+            }, 1); // schedule for the next frame
+        }
+
         public static bool HasFocus(IWindowContainer window)
         {
             if (window == null)
