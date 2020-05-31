@@ -94,6 +94,8 @@ namespace NewWidgets.UI
         Joystick_Y,
         Joystick_LFire,
         Joystick_RFire,
+        Joystick_Start,
+        Joystick_Back,
 
         Max
     }
