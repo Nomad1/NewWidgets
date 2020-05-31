@@ -59,7 +59,7 @@ namespace NewWidgets.Utility
             get { return m_scale; }
             set
             {
-                if (!m_changed && (m_scale - value).LengthSquared() >= ScaleEpsilon)
+                if (!m_changed && Vector3.BoxDistance(m_scale, value) >= ScaleEpsilon)
                     m_changed = true;
 
                 m_scale = value;
@@ -75,7 +75,7 @@ namespace NewWidgets.Utility
             get { return m_position; }
             set
             {
-                if (!m_changed && (value - m_position).LengthSquared() > PositionEpsilon)
+                if (!m_changed && Vector3.BoxDistance(m_position, value) >= PositionEpsilon)
                     m_changed = true;
 
                 m_position = value;
@@ -91,9 +91,9 @@ namespace NewWidgets.Utility
             get { return new Vector2(m_position.X, m_position.Y); }
             set
             {
-                Vector3 newVector = new Vector3(value.X, value.Y, 0);
+                Vector3 newVector = new Vector3(value.X, value.Y, m_position.Z);
 
-                if (!m_changed && (newVector - m_position).LengthSquared() > PositionEpsilon)
+                if (!m_changed && Vector3.BoxDistance(m_position, newVector) >= PositionEpsilon)
                     m_changed = true;
 
                 m_position = newVector;
@@ -110,7 +110,7 @@ namespace NewWidgets.Utility
             get { return m_rotation; }
             set
             {
-                if (!m_changed && (value - m_rotation).LengthSquared() > AngleEpsilon)
+                if (!m_changed && Vector3.BoxDistance(m_rotation, value) >= AngleEpsilon)
                     m_changed = true;
 
                 m_rotation = value;
@@ -160,7 +160,7 @@ namespace NewWidgets.Utility
             {
                 Vector3 newScale = new Vector3(value.X, value.Y, value.X);
 
-                if (!m_changed && (newScale - m_scale).LengthSquared() >= ScaleEpsilon)
+                if (!m_changed && Vector3.BoxDistance(m_scale, newScale) >= ScaleEpsilon)
                     m_changed = true;
 
                 m_scale = newScale;

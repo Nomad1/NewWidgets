@@ -24,9 +24,12 @@ namespace NewWidgets.Widgets
 
         private bool m_needLayout;
 
+        private bool m_tabToValidate;
+
         public event Action<WidgetTextEdit, string> OnFocusLost;
         public event Action<WidgetTextEdit, string> OnTextEntered;
         public event Action<WidgetTextEdit, string> OnTextChanged;
+        public event Func<WidgetTextEdit, SpecialKey, string, bool> OnKeyPressed;
         /// <summary>
         /// Occurs when key is pressed and nex text is to be added. First parameter is source string second is input string
         /// Delegate should return true if string is valid and false if not
@@ -155,7 +158,13 @@ namespace NewWidgets.Widgets
         {
             get { return Enabled; }
         }
-        
+
+        public bool TabToValidate
+        {
+            get { return m_tabToValidate; }
+            set { m_tabToValidate = value; }
+        }
+
         public string Preffix
         {
             get { return m_preffix; }
@@ -168,7 +177,7 @@ namespace NewWidgets.Widgets
                     text = text.Substring(m_preffix.Length);
                     shift -= m_preffix.Length;
                 }
-                
+
                 m_preffix = value;
                 m_cursorPosition += shift;
                 m_text = m_preffix + text;
@@ -232,17 +241,17 @@ namespace NewWidgets.Widgets
                 m_cursor.Transform.Parent = Transform;
             }
 
-           /* // Nomad: I'm not sure it is normal to resize text edit depending on it's content. It looks like leftovers from WidgetLabel copy-paste
-            Vector2 minSize = m_label.Size * FontSize + TextPadding.Size;
-            if (minSize.X < Size.X)
-                minSize.X = Size.X;
-            if (minSize.Y < Size.Y)
-                minSize.Y = Size.Y;
+            /* // Nomad: I'm not sure it is normal to resize text edit depending on it's content. It looks like leftovers from WidgetLabel copy-paste
+             Vector2 minSize = m_label.Size * FontSize + TextPadding.Size;
+             if (minSize.X < Size.X)
+                 minSize.X = Size.X;
+             if (minSize.Y < Size.Y)
+                 minSize.Y = Size.Y;
 
-            Size = minSize;*/
+             Size = minSize;*/
 
             m_needLayout = false;
-            
+
             UpdateCursor(0);
         }
 
@@ -276,7 +285,7 @@ namespace NewWidgets.Widgets
             if (IsFocused)
                 m_cursor.Draw(canvas);
         }
-        
+
         public override bool Key(SpecialKey key, bool up, string keyString)
         {
             if (!IsFocused)
@@ -284,6 +293,11 @@ namespace NewWidgets.Widgets
 
             if (!Enabled)
                 return false;
+
+            if (OnKeyPressed != null && OnKeyPressed(this, key, keyString))
+            {
+                return true;
+            }
 
             if (up && key == SpecialKey.Back)
             {
@@ -301,12 +315,12 @@ namespace NewWidgets.Widgets
 
             if (up && key == SpecialKey.Tab)
             {
-                if (OnTextEntered != null)
+                if (TabToValidate && OnTextEntered != null)
                     OnTextEntered(this, m_text);
 
                 if (WidgetManager.FocusNext(this) && OnFocusLost != null)
                     OnFocusLost(this, m_text);
-                
+
                 return true;
             }
 
@@ -350,7 +364,7 @@ namespace NewWidgets.Widgets
                         if (m_cursorPosition > m_preffix.Length)
                         {
                             m_text = m_text.Substring(0, m_cursorPosition - 1) + m_text.Substring(m_cursorPosition);
-                    
+
                             if (OnTextChanged != null)
                                 OnTextChanged(this, m_text);
 
@@ -362,7 +376,7 @@ namespace NewWidgets.Widgets
                         if (m_cursorPosition <= m_text.Length - 1)
                         {
                             m_text = m_text.Substring(0, m_cursorPosition) + m_text.Substring(m_cursorPosition + 1);
-                    
+
                             if (OnTextChanged != null)
                                 OnTextChanged(this, m_text);
 
@@ -379,14 +393,14 @@ namespace NewWidgets.Widgets
                         break;
                 }
             }
-            
-            switch(key)
+
+            switch (key)
             {
                 case SpecialKey.Up:
                 case SpecialKey.Down:
                     return false;
             }
-            
+
 
 
             return true;
@@ -396,7 +410,7 @@ namespace NewWidgets.Widgets
         {
             if (m_needLayout)
                 return;
-            
+
             if (IsFocused)
             {
                 m_cursorPosition += change;
@@ -442,7 +456,7 @@ namespace NewWidgets.Widgets
             if (string.IsNullOrEmpty(maskChar))
                 return text;
 
-            char [] result = text.ToCharArray();
+            char[] result = text.ToCharArray();
 
             for (int i = 0; i < result.Length; i++)
                 result[i] = maskChar[0];
@@ -462,7 +476,7 @@ namespace NewWidgets.Widgets
 
             m_cursorPosition = m_text.Length;
             UpdateCursor(0);
-            
+
             WidgetManager.UpdateFocus(this, value);
         }
 

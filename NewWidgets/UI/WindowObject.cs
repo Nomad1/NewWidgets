@@ -69,9 +69,33 @@ namespace NewWidgets.UI
         Y,
         Z,
 
+        One,
+        Two,
+        Three,
+        Four,
+        Five,
+        Six,
+        Seven,
+        Eight,
+        Nine,
+        Zero,
+
         Shift,
         Paste,
-        Control
+        Control,
+
+        Joystick_Up,
+        Joystick_Down,
+        Joystick_Left,
+        Joystick_Right,
+        Joystick_A,
+        Joystick_B,
+        Joystick_X,
+        Joystick_Y,
+        Joystick_LFire,
+        Joystick_RFire,
+
+        Max
     }
 
     [Flags]
@@ -248,6 +272,11 @@ namespace NewWidgets.UI
             }
         }
 
+        public virtual bool IsWindow
+        {
+            get { return false; }
+        }
+
         /// <summary>
         /// Unwinds hierarchy to find top-level window
         /// </summary>
@@ -256,10 +285,10 @@ namespace NewWidgets.UI
         {
             get
             {
-                if (m_parent == null)
-                    return this as IWindowContainer;
+                if (this.IsWindow && this is IWindowContainer)
+                    return (IWindowContainer)this;
 
-                return m_parent.Window;
+                return m_parent == null ? null : m_parent.Window;
             }
         }
 
@@ -337,12 +366,6 @@ namespace NewWidgets.UI
         public virtual bool Zoom(float x, float y, float value)
         {
             return false;
-        }
-
-        [Obsolete("Migrate to string version!")]
-        public virtual bool Key(SpecialKey key, bool up, char character)
-        {
-            throw new NotSupportedException();
         }
 
         public virtual bool Key(SpecialKey key, bool up, string keyString)

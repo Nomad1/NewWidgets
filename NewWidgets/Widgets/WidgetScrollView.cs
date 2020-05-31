@@ -458,6 +458,17 @@ namespace NewWidgets.Widgets
             return true;
         }
 
+        public override bool Key(SpecialKey key, bool up, string keyString)
+        {
+            if (!Enabled)
+                return true;
+
+            if (m_contentView.Key(key, up, keyString))
+                return true;
+
+            return false;
+        }
+
         public void AddChild(Widget child)
         {
             m_contentView.AddChild(child);
