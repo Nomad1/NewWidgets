@@ -92,10 +92,12 @@ namespace NewWidgets.UI
         Joystick_B,
         Joystick_X,
         Joystick_Y,
-        Joystick_LFire,
-        Joystick_RFire,
+        Joystick_LBumper,
+        Joystick_RBumper,
         Joystick_Start,
         Joystick_Back,
+        Joystick_RTrigger,
+        Joystick_LTrigger,
 
         Max
     }
