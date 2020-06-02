@@ -27,11 +27,6 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override bool IsWindow
-        {
-            get { return true; }
-        }
-
         public WidgetWindow(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(style.IsEmpty ? DefaultStyle : style)
         {

@@ -276,11 +276,6 @@ namespace NewWidgets.UI
             }
         }
 
-        public virtual bool IsWindow
-        {
-            get { return false; }
-        }
-
         /// <summary>
         /// Unwinds hierarchy to find top-level window
         /// </summary>
@@ -289,10 +284,10 @@ namespace NewWidgets.UI
         {
             get
             {
-                if (this.IsWindow && this is IWindowContainer)
-                    return (IWindowContainer)this;
+                if (m_parent == null)
+                    return this as IWindowContainer;
 
-                return m_parent == null ? null : m_parent.Window;
+                return m_parent.Window;
             }
         }
 
