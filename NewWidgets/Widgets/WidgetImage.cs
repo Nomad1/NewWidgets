@@ -51,13 +51,26 @@ namespace NewWidgets.Widgets
         public float ImageAlpha
         {
             get { return GetProperty(WidgetParameterIndex.ImageOpacity, 1.0f); }
-            set { SetProperty(WidgetParameterIndex.ImageOpacity, value); UpdateColor(); }
+            set
+            {
+                if (ImageAlpha != value)
+                {
+                    SetProperty(WidgetParameterIndex.ImageOpacity, value);
+                    UpdateColor();
+                }
+            }
         }
 
         public int Color
         {
             get { return GetProperty(WidgetParameterIndex.ImageColor, 0xffffff); }
-            set { SetProperty(WidgetParameterIndex.ImageColor, value); UpdateColor(); }
+            set {
+                if (Color != value)
+                {
+                    SetProperty(WidgetParameterIndex.ImageColor, value);
+                    UpdateColor();
+                }
+            }
         }
 
         public override float Alpha
