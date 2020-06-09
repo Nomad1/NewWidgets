@@ -150,6 +150,12 @@ namespace NewWidgets.UI
         /// <param name="id">Sound id</param>
         public abstract void PlaySound(string id);
 
+        /// <summary>
+        /// Shows or hides keyboard if text edit field is focused
+        /// </summary>
+        /// <param name="show">Commands to show or hide the keyboard</param>
+        public abstract void ShowKeyboard(bool show);
+
     }
 }
 

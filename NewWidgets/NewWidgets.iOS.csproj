@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B9E44890-DC40-4C45-A457-335B20581E54}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+    <OutputType>Library</OutputType>
+    <RootNamespace>NewWidgets</RootNamespace>
+    <AssemblyName>NewWidgets.iOS</AssemblyName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug.iOS</OutputPath>
+    <DefineConstants>DEBUG;RUNMOBILE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release.iOS</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+    <Prefer32Bit>false</Prefer32Bit>
+    <DefineConstants>RUNMOBILE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Widgets\Enums.cs" />
+    <Compile Include="Widgets\IFocusableWidget.cs" />
+    <Compile Include="Widgets\ResourceLoader.cs" />
+    <Compile Include="Widgets\Widget.cs" />
+    <Compile Include="Widgets\WidgetButton.cs" />
+    <Compile Include="Widgets\WidgetCheckBox.cs" />
+    <Compile Include="Widgets\WidgetContextMenu.cs" />
+    <Compile Include="Widgets\WidgetImage.cs" />
+    <Compile Include="Widgets\WidgetLabel.cs" />
+    <Compile Include="Widgets\WidgetLine.cs" />
+    <Compile Include="Widgets\WidgetManager.cs" />
+    <Compile Include="Widgets\WidgetPanel.cs" />
+    <Compile Include="Widgets\WidgetScrollView.cs" />
+    <Compile Include="Widgets\WidgetText.cs" />
+    <Compile Include="Widgets\WidgetTextEdit.cs" />
+    <Compile Include="Widgets\WidgetTooltip.cs" />
+    <Compile Include="Utility\Margin.cs" />
+    <Compile Include="UI\Animator.cs" />
+    <Compile Include="UI\Font.cs" />
+    <Compile Include="UI\ImageObject.cs" />
+    <Compile Include="UI\LabelObject.cs" />
+    <Compile Include="UI\Window.cs" />
+    <Compile Include="UI\WindowObject.cs" />
+    <Compile Include="UI\WindowObjectArray.cs" />
+    <Compile Include="Utility\Transform.cs" />
+    <Compile Include="UI\WindowControllerBase.cs" />
+    <Compile Include="UI\ISprite.cs" />
+    <Compile Include="Widgets\WidgetBackground.cs" />
+    <Compile Include="Widgets\WidgetManager.Styles.cs" />
+    <Compile Include="Widgets\WidgetWindow.cs" />
+    <Compile Include="Widgets\WidgetStyleSheet.cs" />
+    <Compile Include="Widgets\WidgetTextField.cs" />
+    <Compile Include="UI\SimpleWindow.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\RunMobile\RunMobile\RunMobile.iOS.csproj">
+      <Project>{B39E52FD-8AE5-45AF-AD95-C468F5644D4A}</Project>
+      <Name>RunMobile.iOS</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+</Project>

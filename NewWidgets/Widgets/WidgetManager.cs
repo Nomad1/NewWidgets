@@ -211,6 +211,7 @@ namespace NewWidgets.Widgets
                 {
                     focusedWidget.SetFocused(false);
                     s_focusedWidgets.Remove(windowHash);
+                    WindowController.Instance.ShowKeyboard(false);
                 }
 
                 return;
@@ -224,6 +225,8 @@ namespace NewWidgets.Widgets
             }
 
             focusedWidget = widget;
+
+            WindowController.Instance.ShowKeyboard(focus && (focusedWidget is WidgetTextEdit || focusedWidget is WidgetTextField));
 
             if (focusedWidget == null)
                 s_focusedWidgets.Remove(windowHash);
@@ -266,6 +269,23 @@ namespace NewWidgets.Widgets
             UpdateFocus((IFocusableWidget)nextFocusable, true);
 
             return true;
+        }
+
+        public static void RemoveFocus(IWindowContainer window)
+        {
+            int windowHash = window.GetHashCode();
+
+            List<WindowObject> focusables = new List<WindowObject>();
+            Window.FindChildren(window, (WindowObject arg) => arg is IFocusableWidget, focusables);
+
+            for (int i = 0; i < focusables.Count; i++)
+            {
+                if (((IFocusableWidget)focusables[i]).IsFocusable)
+                    ((IFocusableWidget)focusables[i]).SetFocused(false);
+            }
+
+            s_focusedWidgets.Remove(windowHash);
+            WindowController.Instance.ShowKeyboard(false);
         }
 
         internal static bool HandleTooltip(Widget widget, string tooltip, Vector2 position, Widget.TooltipDelegate tooltipDelegate)
