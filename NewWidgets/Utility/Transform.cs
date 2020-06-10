@@ -32,6 +32,8 @@ namespace NewWidgets.Utility
         
         private bool m_changed;
         private bool m_iMatrixChanged;
+        private bool m_translationOnly;
+
         private int m_version;
         private int m_parentVersion;
 
@@ -49,23 +51,7 @@ namespace NewWidgets.Utility
         {
             get { return m_version; }
         }
-        
-        /// <summary>
-        /// Non-uniform scale value
-        /// </summary>
-        /// <value>The scale vector.</value>
-        public Vector3 Scale
-        {
-            get { return m_scale; }
-            set
-            {
-                if (!m_changed && m_scale.BoxDistance(value) >= ScaleEpsilon)
-                    m_changed = true;
-
-                m_scale = value;
-            }
-        }
-
+      
         /// <summary>
         /// Gets or sets the position.
         /// </summary>
@@ -114,6 +100,7 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_rotation = value;
+                m_translationOnly = false;
             }
         }
         
@@ -130,6 +117,7 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_rotation.Z = value;
+                m_translationOnly = false;
             }
         }
         
@@ -146,6 +134,7 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_scale = new Vector3(value, value, value);
+                m_translationOnly = false;
             }
         }
         
@@ -164,9 +153,28 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_scale = newScale;
+                m_translationOnly = false;
             }
         }
-        
+
+
+        /// <summary>
+        /// Non-uniform scale value
+        /// </summary>
+        /// <value>The scale vector.</value>
+        public Vector3 Scale
+        {
+            get { return m_scale; }
+            set
+            {
+                if (!m_changed && m_scale.BoxDistance(value) >= ScaleEpsilon)
+                    m_changed = true;
+
+                m_scale = value;
+                m_translationOnly = false;
+            }
+        }
+
         /// <summary>
         /// Gets or sets the parent transform.
         /// </summary>
@@ -292,6 +300,8 @@ namespace NewWidgets.Utility
         /// <param name="scale"></param>
         public Transform(Vector3 position, Vector3 rotation, Vector3 scale)
         {
+            m_translationOnly = rotation.BoxDistance(Vector3.Zero) < float.Epsilon && scale.BoxDistance(Vector3.One) < float.Epsilon;
+
             m_changed = true;
             m_iMatrixChanged = true;
             m_position = position;
@@ -373,13 +383,24 @@ namespace NewWidgets.Utility
         private void UpdateMatrix()
         {
             MathHelper.Init(ref m_matrix);
-            MathHelper.Init(ref m_localMatrix);
+            MathHelper.Init(ref m_localMatrix, true);
 
-            if (m_changed)
-                MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_localMatrix);
+            if (m_translationOnly)
+            {
+                m_localMatrix.Translation = m_position;
 
-            if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
-                MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is the most expensive thing in whole engine
+                if (m_parent != null)
+                    MathHelper.TranslateMatrix(m_parent.Matrix, m_position, ref m_matrix);
+            }
+            else
+            {
+                if (m_changed)
+                    MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_localMatrix);
+
+                if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
+                    MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is the most expensive thing in whole engine
+
+            }
 
             m_iMatrixChanged = true;
 
