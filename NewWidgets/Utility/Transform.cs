@@ -86,7 +86,6 @@ namespace NewWidgets.Utility
             }
         }
         
-        
         /// <summary>
         /// Gets or sets the rotation in radians.
         /// </summary>
@@ -201,12 +200,9 @@ namespace NewWidgets.Utility
         {
             get
             {
-                if (IsChanged)
-                {
-                    UpdateMatrix();
-                }
-                
-                return m_parent == null ? m_localMatrix : m_matrix;
+                PrepareMatrix();
+
+                return m_parent == null ? LocalMatrix : m_matrix;
             }
         }
 
@@ -218,10 +214,14 @@ namespace NewWidgets.Utility
         {
             get
             {
-                if (IsChanged)
+                if (m_translationOnly)
                 {
-                    UpdateMatrix();
-                }
+                    if (m_localMatrix.IsEmpty)
+                        m_localMatrix = Matrix4x4.CreateTranslation(m_position);
+                    else
+                        m_localMatrix.Translation = m_position;
+                } else
+                    PrepareMatrix();
 
                 return m_localMatrix;
             }
@@ -253,7 +253,7 @@ namespace NewWidgets.Utility
             {
                 // Alternative is GetScreenPoint(new Vector3(0,0,0));
                 PrepareMatrix();
-                Vector3 position = m_parent == null ? m_localMatrix.Translation : m_matrix.Translation;
+                Vector3 position = m_parent == null ? m_position : m_matrix.Translation;
                 
                 return new Vector2(position.X, position.Y);  // or new Vector3(transform[12], transform[13], transform[14]); 
             }
@@ -322,9 +322,10 @@ namespace NewWidgets.Utility
             Vector3 result;
 
             if (m_parent == null)
-                result = MathHelper.Transform(new Vector3(source, 0), ref m_localMatrix);
+                result = MathHelper.Transform(new Vector3(source, 0), LocalMatrix);
             else
                 result = MathHelper.Transform(new Vector3(source, 0), ref m_matrix);
+
             return new Vector2(result.X, result.Y);
         }
 
@@ -339,9 +340,10 @@ namespace NewWidgets.Utility
             Vector3 result;
 
             if (m_parent == null)
-                result = MathHelper.Transform(source, ref m_localMatrix);
+                result = MathHelper.Transform(source, LocalMatrix);
             else
                 result = MathHelper.Transform(source, ref m_matrix);
+
             return result;
         }
 
@@ -383,11 +385,10 @@ namespace NewWidgets.Utility
         private void UpdateMatrix()
         {
             MathHelper.Init(ref m_matrix);
-            MathHelper.Init(ref m_localMatrix, true);
 
             if (m_translationOnly)
             {
-                m_localMatrix.Translation = m_position;
+                // don't init m_localMatrix for now, may be we'll don't need it
 
                 if (m_parent != null)
                     MathHelper.TranslateMatrix(m_parent.Matrix, m_position, ref m_matrix);
@@ -395,7 +396,10 @@ namespace NewWidgets.Utility
             else
             {
                 if (m_changed)
+                {
+                    MathHelper.Init(ref m_localMatrix, true);
                     MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_localMatrix);
+                }
 
                 if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
                     MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is the most expensive thing in whole engine
