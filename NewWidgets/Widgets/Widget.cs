@@ -36,8 +36,11 @@ namespace NewWidgets.Widgets
             get { return base.Enabled; }
             set
             {
-                base.Enabled = value;
-                DelayedUpdateStyle();
+                if (Enabled != value)
+                {
+                    base.Enabled = value;
+                    DelayedUpdateStyle();
+                }
             }
         }
 
@@ -46,8 +49,11 @@ namespace NewWidgets.Widgets
             get { return base.Selected; }
             set
             {
-                base.Selected = value;
-                DelayedUpdateStyle();
+                if (Selected != value)
+                {
+                    base.Selected = value;
+                    DelayedUpdateStyle();
+                }
             }
         }
 
@@ -56,8 +62,11 @@ namespace NewWidgets.Widgets
             get { return base.Hovered; }
             set
             {
-                base.Hovered = value;
-                DelayedUpdateStyle();
+                if (Hovered != null)
+                {
+                    base.Hovered = value;
+                    DelayedUpdateStyle();
+                }
             }
         }
        
@@ -204,7 +213,12 @@ namespace NewWidgets.Widgets
             }
 
             if (HasStyle(type)) // only perform switch if we have where to switch
+            {
+                if (type == m_styleType)
+                    return;
+
                 DelayedSwitchStyle(type);
+            }
         }
 
         /// <summary>

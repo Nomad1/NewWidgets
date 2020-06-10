@@ -59,7 +59,7 @@ namespace NewWidgets.Utility
             get { return m_scale; }
             set
             {
-                if (!m_changed && Vector3.BoxDistance(m_scale, value) >= ScaleEpsilon)
+                if (!m_changed && m_scale.BoxDistance(value) >= ScaleEpsilon)
                     m_changed = true;
 
                 m_scale = value;
@@ -75,7 +75,7 @@ namespace NewWidgets.Utility
             get { return m_position; }
             set
             {
-                if (!m_changed && Vector3.BoxDistance(m_position, value) >= PositionEpsilon)
+                if (!m_changed && m_position.BoxDistance(value) >= PositionEpsilon)
                     m_changed = true;
 
                 m_position = value;
@@ -93,7 +93,7 @@ namespace NewWidgets.Utility
             {
                 Vector3 newVector = new Vector3(value.X, value.Y, m_position.Z);
 
-                if (!m_changed && Vector3.BoxDistance(m_position, newVector) >= PositionEpsilon)
+                if (!m_changed && m_position.BoxDistance(newVector) >= PositionEpsilon)
                     m_changed = true;
 
                 m_position = newVector;
@@ -110,7 +110,7 @@ namespace NewWidgets.Utility
             get { return m_rotation; }
             set
             {
-                if (!m_changed && Vector3.BoxDistance(m_rotation, value) >= AngleEpsilon)
+                if (!m_changed && m_rotation.BoxDistance(value) >= AngleEpsilon)
                     m_changed = true;
 
                 m_rotation = value;
@@ -160,7 +160,7 @@ namespace NewWidgets.Utility
             {
                 Vector3 newScale = new Vector3(value.X, value.Y, value.X);
 
-                if (!m_changed && Vector3.BoxDistance(m_scale, newScale) >= ScaleEpsilon)
+                if (!m_changed && m_scale.BoxDistance(newScale) >= ScaleEpsilon)
                     m_changed = true;
 
                 m_scale = newScale;

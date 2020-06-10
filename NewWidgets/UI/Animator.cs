@@ -164,12 +164,10 @@ namespace NewWidgets.UI
 
             while (node != null)
             {
-                LinkedListNode<BaseAnimatorTask> next = node.Next;
-
                 if (node.Value.Key.Owner == owner && (kind == AnimationKind.None || node.Value.Key.Kind == kind))
                     s_tasks.Remove(node);
 
-                node = next;
+                node = node.Next;
             }
         }
         
