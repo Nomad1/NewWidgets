@@ -216,10 +216,14 @@ namespace NewWidgets.Utility
             {
                 if (m_translationOnly)
                 {
+#if USE_NUMERICS
+                    m_localMatrix = Matrix4x4.CreateTranslation(m_position);
+#else
                     if (m_localMatrix.IsEmpty)
                         m_localMatrix = Matrix4x4.CreateTranslation(m_position);
                     else
                         m_localMatrix.Translation = m_position;
+#endif
                 } else
                     PrepareMatrix();
 
