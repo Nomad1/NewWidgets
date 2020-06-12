@@ -347,7 +347,7 @@ namespace NewWidgets.Widgets
             Vector2 point = new Vector2(x, y);
             Vector2 local = this.Transform.GetClientPoint(point);
 
-            if (!m_dragging && press && /*hit && */pointer == 0)
+            if (!m_dragging && press && /*hit && */(pointer == 0 || WindowController.Instance.IsTouchScreen))
             {
                 m_dragVScroller = m_verticalScrollBar.HitTest(x, y);
                 m_dragHScroller = m_horizontalScrollBar.HitTest(x, y);
@@ -365,7 +365,7 @@ namespace NewWidgets.Widgets
                 return true;
             }
 
-            if (m_dragging && ((unpress && pointer == 0)/* || !hit*/))
+            if (m_dragging && ((unpress && (pointer == 0 || WindowController.Instance.IsTouchScreen))/* || !hit*/))
             {
                 StopDrag(point);
 
