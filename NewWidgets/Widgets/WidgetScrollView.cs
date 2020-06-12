@@ -300,13 +300,13 @@ namespace NewWidgets.Widgets
                 if (m_dragVScroller)
                 {
                     move = new Vector2(move.X, -move.Y);
-                    multiplier = m_contentView.Size.Y / Size.Y;
+                    multiplier = (m_contentView.Size.Y / Size.Y) * (m_verticalScrollBar.Size.Y) / (m_verticalScrollBar.Size.Y - m_verticalScrollBarIndicator.Size.Y);
                 }
                 else
                 if (m_dragHScroller)
                 {
                     move = new Vector2(-move.X, move.Y);
-                    multiplier = m_contentView.Size.X / Size.X;
+                    multiplier = (m_contentView.Size.X / Size.X) * (m_horizontalScrollBar.Size.X) / (m_horizontalScrollBar.Size.X - m_horizontalScrollBarIndicator.Size.X);
                 }
 
                 float targetX = m_contentView.Position.X + move.X * multiplier;// * 2;
@@ -384,13 +384,14 @@ namespace NewWidgets.Widgets
                 if (m_dragVScroller)
                 {
                     move = new Vector2(move.X, -move.Y);
-                    multiplier = m_contentView.Size.Y / Size.Y;
+                    multiplier = (m_contentView.Size.Y / Size.Y) * (m_verticalScrollBar.Size.Y) / (m_verticalScrollBar.Size.Y - m_verticalScrollBarIndicator.Size.Y);
                 }
                 else
                 if (m_dragHScroller)
                 {
                     move = new Vector2(-move.X, move.Y);
-                    multiplier = m_contentView.Size.X / Size.X;
+
+                    multiplier = (m_contentView.Size.X/Size.X) * (m_horizontalScrollBar.Size.X) / (m_horizontalScrollBar.Size.X - m_horizontalScrollBarIndicator.Size.X);
                 }
 
                 if (move.LengthSquared() > 0)

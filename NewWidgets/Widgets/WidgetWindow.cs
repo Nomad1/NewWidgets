@@ -40,7 +40,7 @@ namespace NewWidgets.Widgets
             if (base.Touch(x, y, press, unpress, pointer))
                 return true;
 
-            if (!m_dragging && press && pointer == 0)
+            if (!m_dragging && press && (pointer == 0 || WindowController.Instance.IsTouchScreen))
             {
                 Vector2 local = this.Parent.Transform.GetClientPoint(new Vector2(x, y));
                 m_dragShift = local;
