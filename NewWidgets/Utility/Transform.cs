@@ -216,7 +216,7 @@ namespace NewWidgets.Utility
             {
                 if (m_translationOnly)
                 {
-#if USE_NUMERICS
+#if true || USE_NUMERICS
                     m_localMatrix = Matrix4x4.CreateTranslation(m_position);
 #else
                     if (m_localMatrix.IsEmpty)
@@ -388,8 +388,6 @@ namespace NewWidgets.Utility
         /// </summary>
         private void UpdateMatrix()
         {
-            MathHelper.Init(ref m_matrix);
-
             if (m_translationOnly)
             {
                 // don't init m_localMatrix for now, may be we'll don't need it
@@ -400,10 +398,7 @@ namespace NewWidgets.Utility
             else
             {
                 if (m_changed)
-                {
-                    MathHelper.Init(ref m_localMatrix, true);
                     MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_localMatrix);
-                }
 
                 if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
                     MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is the most expensive thing in whole engine
