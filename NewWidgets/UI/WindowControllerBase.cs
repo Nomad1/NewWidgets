@@ -64,9 +64,14 @@ namespace NewWidgets.UI
         public abstract Vector2 PointerPosition { get; }
 
         /// <summary>
-        /// Gets last sesor value
+        /// Gets last sensor value
         /// </summary>
         public abstract Vector3 SensorValue { get; }
+
+        /// <summary>
+        /// Gets last thumb sticks value
+        /// </summary>
+        public abstract Vector4 ThumbStickValue { get; }
 
         /// <summary>
         /// List of currently displayed windows
