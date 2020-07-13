@@ -171,7 +171,7 @@ namespace NewWidgets.UI
                 {
                     return FocusNext(true);
                 }
-                else if ((key == SpecialKey.Select || key == SpecialKey.Enter))
+                else if ((key == SpecialKey.Select || key == SpecialKey.Enter || key == SpecialKey.Enter || key == SpecialKey.Joystick_Start))
                 {
                     foreach (WindowObject child in m_children.List)
                         if (child is IFocusable && ((IFocusable)child).IsFocusable && ((IFocusable)child).IsFocused)

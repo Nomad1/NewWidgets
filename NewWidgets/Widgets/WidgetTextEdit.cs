@@ -306,7 +306,7 @@ namespace NewWidgets.Widgets
                 return true;
             }
 
-            if (up && (key == SpecialKey.Enter))
+            if (up && (key == SpecialKey.Enter || key == SpecialKey.Joystick_Start))
             {
                 if (OnTextEntered != null)
                     OnTextEntered(this, m_text);

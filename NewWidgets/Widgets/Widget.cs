@@ -62,7 +62,7 @@ namespace NewWidgets.Widgets
             get { return base.Hovered; }
             set
             {
-                if (Hovered != null)
+                if (Hovered != value)
                 {
                     base.Hovered = value;
                     DelayedUpdateStyle();

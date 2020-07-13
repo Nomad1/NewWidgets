@@ -287,7 +287,7 @@ namespace NewWidgets.Widgets
                 return true;
             }
 
-            if (up && (key == SpecialKey.Enter))
+            if (up && (key == SpecialKey.Enter || key == SpecialKey.Joystick_Start))
             {
                 //SetFocused(false);
                 if (OnTextEntered != null)
