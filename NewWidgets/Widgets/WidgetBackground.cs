@@ -344,9 +344,17 @@ namespace NewWidgets.Widgets
             if (!Visible)
                 return;
 
+            if (BackgroundStyle == WidgetBackgroundStyle.ImageStretch)
+            {
+                // do nothing
+                LogConsole.WriteLine(LogLevel.CHATTER, "Back");
+            }
+
+
             if (BackgroundDepth == WidgetBackgroundDepth.Back)
                 m_background.Draw(canvas);
 
+          
             if (ClipContents)
             {
                 Vector2 actualScale = Transform.ActualScale;

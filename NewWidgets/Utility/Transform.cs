@@ -12,6 +12,17 @@ namespace NewWidgets.Utility
     /// </summary>
     public class Transform
     {
+        [Flags]
+        private enum TransformType
+        {
+            None = 0,
+            Translation = 0x01,
+            Rotation = 0x02,
+            Scale = 0x04,
+            Parent = 0x08,
+        }
+
+
 #if STEP_UPDATES
         private static readonly float PositionEpsilon = 0.001f;
         private static readonly float AngleEpsilon = 0.001f;
@@ -29,16 +40,16 @@ namespace NewWidgets.Utility
         private Vector3 m_rotation;
         private Vector3 m_position;
         private Vector3 m_scale;
-        
+
         private bool m_changed;
         private bool m_iMatrixChanged;
-        private bool m_translationOnly;
+        private TransformType m_transformType;
 
         private int m_version;
         private int m_parentVersion;
 
         private Transform m_parent;
-        
+
         internal bool IsChanged
         {
             get
@@ -51,7 +62,7 @@ namespace NewWidgets.Utility
         {
             get { return m_version; }
         }
-      
+
         /// <summary>
         /// Gets or sets the position.
         /// </summary>
@@ -65,6 +76,7 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_position = value;
+                m_transformType |= TransformType.Translation;
             }
         }
 
@@ -83,9 +95,10 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_position = newVector;
+                m_transformType |= TransformType.Translation;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the rotation in radians.
         /// </summary>
@@ -99,10 +112,10 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_rotation = value;
-                m_translationOnly = false;
+                m_transformType |= TransformType.Rotation;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the Z rotation in radians (!!)
         /// </summary>
@@ -116,10 +129,10 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_rotation.Z = value;
-                m_translationOnly = false;
+                m_transformType |= TransformType.Rotation;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the uniform scale
         /// </summary>
@@ -133,10 +146,10 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_scale = new Vector3(value, value, value);
-                m_translationOnly = false;
+                m_transformType |= TransformType.Scale;
             }
         }
-        
+
         /// <summary>
         /// Gets or sets the 2-component scale
         /// </summary>
@@ -152,7 +165,7 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_scale = newScale;
-                m_translationOnly = false;
+                m_transformType |= TransformType.Scale;
             }
         }
 
@@ -170,7 +183,7 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_scale = value;
-                m_translationOnly = false;
+                m_transformType |= TransformType.Scale;
             }
         }
 
@@ -184,14 +197,15 @@ namespace NewWidgets.Utility
             set
             {
                 System.Diagnostics.Debug.Assert(m_parent != this);
-                
+
                 if (!m_changed && m_parent != value)
                     m_changed = true;
-                
+
                 m_parent = value;
+                m_transformType |= TransformType.Parent;
             }
         }
-        
+
         /// <summary>
         /// Result transformation 4x4 matrix
         /// </summary>
@@ -214,17 +228,22 @@ namespace NewWidgets.Utility
         {
             get
             {
-                if (m_translationOnly)
+                if ((m_transformType & TransformType.Rotation) == 0)
                 {
 #if true || USE_NUMERICS
-                    m_localMatrix = Matrix4x4.CreateTranslation(m_position);
+                    m_localMatrix.M11 = m_scale.X;
+                    m_localMatrix.M22 = m_scale.Y;
+                    m_localMatrix.M33 = m_scale.Z;
+                    m_localMatrix.Translation = m_position;
+                    //m_localMatrix = Matrix4x4.CreateTranslation(m_position);
 #else
                     if (m_localMatrix.IsEmpty)
                         m_localMatrix = Matrix4x4.CreateTranslation(m_position);
                     else
                         m_localMatrix.Translation = m_position;
 #endif
-                } else
+                }
+                else
                     PrepareMatrix();
 
                 return m_localMatrix;
@@ -246,9 +265,9 @@ namespace NewWidgets.Utility
                 }
 
                 return m_imatrix;
-            }    
+            }
         }
-        
+
         // 2d actual values
 
         public Vector2 ActualPosition
@@ -258,11 +277,11 @@ namespace NewWidgets.Utility
                 // Alternative is GetScreenPoint(new Vector3(0,0,0));
                 PrepareMatrix();
                 Vector3 position = m_parent == null ? m_position : m_matrix.Translation;
-                
+
                 return new Vector2(position.X, position.Y);  // or new Vector3(transform[12], transform[13], transform[14]); 
             }
         }
-        
+
         public Vector2 ActualScale
         {
             get
@@ -270,7 +289,7 @@ namespace NewWidgets.Utility
                 return (m_parent == null ? Vector2.One : m_parent.ActualScale) * new Vector2(m_scale.X, m_scale.Y);
             }
         }
-        
+
         public float ActualRotation
         {
             get
@@ -282,9 +301,9 @@ namespace NewWidgets.Utility
         public Transform()
             : this(Vector3.Zero, Vector3.Zero, Vector3.One)
         {
-            
+
         }
-        
+
         /// <summary>
         /// Creates transform with Z-rotation
         /// </summary>
@@ -295,7 +314,7 @@ namespace NewWidgets.Utility
             : this(new Vector3(position.X, position.Y, 0), new Vector3(0, 0, rotation), new Vector3(uniformScale, uniformScale, uniformScale))
         {
         }
-        
+
         /// <summary>
         /// Creates transform with 3-component rotation in radians
         /// </summary>
@@ -304,7 +323,13 @@ namespace NewWidgets.Utility
         /// <param name="scale"></param>
         public Transform(Vector3 position, Vector3 rotation, Vector3 scale)
         {
-            m_translationOnly = rotation.BoxDistance(Vector3.Zero) < float.Epsilon && scale.BoxDistance(Vector3.One) < float.Epsilon;
+            m_transformType = TransformType.Translation;
+
+            if (rotation.BoxDistance(Vector3.Zero) > AngleEpsilon)
+                m_transformType |= TransformType.Rotation;
+
+            if (scale.BoxDistance(Vector3.One) > ScaleEpsilon)
+                m_transformType |= TransformType.Scale;
 
             m_changed = true;
             m_iMatrixChanged = true;
@@ -321,7 +346,7 @@ namespace NewWidgets.Utility
         /// <param name="source"></param>
         /// <returns></returns>
         public Vector2 GetScreenPoint(Vector2 source)
-        {            
+        {
             PrepareMatrix();
             Vector3 result;
 
@@ -388,22 +413,17 @@ namespace NewWidgets.Utility
         /// </summary>
         private void UpdateMatrix()
         {
-            if (m_translationOnly)
+            if (m_changed)
             {
-                // don't init m_localMatrix for now, may be we'll don't need it
-
-                if (m_parent != null)
-                    MathHelper.TranslateMatrix(m_parent.Matrix, m_position, ref m_matrix);
-            }
-            else
-            {
-                if (m_changed)
+                if ((m_transformType & TransformType.Rotation) == 0)
+                    MathHelper.GetMatrix3d(m_position, m_scale, ref m_localMatrix);
+                else
                     MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_localMatrix);
-
-                if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
-                    MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is the most expensive thing in whole engine
-
             }
+
+            if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
+                MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is the most expensive thing in whole engine
+
 
             m_iMatrixChanged = true;
 
