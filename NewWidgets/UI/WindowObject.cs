@@ -99,6 +99,11 @@ namespace NewWidgets.UI
         Joystick_RTrigger,
         Joystick_LTrigger,
 
+        Accelerate,
+        TurnLeft,
+        TurnRight,
+        Brake,
+
         Max
     }
 
