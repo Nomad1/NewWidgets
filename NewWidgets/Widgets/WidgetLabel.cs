@@ -22,6 +22,8 @@ namespace NewWidgets.Widgets
         private bool m_needRecreate; // flag to indicate that we need a new inner label
         private bool m_needAnimate; // flag to indicate that animation is in progress
         private bool m_needAnimateRandom; // animation type
+
+        private int m_color = 0xffffff;
         
         public Font Font
         {
@@ -90,10 +92,15 @@ namespace NewWidgets.Widgets
             get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
             set
             {
+                if (m_color == value)
+                    return;
+
                 SetProperty(WidgetParameterIndex.TextColor, value);
 
                 if (m_label != null) // try to avoid settings m_needLayout
                     m_label.Color = value;
+
+                m_color = value;
             }
         }
 
