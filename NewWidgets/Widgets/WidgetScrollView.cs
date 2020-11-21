@@ -21,9 +21,9 @@ namespace NewWidgets.Widgets
         private static readonly float s_zoomDeltaScale = 10.0f;
         private static readonly float s_borderPadding = 100.0f;
         private static readonly float s_dragMultiplier = 3.0f;
-        private static readonly float s_dragEpsilon = 100.0f;
+        private static readonly float s_dragEpsilon = 10.0f;
         private static readonly int s_autoScrollSpeed = 50;
-        
+
         private static readonly float ScrollEpsilon = 0.01f;
 
         private readonly WidgetPanel m_contentView;
@@ -44,9 +44,9 @@ namespace NewWidgets.Widgets
 
         private bool m_horizontalBarVisible = false;
         private bool m_verticalBarVisible = false;
-        
+
         private bool m_animating;
-        
+
         private bool m_needLayout;
 
         public override bool Enabled
@@ -54,7 +54,7 @@ namespace NewWidgets.Widgets
             get { return m_contentView.Enabled; }
             set { m_contentView.Enabled = value; }
         }
-        
+
         public Vector2 ContentSize
         {
             get
@@ -63,14 +63,14 @@ namespace NewWidgets.Widgets
             }
             set
             {
-                bool relayout = (m_contentView.Size - value).LengthSquared() > 0;
+                bool relayout = m_contentView.Size.DistanceAvr(value) > float.Epsilon;
                 m_contentView.Size = value;
                 SetScroll(m_contentView.Position.X, m_contentView.Position.Y, true);
                 if (relayout)
                     m_needLayout = true;
             }
         }
-        
+
         public WidgetScrollType HorizontalScroll
         {
             get { return m_horizontalScroll; }
@@ -116,7 +116,7 @@ namespace NewWidgets.Widgets
         }
 
         public WidgetScrollView(WidgetStyleSheet style = default(WidgetStyleSheet))
-            : base(style.IsEmpty ? DefaultStyle : style )
+            : base(style.IsEmpty ? DefaultStyle : style)
         {
             m_contentView = new WidgetPanel(WidgetPanel.DefaultStyle);
             m_contentView.Parent = this;
@@ -139,7 +139,7 @@ namespace NewWidgets.Widgets
 
             m_needLayout = true;
         }
-        
+
         protected override void Resize(Vector2 size)
         {
             base.Resize(size);
@@ -209,7 +209,7 @@ namespace NewWidgets.Widgets
                 if ((m_verticalScroll & WidgetScrollType.AutoHide) != 0)
                     m_verticalBarVisible = indicatorSize < maxLength;
             }
- 
+
             UpdateScroll();
 
             m_needLayout = false;
@@ -250,19 +250,19 @@ namespace NewWidgets.Widgets
         protected override void DrawContents(object canvas)
         {
             base.DrawContents(canvas);
-            
+
             RectangleF visibleRect = new RectangleF(-m_contentView.Position.X, -m_contentView.Position.Y, Size.X, Size.Y); // TODO: margins and scale?
 
             foreach (Widget widget in m_contentView.Children)
             {
                 RectangleF widgetRect = new RectangleF(widget.Position.X, widget.Position.Y, widget.Size.X, widget.Size.Y);
-                
+
                 if (visibleRect.IntersectsWith(widgetRect))
                     widget.Draw(canvas);
-                
-//                if (widget.Position > m_contentView.Size
+
+                //                if (widget.Position > m_contentView.Size
             }
-                       
+
             //m_contentView.Draw(canvas);
 
             if (m_horizontalBarVisible)
@@ -300,29 +300,29 @@ namespace NewWidgets.Widgets
                 if (m_dragVScroller)
                 {
                     move = new Vector2(move.X, -move.Y);
-                    multiplier = (m_contentView.Size.Y / Size.Y) * (m_verticalScrollBar.Size.Y) / (m_verticalScrollBar.Size.Y - m_verticalScrollBarIndicator.Size.Y);
+                    multiplier = m_contentView.Size.Y / (m_verticalScrollBar.Size.Y - m_verticalScrollBarIndicator.Size.Y);
                 }
                 else
                 if (m_dragHScroller)
                 {
                     move = new Vector2(-move.X, move.Y);
-                    multiplier = (m_contentView.Size.X / Size.X) * (m_horizontalScrollBar.Size.X) / (m_horizontalScrollBar.Size.X - m_horizontalScrollBarIndicator.Size.X);
+                    multiplier = m_contentView.Size.X / (m_horizontalScrollBar.Size.X - m_horizontalScrollBarIndicator.Size.X);
                 }
 
-                float targetX = m_contentView.Position.X + move.X * multiplier;// * 2;
+                float targetX = m_contentView.Position.X + move.X * multiplier;
                 if (targetX < -m_contentView.Size.X + Size.X)
                     targetX = -m_contentView.Size.X + Size.X;
                 if (targetX > 0)
                     targetX = 0;
 
-                float targetY = m_contentView.Position.Y + move.Y * multiplier;// * 2;
+                float targetY = m_contentView.Position.Y + move.Y * multiplier;
                 if (targetY < -m_contentView.Size.Y + Size.Y)
                     targetY = -m_contentView.Size.Y + Size.Y;
                 if (targetY > 0)
                     targetY = 0;
 
                 Vector2 target = new Vector2(targetX, targetY);
-                if ((target - m_contentView.Position).LengthSquared() > 0)
+                if (target.DistanceAvr(m_contentView.Position) > float.Epsilon)
                     m_contentView.Move(target, 120, null);
             }
         }
@@ -354,7 +354,7 @@ namespace NewWidgets.Widgets
 
                 if (!WindowController.Instance.IsTouchScreen && !m_dragVScroller && !m_dragHScroller)
                     return true; // on large screens allow only scroller scroll, no body scroll
-                    
+
 
                 m_dragShift = local;
                 m_dragStart = m_dragShift;
@@ -369,9 +369,9 @@ namespace NewWidgets.Widgets
             {
                 StopDrag(point);
 
-                if (/*hit && */(m_dragStart - point).LengthSquared() < s_dragEpsilon)
+                if (/*hit && */m_dragStart.DistanceAvr(point) < s_dragEpsilon)
                     return false;
-                
+
                 return true;
             }
 
@@ -384,17 +384,17 @@ namespace NewWidgets.Widgets
                 if (m_dragVScroller)
                 {
                     move = new Vector2(move.X, -move.Y);
-                    multiplier = (m_contentView.Size.Y / Size.Y) * (m_verticalScrollBar.Size.Y) / (m_verticalScrollBar.Size.Y - m_verticalScrollBarIndicator.Size.Y);
+                    multiplier = (m_contentView.Size.Y + Size.Y + s_borderPadding) / (m_verticalScrollBar.Size.Y - m_verticalScrollBarIndicator.Size.Y);
                 }
                 else
                 if (m_dragHScroller)
                 {
                     move = new Vector2(-move.X, move.Y);
 
-                    multiplier = (m_contentView.Size.X/Size.X) * (m_horizontalScrollBar.Size.X) / (m_horizontalScrollBar.Size.X - m_horizontalScrollBarIndicator.Size.X);
+                    multiplier = (m_contentView.Size.X + Size.X + s_borderPadding) / (m_horizontalScrollBar.Size.X - m_horizontalScrollBarIndicator.Size.X);
                 }
 
-                if (move.LengthSquared() > 0)
+                if (!move.IsZero())
                 {
                     float targetX = m_contentView.Position.X;
 
@@ -402,6 +402,7 @@ namespace NewWidgets.Widgets
                     {
                         float border = (m_horizontalScroll & WidgetScrollType.Inertial) != 0 ? s_borderPadding : 0;
                         targetX = m_contentView.Position.X + move.X * multiplier;
+
                         if (targetX < -m_contentView.Size.X + Size.X - border)
                             targetX = -m_contentView.Size.X + Size.X - border;
                         if (targetX > border)
@@ -420,11 +421,12 @@ namespace NewWidgets.Widgets
                             targetY = border;
                     }
                     Vector2 target = new Vector2(targetX, targetY);
-                    if ((target - m_contentView.Position).LengthSquared() > 0)
+
+                    if (target.DistanceAvr(m_contentView.Position) > float.Epsilon)
                         m_contentView.Move(target, 1, null);
 
                     m_dragShift = local;
-                    
+
                     UpdateScroll();
                 }
                 return true;
@@ -455,7 +457,7 @@ namespace NewWidgets.Widgets
                 SetScroll(m_contentView.Position.X + value * s_zoomDeltaScale, m_contentView.Position.Y);
             else
                 SetScroll(m_contentView.Position.X, m_contentView.Position.Y + value * s_zoomDeltaScale);
-            
+
             return true;
         }
 
@@ -532,9 +534,9 @@ namespace NewWidgets.Widgets
             if (m_horizontalBarVisible)
             {
                 Margin horizontalScrollIndicatorPadding = new Margin(3, 3, 3, 3);
-                
+
                 float max = m_horizontalScrollBar.Size.X - horizontalScrollIndicatorPadding.Left - horizontalScrollIndicatorPadding.Right - m_horizontalScrollBarIndicator.Size.X;
-                
+
                 float percent = MathHelper.Clamp(-m_contentView.Position.X / (m_contentView.Size.X - Size.X), 0, 1);
                 m_horizontalScrollBarIndicator.Position = new Vector2(max * percent + m_horizontalScrollBar.Position.X + horizontalScrollIndicatorPadding.Left, m_horizontalScrollBar.Position.Y + horizontalScrollIndicatorPadding.Top);
             }

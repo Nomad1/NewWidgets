@@ -12,6 +12,7 @@ namespace NewWidgets.Widgets
 
         private static readonly float s_dragEpsilonSquared = 10.0f*10.0f;
 
+        private bool m_draggable = true;
         private Vector2 m_dragShift;
         private Vector2 m_dragStart;
         private bool m_dragging;
@@ -27,9 +28,16 @@ namespace NewWidgets.Widgets
             }
         }
 
+        public bool Draggable
+        {
+            get { return m_draggable; }
+            set { m_draggable = value; }
+        }
+
         public WidgetWindow(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(style.IsEmpty ? DefaultStyle : style)
         {
+
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
@@ -40,7 +48,7 @@ namespace NewWidgets.Widgets
             if (base.Touch(x, y, press, unpress, pointer))
                 return true;
 
-            if (!m_dragging && press && (pointer == 0 || WindowController.Instance.IsTouchScreen))
+            if (m_draggable && !m_dragging && press && (pointer == 0 || WindowController.Instance.IsTouchScreen))
             {
                 Vector2 local = this.Parent.Transform.GetClientPoint(new Vector2(x, y));
                 m_dragShift = local;

@@ -302,7 +302,7 @@ namespace NewWidgets.Widgets
             else
                 s_currentTooltip = null;
 
-            return result;
+            return WindowController.Instance.IsTouchScreen ? false : result;
         }
 
         public static Window GetTopmostWindow()

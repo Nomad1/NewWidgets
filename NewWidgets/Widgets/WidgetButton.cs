@@ -291,6 +291,8 @@ namespace NewWidgets.Widgets
         
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
+            if (m_animating)
+                return true;
             //if (Enabled)
             {
                 if (Enabled && press)
