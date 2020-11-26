@@ -110,7 +110,7 @@ namespace NewWidgets.Widgets
         private static bool HandleTouch(float x, float y, bool press, bool unpress, int pointer)
         {
             if (s_currentTooltip != null && !s_currentTooltip.HitTest(x, y))
-                HandleTooltip(null, null, Vector2.Zero, null);
+                HideTooltips();
 
             if (s_exclusiveWidgets.Count > 0)
             {
@@ -118,6 +118,12 @@ namespace NewWidgets.Widgets
             }
             
             return false;
+        }
+
+        public static void HideTooltips()
+        {
+            if (s_currentTooltip != null)
+                HandleTooltip(null, null, Vector2.Zero, null);
         }
 
         private static void RegisterFont(XmlNode node)
