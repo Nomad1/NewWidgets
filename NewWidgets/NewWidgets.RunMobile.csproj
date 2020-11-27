@@ -67,11 +67,7 @@
     <TargetFrameworkProfile />
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug.Numerics|AnyCPU'">
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release.Numerics|AnyCPU'">
+  <ItemGroup Condition="'$(Configuration)' == 'Debug.Numerics' or '$(Configuration)' == 'Release.Numerics'">
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
