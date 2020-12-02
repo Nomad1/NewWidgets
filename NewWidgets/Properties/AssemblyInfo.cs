@@ -31,4 +31,5 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("RunMobile.OpenTK.Android")]
 #else
 [assembly: InternalsVisibleTo("RunMobile.OpenTK")]
+[assembly: InternalsVisibleTo("RunMobile.OpenTK.ES")]
 #endif
