@@ -349,7 +349,7 @@ namespace NewWidgets.Widgets
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if ((!string.IsNullOrEmpty(m_tooltip) || OnTooltip != null) && ((pointer == 0 && !unpress && !press) || (WindowController.Instance.IsTouchScreen)))
+            if ((!string.IsNullOrEmpty(m_tooltip) || OnTooltip != null) && ((pointer == 0 && !unpress && !press) || (press && WindowController.Instance.IsTouchScreen)))
                 return WidgetManager.HandleTooltip(this, m_tooltip, new Vector2(x, y), OnTooltip);
 
             return base.Touch(x, y, press, unpress, pointer);
