@@ -34,7 +34,6 @@ namespace NewWidgets.Utility
 #endif
 
         internal Matrix4x4 m_matrix;
-        internal Matrix4x4 m_localMatrix;
         internal Matrix4x4 m_imatrix;
 
         private Vector3 m_rotation;
@@ -76,7 +75,11 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_position = value;
-                m_transformType |= TransformType.Translation;
+
+                if (m_position.BoxDistance(Vector3.Zero) >= PositionEpsilon)
+                    m_transformType |= TransformType.Translation;
+                else
+                    m_transformType &= ~TransformType.Translation;
             }
         }
 
@@ -89,13 +92,7 @@ namespace NewWidgets.Utility
             get { return new Vector2(m_position.X, m_position.Y); }
             set
             {
-                Vector3 newVector = new Vector3(value.X, value.Y, m_position.Z);
-
-                if (!m_changed && m_position.BoxDistance(newVector) >= PositionEpsilon)
-                    m_changed = true;
-
-                m_position = newVector;
-                m_transformType |= TransformType.Translation;
+                Position = new Vector3(value.X, value.Y, m_position.Z);
             }
         }
 
@@ -112,7 +109,11 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_rotation = value;
-                m_transformType |= TransformType.Rotation;
+
+                if (m_rotation.BoxDistance(Vector3.Zero) >= AngleEpsilon)
+                    m_transformType |= TransformType.Rotation;
+                else
+                    m_transformType &= ~TransformType.Rotation;
             }
         }
 
@@ -125,11 +126,7 @@ namespace NewWidgets.Utility
             get { return m_rotation.Z; }
             set
             {
-                if (!m_changed && (Math.Abs(m_rotation.Z - value) >= AngleEpsilon))
-                    m_changed = true;
-
-                m_rotation.Z = value;
-                m_transformType |= TransformType.Rotation;
+                Rotation = new Vector3(m_rotation.X, m_rotation.Y, value);
             }
         }
 
@@ -142,11 +139,7 @@ namespace NewWidgets.Utility
             get { return m_scale.X; }
             set
             {
-                if (!m_changed && (Math.Abs(m_scale.X - value) >= ScaleEpsilon))
-                    m_changed = true;
-
-                m_scale = new Vector3(value, value, value);
-                m_transformType |= TransformType.Scale;
+                Scale = new Vector3(value, value, value);
             }
         }
 
@@ -159,13 +152,7 @@ namespace NewWidgets.Utility
             get { return new Vector2(m_scale.X, m_scale.Y); }
             set
             {
-                Vector3 newScale = new Vector3(value.X, value.Y, value.X);
-
-                if (!m_changed && m_scale.BoxDistance(newScale) >= ScaleEpsilon)
-                    m_changed = true;
-
-                m_scale = newScale;
-                m_transformType |= TransformType.Scale;
+                Scale = new Vector3(value.X, value.Y, value.X);
             }
         }
 
@@ -183,7 +170,10 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_scale = value;
-                m_transformType |= TransformType.Scale;
+                if (m_scale.BoxDistance(Vector3.One) >= ScaleEpsilon)
+                    m_transformType |= TransformType.Scale;
+                else
+                    m_transformType &= ~TransformType.Scale;
             }
         }
 
@@ -202,7 +192,11 @@ namespace NewWidgets.Utility
                     m_changed = true;
 
                 m_parent = value;
-                m_transformType |= TransformType.Parent;
+
+                if (m_parent != null)
+                    m_transformType |= TransformType.Parent;
+                else
+                    m_transformType &= ~TransformType.Parent;
             }
         }
 
@@ -216,7 +210,7 @@ namespace NewWidgets.Utility
             {
                 PrepareMatrix();
 
-                return m_parent == null ? LocalMatrix : m_matrix;
+                return m_matrix;
             }
         }
 
@@ -224,31 +218,28 @@ namespace NewWidgets.Utility
         /// Gets the local matrix.
         /// </summary>
         /// <value>The local matrix.</value>
-        public Matrix4x4 LocalMatrix
-        {
-            get
-            {
-                if ((m_transformType & TransformType.Rotation) == 0)
-                {
-#if true || USE_NUMERICS
-                    m_localMatrix.M11 = m_scale.X;
-                    m_localMatrix.M22 = m_scale.Y;
-                    m_localMatrix.M33 = m_scale.Z;
-                    m_localMatrix.Translation = m_position;
-                    //m_localMatrix = Matrix4x4.CreateTranslation(m_position);
-#else
-                    if (m_localMatrix.IsEmpty)
-                        m_localMatrix = Matrix4x4.CreateTranslation(m_position);
-                    else
-                        m_localMatrix.Translation = m_position;
-#endif
-                }
-                else
-                    PrepareMatrix();
+        //public Matrix4x4 LocalMatrix
+        //{
+        //    get
+        //    {
+        //        if ((m_transformType & TransformType.Rotation) == 0)
+        //        {
+        //            //if ((m_transformType & TransformType.Scale) == 0) // it's faster to assign than to check
+        //            {
+        //                m_localMatrix.M11 = m_scale.X;
+        //                m_localMatrix.M22 = m_scale.Y;
+        //                m_localMatrix.M33 = m_scale.Z;
+        //            }
 
-                return m_localMatrix;
-            }
-        }
+        //            m_localMatrix.Translation = m_position;
+
+        //        }
+        //        else
+        //            PrepareMatrix();
+
+        //        return m_localMatrix;
+        //    }
+        //}
 
         /// <summary>
         /// Gets the inverted atrix.
@@ -323,7 +314,8 @@ namespace NewWidgets.Utility
         /// <param name="scale"></param>
         public Transform(Vector3 position, Vector3 rotation, Vector3 scale)
         {
-            m_transformType = TransformType.Translation;
+            if (position.BoxDistance(Vector3.Zero) > PositionEpsilon)
+                m_transformType |= TransformType.Translation;
 
             if (rotation.BoxDistance(Vector3.Zero) > AngleEpsilon)
                 m_transformType |= TransformType.Rotation;
@@ -348,14 +340,7 @@ namespace NewWidgets.Utility
         public Vector2 GetScreenPoint(Vector2 source)
         {
             PrepareMatrix();
-            Vector3 result;
-
-            if (m_parent == null)
-                result = MathHelper.Transform(new Vector3(source, 0), LocalMatrix);
-            else
-                result = MathHelper.Transform(new Vector3(source, 0), ref m_matrix);
-
-            return new Vector2(result.X, result.Y);
+            return MathHelper.Transform(new Vector3(source, 0), ref m_matrix).XY();
         }
 
         /// <summary>
@@ -366,14 +351,7 @@ namespace NewWidgets.Utility
         public Vector3 GetScreenPoint3(Vector3 source)
         {
             PrepareMatrix();
-            Vector3 result;
-
-            if (m_parent == null)
-                result = MathHelper.Transform(source, LocalMatrix);
-            else
-                result = MathHelper.Transform(source, ref m_matrix);
-
-            return result;
+            return MathHelper.Transform(source, ref m_matrix);
         }
 
         /// <summary>
@@ -384,8 +362,7 @@ namespace NewWidgets.Utility
         public Vector2 GetClientPoint(Vector2 source)
         {
             PrepareIMatrix();
-            Vector3 result = MathHelper.Transform(new Vector3(source, 0), ref m_imatrix);
-            return new Vector2(result.X, result.Y);
+            return MathHelper.Transform(new Vector3(source, 0), ref m_imatrix).XY();
         }
 
         /// <summary>
@@ -399,31 +376,27 @@ namespace NewWidgets.Utility
             return MathHelper.Transform(source, ref m_imatrix);
         }
 
-        public void SetMatrix(Matrix4x4 matrix)
-        {
-            m_matrix = matrix;
-
-            m_changed = false;
-            m_version++;
-            m_parentVersion = m_parent != null ? m_parent.m_version : 0;
-        }
-
         /// <summary>
         /// This method bakes transform values to 4x4 matrix
         /// </summary>
         private void UpdateMatrix()
         {
-            if (m_changed)
-            {
-                if ((m_transformType & TransformType.Rotation) == 0)
-                    MathHelper.GetMatrix3d(m_position, m_scale, ref m_localMatrix);
-                else
-                    MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_localMatrix);
-            }
+            if ((m_transformType & TransformType.Rotation) == 0)
+                MathHelper.GetMatrix3d(m_position, m_scale, ref m_matrix);
+            else
+                MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_matrix);
 
             if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
-                MathHelper.Mul(m_parent.Matrix, m_localMatrix, ref m_matrix); // this one is the most expensive thing in whole engine
+            {
+                // this one is the most expensive thing in whole engine
+#if USE_NUMERICS
+                m_matrix = Matrix4x4.Multiply(m_localMatrix, m_parent.Matrix);
+#else
+                m_parent.PrepareMatrix();
 
+                m_matrix.Mul(ref m_parent.m_matrix);
+#endif
+            }
 
             m_iMatrixChanged = true;
 
@@ -442,7 +415,13 @@ namespace NewWidgets.Utility
         {
             if (m_iMatrixChanged || IsChanged)
             {
-                MathHelper.Invert(Matrix, ref m_imatrix);
+                PrepareMatrix();
+
+#if USE_NUMERICS
+                Matrix4x4.Invert(m_matrix, out m_imatrix);
+#else
+                m_imatrix.AssignInverted(ref m_matrix);
+#endif
                 m_iMatrixChanged = false;
             }
         }
