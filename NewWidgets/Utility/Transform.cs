@@ -363,7 +363,6 @@ namespace NewWidgets.Utility
             }
         }
 
-
         /// <summary>
         /// Compares coordinates of two vectors. Returns true if vectors are different
         /// </summary>
@@ -373,14 +372,11 @@ namespace NewWidgets.Utility
         /// <returns></returns>
         private static bool CompareVectors(Vector3 one, Vector3 another, float diff)
         {
-            float d = one.X - another.X;
-            if (d < -diff || d > diff)
+            if (diff < another.X - one.X || one.X - another.X > diff)
                 return true;
-            d = one.Y - another.Y;
-            if (d < -diff || d > diff)
+            if (diff < another.Y - one.Y || one.Y - another.Y > diff)
                 return true;
-            d = one.Z - another.Z;
-            if (d < -diff || d > diff)
+            if (diff < another.Z - one.Z || one.Z - another.Z > diff)
                 return true;
             return false;
         }
