@@ -21,7 +21,7 @@ namespace NewWidgets.Utility
         private static readonly float ScaleEpsilon = float.Epsilon;
 #endif
 
-        internal Matrix4x4 m_matrix;
+        internal Matrix4x3 m_matrix;
         internal Matrix4x4 m_imatrix;
 
         private Vector3 m_rotation;
@@ -91,11 +91,6 @@ namespace NewWidgets.Utility
                     m_changed = CompareVectors(m_rotation, value, AngleEpsilon);
 
                 m_rotation = value;
-
-                //if (m_rotation.BoxDistance(Vector3.Zero) >= AngleEpsilon)
-                    //m_transformType |= TransformType.Rotation;
-                //else
-                    //m_transformType &= ~TransformType.Rotation;
             }
         }
 
@@ -138,7 +133,6 @@ namespace NewWidgets.Utility
             }
         }
 
-
         /// <summary>
         /// Non-uniform scale value
         /// </summary>
@@ -169,6 +163,8 @@ namespace NewWidgets.Utility
                 if (!m_changed && m_parent != value)
                     m_changed = true;
 
+                m_parentVersion = 0;
+
                 m_parent = value;
             }
         }
@@ -177,7 +173,7 @@ namespace NewWidgets.Utility
         /// Result transformation 4x4 matrix
         /// </summary>
         /// <value>The matrix.</value>
-        public Matrix4x4 Matrix
+        public Matrix4x3 Matrix
         {
             get
             {
@@ -195,11 +191,7 @@ namespace NewWidgets.Utility
         {
             get
             {
-                if (m_iMatrixChanged || IsChanged)
-                {
-                    MathHelper.Invert(Matrix, ref m_imatrix);
-                    m_iMatrixChanged = false;
-                }
+                PrepareIMatrix();
 
                 return m_imatrix;
             }
@@ -213,9 +205,8 @@ namespace NewWidgets.Utility
             {
                 // Alternative is GetScreenPoint(new Vector3(0,0,0));
                 PrepareMatrix();
-                Vector3 position = m_parent == null ? m_position : m_matrix.Translation;
 
-                return new Vector2(position.X, position.Y);  // or new Vector3(transform[12], transform[13], transform[14]); 
+                return m_matrix.Translation.XY(); 
             }
         }
 
@@ -226,15 +217,7 @@ namespace NewWidgets.Utility
                 return (m_parent == null ? Vector2.One : m_parent.ActualScale) * new Vector2(m_scale.X, m_scale.Y);
             }
         }
-
-        public float ActualRotation
-        {
-            get
-            {
-                return (m_parent == null ? 0 : m_parent.ActualRotation) + m_rotation.Z;
-            }
-        }
-
+     
         public Transform()
             : this(Vector3.Zero, Vector3.Zero, Vector3.One)
         {
@@ -266,6 +249,7 @@ namespace NewWidgets.Utility
             m_rotation = rotation;
             m_scale = scale;
             m_version = 1;
+            m_parentVersion = 0;
         }
 
 
@@ -331,7 +315,7 @@ namespace NewWidgets.Utility
 #else
                 m_parent.PrepareMatrix();
 
-                m_matrix.Mul(ref m_parent.m_matrix);
+                Matrix4x3.Mul(ref m_matrix, ref m_parent.m_matrix, ref m_matrix);
 #endif
             }
 
@@ -348,17 +332,14 @@ namespace NewWidgets.Utility
                 UpdateMatrix();
         }
 
-        internal void PrepareIMatrix()
+        private void PrepareIMatrix()
         {
             if (m_iMatrixChanged || IsChanged)
             {
                 PrepareMatrix();
 
-#if USE_NUMERICS
-                Matrix4x4.Invert(m_matrix, out m_imatrix);
-#else
-                m_imatrix.AssignInverted(ref m_matrix);
-#endif
+                MathHelper.Invert(ref m_matrix, ref m_imatrix);
+
                 m_iMatrixChanged = false;
             }
         }
