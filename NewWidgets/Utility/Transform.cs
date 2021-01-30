@@ -4,6 +4,10 @@
 using RunMobile.Utility;
 #endif
 
+#if USE_NUMERICS
+using Matrix4x3 = System.Numerics.Matrix4x4;
+#endif
+
 namespace NewWidgets.Utility
 {
     /// <summary>
@@ -11,15 +15,9 @@ namespace NewWidgets.Utility
     /// </summary>
     public class Transform
     {
-#if __MOBILE__
-        private static readonly float PositionEpsilon = 0.01f;
-        private static readonly float AngleEpsilon = 0.0001f;
-        private static readonly float ScaleEpsilon = 0.001f;
-#else
         private static readonly float PositionEpsilon = float.Epsilon;
         private static readonly float AngleEpsilon = float.Epsilon;
         private static readonly float ScaleEpsilon = float.Epsilon;
-#endif
 
         internal Matrix4x3 m_matrix;
         internal Matrix4x4 m_imatrix;
@@ -311,7 +309,7 @@ namespace NewWidgets.Utility
             {
                 // this one is the most expensive thing in whole engine
 #if USE_NUMERICS
-                m_matrix = Matrix4x4.Multiply(m_localMatrix, m_parent.Matrix);
+                m_matrix = Matrix4x4.Multiply(m_matrix, m_parent.Matrix);
 #else
                 m_parent.PrepareMatrix();
 
