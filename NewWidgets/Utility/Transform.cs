@@ -2,9 +2,7 @@
 
 #if RUNMOBILE
 using RunMobile.Utility;
-#endif
-
-#if USE_NUMERICS
+#else
 using Matrix4x3 = System.Numerics.Matrix4x4;
 #endif
 
@@ -204,7 +202,7 @@ namespace NewWidgets.Utility
                 // Alternative is GetScreenPoint(new Vector3(0,0,0));
                 PrepareMatrix();
 
-                return m_matrix.Translation.XY(); 
+                return new Vector2(m_matrix.M41, m_matrix.M42);
             }
         }
 
@@ -259,7 +257,7 @@ namespace NewWidgets.Utility
         public Vector2 GetScreenPoint(Vector2 source)
         {
             PrepareMatrix();
-            return MathHelper.Transform(new Vector3(source, 0), ref m_matrix).XY();
+            return Vector2.Transform(source, m_matrix);
         }
 
         /// <summary>
@@ -270,7 +268,7 @@ namespace NewWidgets.Utility
         public Vector3 GetScreenPoint3(Vector3 source)
         {
             PrepareMatrix();
-            return MathHelper.Transform(source, ref m_matrix);
+            return Vector3.Transform(source, m_matrix);
         }
 
         /// <summary>
@@ -281,7 +279,7 @@ namespace NewWidgets.Utility
         public Vector2 GetClientPoint(Vector2 source)
         {
             PrepareIMatrix();
-            return MathHelper.Transform(new Vector3(source, 0), ref m_imatrix).XY();
+            return Vector2.Transform(source, m_imatrix);
         }
 
         /// <summary>
@@ -292,7 +290,7 @@ namespace NewWidgets.Utility
         public Vector3 GetClientPoint3(Vector3 source)
         {
             PrepareIMatrix();
-            return MathHelper.Transform(source, ref m_imatrix);
+            return Vector3.Transform(source, m_imatrix);
         }
 
         /// <summary>
@@ -313,7 +311,7 @@ namespace NewWidgets.Utility
 #else
                 m_parent.PrepareMatrix();
 
-                Matrix4x3.Mul(ref m_matrix, ref m_parent.m_matrix, ref m_matrix);
+                MathHelper.Mul(ref m_parent.m_matrix, ref m_matrix, ref m_matrix);
 #endif
             }
 

@@ -62,6 +62,26 @@ namespace NewWidgets.Utility
             resultMatrix.M44 = 1.0f;
         }
 
+        public static void GetMatrix3d(Vector3 position, Vector3 scale, ref Matrix4x4 resultMatrix)
+        {
+            resultMatrix.M11 = scale.X;
+            resultMatrix.M12 = 0;
+            resultMatrix.M13 = 0;
+            resultMatrix.M14 = 0;
+            resultMatrix.M21 = 0;
+            resultMatrix.M22 = scale.Y;
+            resultMatrix.M23 = 0;
+            resultMatrix.M24 = 0;
+            resultMatrix.M31 = 0;
+            resultMatrix.M32 = 0;
+            resultMatrix.M33 = scale.Z;
+            resultMatrix.M34 = 0;
+            resultMatrix.M41 = position.X;
+            resultMatrix.M42 = position.Y;
+            resultMatrix.M43 = position.Z;
+            resultMatrix.M44 = 1.0f;
+        }
+
         public static void Init(ref Matrix4x4 matrix)
         {
             // if Matrix is array-based we need to initialize it first, otherwise it will have default(Matrix4x4) value with null array
@@ -77,6 +97,11 @@ namespace NewWidgets.Utility
             nresult = Matrix4x4.Multiply(m1, m2); // we're using reverse multiplying order here intentionaly
         }
 
+        public static void Mul(ref Matrix4x4 m1, ref Matrix4x4 m2, ref Matrix4x4 nresult)
+        {
+            nresult = Matrix4x4.Multiply(m2, m1);
+        }
+
         public static Vector3 Transform(Vector3 vector, ref Matrix4x4 matrix)
         {
             Vector3 result;
@@ -87,7 +112,7 @@ namespace NewWidgets.Utility
             return result;
         }
 
-        public static void Invert(Matrix4x4 m1, ref Matrix4x4 m2)
+        public static void Invert(ref Matrix4x4 m1, ref Matrix4x4 m2)
         {
             Matrix4x4.Invert(m1, out m2);
         }

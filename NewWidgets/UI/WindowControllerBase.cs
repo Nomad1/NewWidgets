@@ -74,6 +74,12 @@ namespace NewWidgets.UI
         public abstract Vector4 ThumbStickValue { get; }
 
         /// <summary>
+        /// Shows or hides keyboard if text edit field is focused
+        /// </summary>
+        /// <param name="show">Commands to show or hide the keyboard</param>
+        public abstract void ShowKeyboard(bool show);
+
+        /// <summary>
         /// List of currently displayed windows
         /// </summary>
         /// <value>The windows.</value>
@@ -154,13 +160,6 @@ namespace NewWidgets.UI
         /// </summary>
         /// <param name="id">Sound id</param>
         public abstract void PlaySound(string id);
-
-        /// <summary>
-        /// Shows or hides keyboard if text edit field is focused
-        /// </summary>
-        /// <param name="show">Commands to show or hide the keyboard</param>
-        public abstract void ShowKeyboard(bool show);
-
     }
 }
 

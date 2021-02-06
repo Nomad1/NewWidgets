@@ -21,7 +21,7 @@ namespace NewWidgets.Widgets
         private static readonly float s_zoomDeltaScale = 10.0f;
         private static readonly float s_borderPadding = 100.0f;
         private static readonly float s_dragMultiplier = 3.0f;
-        private static readonly float s_dragEpsilon = 10.0f;
+        private static readonly float s_dragEpsilon = 2.0f;
         private static readonly int s_autoScrollSpeed = 50;
 
         private static readonly float ScrollEpsilon = 0.01f;
@@ -63,7 +63,7 @@ namespace NewWidgets.Widgets
             }
             set
             {
-                bool relayout = m_contentView.Size.DistanceAvr(value) > float.Epsilon;
+                bool relayout = Vector2.DistanceSquared(m_contentView.Size, value) > float.Epsilon;
                 m_contentView.Size = value;
                 SetScroll(m_contentView.Position.X, m_contentView.Position.Y, true);
                 if (relayout)
@@ -322,7 +322,7 @@ namespace NewWidgets.Widgets
                     targetY = 0;
 
                 Vector2 target = new Vector2(targetX, targetY);
-                if (target.DistanceAvr(m_contentView.Position) > float.Epsilon)
+                if (Vector2.DistanceSquared(target, m_contentView.Position) > float.Epsilon)
                     m_contentView.Move(target, 120, null);
             }
         }
@@ -369,7 +369,7 @@ namespace NewWidgets.Widgets
             {
                 StopDrag(point);
 
-                if (/*hit && */m_dragStart.DistanceAvr(point) < s_dragEpsilon)
+                if (/*hit && */ Vector2.DistanceSquared(m_dragStart, point) < s_dragEpsilon)
                     return false;
 
                 return true;
@@ -394,7 +394,7 @@ namespace NewWidgets.Widgets
                     multiplier = (m_contentView.Size.X + Size.X + s_borderPadding) / (m_horizontalScrollBar.Size.X - m_horizontalScrollBarIndicator.Size.X);
                 }
 
-                if (!move.IsZero())
+                if (Vector2.DistanceSquared(move, Vector2.Zero) > float.Epsilon)
                 {
                     float targetX = m_contentView.Position.X;
 
@@ -422,7 +422,7 @@ namespace NewWidgets.Widgets
                     }
                     Vector2 target = new Vector2(targetX, targetY);
 
-                    if (target.DistanceAvr(m_contentView.Position) > float.Epsilon)
+                    if (Vector2.DistanceSquared(target, m_contentView.Position) > float.Epsilon)
                         m_contentView.Move(target, 1, null);
 
                     m_dragShift = local;

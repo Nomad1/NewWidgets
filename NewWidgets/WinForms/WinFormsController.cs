@@ -100,6 +100,11 @@ namespace NewWidgets.WinForms
             get { return Vector3.Zero; }
         }
 
+        public override Vector4 ThumbStickValue
+        {
+            get { return Vector4.Zero; }
+        }
+
         public event Action OnInit;
         public sealed override event TouchDelegate OnTouch;
 
@@ -404,6 +409,11 @@ namespace NewWidgets.WinForms
         public override void AddWindow(Window window)
         {
             m_windows.Add(window);
+        }
+
+        public override void ShowKeyboard(bool show)
+        {
+
         }
 
         #endregion
