@@ -35,7 +35,7 @@ namespace NewWidgets.Widgets
 
         public virtual void UpdatePosition(Vector2 position)
         {
-            Vector2 tooltipSize = Transform.ActualScale * Size;
+            Vector2 tooltipSize = new Vector2(ScreenRect.Width, ScreenRect.Height);
 
             position += m_shift;
 

@@ -1,9 +1,11 @@
 using System;
 using System.Numerics;
-using NewWidgets.Utility;
 
 #if RUNMOBILE
 using RunMobile.Utility;
+#else
+using System.Drawing;
+using NewWidgets.Utility;
 #endif
 
 namespace NewWidgets.UI
@@ -129,6 +131,9 @@ namespace NewWidgets.UI
         private object m_tag;
         private int m_zIndex;
         private int m_tempZIndex;
+
+        private int m_transformVersion;
+        private RectangleF m_screenRect;
 
         private WindowObject m_parent;
 
@@ -312,6 +317,68 @@ namespace NewWidgets.UI
                 }
         }
 
+        public RectangleF ScreenRect
+        {
+            get
+            {
+                if (m_transformVersion != m_transform.Version)
+                {
+                    Vector2 from = Vector2.Zero;
+
+                    Vector3[] arr = new Vector3[4];
+
+                    var transform = m_transform.Matrix;
+
+                    Vector3 zero = transform.Translation;
+                    Vector3 oneVectorX = new Vector3(transform.M11, transform.M12, transform.M13);
+                    Vector3 oneVectorY = new Vector3(transform.M21, transform.M22, transform.M23);
+
+                    Vector3 width = oneVectorX * Size.X;
+                    Vector3 height = oneVectorY * Size.Y;
+
+                    arr[0] = zero + oneVectorX * from.X + oneVectorY * from.Y;
+                    arr[1] = arr[0] + width;
+                    arr[2] = arr[0] + height;
+                    arr[3] = arr[1] + height;
+
+                    /*// I leave these for double-checking: varr elements should be equal to arr
+                     
+                    Vector2[] varr = new Vector2[4];
+                    varr[0] = m_transform.GetScreenPoint(from);
+                    varr[1] = m_transform.GetScreenPoint(from + new Vector2(Size.X, 0));
+                    varr[2] = m_transform.GetScreenPoint(from + new Vector2(0, Size.Y));
+                    varr[3] = m_transform.GetScreenPoint(from + Size);
+                    */
+
+                    float minX = arr[0].X;
+                    float minY = arr[0].Y;
+                    float maxX = arr[0].X;
+                    float maxY = arr[0].Y;
+
+                    for (int i = 1; i < arr.Length; i++)
+                    {
+                        if (arr[i].X < minX)
+                            minX = arr[i].X;
+
+                        if (arr[i].X > maxX)
+                            maxX = arr[i].X;
+
+                        if (arr[i].Y < minY)
+                            minY = arr[i].Y;
+
+                        if (arr[i].Y > maxY)
+                            maxY = arr[i].Y;
+                    }
+
+                    m_screenRect = new RectangleF(minX, minY, maxX - minX, maxY - minY);
+
+                    m_transformVersion = m_transform.Version;
+                }
+
+                return m_screenRect;
+            }
+        }
+
         protected WindowObject(WindowObject parent, Transform transform = null)
         {
             m_parent = parent;
@@ -336,6 +403,10 @@ namespace NewWidgets.UI
 
         public virtual bool HitTest(float x, float y)
         {
+            if (!ScreenRect.Contains(x, y)) // AABB test
+                return false;
+
+            // OOBB test
             Vector2 coord = m_transform.GetClientPoint(new Vector2(x, y));
 
             return coord.X >= 0 && coord.Y >= 0 && coord.X < Size.X && coord.Y < Size.Y;

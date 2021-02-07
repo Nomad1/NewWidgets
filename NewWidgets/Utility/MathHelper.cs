@@ -82,34 +82,25 @@ namespace NewWidgets.Utility
             resultMatrix.M44 = 1.0f;
         }
 
-        public static void Init(ref Matrix4x4 matrix)
+        public static void TransformMatrix3d(Vector3 position, Vector3 scale, ref Matrix4x4 matrix)
         {
-            // if Matrix is array-based we need to initialize it first, otherwise it will have default(Matrix4x4) value with null array
+            matrix.M11 *= scale.X;
+            matrix.M12 *= scale.X;
+            matrix.M13 *= scale.X;
+            matrix.M21 *= scale.Y;
+            matrix.M22 *= scale.Y;
+            matrix.M23 *= scale.Y;
+            matrix.M31 *= scale.Z;
+            matrix.M32 *= scale.Z;
+            matrix.M33 *= scale.Z;
+            matrix.M41 = matrix.M41 * scale.X + position.X;
+            matrix.M42 = matrix.M42 * scale.Y + position.Y;
+            matrix.M43 = matrix.M43 * scale.Z + position.Z;
         }
 
-        public static void Mul(Matrix4x4 m1, ref Matrix4x4 m2)
-        {
-            m2 = m2 * m1;
-        }
-
-        public static void Mul(Matrix4x4 m2, Matrix4x4 m1, ref Matrix4x4 nresult)
-        {
-            nresult = Matrix4x4.Multiply(m1, m2); // we're using reverse multiplying order here intentionaly
-        }
-
-        public static void Mul(ref Matrix4x4 m1, ref Matrix4x4 m2, ref Matrix4x4 nresult)
+        public static void Mul(ref Matrix4x4 m1, ref Matrix4x4 m2, ref Matrix4x4 nresult)  // we're using reverse multiplying order here intentionaly
         {
             nresult = Matrix4x4.Multiply(m2, m1);
-        }
-
-        public static Vector3 Transform(Vector3 vector, ref Matrix4x4 matrix)
-        {
-            Vector3 result;
-            result.X = matrix.M11 * vector.X + matrix.M21 * vector.Y + matrix.M31 * vector.Z + matrix.M41;
-            result.Y = matrix.M12 * vector.X + matrix.M22 * vector.Y + matrix.M32 * vector.Z + matrix.M42;
-            result.Z = matrix.M13 * vector.X + matrix.M23 * vector.Y + matrix.M33 * vector.Z + matrix.M43;
-
-            return result;
         }
 
         public static void Invert(ref Matrix4x4 m1, ref Matrix4x4 m2)

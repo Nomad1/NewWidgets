@@ -101,7 +101,6 @@
     <Compile Include="UI\Window.cs" />
     <Compile Include="UI\WindowObject.cs" />
     <Compile Include="UI\WindowObjectArray.cs" />
-    <Compile Include="Utility\Transform.cs" />
     <Compile Include="UI\WindowControllerBase.cs" />
     <Compile Include="UI\ISprite.cs" />
     <Compile Include="Widgets\WidgetBackground.cs" />

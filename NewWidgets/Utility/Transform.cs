@@ -1,10 +1,6 @@
 ﻿using System.Numerics;
 
-#if RUNMOBILE
-using RunMobile.Utility;
-#else
-using Matrix4x3 = System.Numerics.Matrix4x4;
-#endif
+using Matrix = System.Numerics.Matrix4x4;
 
 namespace NewWidgets.Utility
 {
@@ -13,17 +9,16 @@ namespace NewWidgets.Utility
     /// </summary>
     public class Transform
     {
-        private static readonly float PositionEpsilon = float.Epsilon;
         private static readonly float AngleEpsilon = float.Epsilon;
-        private static readonly float ScaleEpsilon = float.Epsilon;
 
-        internal Matrix4x3 m_matrix;
+        internal Matrix m_matrix;
         internal Matrix4x4 m_imatrix;
 
         private Vector3 m_rotation;
         private Vector3 m_position;
         private Vector3 m_scale;
 
+        private bool m_hasRotation;
         private bool m_changed;
         private bool m_iMatrixChanged;
 
@@ -36,11 +31,11 @@ namespace NewWidgets.Utility
         {
             get
             {
-                return m_changed || (m_parent != null && (m_parent.IsChanged || m_parent.m_version != m_parentVersion));
+                return m_changed || (m_parent != null && (m_parent.m_version != m_parentVersion || m_parent.IsChanged));
             }
         }
 
-        public int Version
+        internal int Version
         {
             get { return m_version; }
         }
@@ -54,9 +49,7 @@ namespace NewWidgets.Utility
             get { return m_position; }
             set
             {
-                if (!m_changed)
-                    m_changed = CompareVectors(m_position, value, PositionEpsilon);
-
+                m_changed = true;
                 m_position = value;
             }
         }
@@ -83,9 +76,8 @@ namespace NewWidgets.Utility
             get { return m_rotation; }
             set
             {
-                if (!m_changed)
-                    m_changed = CompareVectors(m_rotation, value, AngleEpsilon);
-
+                m_hasRotation = CompareVectors(value, Vector3.Zero, AngleEpsilon);
+                m_changed = true;
                 m_rotation = value;
             }
         }
@@ -138,9 +130,7 @@ namespace NewWidgets.Utility
             get { return m_scale; }
             set
             {
-                if (!m_changed)
-                    m_changed = CompareVectors(m_scale, value, ScaleEpsilon);
-
+                m_changed = true;
                 m_scale = value;
             }
         }
@@ -156,11 +146,8 @@ namespace NewWidgets.Utility
             {
                 System.Diagnostics.Debug.Assert(m_parent != this);
 
-                if (!m_changed && m_parent != value)
-                    m_changed = true;
-
                 m_parentVersion = 0;
-
+                m_changed = true;
                 m_parent = value;
             }
         }
@@ -169,7 +156,7 @@ namespace NewWidgets.Utility
         /// Result transformation 4x4 matrix
         /// </summary>
         /// <value>The matrix.</value>
-        public Matrix4x3 Matrix
+        public Matrix Matrix
         {
             get
             {
@@ -180,9 +167,9 @@ namespace NewWidgets.Utility
         }
 
         /// <summary>
-        /// Gets the inverted atrix.
+        /// Gets the inverted transformation matrix.
         /// </summary>
-        /// <value>The inverted atrix.</value>
+        /// <value>The inverted transformation matrix.</value>
         public Matrix4x4 IMatrix
         {
             get
@@ -190,27 +177,6 @@ namespace NewWidgets.Utility
                 PrepareIMatrix();
 
                 return m_imatrix;
-            }
-        }
-
-        // 2d actual values
-
-        public Vector2 ActualPosition
-        {
-            get
-            {
-                // Alternative is GetScreenPoint(new Vector3(0,0,0));
-                PrepareMatrix();
-
-                return new Vector2(m_matrix.M41, m_matrix.M42);
-            }
-        }
-
-        public Vector2 ActualScale
-        {
-            get
-            {
-                return (m_parent == null ? Vector2.One : m_parent.ActualScale) * new Vector2(m_scale.X, m_scale.Y);
             }
         }
      
@@ -256,8 +222,7 @@ namespace NewWidgets.Utility
         /// <returns></returns>
         public Vector2 GetScreenPoint(Vector2 source)
         {
-            PrepareMatrix();
-            return Vector2.Transform(source, m_matrix);
+            return Vector2.Transform(source, Matrix);
         }
 
         /// <summary>
@@ -265,10 +230,9 @@ namespace NewWidgets.Utility
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public Vector3 GetScreenPoint3(Vector3 source)
+        public Vector3 GetScreenPoint(Vector3 source)
         {
-            PrepareMatrix();
-            return Vector3.Transform(source, m_matrix);
+            return Vector3.Transform(source, Matrix);
         }
 
         /// <summary>
@@ -278,8 +242,7 @@ namespace NewWidgets.Utility
         /// <returns></returns>
         public Vector2 GetClientPoint(Vector2 source)
         {
-            PrepareIMatrix();
-            return Vector2.Transform(source, m_imatrix);
+            return Vector2.Transform(source, IMatrix);
         }
 
         /// <summary>
@@ -287,10 +250,9 @@ namespace NewWidgets.Utility
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public Vector3 GetClientPoint3(Vector3 source)
+        public Vector3 GetClientPoint(Vector3 source)
         {
-            PrepareIMatrix();
-            return Vector3.Transform(source, m_imatrix);
+            return Vector3.Transform(source, IMatrix);
         }
 
         /// <summary>
@@ -298,28 +260,30 @@ namespace NewWidgets.Utility
         /// </summary>
         private void UpdateMatrix()
         {
-            if (CompareVectors(m_rotation, Vector3.Zero, AngleEpsilon))
+            if (m_hasRotation)
                 MathHelper.GetMatrix3d(m_position, m_rotation, m_scale, ref m_matrix);
-            else
+            else // calculation is much simpler without rotation, it saves 3 pairs of sin+cos calculations
                 MathHelper.GetMatrix3d(m_position, m_scale, ref m_matrix);
 
             if (m_parent != null) // if there is parent transform, baked value contains also parent transforms
             {
-                // this one is the most expensive thing in whole engine
-#if USE_NUMERICS
-                m_matrix = Matrix4x4.Multiply(m_matrix, m_parent.Matrix);
-#else
                 m_parent.PrepareMatrix();
 
-                MathHelper.Mul(ref m_parent.m_matrix, ref m_matrix, ref m_matrix);
+                // this one is the most expensive thing in whole engine
+#if USE_NUMERICS
+                m_matrix = Matrix.Multiply(m_matrix, m_parent.m_matrix);
+#else
+                if (m_parent.m_parent == null && !m_parent.m_hasRotation) // things are little bit easier if parent doesn't have a rotation matrix. We can save 20+ multiplications on this
+                    MathHelper.TransformMatrix3d(m_parent.m_position, m_parent.m_scale, ref m_matrix);
+                else
+                    MathHelper.Mul(ref m_parent.m_matrix, ref m_matrix, ref m_matrix);
 #endif
+                m_parentVersion = m_parent.m_version;
             }
 
             m_iMatrixChanged = true;
-
             m_changed = false;
             m_version++;
-            m_parentVersion = m_parent != null ? m_parent.m_version : 0;
         }
 
         internal void PrepareMatrix()
@@ -330,10 +294,10 @@ namespace NewWidgets.Utility
 
         private void PrepareIMatrix()
         {
-            if (m_iMatrixChanged || IsChanged)
-            {
-                PrepareMatrix();
+            PrepareMatrix();
 
+            if (m_iMatrixChanged)
+            {
                 MathHelper.Invert(ref m_matrix, ref m_imatrix);
 
                 m_iMatrixChanged = false;
@@ -349,11 +313,11 @@ namespace NewWidgets.Utility
         /// <returns></returns>
         private static bool CompareVectors(Vector3 one, Vector3 another, float diff)
         {
-            if (diff < another.X - one.X || one.X - another.X > diff)
+            if (diff < another.Z - one.Z || one.Z - another.Z > diff)
                 return true;
             if (diff < another.Y - one.Y || one.Y - another.Y > diff)
                 return true;
-            if (diff < another.Z - one.Z || one.Z - another.Z > diff)
+            if (diff < another.X - one.X || one.X - another.X > diff)
                 return true;
             return false;
         }

@@ -1,4 +1,8 @@
-﻿using NewWidgets.Utility;
+﻿#if RUNMOBILE
+using RunMobile.Utility;
+#else
+using NewWidgets.Utility;
+#endif
 using System.Numerics;
 
 namespace NewWidgets.UI
