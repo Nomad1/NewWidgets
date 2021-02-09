@@ -255,7 +255,7 @@ namespace NewWidgets.Widgets
 
             if (m_cursor != null)
             {
-                m_cursor.Sprite.Alpha = (int)(Math.Sin(WindowController.Instance.GetTime() / 1000.0f) * 64 + 191); // blinks every 2 seconds from 127 to 255
+                m_cursor.Sprite.Alpha = (byte)(Math.Sin(WindowController.Instance.GetTime() / 1000.0f) * 64 + 191); // blinks every 2 seconds from 127 to 255
                 m_cursor.Update();
             }
 

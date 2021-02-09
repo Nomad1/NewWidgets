@@ -288,7 +288,7 @@ namespace NewWidgets.Widgets
                 Animator.StartAnimation(this, (AnimationKind)((int)AnimationKind.Custom + i), 0, 255, time,
                 delegate (float x, int from, int to)
                 {
-                    sprite.Alpha = MathHelper.LinearInterpolationInt(x, from, to);
+                    sprite.Alpha = (byte)MathHelper.LinearInterpolationInt(x, from, to);
                 },
                 null);
             }

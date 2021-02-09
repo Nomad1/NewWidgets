@@ -329,7 +329,7 @@ namespace NewWidgets.Widgets
                 for (int i = array.Length - 1; i >= 0; i--)
                     if (array[i] != null && array[i].Visible && array[i] is ImageObject)
                     {
-                        ((ImageObject)array[i]).Sprite.Alpha = ialpha;
+                        ((ImageObject)array[i]).Sprite.Alpha = (byte)ialpha;
                         ((ImageObject)array[i]).Sprite.Color = BackgroundColor;
                     }
 

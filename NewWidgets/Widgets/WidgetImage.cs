@@ -261,7 +261,7 @@ namespace NewWidgets.Widgets
             if (m_imageObject != null)
             {
                 m_imageObject.Sprite.Color = Color;
-                m_imageObject.Sprite.Alpha = MathHelper.Clamp((int)(Alpha * ImageAlpha * 255 + float.Epsilon), 0, 255);
+                m_imageObject.Sprite.Alpha = (byte)MathHelper.Clamp((int)(Alpha * ImageAlpha * 255 + float.Epsilon), 0, 255);
             }
         }
 

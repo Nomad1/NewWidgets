@@ -48,7 +48,7 @@ namespace NewWidgets.UI
         /// Image transparency, from 0 to 255, only lower 8 bits are used
         /// </summary>
         /// <value>The alpha.</value>
-        int Alpha { get; set; }
+        byte Alpha { get; set; }
 
         /// <summary>
         /// Color tint value, only lower 24-bits are used

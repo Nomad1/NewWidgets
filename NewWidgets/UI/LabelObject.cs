@@ -43,7 +43,7 @@ namespace NewWidgets.UI
 
                 if (m_sprites != null)
                     foreach (ISprite sprite in m_sprites)
-                        sprite.Alpha = ialpha;
+                        sprite.Alpha = (byte)ialpha;
             }
         }
 
@@ -139,7 +139,7 @@ namespace NewWidgets.UI
                 else
                     sprite.Color = m_color;
 
-                sprite.Alpha = ialpha;
+                sprite.Alpha = (byte)ialpha;
                 sprite.Transform.Parent = Transform;
             }
         }
