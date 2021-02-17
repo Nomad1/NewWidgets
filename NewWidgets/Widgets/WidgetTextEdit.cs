@@ -439,7 +439,8 @@ namespace NewWidgets.Widgets
                     if (cursorX + m_contentOffset.X < 0)
                     m_contentOffset.X = -cursorX;
 
-                m_cursor.Position = TextPadding.TopLeft + m_contentOffset + new Vector2(cursorX - (m_cursor.Sprite.FrameSize.X / 2) * FontSize, cursorY - 4 * FontSize); // Nomad: 4 is magic constant. Don't like it at all 
+                m_cursor.Position = TextPadding.TopLeft + m_contentOffset +
+                    new Vector2(cursorX - (m_cursor.Sprite.FrameSize.X / 2) * FontSize, cursorY - 4 * FontSize); // HACK: 4 is magic constant. Don't like it at all 
 
             }
 
@@ -495,7 +496,7 @@ namespace NewWidgets.Widgets
 
                     for (int i = 0; i < sprites.Length; i++)
                     {
-                        if (local.X < sprites[i].Position.X + sprites[i].FrameSize.X / 2)
+                        if (local.X < sprites[i].Transform.Position.X + sprites[i].FrameSize.X / 2)
                         {
                             UpdateCursor(i - m_cursorPosition);
                             found = true;

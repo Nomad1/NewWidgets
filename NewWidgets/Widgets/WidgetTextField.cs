@@ -580,7 +580,7 @@ namespace NewWidgets.Widgets
                     ISprite[] sprites = label.InternalGetSprites();
                     for (int i = 0; i < sprites.Length; i++)
                     {
-                        if (lx < sprites[i].Position.X + sprites[i].FrameSize.X / 2)
+                        if (lx < sprites[i].Transform.Position.X + sprites[i].FrameSize.X / 2)
                         {
                             m_cursorLinePosition = i;
                             spriteFound = true;

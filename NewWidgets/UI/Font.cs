@@ -64,10 +64,15 @@ namespace NewWidgets.UI
             m_fontSprite = fontSprite;
             m_spacing = spacing;
             m_leading = leading;
+
             m_glyphs = new Dictionary<char, Glyph>();
             int maxHeight = 0;
 
-            for (int i = 0; i < fontSprite.Frames; i++)
+            // Here goes hacky magic: we iterate all the frames of `fontSprite` object and set it's Frame property
+            // to retrieve FrameTag and FrameSize values. That allows us to think of font as of an animation with lot of frames
+            // but that is the only thing in whole UI that requires frames and FrameTag.
+
+            for (int i = 0; i < fontSprite.FrameCount; i++)
             {
                 fontSprite.Frame = i;
 
@@ -117,7 +122,7 @@ namespace NewWidgets.UI
 
                 if (result[i] != null)
                 {
-                    result[i].Position = position + new Vector2(m_leading, 0);
+                    result[i].Transform.FlatPosition = position + new Vector2(m_leading, 0);
                     result[i].Frame = glyph.Frame;
                 }
                 else

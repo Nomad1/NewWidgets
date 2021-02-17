@@ -121,7 +121,7 @@ namespace NewWidgets.UI
 
                         if (iconSprite != null) // consume the error cause there is no place for log or message
                         {
-                            iconSprite.Position = new Vector2(sprite.Position.X, sprite.Position.Y + m_font.Baseline - icon.Height / 2);
+                            iconSprite.Transform.FlatPosition = new Vector2(sprite.Transform.Position.X, sprite.Transform.Position.Y + m_font.Baseline - icon.Height / 2);
 
                             iconSprite.Transform.Scale = new Vector3(icon.Width / iconSprite.Size.X, icon.Height / iconSprite.Size.Y, 1.0f);
 
@@ -316,7 +316,7 @@ namespace NewWidgets.UI
                 return RectangleF.Empty;
 
             ISprite sprite = m_sprites[index];
-            return new RectangleF(sprite.Position.X, sprite.Position.Y, sprite.FrameSize.X + m_font.Spacing, sprite.FrameSize.Y);
+            return new RectangleF(sprite.Transform.Position.X, sprite.Transform.Position.Y, sprite.FrameSize.X + m_font.Spacing, sprite.FrameSize.Y);
         }
 
         internal ISprite[] InternalGetSprites()

@@ -9,7 +9,7 @@ namespace NewWidgets.UI
 {
     /// <summary>
     /// Interface for 2d sprite. Sprite instances are created in WindowController, so it could be literally anything, i.e. System.Drawing.Bitmap wrapper
-    /// The only tricky thing is Transform field - transforms are required for heirarchy but this can change sooner or later
+    /// The only tricky thing is Transform field - transforms are required for heirarchy and should reference their parent transforms
     /// </summary>
     public interface ISprite
     {
@@ -20,7 +20,13 @@ namespace NewWidgets.UI
         Vector2 Size { get; }
 
         /// <summary>
-        /// Center of rotation/drawing origin in percent 
+        /// Gets the size of current frame
+        /// </summary>
+        /// <value>The size of the frame in pixels.</value>
+        Vector2 FrameSize { get; }
+
+        /// <summary>
+        /// Center of rotation and drawing origin in float coords 0 to 1.0
         /// </summary>
         /// <value>The pivot shift.</value>
         Vector2 PivotShift { get; set; }
@@ -32,9 +38,9 @@ namespace NewWidgets.UI
         int Frame { get; set; }
 
         /// <summary>
-        /// Number of frames
+        /// Number of frames in this sprite
         /// </summary>
-        int Frames { get; }
+        int FrameCount { get; }
 
         /// <summary>
         /// Gets the tag of current frame
@@ -42,14 +48,9 @@ namespace NewWidgets.UI
         /// <value>The frame tag.</value>
         int FrameTag { get; }
 
+      
         /// <summary>
-        /// Gets the size of current frame
-        /// </summary>
-        /// <value>The size of the frame.</value>
-        Vector2 FrameSize { get; }
-
-        /// <summary>
-        /// Image transparency, from 0 to 255, only lower 8 bits are used
+        /// Image transparency, from 0 to 255
         /// </summary>
         /// <value>The alpha.</value>
         byte Alpha { get; set; }
@@ -60,40 +61,17 @@ namespace NewWidgets.UI
         /// <value>The color.</value>
         int Color { get; set; }
 
-
-        #region Transformation
-
         /// <summary>
         /// Set of Position/Rotation/Scale components
         /// </summary>
         /// <value>The transform.</value>
         Transform Transform { get; }
 
-        /// <summary>
-        /// Position relative to parent
-        /// </summary>
-        /// <value>The position.</value>
-        Vector2 Position { get; set; }
-
-        /// <summary>
-        /// Rotation in degrees
-        /// </summary>
-        /// <value>The rotation.</value>
-        float Rotation { get; set; }
-
-        /// <summary>
-        /// Uniform scale
-        /// </summary>
-        /// <value>The scale.</value>
-        float Scale { get; set; }
-
-        #endregion
-              
         #region Methods
 
-        /// <summary>Checks if point is inside sprite</summary>
-        /// <param name="x">- point X</param>
-        /// <param name="y">- point Y</param>
+        /// <summary>Checks if point is inside sprite in global coords</summary>
+        /// <param name="x">X</param>
+        /// <param name="y">Y</param>
         bool HitTest(float x, float y);
 
         void Draw(object canvas);
