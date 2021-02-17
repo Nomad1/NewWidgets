@@ -4,6 +4,7 @@ using NewWidgets.Widgets;
 using NewWidgets.WinForms;
 using NewWidgets.UI;
 using System.Diagnostics;
+using NewWidgets.Utility;
 
 namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private readonly WinFormsController m_windowController;        private readonly System.Threading.Timer m_updateTimer;        private readonly Delegate m_updateDelegate;        private TestWindow m_window;        private long m_lastFrameUpdate;
         private long m_lastFrameDraw;
@@ -13,11 +14,11 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
         public TestForm()        {            InitializeComponent();            this.KeyPreview = true;
             this.perspectiveViewPictureBox.BackColor = Color.Black;
             perspectiveViewPictureBox.Paint += delegate { UpdateDrawFps(); };
-            ResourceLoader loader = new ResourceLoader("en-en");            loader.RegisterString("login_title", "Connect to server");            loader.RegisterString("login_login", "Login");
-            loader.RegisterString("login_password", "Password");
-            loader.RegisterString("login_local", "Custom server");
-            loader.RegisterString("login_register", "Register new account");
-            loader.RegisterString("login_connect", "Connect");            loader.RegisterString("dialog_title", "Dialog");            loader.RegisterString("dialog_text", "Dialog text that could be very long,\nwith |caaaaaadifferent|r |c336699colors|r, languages ({0}) and may even contain |tsettings_icon:64:64|t images.");            loader.RegisterString("button_yes", "Yes");            loader.RegisterString("button_no", "Yes!");            loader.RegisterString("tooltip_connect", "Start connection");            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, 1.5f, 0.6f, false, "assets");
+            ResourceLoader.Instance.Language = "en-en";            ResourceLoader.Instance.RegisterString("login_title", "Connect to server");            ResourceLoader.Instance.RegisterString("login_login", "Login");
+            ResourceLoader.Instance.RegisterString("login_password", "Password");
+            ResourceLoader.Instance.RegisterString("login_local", "Custom server");
+            ResourceLoader.Instance.RegisterString("login_register", "Register new account");
+            ResourceLoader.Instance.RegisterString("login_connect", "Connect");            ResourceLoader.Instance.RegisterString("dialog_title", "Dialog");            ResourceLoader.Instance.RegisterString("dialog_text", "Dialog text that could be very long,\nwith |caaaaaadifferent|r |c336699colors|r, languages ({0}) and may even contain |tsettings_icon:64:64|t images.");            ResourceLoader.Instance.RegisterString("button_yes", "Yes");            ResourceLoader.Instance.RegisterString("button_no", "Yes!");            ResourceLoader.Instance.RegisterString("tooltip_connect", "Start connection");            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, 1.5f, 0.6f, false, "assets");
             m_windowController.OnInit += HandleOnInit;            m_windowController.RegisterSpriteAtlas("assets/font5.bin");            WidgetManager.LoadUI(System.IO.File.ReadAllText("assets/ui.xml"));
 
             this.perspectiveViewPictureBox.Init(m_windowController);

@@ -237,7 +237,7 @@ namespace NewWidgets.WinForms
             result.PivotShift = sprite.PivotShift;
             result.Alpha = sprite.Alpha;
             result.Color = sprite.Color;
-            result.Position = position;
+            result.Transform.FlatPosition = position;
             return result;
         }
 
@@ -258,7 +258,7 @@ namespace NewWidgets.WinForms
             }
 
             WinFormsSprite result = new WinFormsSprite(image, id, new Vector2(image.Size.Width, image.Size.Height), spriteData.Frames);
-            result.Position = position;
+            result.Transform.FlatPosition = position;
             return result;
         }
 

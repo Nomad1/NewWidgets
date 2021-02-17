@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using NewWidgets.UI;
+using NewWidgets.Utility;
 using NewWidgets.Widgets;
 
 namespace NewWidgets.WinFormsSample

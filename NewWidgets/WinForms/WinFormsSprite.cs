@@ -79,7 +79,7 @@ namespace NewWidgets.WinForms
             }
         }
 
-        public int Frames
+        public int FrameCount
         {
             get { return m_frames.Length; }
         }
@@ -94,14 +94,10 @@ namespace NewWidgets.WinForms
             get { return new Vector2(m_frames[m_frame].Width, m_frames[m_frame].Height); }
         }
 
-        public int Alpha
+        public byte Alpha
         {
-            get { return (int)((m_color & AlphaMask) >> 24); }
-            set
-            {
-                value = MathHelper.Clamp(value, 0, 255);
-                m_color = (m_color & ColorMask) | ((uint)value << 24);
-            }
+            get { return (byte)((m_color & AlphaMask) >> 24); }
+            set { m_color = (m_color & ColorMask) | ((uint)value << 24); }
         }
 
         public int Color
@@ -113,24 +109,6 @@ namespace NewWidgets.WinForms
         public Transform Transform
         {
             get { return m_transform; }
-        }
-
-        public float Scale
-        {
-            get { return m_transform.UniformScale; }
-            set { m_transform.UniformScale = value; }
-        }
-
-        public Vector2 Position
-        {
-            get { return m_transform.FlatPosition; }
-            set { m_transform.FlatPosition = value; }
-        }
-
-        public float Rotation
-        {
-            get { return m_transform.RotationZ; }
-            set { m_transform.RotationZ = value; }
         }
 
         internal WinFormsSprite(Image image, string id, Vector2 size, FrameData[] frames)
