@@ -8,73 +8,15 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
-    #region Helpers
-
-    public class WidgetException : ApplicationException
-    {
-        public WidgetException()
-            : base()
-        {
-        }
-
-        public WidgetException(string message)
-            : base(message)
-        {
-        }
-
-        public WidgetException(string message, Exception ex)
-            : base(message, ex)
-        {
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    internal class WidgetParameterAttribute : Attribute
-    {
-        private readonly string m_name;
-        private readonly Type m_type;
-
-        public string Name
-        {
-            get { return m_name; }
-        }
-
-        public Type Type
-        {
-            get { return m_type; }
-        }
-
-        public WidgetParameterAttribute(string name, Type type = null)
-        {
-            m_name = name;
-            m_type = type ?? typeof(string);
-        }
-    }
-
-
-    #endregion
-
     public static partial class WidgetManager
     {
         // styles
         private static readonly IDictionary<string, WidgetStyleSheet> s_styles = new Dictionary<string, WidgetStyleSheet>();
         private static readonly IDictionary<string, Tuple<WidgetParameterIndex, Type>> s_styleAttributes = InitStyleMap();
 
-
-        // Those guys are obsolete and should be replaced by direct Widget.DefaultStyle like calls
-
+        // Those guys are obsolete and should be replaced by direct Widget.DefaultStyle references
         [Obsolete("Use Widget.DefaultStyle instead")]
         public static WidgetStyleSheet DefaultWidgetStyle { get { return Widget.DefaultStyle; } }
-      /*  [Obsolete("Use WidgetTextEdit.DefaultStyle instead")]
-        public static WidgetStyleReference DefaultTextEditStyle { get { return WidgetTextEdit.DefaultStyle; } }
-        [Obsolete("Use WidgetWindow.DefaultStyle instead")]
-        public static WidgetStyleReference DefaultWindowStyle { get { return WidgetWindow.DefaultStyle; } }
-        [Obsolete("Use WidgetWindow.DefaultStyle instead")]
-        public static WidgetStyleReference DefaultPanelStyle { get { return WidgetPanel.DefaultStyle; } }*/
-
-        //
-        //[Obsolete("Use WidgetLabel.DefaultStyle instead")]
-        //public static WidgetTextStyleSheet DefaultLabelStyle { get { return WidgetLabel.DefaultStyle.Get<WidgetTextStyleSheet>(); } }  // needed only for font size
 
 
         /// <summary>
@@ -209,7 +151,7 @@ namespace NewWidgets.Widgets
             return memberValue;
         }
 
-#region String parsers
+        #region String parsers
 
         /// <summary>
         /// Culture invariant float parsing
@@ -322,6 +264,6 @@ namespace NewWidgets.Widgets
             return attribute == null ? null : attribute.Value;
         }
 
-#endregion
+        #endregion
     }
 }

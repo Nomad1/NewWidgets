@@ -6,6 +6,10 @@ namespace NewWidgets.UI
 {
     public delegate bool TouchDelegate(float x, float y, bool press, bool unpress, int pointer);
 
+    /// <summary>
+    /// Abstract class for UI controller that provides scaling, sprites and other data needed for UI
+    /// You should implement this class to use NewWidgets
+    /// </summary>
     public abstract class WindowController
     {
         private static WindowController s_instance;
@@ -91,7 +95,7 @@ namespace NewWidgets.UI
         public abstract void AddWindow(Window window);
 
         /// <summary>
-        /// Indicates that sprite should be divicede to MxN equal frames
+        /// Indicates that sprite should be divided to MxN equal frames
         /// </summary>
         /// <param name="id">Identifier.</param>
         /// <param name="subdivideX">Number of horizontal frames</param>

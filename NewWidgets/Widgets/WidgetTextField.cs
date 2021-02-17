@@ -6,7 +6,7 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetTextField : WidgetBackground, IFocusableWidget
+    public class WidgetTextField : WidgetBackground, IFocusable
     {
         public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_textedit", true);
 
@@ -620,11 +620,14 @@ namespace NewWidgets.Widgets
             return false;
         }
 
-
         public override void Remove()
         {
             WidgetManager.UpdateFocus(this, false);
             base.Remove();
+        }
+
+        public void Press()
+        {
         }
     }
 }

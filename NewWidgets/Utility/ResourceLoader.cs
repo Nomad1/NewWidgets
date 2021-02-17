@@ -1,32 +1,32 @@
 ﻿using System.Collections.Generic;
 
-namespace NewWidgets.Widgets
+namespace NewWidgets.Utility
 {
-    public class ResourceLoader
+    /// <summary>
+    /// Helper class for resource localization
+    /// </summary>
+    public sealed class ResourceLoader
     {
-        private static ResourceLoader s_instance;
+        private static ResourceLoader s_instance = new ResourceLoader(string.Empty);
 
         public static ResourceLoader Instance
         {
-            get
-            {
-                return s_instance;
-            }
+            get { return s_instance; }
         }
 
-
-        private readonly string m_lang;
         private readonly Dictionary<string, string> m_strings;
+        private string m_language;
         
         public string Language
         {
-            get { return m_lang; }
+            get { return m_language; }
+            set { m_language = value; }
         }
 
-        public ResourceLoader(string lang)
+        private ResourceLoader(string lang)
         {
             m_strings = new Dictionary<string, string>();
-            m_lang = lang;
+            m_language = lang;
             s_instance = this;
         }
 
@@ -50,7 +50,7 @@ namespace NewWidgets.Widgets
                     return result;
             }
 
-            switch (m_lang)
+            switch (m_language)
             {
             case "en-us":
             case "en":

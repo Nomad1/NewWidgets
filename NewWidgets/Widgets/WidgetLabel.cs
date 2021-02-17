@@ -1,11 +1,9 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using NewWidgets.UI;
+using NewWidgets.Utility;
 
 #if RUNMOBILE
 using RunMobile.Utility;
-#else
-using NewWidgets.Utility;
 #endif
 
 namespace NewWidgets.Widgets
@@ -252,7 +250,7 @@ namespace NewWidgets.Widgets
             {
                 ISprite sprite = m_label.InternalGetSprites()[i];
                 sprite.Alpha = 255;
-                Animator.RemoveAnimation(this, (AnimationKind)((int)AnimationKind.Custom + i));
+                AnimationManager.Instance.RemoveAnimation(this, (AnimationKind)((int)AnimationKind.Custom + i));
             }
             
             FadeTo(0.0f, 100, null);
@@ -285,7 +283,7 @@ namespace NewWidgets.Widgets
                 // TODO: Unreadable, refactor
                 int time = isRandom ? 100 + MathHelper.GetRandomInt(0, 200) : 100 + i * 500 / m_label.InternalGetSprites().Length;
 
-                Animator.StartAnimation(this, (AnimationKind)((int)AnimationKind.Custom + i), 0, 255, time,
+                AnimationManager.Instance.StartAnimation(this, (AnimationKind)((int)AnimationKind.Custom + i), 0, 255, time,
                 delegate (float x, int from, int to)
                 {
                     sprite.Alpha = (byte)MathHelper.LinearInterpolationInt(x, from, to);

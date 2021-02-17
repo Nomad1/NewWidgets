@@ -1,13 +1,10 @@
 ﻿using System.Numerics;
 
-#if RUNMOBILE
-using RunMobile.Utility;
-#else
-using NewWidgets.Utility;
-#endif
-
 namespace NewWidgets.UI
 {
+    /// <summary>
+    /// Very simple object containing an sprite
+    /// </summary>
     public class ImageObject : WindowObject
     {
         private readonly ISprite m_sprite;
@@ -24,7 +21,7 @@ namespace NewWidgets.UI
         }
 
         public ImageObject(WindowObject parent, ISprite sprite)
-            : base(parent, sprite == null ? new Transform() : sprite.Transform)
+            : base(parent, sprite == null ? null : sprite.Transform)
         {
             m_sprite = sprite;
 

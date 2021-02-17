@@ -21,7 +21,7 @@ namespace NewWidgets.Widgets
         private static readonly Dictionary<string, Font> s_fonts = new Dictionary<string, Font>();
 
         // focus
-        private static readonly Dictionary<int, IFocusableWidget> s_focusedWidgets = new Dictionary<int, IFocusableWidget>();
+        private static readonly Dictionary<int, IFocusable> s_focusedWidgets = new Dictionary<int, IFocusable>();
         private static readonly LinkedList<Widget> s_exclusiveWidgets = new LinkedList<Widget>();
 
         // Events
@@ -174,7 +174,7 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered three patch {0}", name);
         }
 
-        public static void SetFocus(IFocusableWidget widget, bool value = true)
+        public static void SetFocus(IFocusable widget, bool value = true)
         {
             WindowController.Instance.ScheduleAction(delegate
             {
@@ -189,14 +189,14 @@ namespace NewWidgets.Widgets
 
             int windowHash = window.GetHashCode();
 
-            IFocusableWidget focusedWidget;
+            IFocusable focusedWidget;
             if (s_focusedWidgets.TryGetValue(windowHash, out focusedWidget))
                 return focusedWidget != null;
             
             return false;
         }
 
-        internal static void UpdateFocus(IFocusableWidget widget, bool focus)
+        internal static void UpdateFocus(IFocusable widget, bool focus)
         {
             IWindowContainer window = ((WindowObject)widget).Window;
 
@@ -205,7 +205,7 @@ namespace NewWidgets.Widgets
 
             int windowHash = window.GetHashCode();
 
-            IFocusableWidget focusedWidget;
+            IFocusable focusedWidget;
             s_focusedWidgets.TryGetValue(windowHash, out focusedWidget);
 
             // Nomad: PVS analyzer indicated some amount of fuzzy logic here.
@@ -225,7 +225,7 @@ namespace NewWidgets.Widgets
 
             if (focusedWidget != null)
             {
-                IFocusableWidget oldWidget = focusedWidget;
+                IFocusable oldWidget = focusedWidget;
                 s_focusedWidgets.Remove(windowHash);
                 oldWidget.SetFocused(false);
             }
@@ -244,7 +244,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        internal static bool FocusNext(IFocusableWidget widget)
+        internal static bool FocusNext(IFocusable widget)
         {
             WindowObject obj = widget as WindowObject;
             if (obj == null)
@@ -256,7 +256,7 @@ namespace NewWidgets.Widgets
                 return false;
 
             List<WindowObject> focusables = new List<WindowObject>();
-            Window.FindChildren(window, (WindowObject arg) => arg is IFocusableWidget, focusables);
+            Window.FindChildren(window, (WindowObject arg) => arg is IFocusable, focusables);
 
             WindowObject nextFocusable = null;
 
@@ -272,7 +272,7 @@ namespace NewWidgets.Widgets
             if (nextFocusable == null || nextFocusable == widget)
                 return false; // do nothing
 
-            UpdateFocus((IFocusableWidget)nextFocusable, true);
+            UpdateFocus((IFocusable)nextFocusable, true);
 
             return true;
         }
@@ -282,12 +282,12 @@ namespace NewWidgets.Widgets
             int windowHash = window.GetHashCode();
 
             List<WindowObject> focusables = new List<WindowObject>();
-            Window.FindChildren(window, (WindowObject arg) => arg is IFocusableWidget, focusables);
+            Window.FindChildren(window, (WindowObject arg) => arg is IFocusable, focusables);
 
             for (int i = 0; i < focusables.Count; i++)
             {
-                if (((IFocusableWidget)focusables[i]).IsFocusable)
-                    ((IFocusableWidget)focusables[i]).SetFocused(false);
+                if (((IFocusable)focusables[i]).IsFocusable)
+                    ((IFocusable)focusables[i]).SetFocused(false);
             }
 
             s_focusedWidgets.Remove(windowHash);

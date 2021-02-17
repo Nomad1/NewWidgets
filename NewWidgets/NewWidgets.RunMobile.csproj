@@ -78,8 +78,6 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Widgets\Enums.cs" />
-    <Compile Include="Widgets\IFocusableWidget.cs" />
-    <Compile Include="Widgets\ResourceLoader.cs" />
     <Compile Include="Widgets\Widget.cs" />
     <Compile Include="Widgets\WidgetButton.cs" />
     <Compile Include="Widgets\WidgetCheckBox.cs" />
@@ -94,14 +92,12 @@
     <Compile Include="Widgets\WidgetTextEdit.cs" />
     <Compile Include="Widgets\WidgetTooltip.cs" />
     <Compile Include="Utility\Margin.cs" />
-    <Compile Include="UI\Animator.cs" />
     <Compile Include="UI\Font.cs" />
     <Compile Include="UI\ImageObject.cs" />
     <Compile Include="UI\LabelObject.cs" />
     <Compile Include="UI\Window.cs" />
     <Compile Include="UI\WindowObject.cs" />
     <Compile Include="UI\WindowObjectArray.cs" />
-    <Compile Include="UI\WindowControllerBase.cs" />
     <Compile Include="UI\ISprite.cs" />
     <Compile Include="Widgets\WidgetBackground.cs" />
     <Compile Include="Widgets\WidgetManager.Styles.cs" />
@@ -109,12 +105,19 @@
     <Compile Include="Widgets\WidgetStyleSheet.cs" />
     <Compile Include="Widgets\WidgetTextField.cs" />
     <Compile Include="UI\SimpleWindow.cs" />
+    <Compile Include="Utility\ResourceLoader.cs" />
+    <Compile Include="Widgets\WidgetException.cs" />
+    <Compile Include="Widgets\WidgetParameterAttribute.cs" />
+    <Compile Include="UI\AnimationManager.cs" />
+    <Compile Include="UI\WindowController.cs" />
+    <Compile Include="UI\Enums.cs" />
+    <Compile Include="UI\IFocusable.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\..\RunMobile\RunMobile\RunMobile.csproj">
-      <Project>{B6B7376F-CF08-42A1-A970-69B63EF21F75}</Project>
-      <Name>RunMobile</Name>
+    <ProjectReference Include="..\..\RunMobile\RunMobile.Utility\RunMobile.Utility.csproj">
+      <Project>{029EA736-BCAA-40B3-B44B-52936740C349}</Project>
+      <Name>RunMobile.Utility</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

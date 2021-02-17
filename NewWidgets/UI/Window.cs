@@ -4,35 +4,12 @@ using System.Numerics;
 
 namespace NewWidgets.UI
 {
-    [Flags]
-    public enum WindowFlags
-    {
-        None = 0,
-        FullScreen = 0x01,
-        CloseButton = 0x02,
-        HelpButton = 0x04,
-        MiscButton = 0x08,
-        Controlling = 0x10,
-        CustomAnim = 0x20,
-        Blackout = 0x40,
-        Focusable = 0x80,
-        Focused = 0x100,
-    }
-
     public interface IWindowContainer
     {
         ICollection<WindowObject> Children { get; }
         int MaximumZIndex { get; }
         void AddChild(WindowObject child);
         bool RemoveChild(WindowObject child);
-    }
-
-    public interface IFocusable
-    {
-        bool IsFocusable { get; }
-        bool IsFocused { get; }
-        void Press();
-        void SetFocus(bool focus);
     }
 
     public class Window : WindowObject, IWindowContainer
@@ -228,14 +205,14 @@ namespace NewWidgets.UI
 
             if (focusedChild != null)
             {
-                focusedChild.SetFocus(false);
+                focusedChild.SetFocused(false);
                 focusedChild = null;
             }
 
             if (current != null)
             {
                 focusedChild = current.Value;
-                focusedChild.SetFocus(true);
+                focusedChild.SetFocused(true);
                 return true;
             }
             return false;

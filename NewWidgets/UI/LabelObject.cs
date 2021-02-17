@@ -10,13 +10,9 @@ using System.Drawing;
 
 namespace NewWidgets.UI
 {
-    public enum LabelAlign
-    {
-        Start = 0,
-        Center = 1,
-        End = 2
-    };
-
+    /// <summary>
+    /// Complex label object having an array of daughter sprites based on some text
+    /// </summary>
     public class LabelObject : WindowObject
     {
         private readonly Font m_font;
@@ -323,10 +319,12 @@ namespace NewWidgets.UI
             return new RectangleF(sprite.Position.X, sprite.Position.Y, sprite.FrameSize.X + m_font.Spacing, sprite.FrameSize.Y);
         }
 
-        public ISprite[] InternalGetSprites()
+        internal ISprite[] InternalGetSprites()
         {
             return m_sprites;
         }
+
+        #region Helper classes
 
         public class TextSpan
         {
@@ -352,6 +350,8 @@ namespace NewWidgets.UI
                 Height = height;
             }
         }
+
+        #endregion
     }
 }
 

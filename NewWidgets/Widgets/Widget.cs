@@ -9,7 +9,10 @@ using RunMobile.Utility;
 
 namespace NewWidgets.Widgets
 {
-    public class Widget : WindowObject
+    /// <summary>
+    /// Base class for Widget object
+    /// </summary>
+    public abstract class Widget : WindowObject
     {
         public static readonly WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default", true);
 
@@ -176,7 +179,7 @@ namespace NewWidgets.Widgets
 
         protected void DelayedSwitchStyle(WidgetStyleType styleType)
         {
-            Animator.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null,
+            AnimationManager.Instance.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null,
                 delegate {
                     SwitchStyle(styleType);
                 });
@@ -184,7 +187,7 @@ namespace NewWidgets.Widgets
 
         protected void DelayedUpdateStyle()
         {
-            Animator.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, UpdateStyle);
+            AnimationManager.Instance.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, UpdateStyle);
         }
 
         public void UpdateStyle()
@@ -362,7 +365,7 @@ namespace NewWidgets.Widgets
         
         public void FadeTo(float alpha, int time, Action callback)
         {
-            Animator.StartAnimation(this, AnimationKind.Alpha, Alpha, alpha, time, (float x, float from, float to) => Alpha = MathHelper.LinearInterpolation(x, from, to), callback);
+            AnimationManager.Instance.StartAnimation(this, AnimationKind.Alpha, Alpha, alpha, time, (float x, float from, float to) => Alpha = MathHelper.LinearInterpolation(x, from, to), callback);
         }
     }
 }

@@ -10,120 +10,10 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.UI
 {
-    public enum SpecialKey
-    {
-        None = 0,
-        Menu = 1,
-        Back = 2,
-        Left = 3,
-        Right = 4,
-        Up = 5,
-        Down = 6,
-        Select = 7,
-        Enter = 8,
-        Tab = 9,
-
-        Home = 10,
-        End = 11,
-
-        Slash,
-        BackSlash,
-        Semicolon,
-        Quote,
-        Comma,
-        Period,
-        Minus,
-        Plus,
-        BracketLeft,
-        BracketRight,
-        Tilde,
-        Grave,
-        Backspace,
-        Delete,
-        EraseLine, // combination of Ctrl+Backspace or Cmd+Backspace
-
-        Letter,
-
-        A,
-        B,
-        C,
-        D,
-        E,
-        F,
-        G,
-        H,
-        I,
-        J,
-        K,
-        L,
-        M,
-        N,
-        O,
-        P,
-        Q,
-        R,
-        S,
-        T,
-        U,
-        V,
-        W,
-        X,
-        Y,
-        Z,
-
-        One,
-        Two,
-        Three,
-        Four,
-        Five,
-        Six,
-        Seven,
-        Eight,
-        Nine,
-        Zero,
-
-        Shift,
-        Paste,
-        Control,
-
-        Joystick_Up,
-        Joystick_Down,
-        Joystick_Left,
-        Joystick_Right,
-        Joystick_A,
-        Joystick_B,
-        Joystick_X,
-        Joystick_Y,
-        Joystick_LBumper,
-        Joystick_RBumper,
-        Joystick_Start,
-        Joystick_Back,
-        Joystick_RTrigger,
-        Joystick_LTrigger,
-
-        Accelerate,
-        TurnLeft,
-        TurnRight,
-        Brake,
-
-        Max
-    }
-
-    [Flags]
-    public enum WindowObjectFlags
-    {
-        None = 0x00,
-        Removing = 0x01,
-        Visible = 0x02,
-        Enabled = 0x04,
-        Changed = 0x08,
-        Selected = 0x10,
-        Hovered = 0x20,
-
-        Default = Visible | Enabled | Changed
-    }
-
-    public class WindowObject
+    /// <summary>
+    /// Basic class for UI elements
+    /// </summary>
+    public abstract class WindowObject
     {
         private readonly Transform m_transform;
 
@@ -382,7 +272,7 @@ namespace NewWidgets.UI
         protected WindowObject(WindowObject parent, Transform transform = null)
         {
             m_parent = parent;
-            m_transform = transform == null ? new Transform() : transform;
+            m_transform = transform ?? new Transform();
             if (parent != null)
                 m_transform.Parent = parent.Transform;
 
@@ -393,7 +283,7 @@ namespace NewWidgets.UI
         {
             m_flags = WindowObjectFlags.Default;
 
-            Animator.RemoveAnimation(this);
+            AnimationManager.Instance.RemoveAnimation(this);
         }
 
         protected virtual void Resize(Vector2 size)
@@ -450,7 +340,7 @@ namespace NewWidgets.UI
 
         public virtual void Move(Vector2 point, int time, Action callback)
         {
-            Animator.RemoveAnimation(this, AnimationKind.Position);
+            AnimationManager.Instance.RemoveAnimation(this, AnimationKind.Position);
 
             Vector2 current = Position;
 
@@ -461,15 +351,16 @@ namespace NewWidgets.UI
                 return;
             }
 
-            Animator.StartAnimation(this, AnimationKind.Position, current, point, time, (float x, Vector2 from, Vector2 to) => Position = MathHelper.LinearInterpolation(x, from, to), callback);
+            AnimationManager.Instance.StartAnimation(this, AnimationKind.Position, current, point, time, (float x, Vector2 from, Vector2 to) => Position = MathHelper.LinearInterpolation(x, from, to), callback);
         }
 
         public virtual void Rotate(float angle, int time, Action callback, bool normalize)
         {
-            Animator.RemoveAnimation(this, AnimationKind.Rotation);
+            AnimationManager.Instance.RemoveAnimation(this, AnimationKind.Rotation);
 
             float current = Rotation;
 
+            // if we need to normalize the angle it could be done like this:
             /* float delta = (angle - current) % 360;
 
              if (normalize)
@@ -480,7 +371,7 @@ namespace NewWidgets.UI
                      delta += 360;
              }*/
 
-            Animator.StartAnimation(this, AnimationKind.Rotation, current, angle, time, (float x, float from, float to) => Rotation = MathHelper.LinearInterpolation(x, from, to), callback);
+            AnimationManager.Instance.StartAnimation(this, AnimationKind.Rotation, current, angle, time, (float x, float from, float to) => Rotation = MathHelper.LinearInterpolation(x, from, to), callback);
         }
 
         public virtual void Rotate(float angle, int time, Action callback)
@@ -495,7 +386,7 @@ namespace NewWidgets.UI
 
         public virtual void ScaleTo(Vector2 target, int time, Action callback)
         {
-            Animator.RemoveAnimation(this, AnimationKind.Scale);
+            AnimationManager.Instance.RemoveAnimation(this, AnimationKind.Scale);
 
             Vector2 current = Transform.FlatScale;
 
@@ -506,7 +397,7 @@ namespace NewWidgets.UI
                 return;
             }
 
-            Animator.StartAnimation(this, AnimationKind.Scale, current, target, time,
+            AnimationManager.Instance.StartAnimation(this, AnimationKind.Scale, current, target, time,
                 (float x, Vector2 from, Vector2 to) =>
                 Transform.FlatScale = MathHelper.LinearInterpolation(x, from, to), callback);
         }

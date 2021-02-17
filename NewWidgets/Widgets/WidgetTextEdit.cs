@@ -9,7 +9,7 @@ namespace NewWidgets.Widgets
     /// <summary>
     /// Single-line text edit with support for masking and non-editable preffix
     /// </summary>
-    public class WidgetTextEdit : WidgetBackground, IFocusableWidget
+    public class WidgetTextEdit : WidgetBackground, IFocusable
     {
         public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_textedit", true);
 
@@ -533,6 +533,10 @@ namespace NewWidgets.Widgets
         {
             WidgetManager.UpdateFocus(this, false);
             base.Remove();
+        }
+
+        public void Press()
+        {
         }
     }
 }

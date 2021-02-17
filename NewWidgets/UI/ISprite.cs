@@ -7,6 +7,10 @@ using System.Numerics;
 
 namespace NewWidgets.UI
 {
+    /// <summary>
+    /// Interface for 2d sprite. Sprite instances are created in WindowController, so it could be literally anything, i.e. System.Drawing.Bitmap wrapper
+    /// The only tricky thing is Transform field - transforms are required for heirarchy but this can change sooner or later
+    /// </summary>
     public interface ISprite
     {
         /// <summary>
