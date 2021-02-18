@@ -29,15 +29,15 @@ namespace NewWidgets.UI
                 Size = sprite.Size;
         }
 
-        public override void Draw(object canvas)
+        public override void Draw()
         {
             if (Removing)
                 return;
 
             if (Visible && m_sprite != null)
-                m_sprite.Draw(canvas);
+                m_sprite.Draw();
 
-            base.Draw(canvas);
+            base.Draw();
         }
 
         public override bool Update()

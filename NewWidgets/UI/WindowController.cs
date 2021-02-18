@@ -21,10 +21,11 @@ namespace NewWidgets.UI
                 System.Diagnostics.Debug.Assert(s_instance != null, "WindowController.Instance requested before WindowController was inited!");
                 return s_instance;
             }
-            protected set
-            {
-                s_instance = value;
-            }
+        }
+
+        protected WindowController()
+        {
+            s_instance = this;
         }
 
         /// <summary>
@@ -48,7 +49,7 @@ namespace NewWidgets.UI
         /// Gets the screen scale for UI auto-scaling
         /// </summary>
         /// <value>The screen scale.</value>
-        public abstract float ScreenScale { get; }
+        public abstract float UiScale { get; }
 
         /// <summary>
         /// Gets the button scale to avoid huge buttons on tablets and small on phones
@@ -108,7 +109,7 @@ namespace NewWidgets.UI
         /// <returns>The sprite.</returns>
         /// <param name="sprite">Sprite.</param>
         /// <param name="position">Position.</param>
-        public abstract ISprite CloneSprite(ISprite sprite, Vector2 position);
+        public abstract ISprite CloneSprite(ISprite sprite);
 
         /// <summary>
         /// Construct sprite by hashed id string and position
@@ -116,7 +117,7 @@ namespace NewWidgets.UI
         /// <returns>The sprite.</returns>
         /// <param name="id">Identifier.</param>
         /// <param name="position">Position.</param>
-        public abstract ISprite CreateSprite(string id, Vector2 position);
+        public abstract ISprite CreateSprite(string id);
 
         /// <summary>
         /// Sets the screen clip rectangle.

@@ -315,7 +315,7 @@ namespace NewWidgets.UI
             return true;
         }
 
-        public virtual void Draw(object canvas)
+        public virtual void Draw()
         {
 
         }

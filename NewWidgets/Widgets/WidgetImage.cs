@@ -172,7 +172,7 @@ namespace NewWidgets.Widgets
             if (m_imageObject == null)
             {
 
-                ISprite textureSprite = WindowController.Instance.CreateSprite(texture, Vector2.Zero);
+                ISprite textureSprite = WindowController.Instance.CreateSprite(texture);
                 if (textureSprite == null)
                 {
                     WindowController.Instance.LogError("WidgetImage texture not found for sprite {0}", textureSprite);
@@ -279,11 +279,11 @@ namespace NewWidgets.Widgets
             return true;
         }
 
-        protected override void DrawContents(object canvas)
+        protected override void DrawContents()
         {
             if (m_imageObject != null)
-                m_imageObject.Draw(canvas);
-            base.DrawContents(canvas);
+                m_imageObject.Draw();
+            base.DrawContents();
         }
     }
 }

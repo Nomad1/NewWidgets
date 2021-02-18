@@ -117,7 +117,7 @@ namespace NewWidgets.Widgets
                 return;
             }
 
-            ISprite textureSprite = WindowController.Instance.CreateSprite(texture, Vector2.Zero);
+            ISprite textureSprite = WindowController.Instance.CreateSprite(texture);
             if (textureSprite == null)
             {
                 WindowController.Instance.LogError("Widget texture not found for sprite {0}", textureSprite);
@@ -182,7 +182,10 @@ namespace NewWidgets.Widgets
                                 if (x == 0 && y == 0)
                                     image = background;
                                 else
-                                    image = new ImageObject(this, WindowController.Instance.CreateSprite(texture, size * new Vector2(x, y)));
+                                {
+                                    image = new ImageObject(this, WindowController.Instance.CreateSprite(texture));
+                                    image.Transform.FlatPosition = size * new Vector2(x, y);
+                                }
 
                                 image.Scale = scale;
                                 m_background.Add(image);
@@ -217,7 +220,8 @@ namespace NewWidgets.Widgets
                             if (i % 3 == 0)
                                 x = 0;
 
-                            ISprite sprite = WindowController.Instance.CreateSprite(texture, new Vector2(x, y));
+                            ISprite sprite = WindowController.Instance.CreateSprite(texture);
+                            sprite.Transform.FlatPosition = new Vector2(x, y);
                             sprite.Frame = i;
 
                             if (!inited)
@@ -268,7 +272,8 @@ namespace NewWidgets.Widgets
 
                         for (int i = 0; i < 3; i++)
                         {
-                            ImageObject background = new ImageObject(this, WindowController.Instance.CreateSprite(texture, new Vector2(x, y)));
+                            ImageObject background = new ImageObject(this, WindowController.Instance.CreateSprite(texture));
+                            background.Transform.FlatPosition = new Vector2(x, y);
                             background.Sprite.Frame = i;
 
                             if (scales == null)
@@ -339,13 +344,13 @@ namespace NewWidgets.Widgets
             return true;
         }
 
-        public override void Draw(object canvas)
+        public override void Draw()
         {
             if (!Visible)
                 return;
 
             if (BackgroundDepth == WidgetBackgroundDepth.Back)
-                m_background.Draw(canvas);
+                m_background.Draw();
 
           
             if (ClipContents)
@@ -361,18 +366,18 @@ namespace NewWidgets.Widgets
             }
 
             if (BackgroundDepth == WidgetBackgroundDepth.BackClipped)
-                m_background.Draw(canvas);
+                m_background.Draw();
 
-            DrawContents(canvas);
+            DrawContents();
 
             if (BackgroundDepth == WidgetBackgroundDepth.TopClipped)
-                m_background.Draw(canvas);
+                m_background.Draw();
 
             if (ClipContents)
                 WindowController.Instance.CancelClipRect();
 
             if (BackgroundDepth == WidgetBackgroundDepth.Top)
-                m_background.Draw(canvas);
+                m_background.Draw();
         }
 
         public override void Remove()

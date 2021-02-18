@@ -45,11 +45,11 @@ namespace NewWidgets.Widgets
             return true;
         }
 
-        protected override void DrawContents(object canvas)
+        protected override void DrawContents()
         {
-            base.DrawContents(canvas);
+            base.DrawContents();
 
-            m_children.Draw(canvas);
+            m_children.Draw();
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)

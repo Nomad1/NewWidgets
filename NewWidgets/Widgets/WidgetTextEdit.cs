@@ -275,15 +275,15 @@ namespace NewWidgets.Widgets
             return true;
         }
 
-        protected override void DrawContents(object canvas)
+        protected override void DrawContents()
         {
-            base.DrawContents(canvas);
+            base.DrawContents();
 
             if (m_label != null)
-                m_label.Draw(canvas);
+                m_label.Draw();
 
             if (IsFocused)
-                m_cursor.Draw(canvas);
+                m_cursor.Draw();
         }
 
         public override bool Key(SpecialKey key, bool up, string keyString)

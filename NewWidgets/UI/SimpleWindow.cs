@@ -58,13 +58,13 @@ namespace NewWidgets.UI
             return true;
         }
 
-        public override void Draw(object canvas)
+        public override void Draw()
         {
-            base.Draw(canvas);
+            base.Draw();
 
             if (Visible)
                 foreach (WindowObject child in m_children)
-                    child.Draw(canvas);
+                    child.Draw();
         }
       
         public void AddChild(WindowObject child)

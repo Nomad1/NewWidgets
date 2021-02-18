@@ -117,7 +117,7 @@ namespace NewWidgets.UI
                     if (colors[i] is IconSpan)
                     {
                         IconSpan icon = (IconSpan)colors[i];
-                        ISprite iconSprite = WindowController.Instance.CreateSprite(icon.Icon, Vector2.Zero);
+                        ISprite iconSprite = WindowController.Instance.CreateSprite(icon.Icon);
 
                         if (iconSprite != null) // consume the error cause there is no place for log or message
                         {
@@ -289,17 +289,17 @@ namespace NewWidgets.UI
             return true;
         }
 
-        public override void Draw(object canvas)
+        public override void Draw()
         {
             if (!Visible)
                 return;
 
-            base.Draw(canvas);
+            base.Draw();
 
             if (m_sprites != null)
             {
                 foreach (ISprite sprite in m_sprites)
-                    sprite.Draw(canvas);
+                    sprite.Draw();
             }
         }
 

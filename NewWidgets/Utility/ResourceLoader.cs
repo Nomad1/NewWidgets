@@ -7,7 +7,7 @@ namespace NewWidgets.Utility
     /// </summary>
     public sealed class ResourceLoader
     {
-        private static ResourceLoader s_instance = new ResourceLoader(string.Empty);
+        private static readonly ResourceLoader s_instance = new ResourceLoader(string.Empty);
 
         public static ResourceLoader Instance
         {
@@ -27,7 +27,6 @@ namespace NewWidgets.Utility
         {
             m_strings = new Dictionary<string, string>();
             m_language = lang;
-            s_instance = this;
         }
 
         public string GetString(string str, params object[] parameters)

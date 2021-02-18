@@ -53,7 +53,7 @@ namespace NewWidgets.UI
         }
 
         public Font(string font, float spacing, int leading, int baseline, int shift)
-            : this(WindowController.Instance.CreateSprite(font, Vector2.Zero), spacing, leading, baseline, shift)
+            : this(WindowController.Instance.CreateSprite(font), spacing, leading, baseline, shift)
         {
         }
 
@@ -96,7 +96,8 @@ namespace NewWidgets.UI
                 if (!m_glyphs.TryGetValue(text[i], out glyph))
                     glyph = m_spaceGlyph;
 
-                ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, m_shift));
+                ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite);
+                sprite.Transform.FlatPosition = position + new Vector2(m_leading, m_shift);
                 sprite.Frame = glyph.Frame;
                 result[i] = sprite;
 
@@ -127,7 +128,8 @@ namespace NewWidgets.UI
                 }
                 else
                 {
-                    ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite, position + new Vector2(m_leading, m_shift));
+                    ISprite sprite = WindowController.Instance.CloneSprite(m_fontSprite);
+                    sprite.Transform.FlatPosition = position + new Vector2(m_leading, m_shift);
                     sprite.Frame = glyph.Frame;
                     result[i] = sprite;
                 }

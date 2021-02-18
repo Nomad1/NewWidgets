@@ -117,12 +117,12 @@ namespace NewWidgets.Widgets
             return true;
         }
 
-        protected override void DrawContents(object canvas)
+        protected override void DrawContents()
         {
-            base.DrawContents(canvas);
+            base.DrawContents();
 
             if (m_image != null && (Checked || m_animating))
-                m_image.Draw(canvas);
+                m_image.Draw();
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)

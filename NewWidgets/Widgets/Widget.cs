@@ -326,9 +326,9 @@ namespace NewWidgets.Widgets
 
         #endregion
 
-        public override void Draw(object canvas)
+        public override void Draw()
         {
-            base.Draw(canvas); // does nothing 
+            base.Draw(); // does nothing 
 
             if (!Visible)
                 return;
@@ -345,7 +345,7 @@ namespace NewWidgets.Widgets
                     (int)(clipBottomRight.Y - clipTopLeft.Y + 0.5f));
             }
 
-            DrawContents(canvas);
+            DrawContents();
             
             if (ClipContents)
                 WindowController.Instance.CancelClipRect();
@@ -359,7 +359,7 @@ namespace NewWidgets.Widgets
             return base.Touch(x, y, press, unpress, pointer);
         }
 
-        protected virtual void DrawContents(object canvas)
+        protected virtual void DrawContents()
         {
         }
         

@@ -277,15 +277,15 @@ namespace NewWidgets.Widgets
             return true;
         }
 
-        protected override void DrawContents(object canvas)
+        protected override void DrawContents()
         {
-            base.DrawContents(canvas);
+            base.DrawContents();
             
             if (!string.IsNullOrEmpty(Image))
-                m_image.Draw(canvas);
+                m_image.Draw();
             
             if (!string.IsNullOrEmpty(Text))
-                m_label.Draw(canvas);
+                m_label.Draw();
         }
 
         

@@ -142,13 +142,13 @@ namespace NewWidgets.UI
             return hasChanges;
         }
 
-        public void Draw(object canvas)
+        public void Draw()
         {
             T[] array = EnsureArray();
 
             for (int i = 0; i < array.Length; i++)
                 if (array[i] != null/*&& array[i].Visible*/)
-                    array[i].Draw(canvas);
+                    array[i].Draw();
         }
 
         public bool Touch(float x, float y, bool press, bool unpress, int pointer)

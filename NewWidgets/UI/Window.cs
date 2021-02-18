@@ -81,12 +81,12 @@ namespace NewWidgets.UI
             return true;
         }
 
-        public override void Draw(object canvas)
+        public override void Draw()
         {
-            base.Draw(canvas);
+            base.Draw();
 
             if (Visible)
-                m_children.Draw(canvas);
+                m_children.Draw();
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)

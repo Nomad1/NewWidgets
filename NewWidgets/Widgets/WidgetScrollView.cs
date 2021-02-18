@@ -247,9 +247,9 @@ namespace NewWidgets.Widgets
             return true;
         }
 
-        protected override void DrawContents(object canvas)
+        protected override void DrawContents()
         {
-            base.DrawContents(canvas);
+            base.DrawContents();
 
             RectangleF visibleRect = new RectangleF(-m_contentView.Position.X, -m_contentView.Position.Y, Size.X, Size.Y); // TODO: margins and scale?
 
@@ -258,7 +258,7 @@ namespace NewWidgets.Widgets
                 RectangleF widgetRect = new RectangleF(widget.Position.X, widget.Position.Y, widget.Size.X, widget.Size.Y);
 
                 if (visibleRect.IntersectsWith(widgetRect))
-                    widget.Draw(canvas);
+                    widget.Draw();
 
                 //                if (widget.Position > m_contentView.Size
             }
@@ -267,14 +267,14 @@ namespace NewWidgets.Widgets
 
             if (m_horizontalBarVisible)
             {
-                m_horizontalScrollBar.Draw(canvas);
-                m_horizontalScrollBarIndicator.Draw(canvas);
+                m_horizontalScrollBar.Draw();
+                m_horizontalScrollBarIndicator.Draw();
             }
 
             if (m_verticalBarVisible)
             {
-                m_verticalScrollBar.Draw(canvas);
-                m_verticalScrollBarIndicator.Draw(canvas);
+                m_verticalScrollBar.Draw();
+                m_verticalScrollBarIndicator.Draw();
             }
         }
 

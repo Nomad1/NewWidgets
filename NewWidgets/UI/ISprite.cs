@@ -74,7 +74,7 @@ namespace NewWidgets.UI
         /// <param name="y">Y</param>
         bool HitTest(float x, float y);
 
-        void Draw(object canvas);
+        void Draw();
 
         void Update();
 
