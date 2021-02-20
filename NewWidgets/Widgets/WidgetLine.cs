@@ -13,12 +13,12 @@ namespace NewWidgets.Widgets
     {
         public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_line", true);
 
+        private readonly bool m_simpleLine;
         private Vector2 m_from;
         private Vector2 m_to;
         private float m_gap;
         private float m_width;
         private int m_angleSnap;
-        private bool m_simpleLine;
 
         private bool m_needLayout;
 
@@ -52,7 +52,7 @@ namespace NewWidgets.Widgets
             set { m_width = value; m_needLayout = true; }
         }
 
-        public int Color
+        public uint Color
         {
             get { return BackgroundColor; }
             set { BackgroundColor = value; }

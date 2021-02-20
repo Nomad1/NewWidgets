@@ -61,13 +61,13 @@ namespace NewWidgets.Widgets
 
         public Margin BackgroundPadding
         {
-            get { return GetProperty(WidgetParameterIndex.BackPadding, new Margin(0)); }
+            get { return GetProperty(WidgetParameterIndex.BackPadding, new Margin(0.0f)); }
             set { SetProperty(WidgetParameterIndex.BackPadding, value); InvalidateBackground(); }
         }
 
-        public int BackgroundColor
+        public uint BackgroundColor
         {
-            get { return GetProperty(WidgetParameterIndex.BackColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.BackColor, (uint)0xffffff); }
             set { SetProperty(WidgetParameterIndex.BackColor, value); } // no need to redraw background there
         }
 
@@ -327,7 +327,7 @@ namespace NewWidgets.Widgets
 
             if (m_background.Count > 0)
             {
-                int ialpha = MathHelper.Clamp((int)(Alpha * BackgroundAlpha * 255 + float.Epsilon), 0, 255); // I'm adding epsilon there to avoid 0.999999 rounding to 254
+                int ialpha = MathHelper.Clamp((int)(Opacity * BackgroundAlpha * 255 + float.Epsilon), 0, 255); // I'm adding epsilon there to avoid 0.999999 rounding to 254
 
                 WindowObject[] array = m_background.List;
 

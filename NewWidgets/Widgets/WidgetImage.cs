@@ -61,9 +61,9 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public int Color
+        public uint Color
         {
-            get { return GetProperty(WidgetParameterIndex.ImageColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.ImageColor, (uint)0xffffff); }
             set {
                 if (Color != value)
                 {
@@ -73,10 +73,10 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override float Alpha
+        public override float Opacity
         {
-            get { return base.Alpha; }
-            set { base.Alpha = value; UpdateColor(); }
+            get { return base.Opacity; }
+            set { base.Opacity = value; UpdateColor(); }
         }
 
         public Vector2 ImageSize
@@ -261,7 +261,7 @@ namespace NewWidgets.Widgets
             if (m_imageObject != null)
             {
                 m_imageObject.Sprite.Color = Color;
-                m_imageObject.Sprite.Alpha = (byte)MathHelper.Clamp((int)(Alpha * ImageAlpha * 255 + float.Epsilon), 0, 255);
+                m_imageObject.Sprite.Alpha = (byte)MathHelper.Clamp((int)(Opacity * ImageAlpha * 255 + float.Epsilon), 0, 255);
             }
         }
 

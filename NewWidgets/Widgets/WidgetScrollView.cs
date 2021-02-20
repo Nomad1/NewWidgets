@@ -230,17 +230,17 @@ namespace NewWidgets.Widgets
 
             if (m_horizontalBarVisible)
             {
-                m_horizontalScrollBar.Alpha = Alpha;
+                m_horizontalScrollBar.Opacity = Opacity;
                 m_horizontalScrollBar.Update();
-                m_horizontalScrollBarIndicator.Alpha = Alpha;
+                m_horizontalScrollBarIndicator.Opacity = Opacity;
                 m_horizontalScrollBarIndicator.Update();
             }
 
             if (m_verticalBarVisible)
             {
-                m_verticalScrollBar.Alpha = Alpha;
+                m_verticalScrollBar.Opacity = Opacity;
                 m_verticalScrollBar.Update();
-                m_verticalScrollBarIndicator.Alpha = Alpha;
+                m_verticalScrollBarIndicator.Opacity = Opacity;
                 m_verticalScrollBarIndicator.Update();
             }
 

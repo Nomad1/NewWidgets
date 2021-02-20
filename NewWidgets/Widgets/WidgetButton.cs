@@ -49,13 +49,13 @@ namespace NewWidgets.Widgets
 
         // Forwarded style properties
 
-        public int ImageTint
+        public uint ImageTint
         {
             get { return m_image.Color; }
             set { m_image.Color = value; }
         }
 
-        public int TextColor
+        public uint TextColor
         {
             get { return m_label.Color; }
             set { m_label.Color = value; }
@@ -135,17 +135,17 @@ namespace NewWidgets.Widgets
             get { return m_label; }
         }
 
-        public override float Alpha
+        public override float Opacity
         {
-            get { return base.Alpha;}
+            get { return base.Opacity;}
             set
             {
-                base.Alpha = value;
+                base.Opacity = value;
                 if (m_image != null)
-                    m_image.Alpha = value;
+                    m_image.Opacity = value;
 
                 if (m_label != null)
-                    m_label.Alpha = value;
+                    m_label.Opacity = value;
             }
         }
 
@@ -264,13 +264,13 @@ namespace NewWidgets.Widgets
             
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
             {
-                m_image.Alpha = Alpha;
+                m_image.Opacity = Opacity;
                 m_image.Update();
             }
 
             if (m_label != null)
             {
-                m_label.Alpha = Alpha;
+                m_label.Opacity = Opacity;
                 m_label.Update();
             }
 

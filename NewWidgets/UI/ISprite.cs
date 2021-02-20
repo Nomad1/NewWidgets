@@ -59,7 +59,7 @@ namespace NewWidgets.UI
         /// Color tint value, only lower 24-bits are used
         /// </summary>
         /// <value>The color.</value>
-        int Color { get; set; }
+        uint Color { get; set; }
 
         /// <summary>
         /// Set of Position/Rotation/Scale components

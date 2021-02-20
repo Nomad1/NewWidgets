@@ -54,9 +54,9 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.LineSpacing, value); InvalidateLayout(); }
         }
 
-        public int CursorColor
+        public uint CursorColor
         {
-            get { return GetProperty(WidgetParameterIndex.CursorColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.CursorColor, (uint)0xffffff); }
             set
             {
                 SetProperty(WidgetParameterIndex.CursorColor, value);
@@ -105,9 +105,9 @@ namespace NewWidgets.Widgets
             get { return true; }
         }
 
-        public int TextColor
+        public uint TextColor
         {
-            get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.TextColor, (uint)0xffffff); }
             set
             {
                 SetProperty(WidgetParameterIndex.TextColor, value);
@@ -118,9 +118,9 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public int FocusedTextColor
+        public uint FocusedTextColor
         {
-            get { return GetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, 0xffffff); }
+            get { return GetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, (uint)0xffffff); }
             set
             {
                 SetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, value);
@@ -131,16 +131,16 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override float Alpha
+        public override float Opacity
         {
-            get { return base.Alpha; }
+            get { return base.Opacity; }
             set
             {
-                base.Alpha = value;
+                base.Opacity = value;
 
                 if (m_labels != null)
                     foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
-                        label.Alpha = value;
+                        label.Opacity = value;
             }
         }
 
@@ -223,7 +223,7 @@ namespace NewWidgets.Widgets
 
                 m_labels[i].Color = TextColor;
                 m_labels[i].Scale = FontSize;
-                m_labels[i].Alpha = Alpha;
+                m_labels[i].Opacity = Opacity;
                 m_labels[i].Text = m_lines[i];
                 m_labels[i].Size = sizes[i] / FontSize;
             }

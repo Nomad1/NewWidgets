@@ -24,7 +24,7 @@ namespace NewWidgets.Widgets
                 if (m_image != null)
                 {
                     m_image.Position = value ? ImagePadding.TopLeft : (ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f));
-                    m_image.Alpha = value ? 1.0f : 0.0f;
+                    m_image.Opacity = value ? 1.0f : 0.0f;
                 }
 
                 Selected = value;
@@ -177,13 +177,13 @@ namespace NewWidgets.Widgets
             int animateTime = 100;
             if (Checked)
             {
-                m_image.Alpha = 0.0f;
+                m_image.Opacity = 0.0f;
                 m_image.Position = ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f);
                 m_image.Move(ImagePadding.TopLeft, animateTime, AnimateFinished);
                 m_image.FadeTo(1.0f, animateTime, null);
             } else
             {
-                m_image.Alpha = 1.0f;
+                m_image.Opacity = 1.0f;
                 m_image.Position = ImagePadding.TopLeft;
                 m_image.Move(ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f), animateTime, AnimateFinished);
                 m_image.FadeTo(0.0f, animateTime, null);

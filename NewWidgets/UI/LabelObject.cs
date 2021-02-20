@@ -18,8 +18,8 @@ namespace NewWidgets.UI
         private readonly Font m_font;
         private readonly Vector2 m_pivot;
 
-        private int m_color;
-        private float m_alpha;
+        private uint m_color;
+        private float m_opacity;
         private ISprite[] m_sprites;
         private string m_text;
         private bool m_richText;
@@ -29,13 +29,13 @@ namespace NewWidgets.UI
             get { return m_font; }
         }
 
-        public float Alpha
+        public float Opacity
         {
-            get { return m_alpha; }
+            get { return m_opacity; }
             set
             {
-                m_alpha = value;
-                int ialpha = MathHelper.Clamp((int)(m_alpha * 255), 0, 255);
+                m_opacity = value;
+                int ialpha = MathHelper.Clamp((int)(m_opacity * 255), 0, 255);
 
                 if (m_sprites != null)
                     foreach (ISprite sprite in m_sprites)
@@ -43,7 +43,7 @@ namespace NewWidgets.UI
             }
         }
 
-        public int Color
+        public uint Color
         {
             get { return m_color; }
             set
@@ -71,7 +71,7 @@ namespace NewWidgets.UI
             : base(parent)
         {
             m_color = 0xffffff;
-            m_alpha = 1.0f;
+            m_opacity = 1.0f;
             m_font = font;
 
             float x = 1;
@@ -106,7 +106,7 @@ namespace NewWidgets.UI
             if (colors != null && colors.Length < m_sprites.Length)
                 throw new ArgumentException("Too few colors in array!");
 
-            int ialpha = MathHelper.Clamp((int)(m_alpha * 255), 0, 255);
+            int ialpha = MathHelper.Clamp((int)(m_opacity * 255), 0, 255);
 
             for (int i = 0; i < m_sprites.Length; i++)
             {
@@ -140,7 +140,7 @@ namespace NewWidgets.UI
             }
         }
 
-        public static string ParseRichText(string text, int defaultColor, out TextSpan[] colors, int spaceWidth)
+        public static string ParseRichText(string text, uint defaultColor, out TextSpan[] colors, int spaceWidth)
         {
             colors = new TextSpan[text.Length];
             char[] chars = new char[text.Length];
@@ -161,8 +161,8 @@ namespace NewWidgets.UI
                             {
                                 string colorString = text.Substring(i + 2, 6);
 
-                                int color;
-                                if (int.TryParse(colorString, System.Globalization.NumberStyles.HexNumber, null, out color))
+                                uint color;
+                                if (uint.TryParse(colorString, System.Globalization.NumberStyles.HexNumber, null, out color))
                                 {
                                     currentColor = new TextSpan(color);
                                     i += 7;
@@ -200,13 +200,13 @@ namespace NewWidgets.UI
                                     string icon = iconData[0];
                                     int width;
                                     int height;
-                                    int color;
+                                    uint color;
 
                                     // ignore the errors if any
 
                                     if (iconData.Length > 2 && int.TryParse(iconData[1], out width) && int.TryParse(iconData[2], out height))
                                     {
-                                        if (iconData.Length > 3 && int.TryParse(iconData[3], System.Globalization.NumberStyles.HexNumber, null, out color))
+                                        if (iconData.Length > 3 && uint.TryParse(iconData[3], System.Globalization.NumberStyles.HexNumber, null, out color))
                                         {
                                         }
                                         else
@@ -328,9 +328,9 @@ namespace NewWidgets.UI
 
         public class TextSpan
         {
-            public readonly int Color;
+            public readonly uint Color;
 
-            public TextSpan(int color)
+            public TextSpan(uint color)
             {
                 Color = color;
             }
@@ -342,7 +342,7 @@ namespace NewWidgets.UI
             public readonly int Width;
             public readonly int Height;
 
-            public IconSpan(int color, string icon, int width, int height)
+            public IconSpan(uint color, string icon, int width, int height)
                 : base(color)
             {
                 Icon = icon;

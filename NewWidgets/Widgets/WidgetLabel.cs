@@ -21,7 +21,7 @@ namespace NewWidgets.Widgets
         private bool m_needAnimate; // flag to indicate that animation is in progress
         private bool m_needAnimateRandom; // animation type
 
-        private int m_color = 0xffffff;
+        private uint m_color = 0xffffff;
         
         public Font Font
         {
@@ -85,9 +85,9 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public int Color
+        public uint Color
         {
-            get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.TextColor, (uint)0xffffff); }
             set
             {
                 if (m_color == value)
@@ -102,14 +102,14 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override float Alpha
+        public override float Opacity
         {
-            get { return base.Alpha; }
+            get { return base.Opacity; }
             set
             {
-                base.Alpha = value;
+                base.Opacity = value;
                 if (m_label != null) // try to avoid settings m_needLayout
-                    m_label.Alpha = value;
+                    m_label.Opacity = value;
             }
         }
 
@@ -172,7 +172,7 @@ namespace NewWidgets.Widgets
                 m_label = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, RichText);
             
             m_label.Color = Color;
-            m_label.Alpha = Alpha;
+            m_label.Opacity = Opacity;
             m_label.Scale = FontSize;
 
             if (!string.IsNullOrEmpty(m_text))
@@ -271,7 +271,7 @@ namespace NewWidgets.Widgets
                 m_label.Position = targetPosition;
             });
 
-            Alpha = 1.0f;
+            Opacity = 1.0f;
 
             for (int i = 0; i < m_label.InternalGetSprites().Length; i++)
             {

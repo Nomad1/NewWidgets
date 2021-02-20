@@ -72,9 +72,9 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.RichText, value); InivalidateLayout(); }
         }
 
-        public int Color
+        public uint Color
         {
-            get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.TextColor, (uint)0xffffff); }
             set
             {
                 SetProperty(WidgetParameterIndex.TextColor, value);
@@ -85,16 +85,16 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override float Alpha
+        public override float Opacity
         {
-            get { return base.Alpha; }
+            get { return base.Opacity; }
             set
             {
-                base.Alpha = value;
+                base.Opacity = value;
 
                 if (m_labels != null)
                     foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
-                        label.Alpha = value;
+                        label.Opacity = value;
             }
         }
 
@@ -270,7 +270,7 @@ namespace NewWidgets.Widgets
                 LabelObject label = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, false);
                 label.Color = Color;
                 label.Scale = FontSize;
-                label.Alpha = Alpha;
+                label.Opacity = Opacity;
                 label.Text = lines[i];
 
                 if (RichText)

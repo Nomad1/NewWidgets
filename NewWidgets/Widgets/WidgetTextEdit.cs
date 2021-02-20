@@ -60,9 +60,9 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.TextPadding, value); InvalidateLayout(); }
         }
 
-        public int TextColor
+        public uint TextColor
         {
-            get { return GetProperty(WidgetParameterIndex.TextColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.TextColor, (uint)0xffffff); }
             set
             {
                 SetProperty(WidgetParameterIndex.TextColor, value);
@@ -72,9 +72,9 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public int FocusedTextColor
+        public uint FocusedTextColor
         {
-            get { return GetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, 0xffffff); }
+            get { return GetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, (uint)0xffffff); }
             set
             {
                 SetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, value);
@@ -84,9 +84,9 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public int CursorColor
+        public uint CursorColor
         {
-            get { return GetProperty(WidgetParameterIndex.CursorColor, 0xffffff); }
+            get { return GetProperty(WidgetParameterIndex.CursorColor, (uint)0xffffff); }
             set
             {
                 SetProperty(WidgetParameterIndex.CursorColor, value);
@@ -231,7 +231,7 @@ namespace NewWidgets.Widgets
 
             m_label.Color = TextColor;
             m_label.Scale = FontSize;
-            m_label.Alpha = Alpha;
+            m_label.Opacity = Opacity;
 
             if (m_cursor == null)
             {

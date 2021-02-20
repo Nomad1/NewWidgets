@@ -85,7 +85,7 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.ClipMargin, value); }
         }
 
-        public virtual float Alpha
+        public virtual float Opacity
         {
             get { return m_alpha; }
             set { m_alpha = value; }
@@ -365,7 +365,7 @@ namespace NewWidgets.Widgets
         
         public void FadeTo(float alpha, int time, Action callback)
         {
-            AnimationManager.Instance.StartAnimation(this, AnimationKind.Alpha, Alpha, alpha, time, (float x, float from, float to) => Alpha = MathHelper.LinearInterpolation(x, from, to), callback);
+            AnimationManager.Instance.StartAnimation(this, AnimationKind.Alpha, Opacity, alpha, time, (float x, float from, float to) => Opacity = MathHelper.LinearInterpolation(x, from, to), callback);
         }
     }
 }
