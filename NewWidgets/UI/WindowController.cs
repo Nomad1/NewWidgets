@@ -49,7 +49,7 @@ namespace NewWidgets.UI
         /// Gets the screen scale for UI auto-scaling
         /// </summary>
         /// <value>The screen scale.</value>
-        public abstract float UiScale { get; }
+        public abstract float UIScale { get; }
 
         /// <summary>
         /// Gets the button scale to avoid huge buttons on tablets and small on phones
@@ -112,7 +112,7 @@ namespace NewWidgets.UI
         public abstract ISprite CloneSprite(ISprite sprite);
 
         /// <summary>
-        /// Construct sprite by hashed id string and position
+        /// Construct sprite by hashed id string and with default UI material
         /// </summary>
         /// <returns>The sprite.</returns>
         /// <param name="id">Identifier.</param>
