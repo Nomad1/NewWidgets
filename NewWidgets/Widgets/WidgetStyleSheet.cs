@@ -46,7 +46,7 @@ namespace NewWidgets.Widgets
         BackPadding,
         [WidgetParameter("back_opacity", typeof(float))]
         BackOpacity,
-        [WidgetParameter("back_color", typeof(int))]
+        [WidgetParameter("back_color", typeof(uint))]
         BackColor,
 
         // Text
@@ -55,7 +55,7 @@ namespace NewWidgets.Widgets
         Font,
         [WidgetParameter("font_size", typeof(float))]
         FontSize,
-        [WidgetParameter("text_color", typeof(int))]
+        [WidgetParameter("text_color", typeof(uint))]
         TextColor,
         [WidgetParameter("line_spacing", typeof(float))]
         LineSpacing,
@@ -79,14 +79,14 @@ namespace NewWidgets.Widgets
         ImagePivot,
         [WidgetParameter("image_padding", typeof(Margin))]
         ImagePadding,
-        [WidgetParameter("image_color", typeof(int))]
+        [WidgetParameter("image_color", typeof(uint))]
         ImageColor,
         [WidgetParameter("image_opacity", typeof(float))]
         ImageOpacity,
 
         // Text edit
 
-        [WidgetParameter("cursor_color", typeof(int))]
+        [WidgetParameter("cursor_color", typeof(uint))]
         CursorColor,
         [WidgetParameter("cursor_char")]
         CursorChar,

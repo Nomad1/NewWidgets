@@ -137,8 +137,8 @@ namespace NewWidgets.Widgets
                 memberValue = (object)value;
             else if (targetType == typeof(float))
                 memberValue = (object)FloatParse(value); // bo-oxing (
-            else if (targetType == typeof(int))
-                memberValue = (object)ColorParse(value); // assume int field is color by default
+            else if (targetType == typeof(uint))
+                memberValue = (object)ColorParse(value); // assume uint field is color by default
             else if (targetType == typeof(Margin))
                 memberValue = (object)MarginParse(value);
             else if (targetType == typeof(Vector2))
@@ -168,14 +168,14 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <returns>The parse.</returns>
         /// <param name="value">Value.</param>
-        public static int ColorParse(string value)
+        public static uint ColorParse(string value)
         {
             if (value.Length >= 7 && value[0] == '#')
-                return int.Parse(value.Substring(1), System.Globalization.NumberStyles.HexNumber);
+                return uint.Parse(value.Substring(1), System.Globalization.NumberStyles.HexNumber);
             if (value.Length >= 8 && value[0] == '0' && value[1] == 'x')
-                return int.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                return uint.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
 
-            return int.Parse(value);
+            return uint.Parse(value);
         }
 
         /// <summary>
