@@ -3,7 +3,7 @@ using NewWidgets.UI;
 using NewWidgets.Utility;
 using NewWidgets.Widgets;
 
-namespace NewWidgets.WinFormsSample
+namespace NewWidgets.Sample
 {
     /// <summary>
     /// Test window. Taken from Project Amalthea login dialog
@@ -22,6 +22,22 @@ namespace NewWidgets.WinFormsSample
 
         private readonly WidgetLabel m_fpsLabel;
 
+        static TestWindow()
+        {
+            ResourceLoader.Instance.Language = "en-en";
+            ResourceLoader.Instance.RegisterString("login_title", "Connect to server");
+            ResourceLoader.Instance.RegisterString("login_login", "Login");
+            ResourceLoader.Instance.RegisterString("login_password", "Password");
+            ResourceLoader.Instance.RegisterString("login_local", "Custom server");
+            ResourceLoader.Instance.RegisterString("login_register", "Register new account");
+            ResourceLoader.Instance.RegisterString("login_connect", "Connect");
+            ResourceLoader.Instance.RegisterString("dialog_title", "Dialog");
+            ResourceLoader.Instance.RegisterString("dialog_text", "Dialog text that could be very long,\nwith |caaaaaadifferent|r |c336699colors|r, languages ({0}) and may even contain |tsettings_icon:64:64|t images.");
+            ResourceLoader.Instance.RegisterString("button_yes", "Yes");
+            ResourceLoader.Instance.RegisterString("button_no", "Yes!");
+            ResourceLoader.Instance.RegisterString("tooltip_connect", "Start connection");
+        }
+
         public TestWindow()
             : base(WindowFlags.None)
         {
@@ -30,7 +46,7 @@ namespace NewWidgets.WinFormsSample
 
             WidgetPanel panel = new WidgetWindow();
             panel.Size = new Vector2(600, 760);
-            panel.Scale = WindowController.Instance.ScreenScale;
+            panel.Scale = WindowController.Instance.UIScale;
             panel.Position = Size / 2 - panel.Size * panel.Scale / 2;
             AddChild(panel);
 

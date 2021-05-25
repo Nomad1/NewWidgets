@@ -3,10 +3,10 @@
 using NewWidgets.Widgets;
 using NewWidgets.WinForms;
 using NewWidgets.UI;
-using System.Diagnostics;
 using NewWidgets.Utility;
+using NewWidgets.Sample;
 
-namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private readonly WinFormsController m_windowController;        private readonly System.Threading.Timer m_updateTimer;        private readonly Delegate m_updateDelegate;        private TestWindow m_window;        private long m_lastFrameUpdate;
+namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form    {        private readonly WinFormsController m_windowController;        private System.Threading.Timer m_updateTimer;        private readonly Delegate m_updateDelegate;        private TestWindow m_window;        private long m_lastFrameUpdate;
         private long m_lastFrameDraw;
 
         private float m_averageFrameUpdateTime;
@@ -28,7 +28,13 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
             const int targetFps = 60;
             m_averageFrameTime = m_averageFrameUpdateTime = 1000.0f / targetFps;
             m_lastFrameDraw = m_lastFrameUpdate = Environment.TickCount; // unprecise timer
+        }
+
+        protected override void OnHandleCreated(EventArgs e)
+        {
+
             m_updateTimer = new System.Threading.Timer(delegate { BeginInvoke(m_updateDelegate); UpdateUpdateFps(); }, null, 500, (int)m_averageFrameTime);
+            base.OnHandleCreated(e);
         }
 
         private void HandleOnInit()

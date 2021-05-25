@@ -1,15 +1,12 @@
-﻿using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
+﻿using System.Diagnostics;
 using System.Numerics;
-
+using CoreGraphics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
-namespace NewWidgets.WinForms
+namespace NewWidgets.Mac
 {
-    public class WinFormsSprite : ISprite //TODO: V3072 https://www.viva64.com/en/w/v3072/ The 'WinFormsSprite' class containing IDisposable members does not itself implement IDisposable. Inspect: m_imageAttributes.
+    public class MacSprite : ISprite
     {
         public struct FrameData
         {
@@ -34,14 +31,14 @@ namespace NewWidgets.WinForms
             }
         }
 
-        private static uint ColorMask = 0x00ffffff;
-        private static uint AlphaMask = 0xff000000;
-        private static uint AlphaDrawThreshold = 0x01000000; // alpha <= 1 means invisible
+        private static readonly uint ColorMask = 0x00ffffff;
+        private static readonly uint AlphaMask = 0xff000000;
+        private static readonly uint AlphaDrawThreshold = 0x01000000; // alpha <= 1 means invisible
 
         private readonly string m_id;
         private readonly Vector2 m_size;
         private readonly FrameData[] m_frames;
-        private readonly Image m_image;
+        private readonly CGImage m_image;
 
         private Transform m_transform;
 
@@ -49,10 +46,7 @@ namespace NewWidgets.WinForms
         private uint m_color;
         private int m_frame;
 
-        private uint m_cacheHash;
-        private Bitmap m_cache;
-        private ColorMatrix m_colorMatrix;
-        private ImageAttributes m_imageAttributes;
+        private CGImage [] m_subImages;
 
         public string Id
         {
@@ -111,18 +105,30 @@ namespace NewWidgets.WinForms
             get { return m_transform; }
         }
 
-        internal WinFormsSprite(Image image, string id, Vector2 size, FrameData[] frames)
+        internal MacSprite(CGImage image, string id, Vector2 size, FrameData[] frames)
         {
             m_image = image;
             m_id = id;
             m_size = size;
             m_frames = frames;
 
-
             m_pivotShift = Vector2.Zero;
             m_transform = new Transform(Vector2.Zero, 0, 1.0f);
             m_frame = 0;
             m_color = 0xffffffff;
+
+            m_subImages = new CGImage[frames.Length];
+
+            for (int i = 0; i < frames.Length; i++)
+                if (frames[i].Width != image.Width || frames[i].Height != image.Height)
+                    m_subImages[i] = image.WithImageInRect(new CGRect(frames[i].X, frames[i].Y, frames[i].Width, frames[i].Height));
+        }
+
+        ~MacSprite()
+        {
+            for (int i = 0; i < m_subImages.Length; i++)
+                if (m_subImages[i] != null)
+                    m_subImages[i].Dispose();
         }
 
         public bool HitTest(float x, float y)
@@ -140,21 +146,13 @@ namespace NewWidgets.WinForms
 
         public void Draw()
         {
-            Draw(WinFormsController.CurrentGraphics);
-        }
-
-        public void Draw(object canvas)
-        {
             if ((m_color & AlphaMask) <= AlphaDrawThreshold)
                 return;
 
-            Graphics graphics = canvas as Graphics;
-
-            if (graphics == null)
-                return;
+            CGContext context = ((MacController)WindowController.Instance).CurrentContext;
 
             // Clipping!
-            graphics.SetClip(((WinFormsController)WindowController.Instance).GetClipRect);
+            context.ClipToRect(((MacController)WindowController.Instance).ClipRect);
 
             // Here goes sprite drawing
 
@@ -165,82 +163,21 @@ namespace NewWidgets.WinForms
             arr[1] = m_transform.GetScreenPoint(from + new Vector2(FrameSize.X, 0));
             arr[2] = m_transform.GetScreenPoint(from + new Vector2(0, FrameSize.Y));
 
-            int x = (int)Math.Floor(arr[0].X);
-            int y = (int)Math.Floor(arr[0].Y);
+            // TODO: set tint color
+            //context.SetFillColor(CGColor.CreateSrgb(((m_color >> 16) & 0xff) / 255.0f, ((m_color >> 8) & 0xff) / 255.0f, ((m_color >> 0) & 0xff) / 255.0f, ((m_color >> 24) & 0xff) / 255.0f));
 
-            if (!UpdateCache(arr[0].X - x, arr[0].Y - y, arr[1].X - arr[0].X, arr[2].Y - arr[0].Y)) // make sure that cache is valid
-                return;
+            context.SetAlpha(Alpha / 255.0f);
 
-            if (m_imageAttributes == null)
-                m_imageAttributes = new ImageAttributes();
+            context.DrawImage(new CGRect(arr[0].X, WindowController.Instance.ScreenHeight - arr[0].Y, arr[1].X - arr[0].X, -(arr[2].Y - arr[0].Y)), m_subImages[m_frame] ?? m_image);
 
-            if (m_colorMatrix == null)
-                m_colorMatrix = new ColorMatrix();
-
-            m_colorMatrix.Matrix00 = ((m_color >> 16) & 0xff) / 255.0f;
-            m_colorMatrix.Matrix11 = ((m_color >> 8) & 0xff) / 255.0f;
-            m_colorMatrix.Matrix22 = ((m_color >> 0) & 0xff) / 255.0f;
-            m_colorMatrix.Matrix33 = ((m_color >> 24) & 0xff) / 255.0f;
-            m_imageAttributes.SetColorMatrix(m_colorMatrix);
-
-            if (m_cache != null) // should always be non-null
-            {
-                graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
-                graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.None;
-                graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.None;
-
-                if (m_color == 0xffffffff)
-                    graphics.DrawImageUnscaled(m_cache, x, y);
-                else
-                    graphics.DrawImage(m_cache,
-                       new Rectangle(x, y, m_cache.Width, m_cache.Height),
-                       0, 0, m_cache.Width, m_cache.Height,
-                     GraphicsUnit.Pixel,
-                     m_imageAttributes
-                     );
-
-            }
-        }
-
-        private bool UpdateCache(float x, float y, float width, float height)
-        {
-            if (width < 1 || height < 1)
-                return false;
-
-            uint cacheHash = ((uint)(x * 100)) ^ ((uint)(y * 100)) ^ ((uint)(width * 100) << 16) ^ ((uint)(height * 100) << 16); // kinda fast hash
-
-            if (cacheHash != m_cacheHash)
-            {
-                if (m_cache != null)
-                {
-                    m_cache.Dispose();
-                    m_cache = null;
-                }
-
-                int nwidth = (int)System.Math.Ceiling(width + x);
-                int nheight = (int)System.Math.Ceiling(height + y);
-                m_cache = new Bitmap(nwidth, nheight, PixelFormat.Format32bppArgb);
-
-                using (Graphics g = Graphics.FromImage(m_cache))
-                {
-                    g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    g.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
-
-                    g.DrawImage(m_image,
-                    new RectangleF(x, y, width, height),
-                    new Rectangle(m_frames[m_frame].X, m_frames[m_frame].Y, m_frames[m_frame].Width, m_frames[m_frame].Height),
-                    GraphicsUnit.Pixel);
-                }
-                m_cacheHash = cacheHash;
-            }
-            return true;
+            context.ResetClip();
         }
 
         public void Update()
         {
         }
 
-        private RectangleF GetScreenRect()
+        private CGRect GetScreenRect()
         {
             Vector2 from = -m_pivotShift * FrameSize + new Vector2(m_frames[m_frame].OffsetX, m_frames[m_frame].OffsetY);
 
@@ -270,7 +207,7 @@ namespace NewWidgets.WinForms
                     maxY = arr[i].Y;
             }
 
-            return new RectangleF(minX, minY, maxX - minX, maxY - minY);
+            return new CGRect(minX, minY, maxX - minX, maxY - minY);
         }
     }
 }

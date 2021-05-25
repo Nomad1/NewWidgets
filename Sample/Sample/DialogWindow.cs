@@ -4,7 +4,7 @@ using NewWidgets.UI;
 using NewWidgets.Widgets;
 using NewWidgets.Utility;
 
-namespace NewWidgets.WinFormsSample
+namespace NewWidgets.Sample
 {
     /// <summary>
     /// Dialog window. Taken from Project Amalthea login dialog
@@ -152,7 +152,7 @@ namespace NewWidgets.WinFormsSample
         public static DialogWindow Show(string title, string text, string yesText, string noText = "")
         {
             DialogWindow dialog = new DialogWindow(title, text, yesText, noText);
-            dialog.Scale = WindowController.Instance.ScreenScale * WindowController.Instance.ScreenWidth / 2048.0f;
+            dialog.Scale = WindowController.Instance.UIScale * WindowController.Instance.ScreenWidth / 2048.0f;
             dialog.OnAppear();
 
             WindowController.Instance.ScheduleAction(() => WindowController.Instance.AddWindow(dialog), 1);

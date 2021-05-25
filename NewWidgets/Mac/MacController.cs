@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
 using System.Numerics;
+using CoreGraphics;
 using NewWidgets.UI;
 
-namespace NewWidgets.WinForms
+namespace NewWidgets.Mac
 {
     /// <summary>
-    /// Controller class for Windows Forms test implementation
+    /// Controller class for mac Core Graphics test implementation
     /// </summary>
-    public class WinFormsController : WindowController
+    public class MacController : WindowController
     {
-        public static Graphics CurrentGraphics { get; private set; }
-
         /// <summary>
         /// Helper struct to store sprite data
         /// </summary>
@@ -21,9 +19,9 @@ namespace NewWidgets.WinForms
         {
             public readonly string Image;
             public readonly string Name;
-            public WinFormsSprite.FrameData[] Frames;
+            public MacSprite.FrameData[] Frames;
 
-            public SpriteData(string image, string name, WinFormsSprite.FrameData[] frames)
+            public SpriteData(string image, string name, MacSprite.FrameData[] frames)
             {
                 Name = name;
                 Image = image;
@@ -32,9 +30,9 @@ namespace NewWidgets.WinForms
         }
 
         private readonly LinkedList<Tuple<Action, DateTime>> m_delayedActions = new LinkedList<Tuple<Action, DateTime>>();
-        private readonly Dictionary<string, Image> m_images = new Dictionary<string, Image>();
+        private readonly Dictionary<string, CGImage> m_images = new Dictionary<string, CGImage>();
         private readonly Dictionary<string, SpriteData> m_sprites = new Dictionary<string, SpriteData>();
-        private readonly Stack<Rectangle> m_clipRect = new Stack<Rectangle>();
+        private readonly Stack<CGRect> m_clipRect = new Stack<CGRect>();
 
         private readonly int m_screenWidth;
         private readonly int m_screenHeight;
@@ -43,6 +41,8 @@ namespace NewWidgets.WinForms
         private readonly bool m_isSmallScreen;
         private readonly WindowObjectArray<Window> m_windows;
         private readonly string m_imagePath;
+
+        private CGContext m_currentContext;
 
         public override int ScreenWidth
         {
@@ -79,16 +79,7 @@ namespace NewWidgets.WinForms
             get { return m_imagePath; }
         }
 
-        public Rectangle GetClipRect
-        {
-            get
-            {
-                if (m_clipRect.Count == 0)
-                    return new Rectangle(0, 0, ScreenWidth, ScreenHeight);
-                return m_clipRect.Peek();
-            }
-        }
-
+        
         public override Vector2 PointerPosition
         {
             get
@@ -107,11 +98,27 @@ namespace NewWidgets.WinForms
             get { return Vector4.Zero; }
         }
 
+        internal CGRect ClipRect
+        {
+            get
+            {
+                if (m_clipRect.Count == 0)
+                    return new CGRect(0, 0, ScreenWidth, ScreenHeight);
+
+                return m_clipRect.Peek();
+            }
+        }
+
+        internal CGContext CurrentContext
+        {
+            get { return m_currentContext; }
+        }
+
         public event Action OnInit;
         public sealed override event TouchDelegate OnTouch;
 
 
-        public WinFormsController(int width, int height, float scale, float fontScale, bool isSmallScreen, string imagePath)
+        public MacController(int width, int height, float scale, float fontScale, bool isSmallScreen, string imagePath)
         {
             m_screenWidth = width;
             m_screenHeight = height;
@@ -128,12 +135,12 @@ namespace NewWidgets.WinForms
                 RegisterSprite(Path.GetFileNameWithoutExtension(file), file, null);
         }
 
-        private void RegisterSprite(string id, string file, WinFormsSprite.FrameData[] frames, int subdivideX = 1, int subdivideY = 1)
+        private void RegisterSprite(string id, string file, MacSprite.FrameData[] frames, int subdivideX = 1, int subdivideY = 1)
         {
-            Image image;
+            CGImage image;
 
             if (!m_images.TryGetValue(file, out image))
-                m_images[file] = image = Image.FromFile(file);
+                m_images[file] = image = CGImage.FromPNG(CGDataProvider.FromFile(file), null, false, CGColorRenderingIntent.Default);
 
             if (image == null)
             {
@@ -144,16 +151,16 @@ namespace NewWidgets.WinForms
             if (frames == null)
             {
                 int count = subdivideX * subdivideY;
-                frames = new WinFormsSprite.FrameData[count];
+                frames = new MacSprite.FrameData[count];
 
-                int frameWidth = image.Size.Width / subdivideX;
-                int frameHeight = image.Size.Height / subdivideY;
+                int frameWidth = (int)(image.Width / subdivideX);
+                int frameHeight = (int)(image.Height / subdivideY);
 
                 for (int y = 0; y < subdivideY; y++)
                     for (int x = 0; x < subdivideX; x++)
                     {
                         int index = x + y * subdivideX;
-                        frames[index] = new WinFormsSprite.FrameData(x*frameWidth, y*frameHeight, frameWidth, frameHeight, 0, 0, index);
+                        frames[index] = new MacSprite.FrameData(x*frameWidth, y*frameHeight, frameWidth, frameHeight, 0, 0, index);
                     }
             }
 
@@ -169,7 +176,7 @@ namespace NewWidgets.WinForms
         {
             string spriteName = Path.GetFileNameWithoutExtension(atlasFile);
 
-            Dictionary<string, List<WinFormsSprite.FrameData>> atlas = new Dictionary<string, List<WinFormsSprite.FrameData>>();
+            Dictionary<string, List<MacSprite.FrameData>> atlas = new Dictionary<string, List<MacSprite.FrameData>>();
             try
             {
                 using (Stream stream = File.OpenRead(atlasFile))
@@ -201,15 +208,15 @@ namespace NewWidgets.WinForms
 
                         int tag = magic == 0xfadeabcc ? -1 : reader.ReadInt16();
 
-                        List<WinFormsSprite.FrameData> frameData;
+                        List<MacSprite.FrameData> frameData;
 
                         if (string.IsNullOrEmpty(texture))
                             texture = spriteName;
 
                         if (!atlas.TryGetValue(texture, out frameData))
-                            atlas[texture] = frameData = new List<WinFormsSprite.FrameData>();
+                            atlas[texture] = frameData = new List<MacSprite.FrameData>();
 
-                        frameData.Add(new WinFormsSprite.FrameData(x, y, width, height, offsetX, offsetY, tag));
+                        frameData.Add(new MacSprite.FrameData(x, y, width, height, offsetX, offsetY, tag));
                     }
                 }
             }
@@ -232,7 +239,7 @@ namespace NewWidgets.WinForms
 
         public override ISprite CloneSprite(ISprite sprite)
         {
-            ISprite result = CreateSprite(((WinFormsSprite)sprite).Id);
+            ISprite result = CreateSprite(((MacSprite)sprite).Id);
             result.Frame = sprite.Frame;
             result.PivotShift = sprite.PivotShift;
             result.Alpha = sprite.Alpha;
@@ -249,20 +256,20 @@ namespace NewWidgets.WinForms
                 return null;
             }
 
-            Image image;
+            CGImage image;
             if (!m_images.TryGetValue(spriteData.Image, out image))
             {
                 LogError("Controller asked to retrieve invalid image {0}", spriteData.Image);
                 return null;
             }
 
-            WinFormsSprite result = new WinFormsSprite(image, id, new Vector2(image.Size.Width, image.Size.Height), spriteData.Frames);
+            MacSprite result = new MacSprite(image, id, new Vector2((int)image.Width, (int)image.Height), spriteData.Frames);
             return result;
         }
 
         public override long GetTime()
         {
-            return Environment.TickCount; // not very precise but would work
+            return Environment.TickCount;
         }
 
         public override void LogError(string error, params object[] parameters)
@@ -278,7 +285,7 @@ namespace NewWidgets.WinForms
 
         public override void PlaySound(string id)
         {
-            Console.WriteLine("Playing sound {0}", id); // no need to implement real sound playback in WinForms
+            Console.WriteLine("Playing sound {0}", id);
         }
 
         public override void ScheduleAction(Action action, int delay)
@@ -288,12 +295,13 @@ namespace NewWidgets.WinForms
 
         public override void SetClipRect(int x, int y, int width, int height)
         {
-            m_clipRect.Push(new Rectangle(x, y, width, height));
+            m_clipRect.Push(new CGRect(x, ScreenHeight - y, width, -height));
         }
 
         public override void CancelClipRect()
         {
             m_clipRect.Pop();
+            // no clip rects in winforms
         }
 
         #endregion
@@ -302,6 +310,8 @@ namespace NewWidgets.WinForms
 
         public bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
+            y = ScreenHeight - y;
+
             if (OnTouch != null)
             {
                 foreach (Delegate ndelegate in OnTouch.GetInvocationList())
@@ -360,10 +370,13 @@ namespace NewWidgets.WinForms
 
         #region Draw/Update/Init
 
-        public void Draw(Graphics canvas)
+        public void Draw(CGContext context)
         {
-            CurrentGraphics = canvas;
+            m_currentContext = context;
+
             m_windows.Draw();
+
+            m_currentContext = null;
         }
 
         public bool Update()
