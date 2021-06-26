@@ -151,6 +151,29 @@ namespace NewWidgets.Widgets
                         m_background.Add(background);
                         break;
                     }
+                case WidgetBackgroundStyle.ImageFill:
+                case WidgetBackgroundStyle.ImageTopLeftFill:
+                    {
+                        ImageObject background = new ImageObject(this, textureSprite);
+
+                        if (style == WidgetBackgroundStyle.ImageTopLeftFill)
+                            background.Position = Vector2.Zero;
+                        else
+                            background.Position = backCenter;
+
+                        background.Position = backCenter;
+
+                        // Center and aspect fill
+                        background.Sprite.PivotShift = backgroundPivot;
+                        background.Scale = backSize.X / background.Sprite.Size.X;
+                        background.Rotation = rotation;
+
+                        if (background.Scale * background.Sprite.Size.Y < backSize.Y)
+                            background.Scale = backSize.Y / background.Sprite.Size.Y;
+
+                        m_background.Add(background);
+                        break;
+                    }
                 case WidgetBackgroundStyle.ImageStretch:
                     {
                         ImageObject background = new ImageObject(this, textureSprite);

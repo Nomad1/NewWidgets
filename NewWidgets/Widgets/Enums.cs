@@ -51,7 +51,15 @@ namespace NewWidgets.Widgets
         /// <summary>
         /// Image is divided to 33/33/33 percents horizontally
         /// </summary>
-        ThreeImage = 7
+        ThreeImage = 7,
+        /// <summary>
+        /// Center and aspect fit without gaps
+        /// </summary>
+        ImageFill = 8,
+        /// <summary>
+        /// Aspect fill starting from top left
+        /// </summary>
+        ImageTopLeftFill = 9,
     }
 
     public enum WidgetBackgroundDepth

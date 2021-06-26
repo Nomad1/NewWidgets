@@ -309,7 +309,7 @@ namespace NewWidgets.UI
 
         public virtual bool Update()
         {
-            if ((m_flags & WindowObjectFlags.Removing) != 0)
+            if (Removing)
                 return false;
 
             return true;
@@ -317,12 +317,16 @@ namespace NewWidgets.UI
 
         public virtual void Draw()
         {
-
+            if (Removing || !Visible || !Enabled)
+                return;
         }
 
         public virtual bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if (Enabled && OnTouch != null)
+            if (Removing || !Visible || !Enabled)
+                return false;
+
+            if (OnTouch != null)
                 return OnTouch(x, y, press, unpress, pointer);
 
             return false;
@@ -330,11 +334,17 @@ namespace NewWidgets.UI
 
         public virtual bool Zoom(float x, float y, float value)
         {
+            if (Removing || !Visible || !Enabled)
+                return false;
+
             return false;
         }
 
         public virtual bool Key(SpecialKey key, bool up, string keyString)
         {
+            if (Removing || !Visible || !Enabled)
+                return false;
+
             return false;
         }
 

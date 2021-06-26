@@ -191,7 +191,6 @@ namespace NewWidgets.Widgets
                 case WidgetBackgroundStyle.ImageFit:
                 case WidgetBackgroundStyle.ImageTopLeft:
                     {
-
                         if (style == WidgetBackgroundStyle.ImageTopLeft)
                             m_imageObject.Position = Vector2.Zero;
                         else
@@ -203,6 +202,24 @@ namespace NewWidgets.Widgets
                         m_imageObject.Rotation = rotation;
 
                         if (m_imageObject.Scale * m_imageObject.Sprite.Size.Y > size.Y)
+                            m_imageObject.Scale = size.Y / m_imageObject.Sprite.Size.Y;
+
+                        break;
+                    }
+                case WidgetBackgroundStyle.ImageFill:
+                case WidgetBackgroundStyle.ImageTopLeftFill:
+                    {
+                        if (style == WidgetBackgroundStyle.ImageTopLeftFill)
+                            m_imageObject.Position = Vector2.Zero;
+                        else
+                            m_imageObject.Position = center;
+
+                        // Center and aspect fill
+                        m_imageObject.Sprite.PivotShift = pivot;
+                        m_imageObject.Scale = size.X / m_imageObject.Sprite.Size.X;
+                        m_imageObject.Rotation = rotation;
+
+                        if (m_imageObject.Scale * m_imageObject.Sprite.Size.Y < size.Y)
                             m_imageObject.Scale = size.Y / m_imageObject.Sprite.Size.Y;
 
                         break;

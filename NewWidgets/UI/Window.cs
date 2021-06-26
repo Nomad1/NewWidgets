@@ -83,10 +83,12 @@ namespace NewWidgets.UI
 
         public override void Draw()
         {
+            if (!Visible || Removing)
+                return;
+
             base.Draw();
 
-            if (Visible)
-                m_children.Draw();
+            m_children.Draw();
         }
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
