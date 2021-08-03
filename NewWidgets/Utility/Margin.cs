@@ -1,10 +1,13 @@
 ﻿using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace NewWidgets.Utility
 {
     /// <summary>
     /// Helper struct to store margins and padding. Similar to RectangleF with few helper methods
     /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    [System.ComponentModel.TypeConverter(typeof(System.ComponentModel.ExpandableObjectConverter))]
     public struct Margin
     {
         public static readonly Margin Empty = new Margin(0, 0, 0, 0);
@@ -65,7 +68,7 @@ namespace NewWidgets.Utility
         
         public override string ToString()
         {
-            return string.Format("{0}, {1}, {2}, {3}", TopLeft, BottomRight, Width, Height);
+            return string.Format("[Top:{0} Left:{1} Bottom:{2} Right:{3}]", Top, Left, Bottom, Right);
         }
 
         public static bool IsEmpty(Margin margin)
