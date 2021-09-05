@@ -9,18 +9,29 @@ namespace NewWidgets.Widgets
     {
         public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_checkbox", true);
 
-        private WidgetImage m_image;
+        private readonly WidgetImage m_image;
         private WidgetLabel m_linkedLabel;
 
         private bool m_animating;
 
+        /// <summary>
+        /// This event is raized after checkbox value has been changed. Note that settings Checked = value does not calls this method
+        /// </summary>
         public event Action<WidgetCheckBox> OnChecked;
+
+        /// <summary>
+        /// This event allows to cancel the checkbox mark if false is returned
+        /// </summary>
+        public event Func<WidgetCheckBox, bool> OnCheckChanged;
 
         public bool Checked
         {
             get { return Selected; }
             set
             {
+                if (OnCheckChanged != null && !OnCheckChanged(this))
+                    return;
+
                 if (m_image != null)
                 {
                     m_image.Position = value ? ImagePadding.TopLeft : (ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f));
@@ -164,6 +175,9 @@ namespace NewWidgets.Widgets
                 return;
 
             //GameSound.PlaySound(m_clickSound);
+
+            if (OnCheckChanged != null && !OnCheckChanged(this))
+                return;
 
             Checked = !Checked;
             

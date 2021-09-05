@@ -289,6 +289,8 @@ namespace NewWidgets.UI
         protected virtual void Resize(Vector2 size)
         {
             m_size = size;
+
+            m_transformVersion = -1; // invalidate screen rect
         }
 
         public virtual bool HitTest(float x, float y)
