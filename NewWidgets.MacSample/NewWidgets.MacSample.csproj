@@ -83,7 +83,7 @@
     </Compile>
     <Compile Include="Sample\DialogWindow.cs" />
     <Compile Include="Sample\TestWindow.cs" />
-    <Compile Include="Canvas.cs" />
+    <Compile Include="GameCanvas.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="Main.storyboard" />
