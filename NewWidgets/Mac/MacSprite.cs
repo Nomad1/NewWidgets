@@ -164,7 +164,7 @@ namespace NewWidgets.Mac
             arr[2] = m_transform.GetScreenPoint(from + new Vector2(0, FrameSize.Y));
 
             // TODO: set tint color
-            //context.SetFillColor(CGColor.CreateSrgb(((m_color >> 16) & 0xff) / 255.0f, ((m_color >> 8) & 0xff) / 255.0f, ((m_color >> 0) & 0xff) / 255.0f, ((m_color >> 24) & 0xff) / 255.0f));
+            context.SetFillColor(CGColor.CreateSrgb(((m_color >> 16) & 0xff) / 255.0f, ((m_color >> 8) & 0xff) / 255.0f, ((m_color >> 0) & 0xff) / 255.0f, ((m_color >> 24) & 0xff) / 255.0f));
 
             context.SetAlpha(Alpha / 255.0f);
 

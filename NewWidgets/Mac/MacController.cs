@@ -275,7 +275,6 @@ namespace NewWidgets.Mac
         public override void LogError(string error, params object[] parameters)
         {
             Console.Error.WriteLine(error, parameters);
-            Console.WriteLine(error, parameters);
         }
 
         public override void LogMessage(string message, params object[] parameters)
