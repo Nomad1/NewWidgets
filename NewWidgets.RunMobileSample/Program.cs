@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using NewWidgets.Sample;
 using NewWidgets.Widgets;
 using OpenTK;
@@ -15,10 +14,24 @@ namespace NewWidgets.RunMobileSample
         private BaseGame m_gameController;
         private UserData m_data;
 
+        private long m_lastFrameUpdate;
+        private long m_lastFrameDraw;
+
+        private float m_averageFrameUpdateTime;
+        private float m_averageFrameTime;
+
+        private TestWindow m_window;
+
         public SampleWindow()
             : base(800, 600, OpenTK.Graphics.GraphicsMode.Default, "Sample", GameWindowFlags.Default, DisplayDevice.Default, 4, 1, OpenTK.Graphics.GraphicsContextFlags.ForwardCompatible)
         {
             //Keyboard.KeyDown += Keyboard_KeyDown;
+
+            const int targetFps = 60;
+            m_averageFrameTime = m_averageFrameUpdateTime = 1000.0f / targetFps;
+            m_lastFrameDraw = m_lastFrameUpdate = Environment.TickCount; // unprecise timer
+
+            VSync = VSyncMode.Adaptive;
 
             AssetManager.Init("assets", ".");
         }
@@ -36,12 +49,13 @@ namespace NewWidgets.RunMobileSample
 
         private void HandleInit()
         {
-            SpriteManager.Instance.LoadSpriteAtlas("ui", "ui");
-            SpriteManager.Instance.LoadSpriteAtlas("font5", "font5");
+            SpriteManager.Instance.LoadSpriteAtlas("ui");
+            SpriteManager.Instance.LoadSpriteAtlas("font5");
+            WidgetManager.Init(0.5f);
             WidgetManager.LoadUI(AssetManager.GetAssetTextFile("ui.xml"));
 
-
-            m_gameController.AddWindow(new TestWindow());
+            m_window = new TestWindow();
+            m_gameController.AddWindow(m_window);
         }
 
         protected override void OnResize(EventArgs e)
@@ -75,8 +89,8 @@ namespace NewWidgets.RunMobileSample
                             {
                                 new ShaderUniform("s_pmvMatrix", ShaderDataType.Matrix, ShaderBuiltinUniform.ProjectionViewMatrix),
                                 new ShaderUniform("s_texture_0", ShaderDataType.None, ShaderBuiltinUniform.Texture0)
-                            }//,
-                            //"COMPAT_QUALITY"
+                            },
+                            "COMPAT_QUALITY"
                            );
 
 
@@ -91,10 +105,16 @@ namespace NewWidgets.RunMobileSample
         {
             base.OnUpdateFrame(e);
 
+            GameTime.UpdateNow();
+
             if (m_gameController != null)
             {
                 m_gameController.Update();
+
+                m_window.SetFpsValue(1000.0f / m_averageFrameUpdateTime, 1000.0f / m_averageFrameTime);
             }
+
+            UpdateUpdateFps();
         }
 
         protected override void OnRenderFrame(FrameEventArgs e)
@@ -111,6 +131,36 @@ namespace NewWidgets.RunMobileSample
             }
 
             GLGraphicsManager.Instance.EndFrame();
+
+            SwapBuffers();
+
+            UpdateDrawFps();
+        }
+
+        private void UpdateDrawFps()
+        {
+            long time = Environment.TickCount;
+
+            int frameTime = (int)(time - m_lastFrameDraw);
+
+            // calculate average frame time for last N frames
+            int diminishing = 120 - 1;
+
+            m_averageFrameTime = (m_averageFrameTime * diminishing + frameTime) / (float)(diminishing + 1);
+            m_lastFrameDraw = time;
+        }
+
+        private void UpdateUpdateFps()
+        {
+            long time = Environment.TickCount;
+
+            int frameTime = (int)(time - m_lastFrameUpdate);
+
+            // calculate average frame time for last N frames
+            int diminishing = 120 - 1;
+
+            m_averageFrameUpdateTime = (m_averageFrameUpdateTime * diminishing + frameTime) / (float)(diminishing + 1);
+            m_lastFrameUpdate = time;
         }
 
         public static void Main(string[] args)

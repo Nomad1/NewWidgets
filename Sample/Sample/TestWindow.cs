@@ -10,8 +10,8 @@ namespace NewWidgets.Sample
     /// </summary>
     public class TestWindow : Window
     {
-        private static string DefaultLogin = "login";
-        private static string DefaultPassword = "password";
+        private static readonly string DefaultLogin = "login";
+        private static readonly string DefaultPassword = "password";
 
         private readonly WidgetTextEdit m_loginEdit;
         private readonly WidgetTextEdit m_passEdit;

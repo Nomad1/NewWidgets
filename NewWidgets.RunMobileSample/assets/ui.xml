@@ -2,7 +2,7 @@
 <ui>
   <!-- Fonts -->
 
-  <font name="default" resource="font5" spacing="0" baseline="30" />
+  <font name="default" resource="font|font5" spacing="0" baseline="30" />
 
   <!-- Nine patches -->
 

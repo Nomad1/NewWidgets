@@ -1,8 +1,9 @@
-﻿in vec2 TexCoord;
+﻿uniform sampler2D s_texture_0;
+
+in vec2 TexCoord;
 flat in vec4 Color;
 flat in uint Flag;
-
-uniform sampler2D s_texture_0;
+flat in vec4 Clip;
 
 #if defined( COMPAT_QUALITY )
     const float FontWidth = 0.20;      // ideal thickness value for smoothstep 
@@ -14,6 +15,9 @@ uniform sampler2D s_texture_0;
 
 void main(void)
 {
+    if (step(Clip.x, gl_FragCoord.x) * step(Clip.y, gl_FragCoord.y) * step(gl_FragCoord.x, Clip.z) * step(gl_FragCoord.y, Clip.w) == 0.0) // scissor test
+        discard;
+
     vec4 texColor = texture(s_texture_0, TexCoord);
 
 #if defined( SDF_CHANNEL_RED )
