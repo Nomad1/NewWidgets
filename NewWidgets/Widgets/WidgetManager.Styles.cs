@@ -14,11 +14,6 @@ namespace NewWidgets.Widgets
         private static readonly IDictionary<string, WidgetStyleSheet> s_styles = new Dictionary<string, WidgetStyleSheet>();
         private static readonly IDictionary<string, Tuple<WidgetParameterIndex, Type>> s_styleAttributes = InitStyleMap();
 
-        // Those guys are obsolete and should be replaced by direct Widget.DefaultStyle references
-        [Obsolete("Use Widget.DefaultStyle instead")]
-        public static WidgetStyleSheet DefaultWidgetStyle { get { return Widget.DefaultStyle; } }
-
-
         /// <summary>
         /// Gets the style by name
         /// </summary>
@@ -40,6 +35,99 @@ namespace NewWidgets.Widgets
             }
 
             return default(WidgetStyleSheet);
+        }
+
+        #region XML CSS loading
+
+        /// <summary>
+        /// Loads ui data from a XML string
+        /// </summary>
+        /// <param name="uiData"></param>
+        /// <exception cref="WidgetException"></exception>
+        public static void LoadUI(string uiData)
+        {
+            try
+            {
+                XmlDocument document = new XmlDocument();
+                document.LoadXml(uiData);
+
+                foreach (XmlNode root in document.ChildNodes)
+                {
+                    if (root.Name == "ui")
+                    {
+                        foreach (XmlNode node in root.ChildNodes)
+                        {
+                            switch (node.Name)
+                            {
+                                case "font":
+                                    RegisterFont(node);
+                                    break;
+                                case "nine":
+                                    RegisterNinePatch(node);
+                                    break;
+                                case "three":
+                                    RegisterThreePatch(node);
+                                    break;
+                                case "style":
+                                    RegisterStyle(node);
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                WindowController.Instance.LogError("Error loading ui data: " + ex);
+                throw new WidgetException("Error loading ui data", ex);
+            }
+        }
+
+
+        private static void RegisterFont(XmlNode node)
+        {
+            string name = node.Attributes.GetNamedItem("name").Value;
+            string resource = node.Attributes.GetNamedItem("resource").Value;
+            float spacing = FloatParse(node.Attributes.GetNamedItem("spacing").Value);
+            int baseline = int.Parse(node.Attributes.GetNamedItem("baseline").Value);
+
+            int shift = 0;
+
+            if (node.Attributes.GetNamedItem("shift") != null)
+                shift = int.Parse(node.Attributes.GetNamedItem("shift").Value);
+
+            int leading = 0;
+
+            if (node.Attributes.GetNamedItem("leading") != null)
+                leading = int.Parse(node.Attributes.GetNamedItem("leading").Value);
+
+            Font font = new Font(resource, spacing, leading, baseline, shift);
+
+            s_fonts[name] = font;
+
+            if (name == "default")
+                s_mainFont = font;
+
+            WindowController.Instance.LogMessage("Registered font {0}, resource {1}, spacing {2}", name, resource, spacing);
+        }
+
+        private static void RegisterNinePatch(XmlNode node)
+        {
+            string name = node.Attributes.GetNamedItem("name").Value;
+
+            WindowController.Instance.SetSpriteSubdivision(name, 3, 3);
+
+            WindowController.Instance.LogMessage("Registered nine patch {0}", name);
+        }
+
+        private static void RegisterThreePatch(XmlNode node)
+        {
+            string name = node.Attributes.GetNamedItem("name").Value;
+
+            WindowController.Instance.SetSpriteSubdivision(name, 3, 1);
+
+            WindowController.Instance.LogMessage("Registered three patch {0}", name);
         }
 
         private static void RegisterStyle(XmlNode node)
@@ -65,6 +153,8 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered style {0}", name);
         }
 
+        #endregion
+
         private static IDictionary<string, Tuple<WidgetParameterIndex, Type>> InitStyleMap()
         {
             Dictionary<string, Tuple<WidgetParameterIndex, Type>> result = new Dictionary<string, Tuple<WidgetParameterIndex, Type>>();
@@ -84,9 +174,7 @@ namespace NewWidgets.Widgets
         {
             foreach (XmlNode element in node.ChildNodes)
             {
-#if !DEBUG
                 try
-#endif
                 {
                     string value = element.InnerText;
                     if (string.IsNullOrEmpty(value) && element.Attributes.GetNamedItem("value") != null)
@@ -105,13 +193,11 @@ namespace NewWidgets.Widgets
                     //style.Set(null, element.Name, value);
 
                 }
-#if !DEBUG
                 catch (Exception ex)
                 {
                     WindowController.Instance.LogError("Error parsing style {0}, element {1}: {2}", style.Name, element.Name, ex);
-                    throw;
+                    throw new WidgetException("Error parsing style!", ex);
                 }
-#endif
             }
         }
 
@@ -143,6 +229,10 @@ namespace NewWidgets.Widgets
                 memberValue = (object)MarginParse(value);
             else if (targetType == typeof(Vector2))
                 memberValue = (object)Vector2Parse(value);
+            else if (targetType == typeof(Vector3))
+                memberValue = (object)Vector3Parse(value);
+            else if (targetType == typeof(Vector4))
+                memberValue = (object)Vector4Parse(value);
             else if (targetType.IsEnum)
                 memberValue = (object)EnumParse(targetType, value);
             else
@@ -179,7 +269,7 @@ namespace NewWidgets.Widgets
         }
 
         /// <summary>
-        /// Parse a string to 2-component vector
+        /// Parse a string to a 2-component vector
         /// </summary>
         /// <returns>The parse.</returns>
         /// <param name="value">Value.</param>
@@ -194,6 +284,44 @@ namespace NewWidgets.Widgets
             float y = FloatParse(values[1]);
             return new Vector2(x, y);
         }
+
+        /// <summary>
+        /// Parse a string to a 3-component vector
+        /// </summary>
+        /// <returns>The parse.</returns>
+        /// <param name="value">Value.</param>
+        public static Vector3 Vector3Parse(string value)
+        {
+            string[] values = value.Split(';');
+
+            if (values.Length != 3)
+                throw new ArgumentException("Invalid string value for Vector3 type!");
+
+            float x = FloatParse(values[0]);
+            float y = FloatParse(values[1]);
+            float z = FloatParse(values[2]);
+            return new Vector3(x, y, z);
+        }
+
+        /// <summary>
+        /// Parse a string to a 4-component vector
+        /// </summary>
+        /// <returns>The parse.</returns>
+        /// <param name="value">Value.</param>
+        public static Vector4 Vector4Parse(string value)
+        {
+            string[] values = value.Split(';');
+
+            if (values.Length != 4)
+                throw new ArgumentException("Invalid string value for Vector4 type!");
+
+            float x = FloatParse(values[0]);
+            float y = FloatParse(values[1]);
+            float z = FloatParse(values[2]);
+            float w = FloatParse(values[3]);
+            return new Vector4(x, y, z, w);
+        }
+
 
         /// <summary>
         /// Pastse a string to 4-component or 1-component margin
@@ -240,7 +368,7 @@ namespace NewWidgets.Widgets
         }
 
         /// <summary>
-        /// Parse a string to specific enum tpye
+        /// Parse a string to specific enum type
         /// </summary>
         /// <returns>The parse.</returns>
         /// <param name="value">Value.</param>

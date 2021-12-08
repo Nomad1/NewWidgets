@@ -1,5 +1,4 @@
-﻿#define MEMORY_PRIORITY // undefine for speed priority
-
+﻿//#define MEMORY_PRIORITY // undefine for speed priority
 
 using System.Numerics;
 
@@ -9,6 +8,7 @@ using System.Collections.Generic;
 
 namespace NewWidgets.Widgets
 {
+    // List of default parameters. We need to use it as Enum to get fast access instead of dictionary search
     internal enum WidgetParameterIndex
     {
         // Common
@@ -183,10 +183,15 @@ namespace NewWidgets.Widgets
 
                 if (index != WidgetParameterIndex.None)
                 {
+#if MEMORY_PRIORITY
                     object objectResult;
 
                     if (ObjectParameters.TryGetValue((int)index, out objectResult))
                         return objectResult;
+#else
+                    return ObjectParameters[(int)index];
+#endif
+
                 }
 
                 if (Parent != null)

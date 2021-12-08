@@ -2,6 +2,9 @@
 
 namespace NewWidgets.Widgets
 {
+    /// <summary>
+    /// Helper exeption class for widgets
+    /// </summary>
     public class WidgetException : ApplicationException
     {
         public WidgetException()

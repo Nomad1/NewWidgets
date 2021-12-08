@@ -10,7 +10,7 @@ using RunMobile.Utility;
 namespace NewWidgets.Widgets
 {
     /// <summary>
-    /// Base class for Widget object
+    /// Base class for abstract widgets, i.e. Image or Label
     /// </summary>
     public abstract class Widget : WindowObject
     {

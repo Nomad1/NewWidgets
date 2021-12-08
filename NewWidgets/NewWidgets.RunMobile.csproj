@@ -57,18 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Widgets\Enums.cs" />
     <Compile Include="Widgets\Widget.cs" />
-    <Compile Include="Widgets\WidgetButton.cs" />
-    <Compile Include="Widgets\WidgetCheckBox.cs" />
-    <Compile Include="Widgets\WidgetContextMenu.cs" />
-    <Compile Include="Widgets\WidgetImage.cs" />
-    <Compile Include="Widgets\WidgetLabel.cs" />
-    <Compile Include="Widgets\WidgetLine.cs" />
     <Compile Include="Widgets\WidgetManager.cs" />
-    <Compile Include="Widgets\WidgetPanel.cs" />
-    <Compile Include="Widgets\WidgetScrollView.cs" />
-    <Compile Include="Widgets\WidgetText.cs" />
-    <Compile Include="Widgets\WidgetTextEdit.cs" />
-    <Compile Include="Widgets\WidgetTooltip.cs" />
     <Compile Include="Utility\Margin.cs" />
     <Compile Include="UI\Font.cs" />
     <Compile Include="UI\ImageObject.cs" />
@@ -79,9 +68,7 @@
     <Compile Include="UI\ISprite.cs" />
     <Compile Include="Widgets\WidgetBackground.cs" />
     <Compile Include="Widgets\WidgetManager.Styles.cs" />
-    <Compile Include="Widgets\WidgetWindow.cs" />
     <Compile Include="Widgets\WidgetStyleSheet.cs" />
-    <Compile Include="Widgets\WidgetTextField.cs" />
     <Compile Include="UI\SimpleWindow.cs" />
     <Compile Include="Utility\ResourceLoader.cs" />
     <Compile Include="Widgets\WidgetException.cs" />
@@ -90,6 +77,25 @@
     <Compile Include="UI\WindowController.cs" />
     <Compile Include="UI\Enums.cs" />
     <Compile Include="UI\IFocusable.cs" />
+    <Compile Include="Widgets\Controls\WidgetButton.cs" />
+    <Compile Include="Widgets\Controls\WidgetCheckBox.cs" />
+    <Compile Include="Widgets\Controls\WidgetContextMenu.cs" />
+    <Compile Include="Widgets\Controls\WidgetImage.cs" />
+    <Compile Include="Widgets\Controls\WidgetLabel.cs" />
+    <Compile Include="Widgets\Controls\WidgetLine.cs" />
+    <Compile Include="Widgets\Controls\WidgetText.cs" />
+    <Compile Include="Widgets\Controls\WidgetTextEdit.cs" />
+    <Compile Include="Widgets\Controls\WidgetTextField.cs" />
+    <Compile Include="Widgets\Controls\WidgetToolbar.cs" />
+    <Compile Include="Widgets\Controls\WidgetTooltip.cs" />
+    <Compile Include="Widgets\Controls\WidgetPanel.cs" />
+    <Compile Include="Widgets\Controls\WidgetScrollView.cs" />
+    <Compile Include="Widgets\Controls\WidgetWindow.cs" />
+    <Compile Include="Widgets\Controls\Experimental\WidgetList.cs" />
+    <Compile Include="Widgets\Controls\Experimental\WidgetProgressLine.cs" />
+    <Compile Include="Widgets\Controls\Experimental\WidgetSelect.cs" />
+    <Compile Include="Widgets\Controls\Experimental\WidgetSlider.cs" />
+    <Compile Include="Widgets\Controls\Experimental\WidgetTable.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
@@ -97,6 +103,10 @@
       <Project>{029EA736-BCAA-40B3-B44B-52936740C349}</Project>
       <Name>RunMobile.Utility</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Widgets\Controls\" />
+    <Folder Include="Widgets\Controls\Experimental\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

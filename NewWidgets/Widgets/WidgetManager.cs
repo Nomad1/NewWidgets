@@ -2,18 +2,25 @@
 using System.Numerics;
 
 using System.Collections.Generic;
-using System.Xml;
 using NewWidgets.UI;
 
 namespace NewWidgets.Widgets
 {
+    /// <summary>
+    /// This static class contains different static variables for widgets
+    /// along with global handler, focusing handlers and style loading
+    /// </summary>
     public static partial class WidgetManager
     {
+        private const string DefaultFontName = "default";
+
         // 
         private static float s_fontScale;
         private static Font s_mainFont;
 
         private static Widget s_currentTooltip;
+
+        private static bool s_isInited;
 
         // this window is used for tooltips and other top-level controls. If not set, last one of Windows collection is to be used instead
         private static Window s_topLevelWindow;
@@ -36,10 +43,14 @@ namespace NewWidgets.Widgets
         {
             if (!string.IsNullOrEmpty(name))
             {
+                if (name == DefaultFontName)
+                    return s_mainFont;
+
                 Font result;
                 if (s_fonts.TryGetValue(name, out result))
                     return result;
-            }
+            } else
+                throw new WidgetException("Empty font name passed to GetFont!");
 
             WindowController.Instance.LogError("WidgetManager got GetFont for not existing font {0}", name);
 
@@ -52,60 +63,17 @@ namespace NewWidgets.Widgets
         /// <param name="fontScale">Font scale.</param>
         public static void Init(float fontScale)
         {
+            if (s_isInited)
+                throw new WidgetException("Widget manager is already inited!");
+
+            s_isInited = true;
             s_fontScale = fontScale; 
             s_styles.Clear();
 
             WindowController.Instance.OnTouch += HandleTouch;
         }
 
-        public static void RegisterTopLevelWindow(Window window)
-        {
-            s_topLevelWindow = window;
-        }
-
-        public static void LoadUI(string uiData)
-        {
-#if !DEBUG
-            try
-#endif
-            {
-                XmlDocument document = new XmlDocument();
-                document.LoadXml(uiData);
-
-                foreach (XmlNode root in document.ChildNodes)
-                {
-                    if (root.Name == "ui")
-                    {
-                        foreach (XmlNode node in root.ChildNodes)
-                        {
-                            switch (node.Name)
-                            {
-                                case "font":
-                                    RegisterFont(node);
-                                    break;
-                                case "nine":
-                                    RegisterNinePatch(node);
-                                    break;
-                                case "three":
-                                    RegisterThreePatch(node);
-                                    break;
-                                case "style":
-                                    RegisterStyle(node);
-                                    break;
-                            }
-                        }
-                    }
-                }
-
-            }
-#if !DEBUG
-            catch (Exception ex)
-            {
-                WindowController.Instance.LogError("Error loading ui data: " + ex);
-                throw;
-            }
-#endif
-        }
+        
 
         private static bool HandleTouch(float x, float y, bool press, bool unpress, int pointer)
         {
@@ -120,59 +88,33 @@ namespace NewWidgets.Widgets
             return false;
         }
 
+        /// <summary>
+        /// Hides current tooltip
+        /// </summary>
         public static void HideTooltips()
         {
             if (s_currentTooltip != null)
                 HandleTooltip(null, null, Vector2.Zero, null);
         }
 
-        private static void RegisterFont(XmlNode node)
+        internal static bool HandleTooltip(Widget widget, string tooltip, Vector2 position, Widget.TooltipDelegate tooltipDelegate)
         {
-            string name = node.Attributes.GetNamedItem("name").Value;
-            string resource = node.Attributes.GetNamedItem("resource").Value;
-            float spacing = FloatParse(node.Attributes.GetNamedItem("spacing").Value);
-            int baseline = int.Parse(node.Attributes.GetNamedItem("baseline").Value);
+            Widget.TooltipDelegate callback = tooltipDelegate ?? OnTooltip;
 
-            int shift = 0;
+            if (callback == null)
+                return false;
 
-            if (node.Attributes.GetNamedItem("shift") != null)
-                shift = int.Parse(node.Attributes.GetNamedItem("shift").Value);
+            bool result = callback(widget, tooltip, position);
 
-            int leading = 0;
+            if (result)
+                s_currentTooltip = widget;
+            else
+                s_currentTooltip = null;
 
-            if (node.Attributes.GetNamedItem("leading") != null)
-                leading = int.Parse(node.Attributes.GetNamedItem("leading").Value);
-
-            //IWindowController.Instance.RegisterSpriteTemplate(resource, 1.0f, 0.0f, 0.0f, 0);
-            //IWindowController.Instance.RegisterSpriteAnimation(resource, 0, resource, resource, 0, 0, 0, 0);
-
-            Font font = new Font(resource, spacing, leading, baseline, shift);
-
-            s_fonts[name] = font;
-
-            if (name == "default")
-                s_mainFont = font;
-
-            WindowController.Instance.LogMessage("Registered font {0}, resource {1}, spacing {2}", name, resource, spacing);
+            return WindowController.Instance.IsTouchScreen ? false : result;
         }
 
-        private static void RegisterNinePatch(XmlNode node)
-        {
-            string name = node.Attributes.GetNamedItem("name").Value;
-
-            WindowController.Instance.SetSpriteSubdivision(name, 3, 3);
-
-            WindowController.Instance.LogMessage("Registered nine patch {0}", name);
-        }
-
-        private static void RegisterThreePatch(XmlNode node)
-        {
-            string name = node.Attributes.GetNamedItem("name").Value;
-
-            WindowController.Instance.SetSpriteSubdivision(name, 3, 1);
-
-            WindowController.Instance.LogMessage("Registered three patch {0}", name);
-        }
+        #region Focus handling
 
         public static void SetFocus(IFocusable widget, bool value = true)
         {
@@ -294,21 +236,13 @@ namespace NewWidgets.Widgets
             WindowController.Instance.ShowKeyboard(false);
         }
 
-        internal static bool HandleTooltip(Widget widget, string tooltip, Vector2 position, Widget.TooltipDelegate tooltipDelegate)
+        #endregion
+
+        #region Modal windows support
+
+        public static void RegisterTopLevelWindow(Window window)
         {
-            Widget.TooltipDelegate callback = tooltipDelegate ?? OnTooltip;
-
-            if (callback == null)
-                return false;
-
-            bool result = callback(widget, tooltip, position);
-
-            if (result)
-                s_currentTooltip = widget;
-            else
-                s_currentTooltip = null;
-
-            return WindowController.Instance.IsTouchScreen ? false : result;
+            s_topLevelWindow = window;
         }
 
         public static Window GetTopmostWindow()
@@ -325,6 +259,7 @@ namespace NewWidgets.Widgets
         {
             s_exclusiveWidgets.Remove(widget);
         }
+
+        #endregion
     }
-    
 }

@@ -9,6 +9,10 @@ using RunMobile.Utility;
 
 namespace NewWidgets.Widgets
 {
+    /// <summary>
+    /// Base class for widgets that has some kind of repeatable background, i.e. Panel
+    /// It also could be used by itself to draw something
+    /// </summary>
     public class WidgetBackground : Widget
     {
         public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_background", true);
