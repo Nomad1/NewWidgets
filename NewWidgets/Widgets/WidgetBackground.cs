@@ -403,10 +403,10 @@ namespace NewWidgets.Widgets
                 Vector2 clipBottomRight = this.Transform.GetScreenPoint(new Vector2(this.Size.X - ClipMargin.Right, this.Size.Y - ClipMargin.Bottom));
 
                 WindowController.Instance.SetClipRect(
-                    (int)clipTopLeft.X,
-                    (int)clipTopLeft.Y,
-                    (int)(clipBottomRight.X - clipTopLeft.X + 0.5f),
-                    (int)(clipBottomRight.Y - clipTopLeft.Y + 0.5f));
+                    (int)Math.Floor(clipTopLeft.X),
+                    (int)Math.Floor(clipTopLeft.Y),
+                    (int)Math.Ceiling(clipBottomRight.X - clipTopLeft.X),
+                    (int)Math.Ceiling(clipBottomRight.Y - clipTopLeft.Y));
             }
 
             if (BackgroundDepth == WidgetBackgroundDepth.BackClipped)
