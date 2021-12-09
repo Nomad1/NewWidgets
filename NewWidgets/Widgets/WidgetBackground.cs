@@ -261,22 +261,34 @@ namespace NewWidgets.Widgets
                                 float width = (backSize.X / 3);
                                 float height = (backSize.Y / 3);
 
-                                scales = new Vector2[9];
-                                scales[0] = scales[2] = scales[6] = scales[8] = new Vector2(1.0f, 1.0f);
-                                scales[1] = scales[7] = new Vector2((Size.X - width * 2) / width, 1.0f);
-                                scales[3] = scales[5] = new Vector2(1.0f, (Size.Y - height * 2) / height);
-                                scales[4] = new Vector2(scales[1].X, scales[3].Y);
+                                float xscale = (Size.X - width * 2) / width;
+                                float yscale = (Size.Y - height * 2) / height;
 
-                                positions = new Vector2[9];
-                                positions[0] = new Vector2(0, 0);
-                                positions[1] = new Vector2(width, 0);
-                                positions[2] = new Vector2(Size.X - width, 0);
-                                positions[3] = new Vector2(0, height);
-                                positions[4] = new Vector2(width, height);
-                                positions[5] = new Vector2(Size.X - width, height);
-                                positions[6] = new Vector2(0, Size.Y - height);
-                                positions[7] = new Vector2(width, Size.Y - height);
-                                positions[8] = new Vector2(Size.X - width, Size.Y - height);
+                                scales = new []
+                                {
+                                    new Vector2(1.0f, 1.0f),
+                                    new Vector2(xscale, 1.0f),
+                                    new Vector2(1.0f, 1.0f),
+                                    new Vector2(1.0f, yscale),
+                                    new Vector2(xscale, yscale),
+                                    new Vector2(1.0f, yscale),
+                                    new Vector2(1.0f, 1.0f),
+                                    new Vector2(xscale, 1.0f),
+                                    new Vector2(1.0f, 1.0f)
+                                };
+
+                                positions = new []
+                                {
+                                    new Vector2(0, 0),
+                                    new Vector2(width, 0),
+                                    new Vector2(Size.X - width, 0),
+                                    new Vector2(0, height),
+                                    new Vector2(width, height),
+                                    new Vector2(Size.X - width, height),
+                                    new Vector2(0, Size.Y - height),
+                                    new Vector2(width, Size.Y - height),
+                                    new Vector2(Size.X - width, Size.Y - height)
+                                };
                             }
 
                             ImageObject background = new ImageObject(this, sprite);
@@ -313,14 +325,19 @@ namespace NewWidgets.Widgets
 
                                 float width = (backSize.X / 3);
 
-                                scales = new Vector2[3];
-                                scales[0] = scales[2] = new Vector2(1.0f, 1.0f);
-                                scales[1] = new Vector2((Size.X - width * 2) / width, 1.0f);
+                                scales = new[]
+                                {
+                                    new Vector2(1.0f, 1.0f),
+                                    new Vector2((Size.X - width * 2) / width, 1.0f),
+                                    new Vector2(1.0f, 1.0f),
+                                };
 
-                                positions = new Vector2[9];
-                                positions[0] = new Vector2(0, 0);
-                                positions[1] = new Vector2(width, 0);
-                                positions[2] = new Vector2(Size.X - width, 0);
+                                positions = new[]
+                                {
+                                    new Vector2(0, 0),
+                                    new Vector2(width, 0),
+                                    new Vector2(Size.X - width, 0)
+                                };
                             }
 
                             background.Position = shift + positions[i];

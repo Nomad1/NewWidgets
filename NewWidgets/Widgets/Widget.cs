@@ -160,11 +160,23 @@ namespace NewWidgets.Widgets
             m_styles[(int)style].Set(m_styles, index, value);
         }
 
+        /// <summary>
+        /// Retrieve stylesheet property value by name
+        /// </summary>
+        /// <typeparam name="T">Desired type</typeparam>
+        /// <param name="name">property name</param>
+        /// <param name="defaultValue">default value</param>
+        /// <returns></returns>
         public T GetProperty<T>(string name, T defaultValue)
         {
             return m_styles[(int)m_styleType].Get(name, defaultValue);
         }
 
+        /// <summary>
+        /// Sets a named property for all assigned stylesheets
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
         public void SetProperty(string name, string value)
         {
             for (int i = 0; i < m_styles.Length; i++)
