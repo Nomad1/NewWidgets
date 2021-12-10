@@ -120,12 +120,12 @@ namespace NewWidgets.Widgets
 
         public uint FocusedTextColor
         {
-            get { return GetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, (uint)0xffffff); }
+            get { return GetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, (uint)0xffffff); }
             set
             {
-                SetProperty(WidgetStyleType.Selected, WidgetParameterIndex.TextColor, value);
+                SetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, value);
 
-                if (StyleType == WidgetStyleType.Selected  && m_labels != null)
+                if (CurrentState == WidgetState.Selected  && m_labels != null)
                     foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
                         label.Color = value;
             }
@@ -150,6 +150,11 @@ namespace NewWidgets.Widgets
         }
 
 
+        public override string StyleClassType
+        {
+            get { return "textedit"; }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextEdit"/> class.
         /// </summary>
@@ -173,7 +178,7 @@ namespace NewWidgets.Widgets
             InvalidateLayout();
         }
 
-        public override bool SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetState styleType)
         {
             if (base.SwitchStyle(styleType))
             {

@@ -31,7 +31,7 @@ namespace NewWidgets.Widgets
         public event Action<WidgetButton> OnHover;
         public event Action<WidgetButton> OnUnhover;
 
-        private bool m_needLayout;
+        private bool m_needLayout;        
 
         // Dynamic properties
 
@@ -149,6 +149,11 @@ namespace NewWidgets.Widgets
             }
         }
 
+        public override string StyleClassType
+        {
+            get { return "button"; }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetButton"/> class.
         /// </summary>
@@ -184,7 +189,7 @@ namespace NewWidgets.Widgets
             m_clickSound = "click";
         }
 
-        public override bool SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetState styleType)
         {
             if (base.SwitchStyle(styleType))
             {

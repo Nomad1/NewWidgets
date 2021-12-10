@@ -113,6 +113,11 @@ namespace NewWidgets.Widgets
             }
         }
 
+        public override string StyleClassType
+        {
+            get { return "label"; }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetLabel"/> class.
         /// </summary>
@@ -150,7 +155,7 @@ namespace NewWidgets.Widgets
             InivalidateLayout();
         }
 
-        public override bool SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetState styleType)
         {
             if (base.SwitchStyle(styleType))
             {

@@ -67,6 +67,11 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); }
         }
 
+        public override string StyleClassType
+        {
+            get { return "checkbox"; }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetCheckBox"/> class.
         /// </summary>
@@ -103,7 +108,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override bool SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetState styleType)
         {
             if (base.SwitchStyle(styleType))
             {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System;
 
-using NewWidgets.Widgets;
 using NewWidgets.Utility;
 using NewWidgets.UI;
 
@@ -31,14 +30,6 @@ namespace NewWidgets.Widgets
             object value = ((SortWrapper<T>)obj).Value;
 
             return Comparer<object>.Default.Compare(Value, value);
-
-            //if (!(Value is IComparable))
-            //    return 1;
-
-            //if (!(value is IComparable))
-            //    return -1;
-
-            //return ((IComparable)Value).CompareTo((IComparable)value);
         }
 
         public override string ToString()
@@ -696,7 +687,7 @@ namespace NewWidgets.Widgets
             public void UpdateStyle(TableLayout layout, WidgetStyleSheet style)
             {
                 this.Size = new Vector2(layout.RowWidth + layout.RowPadding.Width, layout.RowHeight + layout.RowPadding.Height);
-                this.LoadStyle(WidgetStyleType.Normal, style);
+                this.LoadStyle(WidgetState.Normal, style);
 
                 var data = EnsureData(layout);
 

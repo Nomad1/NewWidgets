@@ -96,6 +96,7 @@
     <Compile Include="Widgets\Controls\Experimental\WidgetSelect.cs" />
     <Compile Include="Widgets\Controls\Experimental\WidgetSlider.cs" />
     <Compile Include="Widgets\Controls\Experimental\WidgetTable.cs" />
+    <Compile Include="Widgets\WidgetPreudoClassAttribute.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

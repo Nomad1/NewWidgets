@@ -5,11 +5,7 @@ using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
-#if RUNMOBILE
 using RunMobile.Utility;
-#else
-using System.Drawing;
-#endif
 
 namespace NewWidgets.Widgets
 {
@@ -17,33 +13,33 @@ namespace NewWidgets.Widgets
     {
         public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_scrollview", true);
 
-
         private static readonly float s_zoomDeltaScale = 10.0f;
         private static readonly float s_borderPadding = 100.0f;
         private static readonly float s_dragMultiplier = 3.0f;
         private static readonly float s_dragEpsilon = 2.0f;
         private static readonly int s_autoScrollSpeed = 50;
 
-        private static readonly float ScrollEpsilon = 0.01f;
+        private static readonly float s_scrollEpsilon = 0.0001f;
+
+        private static readonly Margin s_verticalIndicatorPadding = new Margin(3.0f);
+        private static readonly Margin s_horizontalIndicatorPadding = new Margin(3.0f);
+
+        private WidgetScrollType m_horizontalScroll;
+        private WidgetScrollType m_verticalScroll;
 
         private readonly WidgetPanel m_contentView;
+        private readonly Widget m_horizontalScrollBar;
+        private readonly Widget m_verticalScrollBar;
+        private readonly Widget m_horizontalScrollBarIndicator;
+        private readonly Widget m_verticalScrollBarIndicator;
 
         private Vector2 m_dragShift;
         private Vector2 m_dragStart;
         private bool m_dragging;
         private bool m_dragVScroller;
         private bool m_dragHScroller;
-
-        private WidgetScrollType m_horizontalScroll;
-        private WidgetScrollType m_verticalScroll;
-
-        private readonly Widget m_horizontalScrollBar;
-        private readonly Widget m_verticalScrollBar;
-        private readonly Widget m_horizontalScrollBarIndicator;
-        private readonly Widget m_verticalScrollBarIndicator;
-
-        private bool m_horizontalBarVisible = false;
-        private bool m_verticalBarVisible = false;
+        private bool m_horizontalBarVisible;
+        private bool m_verticalBarVisible;
 
         private bool m_animating;
 
@@ -115,6 +111,11 @@ namespace NewWidgets.Widgets
             get { return m_contentView; }
         }
 
+        public override string StyleClassType
+        {
+            get { return "scrollview"; }
+        }
+
         public WidgetScrollView(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(style.IsEmpty ? DefaultStyle : style)
         {
@@ -162,7 +163,6 @@ namespace NewWidgets.Widgets
             {
                 // TODO: load padding from WidgetManager
                 Margin horizontalScrollBarPadding = m_verticalBarVisible ? new Margin(2, 0, 18, 1) : new Margin(2, 0, 2, 1);
-                Margin horizontalScrollIndicatorPadding = new Margin(3, 3, 3, 3);
                 float horizontalScrollBarHeight = 21;
                 float horizontalScrollIndicatorHeight = 15;
                 float horizontalScrollIndicatorWidth = 60;
@@ -170,7 +170,7 @@ namespace NewWidgets.Widgets
                 m_horizontalScrollBar.Size = new Vector2(Size.X - horizontalScrollBarPadding.Right - horizontalScrollBarPadding.Left, horizontalScrollBarHeight);
                 m_horizontalScrollBar.Position = new Vector2(horizontalScrollBarPadding.Left, Size.Y - m_horizontalScrollBar.Size.Y - horizontalScrollBarPadding.Bottom);
 
-                float maxLength = m_horizontalScrollBar.Size.X - horizontalScrollIndicatorPadding.Left - horizontalScrollIndicatorPadding.Right;
+                float maxLength = m_horizontalScrollBar.Size.X - s_horizontalIndicatorPadding.Left - s_horizontalIndicatorPadding.Right;
                 float indicatorSize = (maxLength * Size.X / m_contentView.Size.X);
 
                 if (indicatorSize < horizontalScrollIndicatorWidth)
@@ -188,7 +188,6 @@ namespace NewWidgets.Widgets
             {
                 // TODO: load padding from WidgetManager
                 Margin verticalScrollBarPadding = m_horizontalBarVisible ? new Margin(0, 2, 1, 18) : new Margin(0, 2, 1, 2);
-                Margin verticalScrollIndicatorPadding = new Margin(3, 3, 3, 3);
                 float verticalScrollBarWidth = 21;
                 float verticalScrollIndicatorWidth = 15;
                 float verticalScrollIndicatorHeight = 60;
@@ -196,7 +195,7 @@ namespace NewWidgets.Widgets
                 m_verticalScrollBar.Size = new Vector2(verticalScrollBarWidth, Size.Y - verticalScrollBarPadding.Top - verticalScrollBarPadding.Bottom);
                 m_verticalScrollBar.Position = new Vector2(Size.X - m_verticalScrollBar.Size.X - verticalScrollBarPadding.Right, verticalScrollBarPadding.Top);
 
-                float maxLength = m_verticalScrollBar.Size.Y - verticalScrollIndicatorPadding.Left - verticalScrollIndicatorPadding.Right;
+                float maxLength = m_verticalScrollBar.Size.Y - s_verticalIndicatorPadding.Left - s_verticalIndicatorPadding.Right;
                 float indicatorSize = (maxLength * Size.Y / m_contentView.Size.Y);
 
                 if (indicatorSize < verticalScrollIndicatorHeight)
@@ -521,34 +520,30 @@ namespace NewWidgets.Widgets
                 y = 0;
 
             Vector2 newPos = new Vector2(x, y);
-            float distance = (newPos - m_contentView.Position).Length(); // TODO: distance is no longer used, may be switch to DistanceSquared?
-            if (distance < ScrollEpsilon)
+            float distance = (newPos - m_contentView.Position).LengthSquared();
+            if (distance < s_scrollEpsilon)
                 return;
 
             m_animating = true;
-            m_contentView.Move(newPos, time/*(int)(distance * 1000 / s_autoScrollSpeed)*/, delegate { m_animating = false; UpdateScroll(); });
+            m_contentView.Move(newPos, time, delegate { m_animating = false; UpdateScroll(); });
         }
 
         private void UpdateScroll()
         {
             if (m_horizontalBarVisible)
             {
-                Margin horizontalScrollIndicatorPadding = new Margin(3, 3, 3, 3);
-
-                float max = m_horizontalScrollBar.Size.X - horizontalScrollIndicatorPadding.Left - horizontalScrollIndicatorPadding.Right - m_horizontalScrollBarIndicator.Size.X;
+                float max = m_horizontalScrollBar.Size.X - s_horizontalIndicatorPadding.Left - s_horizontalIndicatorPadding.Right - m_horizontalScrollBarIndicator.Size.X;
 
                 float percent = MathHelper.Clamp(-m_contentView.Position.X / (m_contentView.Size.X - Size.X), 0, 1);
-                m_horizontalScrollBarIndicator.Position = new Vector2(max * percent + m_horizontalScrollBar.Position.X + horizontalScrollIndicatorPadding.Left, m_horizontalScrollBar.Position.Y + horizontalScrollIndicatorPadding.Top);
+                m_horizontalScrollBarIndicator.Position = new Vector2(max * percent + m_horizontalScrollBar.Position.X + s_horizontalIndicatorPadding.Left, m_horizontalScrollBar.Position.Y + s_horizontalIndicatorPadding.Top);
             }
 
             if (m_verticalBarVisible)
             {
-                Margin verticalScrollIndicatorPadding = new Margin(3, 3, 3, 3);
-
-                float max = m_verticalScrollBar.Size.Y - verticalScrollIndicatorPadding.Top - verticalScrollIndicatorPadding.Bottom - m_verticalScrollBarIndicator.Size.Y;
+                float max = m_verticalScrollBar.Size.Y - s_verticalIndicatorPadding.Top - s_verticalIndicatorPadding.Bottom - m_verticalScrollBarIndicator.Size.Y;
 
                 float percent = MathHelper.Clamp(-m_contentView.Position.Y / (m_contentView.Size.Y - Size.Y), 0, 1);
-                m_verticalScrollBarIndicator.Position = new Vector2(m_verticalScrollBar.Position.X + verticalScrollIndicatorPadding.Left, max * percent + m_verticalScrollBar.Position.Y + verticalScrollIndicatorPadding.Top);
+                m_verticalScrollBarIndicator.Position = new Vector2(m_verticalScrollBar.Position.X + s_verticalIndicatorPadding.Left, max * percent + m_verticalScrollBar.Position.Y + s_verticalIndicatorPadding.Top);
             }
         }
     }

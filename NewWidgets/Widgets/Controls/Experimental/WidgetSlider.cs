@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using NewWidgets.Widgets;
 using NewWidgets.UI;
 
 namespace NewWidgets.Widgets
@@ -10,10 +9,10 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetSlider : WidgetPanel
     {
-        const float s_height = 10f;
         // TODO: make configurable
-        const float s_width = 250f;
-        const float s_inset = 15f;
+        private static readonly float s_height = 10f;
+        private static readonly float s_width = 250f;
+        private static readonly float s_inset = 15f;
 
         private readonly WidgetProgressLine m_progressLine;
         private readonly DraggableButton m_lowerButton;

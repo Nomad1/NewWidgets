@@ -85,7 +85,7 @@ namespace NewWidgets.Widgets
             m_background = new WindowObjectArray<WindowObject>();
         }
 
-        public override bool SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetState styleType)
         {
             if (base.SwitchStyle(styleType))
             {

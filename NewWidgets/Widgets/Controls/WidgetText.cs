@@ -103,6 +103,11 @@ namespace NewWidgets.Widgets
             get { return m_labels == null ? 0 : m_labels.Length; }
         }
 
+        public override string StyleClassType
+        {
+            get { return "label"; }
+        }
+
         public WidgetText(string text)
             : this(default(WidgetStyleSheet), text)
         {
@@ -125,7 +130,7 @@ namespace NewWidgets.Widgets
             InivalidateLayout();
         }
 
-        public override bool SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetState styleType)
         {
             if (base.SwitchStyle(styleType))
             {

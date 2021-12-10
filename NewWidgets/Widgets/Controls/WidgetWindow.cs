@@ -34,6 +34,11 @@ namespace NewWidgets.Widgets
             set { m_draggable = value; }
         }
 
+        public override string StyleClassType
+        {
+            get { return "window"; }
+        }
+
         public WidgetWindow(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(style.IsEmpty ? DefaultStyle : style)
         {

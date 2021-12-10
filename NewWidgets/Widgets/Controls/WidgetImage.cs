@@ -89,6 +89,11 @@ namespace NewWidgets.Widgets
             get { PrepareImage(); return m_imageObject; }
         }
 
+        public override string StyleClassType
+        {
+            get { return "image"; }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetImage"/> class.
         /// Unlike <see cref="T:NewWidgets.Widgets.WidgetBackground"/> it does not allows tiling
@@ -130,7 +135,7 @@ namespace NewWidgets.Widgets
                 Image = image;
         }
 
-        public override bool SwitchStyle(WidgetStyleType styleType)
+        public override bool SwitchStyle(WidgetState styleType)
         {
             if (base.SwitchStyle(styleType))
             {

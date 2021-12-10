@@ -1,5 +1,4 @@
 ﻿using System.Numerics;
-using NewWidgets.Widgets;
 using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets

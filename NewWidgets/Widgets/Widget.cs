@@ -19,7 +19,10 @@ namespace NewWidgets.Widgets
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
         internal protected readonly WidgetStyleSheet[] m_styles;
-        private WidgetStyleType m_styleType;
+
+        private WidgetState m_currentState;
+        private string m_styleClass;
+        private string m_styleElementName;
 
         private float m_alpha = 1.0f; // the only property that could be changed for simple widget without affecting its stylesheet
 
@@ -27,9 +30,24 @@ namespace NewWidgets.Widgets
 
         #region Style-related stuff
 
-        public WidgetStyleType StyleType
+        public WidgetState CurrentState
         {
-            get { return m_styleType; }
+            get { return m_currentState; }
+        }
+
+        public string StyleClass
+        {
+            get { return m_styleClass; }
+        }
+
+        public string StyleElementName
+        {
+            get { return m_styleElementName; }
+        }
+
+        public virtual string StyleClassType
+        {
+            get { return "panel"; }
         }
 
         #endregion
@@ -111,11 +129,11 @@ namespace NewWidgets.Widgets
                 style = DefaultStyle;
             Size = style.Get(WidgetParameterIndex.Size, new Vector2(0, 0));
 
-            m_styleType = WidgetStyleType.Normal;
+            m_currentState = WidgetState.Normal;
 
-            m_styles = new WidgetStyleSheet[(int)WidgetStyleType.Max];
+            m_styles = new WidgetStyleSheet[(int)WidgetState.Max];
 
-            LoadStyle(WidgetStyleType.Normal, style);
+            LoadStyle(WidgetState.Normal, style);
         }
 
         /// <summary>
@@ -126,7 +144,7 @@ namespace NewWidgets.Widgets
            : base(null)
         {
             Size = new Vector2(0, 0);
-            m_styleType = WidgetStyleType.Normal;
+            m_currentState = WidgetState.Normal;
             m_styles = styles; // use the same styles as parent
         }
 
@@ -134,13 +152,13 @@ namespace NewWidgets.Widgets
 
         internal T GetProperty<T>(WidgetParameterIndex index, T defaultValue)
         {
-            return m_styles[(int)m_styleType].Get(index, defaultValue);
+            return m_styles[(int)m_currentState].Get(index, defaultValue);
         }
 
-        internal T GetProperty<T>(WidgetStyleType style, WidgetParameterIndex index, T defaultValue)
+        internal T GetProperty<T>(WidgetState style, WidgetParameterIndex index, T defaultValue)
         {
             if (!HasStyle(style))
-                style = m_styleType;
+                style = m_currentState;
 
             return m_styles[(int)style].Get(index, defaultValue);
         }
@@ -152,7 +170,7 @@ namespace NewWidgets.Widgets
                     m_styles[i].Set(m_styles, index, value);
         }
 
-        internal void SetProperty<T>(WidgetStyleType style, WidgetParameterIndex index, T value)
+        internal void SetProperty<T>(WidgetState style, WidgetParameterIndex index, T value)
         {
             if (!HasStyle(style))
                 throw new ArgumentException("Widget doesn't have style " + style + " assigned!");
@@ -169,7 +187,7 @@ namespace NewWidgets.Widgets
         /// <returns></returns>
         public T GetProperty<T>(string name, T defaultValue)
         {
-            return m_styles[(int)m_styleType].Get(name, defaultValue);
+            return m_styles[(int)m_currentState].Get(name, defaultValue);
         }
 
         /// <summary>
@@ -184,52 +202,49 @@ namespace NewWidgets.Widgets
                     m_styles[i].Set(m_styles, name, value);
         }
 
-        protected bool HasStyle(WidgetStyleType styleType)
+        private bool HasStyle(WidgetState styleType)
         {
             return !m_styles[(int)styleType].IsEmpty;
         }
 
-        protected void DelayedSwitchStyle(WidgetStyleType styleType)
+        private void DelayedSwitchStyle(WidgetState styleType)
         {
-            AnimationManager.Instance.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null,
-                delegate {
-                    SwitchStyle(styleType);
-                });
+            AnimationManager.Instance.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, () => SwitchStyle(styleType));
         }
 
-        protected void DelayedUpdateStyle()
+        private void DelayedUpdateStyle()
         {
             AnimationManager.Instance.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, UpdateStyle);
         }
 
         public void UpdateStyle()
         {
-            WidgetStyleType type = WidgetStyleType.Normal;
+            WidgetState type = WidgetState.Normal;
 
             if (Selected)
-                type |= WidgetStyleType.Selected;
+                type |= WidgetState.Selected;
 
             if (!Enabled)
-                type |= WidgetStyleType.Disabled;
+                type |= WidgetState.Disabled;
 
             if (Hovered)
-                type |= WidgetStyleType.Hovered;
+                type |= WidgetState.Hovered;
 
             if (!HasStyle(type)) // try to fall back
             {
-                if (HasStyle(type & ~WidgetStyleType.Selected))
-                    type &= ~WidgetStyleType.Selected;
+                if (HasStyle(type & ~WidgetState.Selected))
+                    type &= ~WidgetState.Selected;
 
-                if (HasStyle(type & ~WidgetStyleType.Disabled))
-                    type &= ~WidgetStyleType.Disabled;
+                if (HasStyle(type & ~WidgetState.Disabled))
+                    type &= ~WidgetState.Disabled;
 
-                if (HasStyle(type & ~WidgetStyleType.Hovered))
-                    type &= ~WidgetStyleType.Hovered;
+                if (HasStyle(type & ~WidgetState.Hovered))
+                    type &= ~WidgetState.Hovered;
             }
 
             if (HasStyle(type)) // only perform switch if we have where to switch
             {
-                if (type == m_styleType)
+                if (type == m_currentState)
                     return;
 
                 DelayedSwitchStyle(type);
@@ -240,15 +255,15 @@ namespace NewWidgets.Widgets
         /// Switches the style.
         /// </summary>
         /// <param name="styleType">Style type.</param>
-        public virtual bool SwitchStyle(WidgetStyleType styleType)
+        public virtual bool SwitchStyle(WidgetState styleType)
         {
             if (!HasStyle(styleType))
                 return false;
 
-            if (m_styleType == styleType)
+            if (m_currentState == styleType)
                 return false;
 
-            m_styleType = styleType;
+            m_currentState = styleType;
 
             return true;
         }
@@ -258,7 +273,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="styleType">Style type.</param>
         /// <param name="style">Style.</param>
-        public void LoadStyle(WidgetStyleType styleType, WidgetStyleSheet style)
+        public void LoadStyle(WidgetState styleType, WidgetStyleSheet style)
         {
             if (style.IsEmpty)
                 return;
@@ -266,29 +281,29 @@ namespace NewWidgets.Widgets
             m_styles[(int)styleType] = style;
 
             // Hovered can be only subset of Normal, Disabled, Selected or SelectedDisabled
-            if (styleType == WidgetStyleType.Normal || styleType == WidgetStyleType.Disabled || styleType == WidgetStyleType.Selected || styleType == WidgetStyleType.SelectedDisabled)
+            if (styleType == WidgetState.Normal || styleType == WidgetState.Disabled || styleType == WidgetState.Selected || styleType == WidgetState.SelectedDisabled)
             {
                 var hoveredStyleReference = style.Get(WidgetParameterIndex.HoveredStyle, default(WidgetStyleSheet));
 
                 if (!hoveredStyleReference.IsEmpty)
                 {
-                    WidgetStyleType targetStyleType = 0;
+                    WidgetState targetStyleType = 0;
                     switch (styleType)
                     {
-                        case WidgetStyleType.Normal:
-                            targetStyleType = WidgetStyleType.Hovered;
+                        case WidgetState.Normal:
+                            targetStyleType = WidgetState.Hovered;
                             break;
-                        case WidgetStyleType.Selected:
-                            targetStyleType = WidgetStyleType.SelectedHovered;
+                        case WidgetState.Selected:
+                            targetStyleType = WidgetState.SelectedHovered;
                             break;
-                        case WidgetStyleType.Disabled:
-                            if (style.Name == m_styles[(int)WidgetStyleType.Normal].Name)
+                        case WidgetState.Disabled:
+                            if (style.Name == m_styles[(int)WidgetState.Normal].Name)
                                 targetStyleType = 0; // workaround to prevent using hovered style when disabled is set to same style as normal
                             else
-                                targetStyleType = WidgetStyleType.DisabledHovered;
+                                targetStyleType = WidgetState.DisabledHovered;
                             break;
-                        case WidgetStyleType.SelectedDisabled:
-                            targetStyleType = WidgetStyleType.SelectedDisabledHovered;
+                        case WidgetState.SelectedDisabled:
+                            targetStyleType = WidgetState.SelectedDisabledHovered;
                             break;
                     }
 
@@ -299,20 +314,20 @@ namespace NewWidgets.Widgets
             }
 
             // Disabled can be only subset of Normal or Selected
-            if (styleType == WidgetStyleType.Normal || styleType == WidgetStyleType.Selected)
+            if (styleType == WidgetState.Normal || styleType == WidgetState.Selected)
             {
                 var disabledStyleReference = style.Get(WidgetParameterIndex.DisabledStyle, default(WidgetStyleSheet));
 
                 if (!disabledStyleReference.IsEmpty)
                 {
-                    WidgetStyleType targetStyleType = 0;
+                    WidgetState targetStyleType = 0;
                     switch (styleType)
                     {
-                        case WidgetStyleType.Normal:
-                            targetStyleType = WidgetStyleType.Disabled;
+                        case WidgetState.Normal:
+                            targetStyleType = WidgetState.Disabled;
                             break;
-                        case WidgetStyleType.Selected:
-                            targetStyleType = WidgetStyleType.SelectedDisabled;
+                        case WidgetState.Selected:
+                            targetStyleType = WidgetState.SelectedDisabled;
                             break;
                     }
 
@@ -322,17 +337,17 @@ namespace NewWidgets.Widgets
             }
 
             // Selected can be only subset of Normal
-            if (styleType == WidgetStyleType.Normal)
+            if (styleType == WidgetState.Normal)
             {
                 var selectedStyleReference = style.Get(WidgetParameterIndex.SelectedStyle, default(WidgetStyleSheet));
 
                 if (!selectedStyleReference.IsEmpty)
-                    LoadStyle(WidgetStyleType.Selected, selectedStyleReference);
+                    LoadStyle(WidgetState.Selected, selectedStyleReference);
 
                 var selectedHoveredStyleReference = style.Get(WidgetParameterIndex.SelectedHoveredStyle, default(WidgetStyleSheet));
 
                 if (!selectedHoveredStyleReference.IsEmpty)
-                    LoadStyle(WidgetStyleType.SelectedHovered, selectedHoveredStyleReference);
+                    LoadStyle(WidgetState.SelectedHovered, selectedHoveredStyleReference);
             }
         }
 

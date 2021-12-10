@@ -2,6 +2,9 @@
 
 namespace NewWidgets.Widgets
 {
+    /// <summary>
+    /// Helper attribute for pre-defined parameters. It's faster to have this than look up strings all the time
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
     internal class WidgetParameterAttribute : Attribute
     {

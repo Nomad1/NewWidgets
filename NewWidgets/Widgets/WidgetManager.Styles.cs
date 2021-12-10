@@ -12,7 +12,7 @@ namespace NewWidgets.Widgets
     {
         // styles
         private static readonly IDictionary<string, WidgetStyleSheet> s_styles = new Dictionary<string, WidgetStyleSheet>();
-        private static readonly IDictionary<string, Tuple<WidgetParameterIndex, Type>> s_styleAttributes = InitStyleMap();
+        private static readonly IDictionary<string, Tuple<WidgetParameterIndex, Type>> s_styleParameters = InitStyleParameterMap();
 
         /// <summary>
         /// Gets the style by name
@@ -155,7 +155,12 @@ namespace NewWidgets.Widgets
 
         #endregion
 
-        private static IDictionary<string, Tuple<WidgetParameterIndex, Type>> InitStyleMap()
+        /// <summary>
+        /// This method enumerates all items of WidgetParameterIndex looking for WidgetParameter attribute
+        /// and storing data in a dictionary
+        /// </summary>
+        /// <returns></returns>
+        private static IDictionary<string, Tuple<WidgetParameterIndex, Type>> InitStyleParameterMap()
         {
             Dictionary<string, Tuple<WidgetParameterIndex, Type>> result = new Dictionary<string, Tuple<WidgetParameterIndex, Type>>();
 
@@ -163,8 +168,10 @@ namespace NewWidgets.Widgets
 
             foreach (FieldInfo field in fields)
             {
-                foreach (WidgetParameterAttribute attribute in field.GetCustomAttributes(typeof(WidgetParameterAttribute), true))
-                    result[attribute.Name] = new Tuple<WidgetParameterIndex, Type>((WidgetParameterIndex)field.GetValue(null), attribute.Type);
+                WidgetParameterIndex index = (WidgetParameterIndex)field.GetValue(null);
+
+                foreach (WidgetParameterAttribute attribute in field.GetCustomAttributes(typeof(WidgetParameterAttribute), false))
+                    result[attribute.Name] = new Tuple<WidgetParameterIndex, Type>(index, attribute.Type);
             }
 
             return result;
@@ -187,7 +194,7 @@ namespace NewWidgets.Widgets
 
                     Tuple<WidgetParameterIndex, Type> field;
 
-                    if (s_styleAttributes.TryGetValue(element.Name, out field))
+                    if (s_styleParameters.TryGetValue(element.Name, out field))
                         style.Set(null, field.Item1, ParseValue(field.Item2, value));
 
                     //style.Set(null, element.Name, value);
@@ -201,14 +208,14 @@ namespace NewWidgets.Widgets
             }
         }
 
-        internal static WidgetParameterIndex GetParameterIndexByName(string name)
+        internal static Tuple<WidgetParameterIndex, Type> GetParameterIndexByName(string name)
         {
             Tuple<WidgetParameterIndex, Type> field;
 
-            if (s_styleAttributes.TryGetValue(name, out field))
-                return field.Item1;
+            if (s_styleParameters.TryGetValue(name, out field))
+                return field;
 
-            return 0;
+            return null;
         }
 
         internal static object ParseValue(Type targetType, string value)
@@ -220,21 +227,21 @@ namespace NewWidgets.Widgets
             else if (targetType == typeof(WidgetStyleSheet))
                 memberValue = GetStyle(value, true); // saves only reference
             else if (targetType == typeof(string))
-                memberValue = (object)value;
+                memberValue = value;
             else if (targetType == typeof(float))
-                memberValue = (object)FloatParse(value); // bo-oxing (
+                memberValue = FloatParse(value); // bo-oxing (
             else if (targetType == typeof(uint))
-                memberValue = (object)ColorParse(value); // assume uint field is color by default
+                memberValue = ColorParse(value); // assume uint field is color by default
             else if (targetType == typeof(Margin))
-                memberValue = (object)MarginParse(value);
+                memberValue = MarginParse(value);
             else if (targetType == typeof(Vector2))
-                memberValue = (object)Vector2Parse(value);
+                memberValue = Vector2Parse(value);
             else if (targetType == typeof(Vector3))
-                memberValue = (object)Vector3Parse(value);
+                memberValue = Vector3Parse(value);
             else if (targetType == typeof(Vector4))
-                memberValue = (object)Vector4Parse(value);
+                memberValue = Vector4Parse(value);
             else if (targetType.IsEnum)
-                memberValue = (object)EnumParse(targetType, value);
+                memberValue = EnumParse(targetType, value);
             else
                 memberValue = Convert.ChangeType(value, targetType); // fallback, may crash
 

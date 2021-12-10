@@ -1,217 +1,111 @@
-﻿//#define MEMORY_PRIORITY // undefine for speed priority
+﻿#define MEMORY_PRIORITY // undefine for speed priority
 
-using System.Numerics;
-
-using NewWidgets.Utility;
-using NewWidgets.UI;
+using System;
 using System.Collections.Generic;
 
 namespace NewWidgets.Widgets
 {
-    // List of default parameters. We need to use it as Enum to get fast access instead of dictionary search
-    internal enum WidgetParameterIndex
-    {
-        // Common
-        None,
-        [WidgetParameter("size", typeof(Vector2))]
-        Size,
-        [WidgetParameter("clip", typeof(bool))]
-        Clip,
-        [WidgetParameter("clip_margin", typeof(Margin))]
-        ClipMargin,
-        [WidgetParameter("hovered_style", typeof(WidgetStyleSheet))]
-        HoveredStyle,
-        [WidgetParameter("disabled_style", typeof(WidgetStyleSheet))]
-        DisabledStyle,
-        [WidgetParameter("selected_style", typeof(WidgetStyleSheet))]
-        SelectedStyle,
-        [WidgetParameter("selected_hovered_style", typeof(WidgetStyleSheet))]
-        SelectedHoveredStyle,
-
-        // Background
-
-        [WidgetParameter("back_style", typeof(WidgetBackgroundStyle))]
-        BackStyle,
-        [WidgetParameter("back_depth", typeof(WidgetBackgroundDepth))]
-        BackDepth,
-        [WidgetParameter("back_image")]
-        BackImage,
-        [WidgetParameter("back_scale", typeof(float))]
-        BackScale,
-        [WidgetParameter("back_angle", typeof(float))]
-        BackAngle,
-        [WidgetParameter("back_pivot", typeof(Vector2))]
-        BackPivot,
-        [WidgetParameter("back_padding", typeof(Margin))]
-        BackPadding,
-        [WidgetParameter("back_opacity", typeof(float))]
-        BackOpacity,
-        [WidgetParameter("back_color", typeof(uint))]
-        BackColor,
-
-        // Text
-
-        [WidgetParameter("font", typeof(Font))]
-        Font,
-        [WidgetParameter("font_size", typeof(float))]
-        FontSize,
-        [WidgetParameter("text_color", typeof(uint))]
-        TextColor,
-        [WidgetParameter("line_spacing", typeof(float))]
-        LineSpacing,
-        [WidgetParameter("text_align", typeof(WidgetAlign))]
-        TextAlign,
-        [WidgetParameter("text_padding", typeof(Margin))]
-        [WidgetParameter("padding", typeof(Margin))]
-        TextPadding,
-        [WidgetParameter("richtext", typeof(bool))]
-        RichText,
-
-        // Image
-
-        [WidgetParameter("image")]
-        Image,
-        [WidgetParameter("image_style", typeof(WidgetBackgroundStyle))]
-        ImageStyle,
-        [WidgetParameter("image_angle", typeof(float))]
-        ImageAngle,
-        [WidgetParameter("image_pivot", typeof(Vector2))]
-        ImagePivot,
-        [WidgetParameter("image_padding", typeof(Margin))]
-        ImagePadding,
-        [WidgetParameter("image_color", typeof(uint))]
-        ImageColor,
-        [WidgetParameter("image_opacity", typeof(float))]
-        ImageOpacity,
-
-        // Text edit
-
-        [WidgetParameter("cursor_color", typeof(uint))]
-        CursorColor,
-        [WidgetParameter("cursor_char")]
-        CursorChar,
-        [WidgetParameter("mask_char")]
-        MaskChar,
-
-
-        // Button
-
-        [WidgetParameter("button_layout", typeof(WidgetButtonLayout))]
-        ButtonLayout,
-        [WidgetParameter("button_text_style", typeof(WidgetStyleSheet))]
-        ButtonTextStyle,
-        [WidgetParameter("button_image_style", typeof(WidgetStyleSheet))]
-        ButtonImageStyle,
-        [WidgetParameter("button_image_padding", typeof(Margin))]
-        ButtonImagePadding,
-        [WidgetParameter("button_text_padding", typeof(Margin))]
-        ButtonTextPadding,
-        [WidgetParameter("button_animate_scale", typeof(float))]
-        ButtonAnimateScale,
-        [WidgetParameter("button_animate_pivot", typeof(Vector2))]
-        ButtonAnimatePivot,
-        [WidgetParameter("button_animate_time", typeof(int))]
-        ButtonAnimateTime,
-
-        // Scroll view
-
-        [WidgetParameter("horizontal_scroll", typeof(WidgetStyleSheet))]
-        HorizontalScrollStyle,
-        [WidgetParameter("vertical_scroll", typeof(WidgetStyleSheet))]
-        VerticalcrollStyle,
-        [WidgetParameter("horizontal_indicator", typeof(WidgetStyleSheet))]
-        HorizontalIndicatorStyle,
-        [WidgetParameter("vertical_indicator", typeof(WidgetStyleSheet))]
-        VerticalIndicatorStyle,
-
-        // Text field
-        [WidgetParameter("scroll_style", typeof(WidgetStyleSheet))]
-        TextFieldScrollStyle,
-
-        Max = TextFieldScrollStyle + 1
-    }
-
+    
     /// <summary>
     /// Style sheet for various widget parameters
     /// </summary>
     public struct WidgetStyleSheet
     {
-        private class ParameterData
+        private class StyleSheetData
         {
-            public ParameterData Parent;
+            private StyleSheetData m_parent;
 #if MEMORY_PRIORITY
-            public readonly IDictionary<int, object> ObjectParameters;
+            private readonly IDictionary<WidgetParameterIndex, object> m_indexedParameters = new Dictionary<WidgetParameterIndex, object>();
 #else
-            public readonly object[] ObjectParameters; // internal storage for known indexed parameters
+            public readonly object[] m_indexedParameters = new object[(int)WidgetParameterIndex.Max]; // internal storage for known indexed parameters
 #endif
-            public readonly IDictionary<string, string> DictionaryParameters; // external storage for custom parameters
+            private readonly IDictionary<string, object> m_namedParameters = new Dictionary<string, object>(); // external storage for custom parameters
 
-            public ParameterData(ParameterData parent)
+            public StyleSheetData(StyleSheetData parent)
             {
-                Parent = parent;
-#if MEMORY_PRIORITY
-                ObjectParameters = new Dictionary<int, object>();
-#else
-                ObjectParameters = new object[(int)WidgetParameterIndex.Max];
-#endif
-                DictionaryParameters = new Dictionary<string, string>();
+                m_parent = parent;
+            }
+
+            public void SetParent(StyleSheetData parent)
+            {
+                m_parent = parent;
             }
 
             public object GetParameter(WidgetParameterIndex index)
             {
                 object result;
-#if MEMORY_PRIORITY
-                ObjectParameters.TryGetValue((int)index, out result);
-#else
-                result = ObjectParameters[(int)index];
-#endif
 
-                if (result == null && Parent != null)
-                    result = Parent.GetParameter(index);
+                // check if we have this parameter in local dictionary
+
+#if MEMORY_PRIORITY
+                if (!m_indexedParameters.TryGetValue(index, out result))
+#else
+                result = m_indexedParameters[(int)index];
+                if (result == null)
+#endif
+                {
+                    if (m_parent != null)
+                        result = m_parent.GetParameter(index);
+                }
 
                 return result;
             }
 
             public object GetParameter(string name)
             {
-                string result;
+                object result;
 
-                if (DictionaryParameters.TryGetValue(name, out result))
+                if (m_namedParameters.TryGetValue(name, out result))
                     return result; // returns string, not object!
 
-                WidgetParameterIndex index = WidgetManager.GetParameterIndexByName(name);
+                Tuple<WidgetParameterIndex, Type> index = WidgetManager.GetParameterIndexByName(name);
 
-                if (index != WidgetParameterIndex.None)
-                {
-#if MEMORY_PRIORITY
-                    object objectResult;
+                if (index != null)
+                    return GetParameter(index.Item1);
 
-                    if (ObjectParameters.TryGetValue((int)index, out objectResult))
-                        return objectResult;
-#else
-                    return ObjectParameters[(int)index];
-#endif
-
-                }
-
-                if (Parent != null)
-                    return Parent.GetParameter(name);
+                // we need this to find non-indexed named params in parent tree
+                if (m_parent != null)
+                    return m_parent.GetParameter(name);
 
                 return null;
             }
+
+            public void SetParameter(WidgetParameterIndex index, object value)
+            {
+#if MEMORY_PRIORITY
+                m_indexedParameters[index] = value;
+#else
+                m_indexedParameters[(int)index] = value;
+#endif
+            }
+
+            public void SetParameter(string name, object value)
+            {
+                Tuple<WidgetParameterIndex,Type> index = WidgetManager.GetParameterIndexByName(name);
+
+                if (index != null)
+                {
+                    if (index.Item2 != value.GetType())
+                        throw new WidgetException("Invalid data of type " + value.GetType() + " set for index " + name);
+
+                    SetParameter(index.Item1, value);
+                }
+                else
+                    m_namedParameters[name] = value;
+            }
+
         }
 
         private string m_name;
         private int m_instancedFor; // This variable contains hash code of specific object for which this instance of style sheet was created
                                     // raises assertion if zero and any setter is called
 
-        private ParameterData m_data;
+        private StyleSheetData m_data;
         // Internal properties
 
         public string Name
         {
             get { return m_name; }
-            internal set { m_name = value; }
         }
 
         public bool IsEmpty
@@ -228,7 +122,7 @@ namespace NewWidgets.Widgets
         internal WidgetStyleSheet(string name, WidgetStyleSheet parent)
         {
             m_name = name;
-            m_data = new ParameterData(parent.m_data);
+            m_data = new StyleSheetData(parent.m_data);
             m_instancedFor = 0;
         }
 
@@ -238,7 +132,7 @@ namespace NewWidgets.Widgets
         /// <param name="parent">Parent.</param>
         internal void SetParent(WidgetStyleSheet parent)
         {
-            m_data.Parent = parent.m_data;
+            m_data.SetParent(parent.m_data);
         }
 
         private bool MakeWritable(object instance)
@@ -253,7 +147,7 @@ namespace NewWidgets.Widgets
 
             m_instancedFor = instanceHash;
             m_name = m_name + "_" + m_instancedFor;
-            m_data = new ParameterData(m_data);
+            m_data = new StyleSheetData(m_data);
 
             return true;
         }
@@ -270,15 +164,10 @@ namespace NewWidgets.Widgets
             if (result == null)
                 return defaultValue;
 
+            if (result.GetType() != typeof(T))
+                throw new WidgetException("Trying to retrieve parameter " + index + " with cast to incompatible type " + typeof(T));
+
             return (T)result;
-        }
-
-        internal void Set(object instance, WidgetParameterIndex index, object value)
-        {
-            if (instance != null)
-                MakeWritable(instance);
-
-            m_data.ObjectParameters[(int)index] = value;
         }
 
         /// <summary>
@@ -292,12 +181,23 @@ namespace NewWidgets.Widgets
         {
             object result = m_data.GetParameter(name);
 
-            if (result == null || result.GetType() != typeof(T))
+            if (result == null)
                 return defaultValue;
+
+            if (result.GetType() != typeof(T))
+                throw new WidgetException("Trying to retrieve parameter " + name + " with cast to incompatible type " + typeof(T));
 
             return (T)result;
         }
 
+        internal void Set(object instance, WidgetParameterIndex index, object value)
+        {
+            if (instance != null)
+                MakeWritable(instance);
+
+            m_data.SetParameter(index, value);
+        }
+      
         /// <summary>
         /// Set the specified parameter by name
         /// </summary>
@@ -309,7 +209,7 @@ namespace NewWidgets.Widgets
             if (instance != null)
                 MakeWritable(instance);
 
-            m_data.DictionaryParameters[name] = value;
+            m_data.SetParameter(name, value);
         }
     }
 }

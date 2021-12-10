@@ -58,6 +58,11 @@ namespace NewWidgets.Widgets
             set { BackgroundColor = value; }
         }
 
+        public override string StyleClassType
+        {
+            get { return "line"; }
+        }
+
         /// <summary>
         /// Draws a line
         /// </summary>
