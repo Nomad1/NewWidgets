@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RunMobile.OpenTK", "..\RunM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewWidgets.RunMobileSample", "NewWidgets.RunMobileSample\NewWidgets.RunMobileSample.csproj", "{9F600BDD-C381-43E4-8C5E-9EF300A44587}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StyleTree", "StyleTree\StyleTree.csproj", "{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -105,6 +107,22 @@ Global
 		{9F600BDD-C381-43E4-8C5E-9EF300A44587}.Debug.OpenGLES|Any CPU.Build.0 = Debug|x86
 		{9F600BDD-C381-43E4-8C5E-9EF300A44587}.Release.OpenGLES|Any CPU.ActiveCfg = Debug|x86
 		{9F600BDD-C381-43E4-8C5E-9EF300A44587}.Release.OpenGLES|Any CPU.Build.0 = Debug|x86
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Debug|x86.Build.0 = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Release|x86.ActiveCfg = Release|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Release|x86.Build.0 = Release|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Debug.Numerics|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Debug.Numerics|Any CPU.Build.0 = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Release.Numerics|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Release.Numerics|Any CPU.Build.0 = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Release.Modern|Any CPU.ActiveCfg = Release|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Release.Modern|Any CPU.Build.0 = Release|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Debug.Modern|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Debug.Modern|Any CPU.Build.0 = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Debug.OpenGLES|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Debug.OpenGLES|Any CPU.Build.0 = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Release.OpenGLES|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FA7116C-0732-4EE0-9C3C-1863D5F8F900}.Release.OpenGLES|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
