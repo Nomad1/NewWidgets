@@ -32,7 +32,13 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubList.cs" />
+    <Compile Include="StyleCollection.cs" />
+    <Compile Include="StyleData.cs" />
+    <Compile Include="StyleSelector.cs" />
+    <Compile Include="StyleSelectorList.cs" />
     <Compile Include="StyleNode.cs" />
+    <Compile Include="StyleSelectorOperand.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
