@@ -90,8 +90,108 @@ namespace StyleTree
         }
     }
 
-    public class SelectorList
+    /// <summary>
+    /// Operand that shows how two CSS selectors are combined
+    /// </summary>
+    internal enum SelectorOperand
     {
+        None = 0, // comma
+        Inverit = 1, // E F an F element descendant of an E element
+        Child = 2, // E > F an F element child of an E element
+        DirectSibling = 3, // E + F  an F element immediately preceded by an E element
+        Sibling = 4, // E ~ F   an F element preceded by an E element
+    }
+
+    /// <summary>
+    /// Simple ValueTuple for chain
+    /// </summary>
+    internal struct StyleSelectorChain
+    {
+        public readonly int Index;
+        public readonly int Length;
+
+        public StyleSelectorChain(int index, int length)
+        {
+            Index = index;
+            Length = length;
+        }
+    }
+
+    /// <summary>
+    /// Helper class processed from CSS string
+    /// </summary>
+    internal class StyleSelectorList
+    {
+        private readonly StyleSelector[] m_selectors;
+
+        private readonly SelectorOperand[] m_operands;
+
+        public bool IsEmpty
+        {
+            get { return m_selectors.Length == 0; }
+        }
+
+        /// <summary>
+        /// Returns true if there is only one selector without inheritance
+        /// </summary>
+        public bool IsSimple
+        {
+            get { return m_selectors.Length == 1; }
+        }
+
+        /// <summary>
+        /// Returns amount of separate chains
+        /// </summary>
+        public int ChainCount
+        {
+            get
+            {
+                int count = 0;
+
+                // operands array is always the length of selector array having None as a last member
+
+                for (int i = 0; i < m_operands.Length; i++)
+                    if (m_operands[i] == SelectorOperand.None)
+                        count++;
+
+                return count;
+            }
+        }
+
+        public StyleSelector[] Selectors
+        {
+            get { return m_selectors; }
+        }
+
+        public SelectorOperand[] Operands
+        {
+            get { return m_operands; }
+        }
+
+        public StyleSelectorList(string selectorString)
+        {
+
+        }
+
+        public StyleSelectorChain[] GetChains()
+        {
+            List<StyleSelectorChain> result = new List<StyleSelectorChain>();
+
+            int chainStart = 0;
+            int chainLength = 1;
+
+            for (int i = 0; i < m_operands.Length; i++)
+            {
+                if (m_operands[i] == SelectorOperand.None)
+                {
+                    result.Add(StyleSelectorChain(chainStart, chainLength));
+                    chainStart = i;
+                    chainLength = 1;
+                }
+            }
+
+            return result.ToArray();
+        }
     }
 
     /// <summary>
@@ -146,15 +246,19 @@ namespace StyleTree
             // TODO: process properties to remove scripts, shorthand values, unit conversion, tc.
             // properties = ProcessProperties(properties)
 
-            string[] selectors = selectorsString.Split(',');
+            StyleSelectorList selectorList = new StyleSelectorList(selectorsString);
+
+            //string[] selectors = selectorsString.Split(',');
 
             StyleData data = null;
 
-            foreach (string selectorString in selectors)
+            foreach (ValueTuple<int,int> selector in selectorList.GetChains())
             {
-                string trimmedString = selectorString.Trim();
+                //string trimmedString = selectorString.Trim();
 
-                StyleNode targetNode = FindExactNode(trimmedString);
+
+
+                StyleNode targetNode = FindExactNode(selectorList, selector);
 
                 if (targetNode != null)
                 {
@@ -176,7 +280,7 @@ namespace StyleTree
             // TODO: split selector string to elements and create new StyleNode
         }
 
-        public StyleNode FindExactNode(string selectorString)
+        public StyleNode FindExactNode(StyleSelectorList list, ValueTuple<int,int> chain)
         {
             if (string.IsNullOrEmpty(selectorString))
                 return null;
