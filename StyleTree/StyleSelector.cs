@@ -9,7 +9,7 @@ namespace StyleTree
     /// </summary>
     internal class StyleSelector
     {
-        private static readonly Regex s_selectorParser = new Regex(@"^(?<element>[\*|\w|\-]+)?(?<id>#[\w|\-]+)?(?<class>\.[\w|\-|\.]+)*(?<attributes>\[.+\])?(?<pseudostyle>:.+)*$", RegexOptions.Compiled);
+        private static readonly Regex s_selectorParser = new Regex(@"^(?<element>[\*|\w|\-]+)?(?<id>#[\w|\-]+)?(?<class>\.[\w|\-|\.]+)?(?<attributes>\[.+\])?(?<pseudostyle>:.+)?$", RegexOptions.Compiled);
 
         private readonly string m_element;
         private readonly string m_class;
@@ -24,7 +24,7 @@ namespace StyleTree
         public string Class
         {
             get { return m_class; }
-        }
+        }   
 
         public string Id
         {
@@ -81,7 +81,7 @@ namespace StyleTree
             return builder.ToString();
         }
 
-        public bool ExactMatch(StyleSelector other)
+        public bool Equals(StyleSelector other)
         {
             if (other == null)
                 return false;

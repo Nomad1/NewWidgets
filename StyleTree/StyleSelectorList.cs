@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace StyleTree
 {
@@ -9,6 +10,8 @@ namespace StyleTree
     /// </summary>
     internal class StyleSelectorList
     {
+        private static readonly Regex s_selectorParser = new Regex(@"([\w#:\-\[\]()\.\='\^\/]+)([\s,+>~]+)", RegexOptions.Compiled);
+
         private readonly IList<StyleSelector> m_selectors;
         private readonly IList<StyleSelectorOperator> m_operators;
         private readonly int m_chainCount;
@@ -52,66 +55,59 @@ namespace StyleTree
         public StyleSelectorList(string selectorsString)
         {
             // remove whitespaces to simplify parsing
-            string[] splitStrings = selectorsString.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+            MatchCollection splitStrings = s_selectorParser.Matches(selectorsString + ",");
 
-            if (splitStrings.Length == 0)
+            //string[] splitStrings = selectorsString.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (splitStrings.Count == 0)
                 throw new ArgumentException("Invalid argument passed to StyleSelectorList constructor - not a style string", selectorsString);
 
             List<StyleSelector> selectors = new List<StyleSelector>();
             List<StyleSelectorOperator> operators = new List<StyleSelectorOperator>();
 
-            for (int i = 1; i < splitStrings.Length; i++)
-            {
-                StyleSelectorOperator @operator;
+            StyleSelectorOperator lastOperator = StyleSelectorOperator.None;
 
-                switch (splitStrings[i][0])
+            foreach (Match match in splitStrings)
+            {
+                StyleSelectorOperator @operator = StyleSelectorOperator.Inherit; // space by default
+
+                string selector = match.Groups[1].Value;
+                string splitOperator = match.Groups[2].Value.Trim();
+
+                if (splitOperator.Length > 0)
                 {
-                    case ',':
-                        @operator = StyleSelectorOperator.None;
-                        break;
-                    case '+':
-                        @operator = StyleSelectorOperator.DirectSibling;
-                        break;
-                    case '>':
-                        @operator = StyleSelectorOperator.Child;
-                        break;
-                    case '~':
-                        @operator = StyleSelectorOperator.Sibling;
-                        break;
-                    default: // there was a space symbol but it was removed during Split call so now first character is the name of the class or element
-                        @operator = StyleSelectorOperator.Inherit;
-                        break;
+                    switch (splitOperator[0])
+                    {
+                        case ',':
+                            @operator = StyleSelectorOperator.None;
+                            break;
+                        case '+':
+                            @operator = StyleSelectorOperator.DirectSibling;
+                            break;
+                        case '>':
+                            @operator = StyleSelectorOperator.Child;
+                            break;
+                        case '~':
+                            @operator = StyleSelectorOperator.Sibling;
+                            break;
+                        default: // there was a space symbol but it was removed during Split call so now first character is the name of the class or element
+                            @operator = StyleSelectorOperator.Inherit;
+                            break;
+                    }
                 }
 
-                selectors.Add(new StyleSelector(splitStrings[i - 1]));
+                selectors.Add(new StyleSelector(selector));
                 operators.Add(@operator);
 
-                if (@operator != StyleSelectorOperator.Inherit)
-                    i++;
+                lastOperator = @operator;
 
+                //if (@operator != StyleSelectorOperator.Inherit)
+                //i++;
             }
 
-            string last = splitStrings[splitStrings.Length - 1];
-            if (last.Length > 0)
-            {
-                // at this stage we expect last literal to be a string for previous operand. I.e. if input was "#aa foo" there should be "foo"
-                // having an operator here definitely an error
-                switch (last[0])
-                {
-                    case ',':
-                    case '+':
-                    case '>':
-                    case '~':
-                        throw new ArgumentException("StyleSelectorList constructor got a string ending with operator " + last, selectorsString);
-                }
-
-                selectors.Add(new StyleSelector(last));
-                operators.Add(StyleSelectorOperator.None);
-            }
-            else
-            {
-                throw new ArgumentException("Invalid argument passed to StyleSelectorList constructor - not a style string", selectorsString);
-            }
+            Match last = splitStrings[splitStrings.Count - 1];
+            if (lastOperator != StyleSelectorOperator.None)
+                    throw new ArgumentException("StyleSelectorList constructor got a string ending with operator " + last, selectorsString);
 
             m_selectors = selectors.ToArray();
             m_operators = operators.ToArray();

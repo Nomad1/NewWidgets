@@ -33,6 +33,9 @@ namespace StyleTree
 
         public void LoadData(IDictionary<string, string> data)
         {
+            if (m_properties == data)
+                return;
+
             foreach (KeyValuePair<string, string> pair in data)
             {
                 string oldValue;
