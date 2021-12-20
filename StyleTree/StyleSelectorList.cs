@@ -10,7 +10,7 @@ namespace StyleTree
     internal class StyleSelectorList
     {
         private readonly IList<StyleSelector> m_selectors;
-        private readonly IList<StyleSelectorOperand> m_operands;
+        private readonly IList<StyleSelectorOperator> m_operators;
         private readonly int m_chainCount;
 
         public bool IsEmpty
@@ -27,7 +27,7 @@ namespace StyleTree
         }
 
         /// <summary>
-        /// Returns true if there is only one selector chain without extra SelectorOperand.None
+        /// Returns true if there is only one selector chain without extra SelectorOperator.None
         /// </summary>
         public bool IsSingleChain
         {
@@ -44,42 +44,91 @@ namespace StyleTree
             get { return m_selectors; }
         }
 
-        public IList<StyleSelectorOperand> Operands
+        public IList<StyleSelectorOperator> Operators
         {
-            get { return m_operands; }
+            get { return m_operators; }
         }
 
         public StyleSelectorList(string selectorsString)
         {
-            // parse string to chains
-            string[] selectors = selectorsString.Trim().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            // remove whitespaces to simplify parsing
+            string[] splitStrings = selectorsString.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
+            if (splitStrings.Length == 0)
+                throw new ArgumentException("Invalid argument passed to StyleSelectorList constructor - not a style string", selectorsString);
 
-            // if there is no inheritance we can try to resolve it immediately
-            //bool simple = selectorString.IndexOfAny(new char[] { ' ', '+', '>', '~' }) == -1;
+            List<StyleSelector> selectors = new List<StyleSelector>();
+            List<StyleSelectorOperator> operators = new List<StyleSelectorOperator>();
 
-            // string[] pseudoClassSeparation = selectorString.Split(new char[] { ':' }, 2);
+            for (int i = 1; i < splitStrings.Length; i++)
+            {
+                StyleSelectorOperator @operator;
 
-            //string simpleName = pseudoClassSeparation[0];
+                switch (splitStrings[i][0])
+                {
+                    case ',':
+                        @operator = StyleSelectorOperator.None;
+                        break;
+                    case '+':
+                        @operator = StyleSelectorOperator.DirectSibling;
+                        break;
+                    case '>':
+                        @operator = StyleSelectorOperator.Child;
+                        break;
+                    case '~':
+                        @operator = StyleSelectorOperator.Sibling;
+                        break;
+                    default: // there was a space symbol but it was removed during Split call so now first character is the name of the class or element
+                        @operator = StyleSelectorOperator.Inherit;
+                        break;
+                }
 
-            //if (simpleName.Length == 0) // malformed selector, pseudo-class not allowed without a name
-            //  return null;
+                selectors.Add(new StyleSelector(splitStrings[i - 1]));
+                operators.Add(@operator);
 
-            //string pseudoClass = pseudoClassSeparation.Length > 1 ? pseudoClassSeparation[1] : null;
+                if (@operator != StyleSelectorOperator.Inherit)
+                    i++;
 
-            m_chainCount = selectors.Length;
+            }
+
+            string last = splitStrings[splitStrings.Length - 1];
+            if (last.Length > 0)
+            {
+                // at this stage we expect last literal to be a string for previous operand. I.e. if input was "#aa foo" there should be "foo"
+                // having an operator here definitely an error
+                switch (last[0])
+                {
+                    case ',':
+                    case '+':
+                    case '>':
+                    case '~':
+                        throw new ArgumentException("StyleSelectorList constructor got a string ending with operator " + last, selectorsString);
+                }
+
+                selectors.Add(new StyleSelector(last));
+                operators.Add(StyleSelectorOperator.None);
+            }
+            else
+            {
+                throw new ArgumentException("Invalid argument passed to StyleSelectorList constructor - not a style string", selectorsString);
+            }
+
+            m_selectors = selectors.ToArray();
+            m_operators = operators.ToArray();
+
+            m_chainCount = CountChains();
         }
 
-        internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorOperand> operands)
+        internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorOperator> operators)
         {
             m_selectors = selectors;
-            m_operands = operands;
+            m_operators = operators;
             m_chainCount = CountChains();
         }
 
         private StyleSelectorList(StyleSelectorList other, int start, int count)
             : this(new ListRange<StyleSelector>(other.m_selectors, start, count),
-                  new ListRange<StyleSelectorOperand>(other.m_operands, start, count))
+                  new ListRange<StyleSelectorOperator>(other.m_operators, start, count))
         {
 
         }
@@ -92,10 +141,10 @@ namespace StyleTree
         {
             int count = 0;
 
-            // operands array is always the length of selector array having None as a last member
+            // operators array is always the length of selector array having None as a last member
 
-            for (int i = 0; i < m_operands.Count; i++)
-                if (m_operands[i] == StyleSelectorOperand.None)
+            for (int i = 0; i < m_operators.Count; i++)
+                if (m_operators[i] == StyleSelectorOperator.None)
                     count++;
 
             return count;
@@ -111,9 +160,9 @@ namespace StyleTree
             int chainStart = 0;
             int chainLength = 1;
 
-            for (int i = 0; i < m_operands.Count; i++)
+            for (int i = 0; i < m_operators.Count; i++)
             {
-                if (m_operands[i] == StyleSelectorOperand.None)
+                if (m_operators[i] == StyleSelectorOperator.None)
                 {
                     result.Add(new StyleSelectorList(this, chainStart, chainLength));
                     chainStart = i;
@@ -131,7 +180,7 @@ namespace StyleTree
 
             for (int i = 0; i < other.Count; i++)
             {
-                if (m_operands[i] != other.m_operands[i])
+                if (m_operators[i] != other.m_operators[i])
                     return false;
 
                 if (!m_selectors[i].Equals(other.m_selectors[i]))
@@ -145,26 +194,26 @@ namespace StyleTree
         {
             StringBuilder builder = new StringBuilder();
 
-            for (int i = 0; i < m_operands.Count; i++)
+            for (int i = 0; i < m_operators.Count - 1; i++)
             {
                 builder.Append(m_selectors[i].ToString());
 
-                switch (m_operands[i])
+                switch (m_operators[i])
                 {
-                    case StyleSelectorOperand.None:
+                    case StyleSelectorOperator.None:
                         builder.Append(", ");
                         break;
-                    case StyleSelectorOperand.Child:
+                    case StyleSelectorOperator.Child:
                         builder.Append(" > ");
                         break;
-                    case StyleSelectorOperand.DirectSibling:
+                    case StyleSelectorOperator.DirectSibling:
                         builder.Append(" + ");
                         break;
-                    case StyleSelectorOperand.Sibling:
+                    case StyleSelectorOperator.Sibling:
                         builder.Append(" ~ ");
                         break;
                     default:
-                    case StyleSelectorOperand.Inherit:
+                    case StyleSelectorOperator.Inherit:
                         builder.Append(' ');
                         break;
                 }

@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace StyleTree
 {
@@ -7,6 +9,8 @@ namespace StyleTree
     /// </summary>
     internal class StyleSelector
     {
+        private static readonly Regex s_selectorParser = new Regex(@"^(?<element>[\*|\w|\-]+)?(?<id>#[\w|\-]+)?(?<class>\.[\w|\-|\.]+)*(?<attributes>\[.+\])?(?<pseudostyle>:.+)*$", RegexOptions.Compiled);
+
         private readonly string m_element;
         private readonly string m_class;
         private readonly string m_id;
@@ -30,6 +34,24 @@ namespace StyleTree
         public string PseudoClass
         {
             get { return m_pseudoClass; }
+        }
+
+        public StyleSelector(string selectorString)
+        {
+            MatchCollection matches = s_selectorParser.Matches(selectorString);
+
+            if (matches.Count != 1)
+                throw new ArgumentException("Invalid selector string", selectorString);
+
+            foreach (Match match in matches)
+            {
+                m_id = match.Groups["id"].Value;
+                m_element = match.Groups["element"].Value;
+                m_class = match.Groups["class"].Value;
+                m_pseudoClass = match.Groups["pseudostyle"].Value;
+                // ignoring attributes for now
+                break;
+            }
         }
 
         public StyleSelector(string element, string @class, string id, string pseudoClass)

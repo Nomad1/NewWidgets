@@ -8,8 +8,6 @@ namespace StyleTree
     /// </summary>
     public class StyleCollection
     {
-        private readonly StyleNode m_root;
-
         private readonly IDictionary<string, ICollection<StyleNode>> m_elementCollection = new Dictionary<string, ICollection<StyleNode>>();
         private readonly IDictionary<string, ICollection<StyleNode>> m_idCollection = new Dictionary<string, ICollection<StyleNode>>();
         private readonly IDictionary<string, ICollection<StyleNode>> m_classCollection = new Dictionary<string, ICollection<StyleNode>>();
@@ -17,13 +15,13 @@ namespace StyleTree
         public StyleCollection()
         {
             // html selector is always a root. There is also a special case with :root pseudo-class but it's not supported for now
-            m_root = new StyleNode(
+            StyleNode root = new StyleNode(
                 new StyleSelectorList(
                     new[] { new StyleSelector("html", null, null, null) },
-                    new[] { StyleSelectorOperand.None }),
+                    new[] { StyleSelectorOperator.None }),
                 new StyleData());
 
-            AddStyle(m_root);
+            AddStyle(root);
         }
 
         /// <summary>
@@ -131,19 +129,44 @@ namespace StyleTree
             throw new NotImplementedException();
         }
 
-            //private StyleNode RecursiveFindExact(StyleNode node, string selectorString)
-            //{
-            //    foreach (StyleNode child in node.Children)
-            //    {
-            //        if (IsExactNode(child.Selector, selectorString))
-            //            return child;
+        public void Dump()
+        {
+            Console.WriteLine("Elements ({0}):", m_elementCollection.Count);
+            foreach (var pair in m_elementCollection)
+            {
+                foreach(StyleNode node in pair.Value)
+                    Console.WriteLine("{0}: {1}", pair.Key, node.StyleSelector);
+            }
 
-            //        StyleNode result = RecursiveFindExact(child, selectorString);
-            //        if (result != null)
-            //            return result;
-            //    }
-            //    return null;
-            //}
+            Console.WriteLine("Classes ({0}):", m_classCollection.Count);
+            foreach (var pair in m_classCollection)
+            {
+                foreach (StyleNode node in pair.Value)
+                    Console.WriteLine("{0}: {1}", pair.Key, node.StyleSelector);
+            }
 
+            Console.WriteLine("IDs ({0}):", m_idCollection.Count);
+            foreach (var pair in m_idCollection)
+            {
+                foreach (StyleNode node in pair.Value)
+                    Console.WriteLine("{0}: {1}", pair.Key, node.StyleSelector);
+            }
         }
+
+
+        //private StyleNode RecursiveFindExact(StyleNode node, string selectorString)
+        //{
+        //    foreach (StyleNode child in node.Children)
+        //    {
+        //        if (IsExactNode(child.Selector, selectorString))
+        //            return child;
+
+        //        StyleNode result = RecursiveFindExact(child, selectorString);
+        //        if (result != null)
+        //            return result;
+        //    }
+        //    return null;
+        //}
+
+    }
 }
