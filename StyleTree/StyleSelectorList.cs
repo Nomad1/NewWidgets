@@ -154,21 +154,24 @@ namespace StyleTree
             List<StyleSelectorList> result = new List<StyleSelectorList>();
 
             int chainStart = 0;
-            int chainLength = 1;
 
             for (int i = 0; i < m_operators.Count; i++)
             {
                 if (m_operators[i] == StyleSelectorOperator.None)
                 {
-                    result.Add(new StyleSelectorList(this, chainStart, chainLength));
-                    chainStart = i;
-                    chainLength = 1;
+                    result.Add(new StyleSelectorList(this, chainStart, i - chainStart + 1));
+                    chainStart = i + 1;
                 }
             }
 
             return result.ToArray();
         }
 
+        /// <summary>
+        /// Check two selector lists for equality
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public bool Equals(StyleSelectorList other)
         {
             if (Count != other.Count)

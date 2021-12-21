@@ -10,6 +10,7 @@ namespace StyleTree
     internal class StyleData
     {
         private IDictionary<string, string> m_properties;
+        private bool m_owner;
 
         public bool IsEmpty
         {
@@ -24,17 +25,25 @@ namespace StyleTree
         public StyleData()
         {
             m_properties = new Dictionary<string, string>();
+            m_owner = true;
         }
 
         public StyleData(IDictionary<string, string> data)
         {
             m_properties = data;
+            m_owner = false;
         }
 
         public void LoadData(IDictionary<string, string> data)
         {
             if (m_properties == data)
                 return;
+
+            if (!m_owner) // we don't have an unique dictionary, make a copy right now
+            {
+                m_properties = new Dictionary<string, string>(m_properties);
+                m_owner = true;
+            }
 
             foreach (KeyValuePair<string, string> pair in data)
             {

@@ -39,6 +39,7 @@
     <Compile Include="StyleSelectorList.cs" />
     <Compile Include="StyleNode.cs" />
     <Compile Include="Enums.cs" />
+    <Compile Include="CSSParser.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

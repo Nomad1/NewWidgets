@@ -17,7 +17,7 @@ namespace StyleTree
             // html selector is always a root. There is also a special case with :root pseudo-class but it's not supported for now
             StyleNode root = new StyleNode(
                 new StyleSelectorList(
-                    new[] { new StyleSelector("html", null, null, null) },
+                    new[] { new StyleSelector("html", "", "", "") },
                     new[] { StyleSelectorOperator.None }),
                 new StyleData());
 
@@ -79,11 +79,10 @@ namespace StyleTree
                     node.Data.LoadData(properties);
                     continue;
                 }
-
                 if (data == null)
                     data = new StyleData(properties);
 
-                AddStyle(new StyleNode(selector, data));
+                AddStyle(new StyleNode(selector, new StyleData(properties)));
             }
         }
 
@@ -110,7 +109,7 @@ namespace StyleTree
             if (result != null)
             {
                 foreach (StyleNode node in result)
-                    if (node.SelectorList.Equals(selectorList))
+                    if (node.SelectorList.Equals(selectorList)) // here we check only for exact 100% match
                         return node;
             }
 
@@ -126,7 +125,15 @@ namespace StyleTree
             if (result != null)
                 return result;
 
-            throw new NotImplementedException();
+            //Console.Error.WriteLine("Complex search not implemented yet!");
+
+            // TODO: implement cascading.
+
+            // 1. find hierarchy match (considering operators) for each list entry. It's different from exact match because it should consider inheritance and incapsulation
+            // 2. compose a specificity list and sort the results
+            // 3. mix all the properties to one list and return new style. Note: we'll need to backtrack parent stylesheet to make sure new style is invalidated if parents are modified
+            
+            return null;
         }
 
         public void Dump()
@@ -135,21 +142,21 @@ namespace StyleTree
             foreach (var pair in m_elementCollection)
             {
                 foreach(StyleNode node in pair.Value)
-                    Console.WriteLine("{0}: {1}", pair.Key, node.StyleSelector);
+                    Console.WriteLine(node);
             }
 
             Console.WriteLine("Classes ({0}):", m_classCollection.Count);
             foreach (var pair in m_classCollection)
             {
                 foreach (StyleNode node in pair.Value)
-                    Console.WriteLine("{0}: {1}", pair.Key, node.StyleSelector);
+                    Console.WriteLine(node);
             }
 
             Console.WriteLine("IDs ({0}):", m_idCollection.Count);
             foreach (var pair in m_idCollection)
             {
                 foreach (StyleNode node in pair.Value)
-                    Console.WriteLine("{0}: {1}", pair.Key, node.StyleSelector);
+                    Console.WriteLine(node);
             }
         }
 
