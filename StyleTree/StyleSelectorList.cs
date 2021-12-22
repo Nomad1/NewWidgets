@@ -201,22 +201,46 @@ namespace StyleTree
         /// <returns></returns>
         public bool AppliesTo(StyleSelectorList other)
         {
-            if (IsSimple)
-                return m_selectors[0].Equals(other.m_selectors[other.Count - 1], false);
+            // Here we are enumeration two collections from the tail.
+            // for each entry from this.Selectors we need to find at least one entry in other.Selectors
+            // if there is no corresponding entry - we fail
+            // if other.Selectors is already enumerated but we have something in this.Selectors - we fail
+            // otherwise we have a complete match
+
+            int position = other.m_selectors.Count;
+
+            for (int i = m_selectors.Count - 1; i >= 0; i--)
+            {
+                bool found = false;
+
+                while (--position >= 0)
+                {
+                    if (m_selectors[i].Equals(other.m_selectors[position], false))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                    return false;
+            }
+            //if (IsSimple)
+                //return m_selectors[0].Equals(other.m_selectors[other.Count - 1], false);
 
             // TODO: deep search using operators and everything.
             // right now below part is not working properly
             // it should take
             // "this = ul li b" and successfuly compare to "other = html ul li ul li b#b"
 
-            for (int i = 0; i < other.Count; i++)
-            {
-                if (m_operators[i] != other.m_operators[i])
-                    return false;
+            //for (int i = 0; i < other.Count; i++)
+            //{
+            //    if (m_operators[i] != other.m_operators[i])
+            //        return false;
 
-                if (!m_selectors[i].Equals(other.m_selectors[i], false))
-                    return false;
-            }
+            //    if (!m_selectors[i].Equals(other.m_selectors[i], false))
+            //        return false;
+            //}
 
             return true;
         }

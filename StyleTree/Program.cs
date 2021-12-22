@@ -18,7 +18,7 @@ namespace StyleTree
 }
 #b { background-color: blue; color: yellow }
 
-li ul li ul li b { color: red; }
+li ul li ul li b { font-color: red; }
 b { color: green; }
 
 /*html ul.main li ul.special li ul li b#b { color: red; }*/
@@ -179,12 +179,12 @@ body{padding:0;margin:0}body .pull-right{float:right!important}body .pull-left{f
                 HtmlNode li21 = new HtmlNode(ul2, "li", "", "", "2.1");
                 HtmlNode li22 = new HtmlNode(ul2, "li", "", "", "2.2");
                 HtmlNode li3 = new HtmlNode(ul1, "li", "", "", "Item Three");
-                HtmlNode ul3 = new HtmlNode(li3, "ul", "", "special");
+                HtmlNode ul3 = new HtmlNode(li3, "ul", "sdf", "special");
                 HtmlNode li31 = new HtmlNode(ul3, "li", "", "", "3.1");
                 HtmlNode ul4 = new HtmlNode(li31, "ul");
-                HtmlNode li41 = new HtmlNode(ul4, "li");
+                HtmlNode li41 = new HtmlNode(ul4, "li", "some");
                 HtmlNode b = new HtmlNode(li41, "b", "b", "", "3.1.1");
-                HtmlNode li42 = new HtmlNode(ul4, "li", "3.1.2");
+                HtmlNode li42 = new HtmlNode(ul4, "li", "", "", "3.1.2");
                 HtmlNode li32 = new HtmlNode(ul3, "li", "", "", "3.2");
 
 
