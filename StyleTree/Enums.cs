@@ -3,7 +3,7 @@
     /// <summary>
     /// Operand that shows how two CSS selectors are combined
     /// </summary>
-    internal enum StyleSelectorOperator
+    public enum StyleSelectorOperator
     {
         None = 1, // comma
         Inherit = 2, // E F an F element descendant of an E element

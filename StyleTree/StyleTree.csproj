@@ -40,6 +40,7 @@
     <Compile Include="StyleNode.cs" />
     <Compile Include="Enums.cs" />
     <Compile Include="CSSParser.cs" />
+    <Compile Include="HtmlNode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -8,7 +8,7 @@ namespace StyleTree
     /// <summary>
     /// Helper class processed from CSS string. Can contain one or main selector chains
     /// </summary>
-    internal class StyleSelectorList
+    public class StyleSelectorList
     {
         private static readonly Regex s_selectorParser = new Regex(@"([\w#:\-\[\]()\.\='\^\/]+)([\s,+>~]+)", RegexOptions.Compiled);
 
@@ -122,7 +122,7 @@ namespace StyleTree
             m_chainCount = CountChains();
         }
 
-        private StyleSelectorList(StyleSelectorList other, int start, int count)
+        internal StyleSelectorList(StyleSelectorList other, int start, int count)
             : this(new ListRange<StyleSelector>(other.m_selectors, start, count),
                   new ListRange<StyleSelectorOperator>(other.m_operators, start, count))
         {
@@ -167,6 +167,11 @@ namespace StyleTree
             return result.ToArray();
         }
 
+        public StyleSelectorList Range(int from, int length)
+        {
+            return new StyleSelectorList(this, from, length);
+        }
+
         /// <summary>
         /// Check two selector lists for equality
         /// </summary>
@@ -182,7 +187,34 @@ namespace StyleTree
                 if (m_operators[i] != other.m_operators[i])
                     return false;
 
-                if (!m_selectors[i].Equals(other.m_selectors[i]))
+                if (!m_selectors[i].Equals(other.m_selectors[i], true))
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Check two selector lists if one can be applied to another
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool AppliesTo(StyleSelectorList other)
+        {
+            if (IsSimple)
+                return m_selectors[0].Equals(other.m_selectors[other.Count - 1], false);
+
+            // TODO: deep search using operators and everything.
+            // right now below part is not working properly
+            // it should take
+            // "this = ul li b" and successfuly compare to "other = html ul li ul li b#b"
+
+            for (int i = 0; i < other.Count; i++)
+            {
+                if (m_operators[i] != other.m_operators[i])
+                    return false;
+
+                if (!m_selectors[i].Equals(other.m_selectors[i], false))
                     return false;
             }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace StyleTree
 {
@@ -7,7 +8,7 @@ namespace StyleTree
     /// Simple data storage for properties. Theoretically short-hand properties should be expanded before going there
     /// Also there is no support for expressions ATM
     /// </summary>
-    internal class StyleData
+    public class StyleData
     {
         private IDictionary<string, string> m_properties;
         private bool m_owner;
@@ -56,6 +57,16 @@ namespace StyleTree
 
                 m_properties[pair.Key] = pair.Value;
             }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (var pair in m_properties)
+                builder.AppendFormat("\t{0}: {1};\n", pair.Key, pair.Value);
+
+            return builder.ToString();
         }
     }
 }

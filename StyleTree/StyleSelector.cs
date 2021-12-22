@@ -7,7 +7,7 @@ namespace StyleTree
     /// <summary>
     /// Basic CSS selector description parsed from form E.class#id:hover
     /// </summary>
-    internal class StyleSelector
+    public class StyleSelector
     {
         private static readonly Regex s_selectorParser = new Regex(@"^(?<element>[\*|\w|\-]+)?(?<id>#[\w|\-]+)?(?<class>\.[\w|\-|\.]+)?(?<attributes>\[.+\])?(?<pseudostyle>:.+)?$", RegexOptions.Compiled);
 
@@ -81,12 +81,24 @@ namespace StyleTree
             return builder.ToString();
         }
 
-        public bool Equals(StyleSelector other)
+        public bool Equals(StyleSelector other, bool exactMatch)
         {
             if (other == null)
                 return false;
 
-            return m_element == other.Element && m_class == other.Class && m_id == other.Id && m_pseudoClass == other.PseudoClass;
+            if (exactMatch)
+                return m_element == other.Element && m_class == other.Class && m_id == other.Id && m_pseudoClass == other.PseudoClass;
+
+            // returns true if this style can be applied to target string, i.t.
+            // this = button and other = button.foo:hover
+            // but fails if this class has specifications, i.e.
+            // this = button#id and other = button.foo:hover
+            // clearly other don't have id = #id so it can't be used there
+
+            return (string.IsNullOrEmpty(m_element) || m_element == other.Element) &&
+                (string.IsNullOrEmpty(m_class) || m_class == other.Class) &&
+                (string.IsNullOrEmpty(m_id) || m_id == other.Id) &&
+                (string.IsNullOrEmpty(m_pseudoClass) || m_pseudoClass == other.PseudoClass);
         }
     }
 }

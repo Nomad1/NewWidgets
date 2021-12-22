@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 
 namespace StyleTree
 {
@@ -46,16 +45,7 @@ namespace StyleTree
 
         public override string ToString()
         {
-            StringBuilder builder = new StringBuilder();
-            builder.Append(m_selectorList.ToString());
-            builder.AppendLine(" {");
-
-            foreach (var pair in m_data.Properties)
-                builder.AppendFormat("\t{0}: {1};\n", pair.Key, pair.Value);
-
-            builder.AppendLine("}");
-
-            return builder.ToString();
+            return string.Format("{0} {{\n{1}}}\n", m_selectorList, m_data);
         }
     }
 }

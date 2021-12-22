@@ -95,20 +95,20 @@ namespace StyleTree
 
             StyleSelector selector = selectorList.Selectors[selectorList.Count - 1];
 
-            // then we look in our dictionaries for nodes having
-            ICollection<StyleNode> result = null;
+            // then we look in our dictionaries for nodes having some of the target parts
+            ICollection<StyleNode> collection = null;
 
-            if (!string.IsNullOrEmpty(selector.Id)) // if it starts with # it should be an ID
-                m_idCollection.TryGetValue(selector.Id, out result);
-            else if (!string.IsNullOrEmpty(selector.Class)) // if it startis with . it is a class
-                m_classCollection.TryGetValue(selector.Class, out result);
-            else // it's an element name
-                if (!string.IsNullOrEmpty(selector.Element))
-                m_elementCollection.TryGetValue(selector.Element, out result);
+            if (!string.IsNullOrEmpty(selector.Id)) // if it has an id, check id collection
+                m_idCollection.TryGetValue(selector.Id, out collection);
+            else if (!string.IsNullOrEmpty(selector.Class)) // if it has a class, check class collection
+                m_classCollection.TryGetValue(selector.Class, out collection);
+            else
+                if (!string.IsNullOrEmpty(selector.Element)) // otherwise check element collection
+                m_elementCollection.TryGetValue(selector.Element, out collection);
 
-            if (result != null)
+            if (collection != null)
             {
-                foreach (StyleNode node in result)
+                foreach (StyleNode node in collection)
                     if (node.SelectorList.Equals(selectorList)) // here we check only for exact 100% match
                         return node;
             }
@@ -116,14 +116,54 @@ namespace StyleTree
             return null;
         }
 
-        public StyleNode FindStyle(string selectorsString)
+        public StyleData GetStyleData(StyleSelectorList selectorList)
         {
-            StyleSelectorList selectorList = new StyleSelectorList(selectorsString);
+            if (selectorList == null || selectorList.IsEmpty)
+                throw new ArgumentException("Invalid StyleNode for FindStyle call");
 
-            StyleNode result = FindExactStyle(selectorList);
+            List<StyleNode> styles = new List<StyleNode>();
+            for (int i = 0; i < selectorList.Count; i++)
+            {
+                StyleSelectorList selectorPart = new StyleSelectorList(selectorList, 0, i + 1);
 
-            if (result != null)
-                return result;
+                StyleSelector selector = selectorPart.Selectors[selectorPart.Count - 1];
+
+                // we look in our dictionaries for nodes having some of the target parts
+                ICollection<StyleNode> collection;
+
+
+                if (!string.IsNullOrEmpty(selector.Element)) // if it has an element name, check element collection
+                    if (m_elementCollection.TryGetValue(selector.Element, out collection))
+                        foreach (StyleNode node in collection)
+                            if (node.SelectorList.AppliesTo(selectorPart))
+                                styles.Add(node);
+
+                if (!string.IsNullOrEmpty(selector.Class)) // if it has a class, check class collection
+                    if (m_classCollection.TryGetValue(selector.Class, out collection))
+                        foreach (StyleNode node in collection)
+                            if (node.SelectorList.AppliesTo(selectorPart))
+                                styles.Add(node);
+
+                if (!string.IsNullOrEmpty(selector.Id)) // if it has an id, check id collection
+                    if (m_idCollection.TryGetValue(selector.Id, out collection))
+                        foreach (StyleNode node in collection)
+                            if (node.SelectorList.AppliesTo(selectorPart))
+                                styles.Add(node);
+
+            }
+
+            // TODO: sort styles by specificity. Right now order element-class-id gives us a little bit of similarity to specificity system
+
+            if (styles.Count == 0)
+                return null;
+
+            if (styles.Count == 1)
+                return styles[0].Data;
+
+            StyleData result = new StyleData();
+
+            foreach (StyleNode styleNode in styles)
+                result.LoadData(styleNode.Data.Properties);
 
             //Console.Error.WriteLine("Complex search not implemented yet!");
 
@@ -132,8 +172,13 @@ namespace StyleTree
             // 1. find hierarchy match (considering operators) for each list entry. It's different from exact match because it should consider inheritance and incapsulation
             // 2. compose a specificity list and sort the results
             // 3. mix all the properties to one list and return new style. Note: we'll need to backtrack parent stylesheet to make sure new style is invalidated if parents are modified
-            
-            return null;
+
+            return result;
+        }
+
+        public StyleData GetStyleData(string selectorsString)
+        {
+            return GetStyleData(new StyleSelectorList(selectorsString));
         }
 
         public void Dump()

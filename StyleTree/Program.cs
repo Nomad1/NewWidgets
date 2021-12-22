@@ -6,7 +6,25 @@ namespace StyleTree
 {
     class MainClass
     {
-        private static readonly string s_cssSamples= @"body,html{height:100%}
+        private static readonly string s_cssSample2 = @".main {
+    color: rebeccapurple;
+    border: 2px solid #ccc;
+    padding: 1em;
+}
+
+.special {
+    color: black;
+    font-weight: bold;
+}
+#b { background-color: blue; color: yellow }
+
+li ul li ul li b { color: red; }
+b { color: green; }
+
+/*html ul.main li ul.special li ul li b#b { color: red; }*/
+";
+
+        private static readonly string s_cssSample1= @"body,html{height:100%}
             th, td {
               padding: 6px 15px;
             }
@@ -75,23 +93,60 @@ body{padding:0;margin:0}body .pull-right{float:right!important}body .pull-left{f
         {
             StyleSelector styleSelector = new StyleSelector(element, @class, id, pseudoClass);
 
-            StyleNode node = collection.FindStyle(styleSelector.ToString());
+            StyleData data = collection.GetStyleData(styleSelector.ToString());
 
-            if (node == null)
-                Console.WriteLine("Style for {0} not found!", styleSelector.ToString());
+            if (data == null)
+                Console.WriteLine("Style for {0} not found!", styleSelector);
             else
-                Console.WriteLine("Style search result for {0}:\n{1}", styleSelector.ToString(), node.ToString());
+                Console.WriteLine("Style search result for {0}:\n{1}", styleSelector, data);
 
         }
 
         private static void PrintStyle(StyleCollection collection, string value)
         {
-            StyleNode node = collection.FindStyle(value);
+            StyleData data = collection.GetStyleData(value);
 
-            if (node == null)
+            if (data == null)
                 Console.WriteLine("Style for \"{0}\" not found!", value);
             else
-                Console.WriteLine("Style search result for \"{0}\":\n{1}", value, node.ToString());
+                Console.WriteLine("Style search result for \"{0}\":\n{1}", value, data);
+
+        }
+
+        private static StyleSelector GetHtmlStyle(HtmlNode node)
+        {
+            return new StyleSelector(node.Element, node.Class, node.Id, "");
+        }
+
+        private static void PrintStyle(StyleCollection collection, HtmlNode htmlNode)
+        {
+            List<StyleSelector> styleList = new List<StyleSelector>();
+
+            HtmlNode current = htmlNode;
+            while (current != null)
+            {
+                styleList.Add(GetHtmlStyle(current));
+                current = current.Parent;
+            }
+
+            StyleSelector[] styles = new StyleSelector[styleList.Count];
+            StyleSelectorOperator[] operators = new StyleSelectorOperator[styleList.Count];
+
+            for (int i = 0; i < styleList.Count; i++)
+            {
+                styles[styleList.Count - i - 1] = styleList[i];
+                operators[i] = StyleSelectorOperator.Inherit;
+            }
+
+            operators[operators.Length - 1] = StyleSelectorOperator.None; // trailing None operator
+
+            StyleSelectorList list = new StyleSelectorList(styles, operators);
+            StyleData data = collection.GetStyleData(list);
+
+            if (data == null)
+                Console.WriteLine("Style for \"{0}\" not found!", list);
+            else
+                Console.WriteLine("Style search result for \"{0}\":\n{1}", list, data);
 
         }
 
@@ -109,12 +164,34 @@ body{padding:0;margin:0}body .pull-right{float:right!important}body .pull-left{f
             collection.AddStyle("#foo > .bar + div.k1.k2 [id='baz']:hello(2):not(:where(#yolo))::before", new Dictionary<string, string>());
             */
 
-            CSSParser.ParseCSS(s_cssSamples, collection);
+            CSSParser.ParseCSS(s_cssSample2, collection);
 
             collection.Dump();
 
+
+            HtmlNode html = new HtmlNode(null, "html");
+                // TODO: Parse from file
+
+                HtmlNode ul1 = new HtmlNode(html, "ul", "", "main");
+                HtmlNode li1 = new HtmlNode(ul1, "li", "", "", "Item One");
+                HtmlNode li2 = new HtmlNode(ul1, "li", "", "", "Item Two");
+                HtmlNode ul2 = new HtmlNode(li2, "ul");
+                HtmlNode li21 = new HtmlNode(ul2, "li", "", "", "2.1");
+                HtmlNode li22 = new HtmlNode(ul2, "li", "", "", "2.2");
+                HtmlNode li3 = new HtmlNode(ul1, "li", "", "", "Item Three");
+                HtmlNode ul3 = new HtmlNode(li3, "ul", "", "special");
+                HtmlNode li31 = new HtmlNode(ul3, "li", "", "", "3.1");
+                HtmlNode ul4 = new HtmlNode(li31, "ul");
+                HtmlNode li41 = new HtmlNode(ul4, "li");
+                HtmlNode b = new HtmlNode(li41, "b", "b", "", "3.1.1");
+                HtmlNode li42 = new HtmlNode(ul4, "li", "3.1.2");
+                HtmlNode li32 = new HtmlNode(ul3, "li", "", "", "3.2");
+
+
             //PrintStyle(collection, "td", null, null, null);
-            PrintStyle(collection, ".test td");
+            //PrintStyle(collection, ".test td");
+
+            PrintStyle(collection, b);
         }
     }
 }
