@@ -88,6 +88,8 @@ body{padding:0;margin:0}body .pull-right{float:right!important}body .pull-left{f
 /*body d[data-view],body header{display:none;opacity:0;transition:opacity .7s ease-in}body a[data-view].active{display:block;opacity:1}body s[data-nav=playground] header{display:block;opacity:1}[data-view=home]{height:100%}[data-view=home] button{opacity:0;pointer-events:none;transition:opacity 1.5s ease-in-out}[data-view=home] button.live{opacity:1;pointer-events:all}[data-view=home] .mdc-layout-grid__cell--span-4.mdc-elevation--z4{padding:1em;background:#fff}*/
             ";
 
+        private static readonly string s_htmlSample = "<html><ul class=\".main\"><li>Item One</li><li>Item Two<ul><li>2.1</li><li>2.2</li></ul></li><li>Item Three<ul id=\"#sdf\" class=\".special\"><li>3.1<ul><li id=\"#some\"><b id=\"#b\">3.1.1</b></li><li>3.1.2</li></ul></li><li>3.2</li></ul></li></ul></html>";
+
 
         private static void PrintStyle(StyleCollection collection, string element, string @class, string id, string pseudoClass)
         {
@@ -168,7 +170,7 @@ body{padding:0;margin:0}body .pull-right{float:right!important}body .pull-left{f
 
             collection.Dump();
 
-
+            /*
             HtmlNode html = new HtmlNode(null, "html");
                 // TODO: Parse from file
 
@@ -186,12 +188,17 @@ body{padding:0;margin:0}body .pull-right{float:right!important}body .pull-left{f
                 HtmlNode b = new HtmlNode(li41, "b", "b", "", "3.1.1");
                 HtmlNode li42 = new HtmlNode(ul4, "li", "", "", "3.1.2");
                 HtmlNode li32 = new HtmlNode(ul3, "li", "", "", "3.2");
+            */
 
+            HtmlNode html = HtmlNode.ParseXHmlt(s_htmlSample);
 
+            HtmlNode b = html.GetElementById("#b");
             //PrintStyle(collection, "td", null, null, null);
             //PrintStyle(collection, ".test td");
 
             PrintStyle(collection, b);
+
+            Console.WriteLine(html);
         }
     }
 }
