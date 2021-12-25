@@ -1,0 +1,29 @@
+﻿.main {
+    color: rebeccapurple;
+    border: 2px solid #ccc;
+    padding: 1em;
+}
+
+.special {
+    color: black;
+    font-weight: bold;
+}
+
+#bb {
+    background-color: blue;
+    color: yellow
+}
+
+/*li ul li ul li b { font-color: red; }
+b { color: green; }*/
+.tmp.tmp2 {
+    color: red;
+}
+
+.tmp2 {
+    background-color: green;
+    color: green;
+}
+
+
+/*html ul.main li ul.special li ul li b#b { color: red; }*/

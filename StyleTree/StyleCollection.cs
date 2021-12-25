@@ -36,7 +36,10 @@ namespace StyleTree
             StyleSelector selector = node.MainSelector;
 
             AddToCollection(m_idCollection, selector.Id, node); // if it starts with # it should be an ID
-            AddToCollection(m_classCollection, selector.Class, node); // if it startis with . it is a class
+
+            if (selector.Classes.Length > 0)
+                AddToCollection(m_classCollection, selector.Classes[selector.Classes.Length -1], node); // last class should be stored
+
             AddToCollection(m_elementCollection, selector.Element, node); // it's an element name
         }
 
@@ -100,8 +103,8 @@ namespace StyleTree
 
             if (!string.IsNullOrEmpty(selector.Id)) // if it has an id, check id collection
                 m_idCollection.TryGetValue(selector.Id, out collection);
-            else if (!string.IsNullOrEmpty(selector.Class)) // if it has a class, check class collection
-                m_classCollection.TryGetValue(selector.Class, out collection);
+            else if (selector.Classes.Length > 0) // if it has a class, check class collection
+                m_classCollection.TryGetValue(selector.Classes[selector.Classes.Length - 1], out collection);
             else
                 if (!string.IsNullOrEmpty(selector.Element)) // otherwise check element collection
                 m_elementCollection.TryGetValue(selector.Element, out collection);
@@ -131,24 +134,35 @@ namespace StyleTree
                 // we look in our dictionaries for nodes having some of the target parts
                 ICollection<StyleNode> collection;
 
-
                 if (!string.IsNullOrEmpty(selector.Element)) // if it has an element name, check element collection
                     if (m_elementCollection.TryGetValue(selector.Element, out collection))
                         foreach (StyleNode node in collection)
                             if (node.SelectorList.AppliesTo(selectorPart))
+                            {
                                 styles.Add(node);
 
-                if (!string.IsNullOrEmpty(selector.Class)) // if it has a class, check class collection
-                    if (m_classCollection.TryGetValue(selector.Class, out collection))
-                        foreach (StyleNode node in collection)
-                            if (node.SelectorList.AppliesTo(selectorPart))
-                                styles.Add(node);
+                                Console.WriteLine("Found match for element {0} to style {1}", selector.Element, node);
+                            }
 
                 if (!string.IsNullOrEmpty(selector.Id)) // if it has an id, check id collection
                     if (m_idCollection.TryGetValue(selector.Id, out collection))
                         foreach (StyleNode node in collection)
                             if (node.SelectorList.AppliesTo(selectorPart))
+                            {
                                 styles.Add(node);
+
+                                Console.WriteLine("Found match for id #{0} to style {1}", selector.Id, node);
+                            }
+
+                foreach (string @class in selector.Classes) // if it has a class, check class collection
+                    if (m_classCollection.TryGetValue(@class, out collection))
+                        foreach (StyleNode node in collection)
+                            if (node.SelectorList.AppliesTo(selectorPart))
+                            {
+                                styles.Add(node);
+
+                                Console.WriteLine("Found match for class {0} to style {1}", @class, node);
+                            }
 
             }
 

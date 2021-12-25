@@ -10,20 +10,21 @@ namespace StyleTree
     public class StyleSelector
     {
         private static readonly Regex s_selectorParser = new Regex(@"^(?<element>[\*|\w|\-]+)?(?<id>#[\w|\-]+)?(?<class>\.[\w|\-|\.]+)?(?<attributes>\[.+\])?(?<pseudostyle>:.+)?$", RegexOptions.Compiled);
+        private static readonly Regex s_pseudoClassParser = new Regex(@"(:{1,2}[^:]+)", RegexOptions.Compiled);
 
         private readonly string m_element;
-        private readonly string m_class;
+        private readonly string [] m_classes;
         private readonly string m_id;
-        private readonly string m_pseudoClass;
+        private readonly string [] m_pseudoClasses;
 
         public string Element
         {
             get { return m_element; }
         }
 
-        public string Class
+        public string [] Classes
         {
-            get { return m_class; }
+            get { return m_classes; }
         }   
 
         public string Id
@@ -31,9 +32,9 @@ namespace StyleTree
             get { return m_id; }
         }
 
-        public string PseudoClass
+        public string [] PseudoClasses
         {
-            get { return m_pseudoClass; }
+            get { return m_pseudoClasses; }
         }
 
         public StyleSelector(string selectorString)
@@ -45,38 +46,74 @@ namespace StyleTree
 
             foreach (Match match in matches)
             {
-                m_id = match.Groups["id"].Value;
-                m_element = match.Groups["element"].Value;
-                m_class = match.Groups["class"].Value;
-                m_pseudoClass = match.Groups["pseudostyle"].Value;
+                m_id = match.Groups["id"].Value.TrimStart('#'); // element ID should not have leading #
+                m_element = match.Groups["element"].Value; // element type goes as is
+                m_classes = match.Groups["class"].Value.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries); // classes should be split. May be we need to use Regex as well, but right now simple split would work
+
+                if (match.Groups["pseudostyle"].Success) // Pseudo-classes are tricky and can be in form ::first-child, :disabled or even :not(enabled)
+                {
+                    MatchCollection psMatches = s_pseudoClassParser.Matches(match.Groups["pseudostyle"].Value);
+                    m_pseudoClasses = new string[psMatches.Count];
+
+                    for (int i = 0; i < m_pseudoClasses.Length; i++)
+                        m_pseudoClasses[i] = psMatches[i].Groups[0].Value;
+                }
                 // ignoring attributes for now
                 break;
             }
         }
 
-        public StyleSelector(string element, string @class, string id, string pseudoClass)
+        public StyleSelector(string element, string [] classes, string id, string [] pseudoClasses)
         {
             m_element = element;
-            m_class = @class;
+            m_classes = classes;
             m_id = id;
-            m_pseudoClass = pseudoClass;
+            m_pseudoClasses = pseudoClasses;
+        }
+
+        public StyleSelector(string element, string classes, string id, string pseudoClasses)
+        {
+            m_id = id.TrimStart('#'); // element ID should not have leading #
+            m_element = element; // element type goes as is
+            m_classes = classes.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries); // classes should be split. May be we need to use Regex as well, but right now simple split would work
+
+            if (!string.IsNullOrEmpty(pseudoClasses)) // Pseudo-classes are tricky and can be in form ::first-child, :disabled or even :not(enabled)
+            {
+                MatchCollection psMatches = s_pseudoClassParser.Matches(pseudoClasses);
+                m_pseudoClasses = new string[psMatches.Count];
+
+                for (int i = 0; i < m_pseudoClasses.Length; i++)
+                    m_pseudoClasses[i] = psMatches[i].Groups[0].Value;
+            }
         }
 
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
 
-            if (m_element != null)
-                builder.Append(m_element);
+            if (!string.IsNullOrEmpty(m_element))
+                builder.Append(m_element); // element type goes as is
 
-            if (m_class != null)
-                builder.Append(m_class);
-
-            if (m_id != null)
+            if (!string.IsNullOrEmpty(m_id))
+            {
+                builder.Append('#'); // id is to be preceded by #
                 builder.Append(m_id);
+            }
 
-            if (m_pseudoClass != null)
-                builder.Append(m_pseudoClass);
+            if (m_classes != null)
+            {
+                foreach (string @class in m_classes)
+                {
+                    builder.Append('.'); // class is to be prepended by .
+                    builder.Append(@class);
+                }
+            }
+
+            if (m_pseudoClasses != null)
+            {
+                foreach (string pseudoClass in m_pseudoClasses) // pseudo classes have their own separators
+                    builder.Append(pseudoClass);
+            }
 
             return builder.ToString();
         }
@@ -87,7 +124,11 @@ namespace StyleTree
                 return false;
 
             if (exactMatch)
-                return m_element == other.Element && m_class == other.Class && m_id == other.Id && m_pseudoClass == other.PseudoClass;
+                return
+                    m_element == other.Element &&
+                    m_id == other.Id &&
+                    CompareClasses(m_classes, other.Classes, true) &&
+                    CompareClasses(m_pseudoClasses, other.PseudoClasses, true);
 
             // returns true if this style can be applied to target string, i.t.
             // this = button and other = button.foo:hover
@@ -95,10 +136,40 @@ namespace StyleTree
             // this = button#id and other = button.foo:hover
             // clearly other don't have id = #id so it can't be used there
 
-            return (string.IsNullOrEmpty(m_element) || m_element == other.Element) &&
-                (string.IsNullOrEmpty(m_class) || m_class == other.Class) &&
+            return
+                (string.IsNullOrEmpty(m_element) || m_element == other.Element) &&
                 (string.IsNullOrEmpty(m_id) || m_id == other.Id) &&
-                (string.IsNullOrEmpty(m_pseudoClass) || m_pseudoClass == other.PseudoClass);
+                (m_classes == null || m_classes.Length == 0 || CompareClasses(m_classes, other.Classes, false)) &&
+                (m_pseudoClasses == null || m_pseudoClasses.Length == 0 || CompareClasses(m_pseudoClasses, other.PseudoClasses, false));
+        }
+
+        /// <summary>
+        /// This method compares two arrays and returns true if they are equal if exactMatch == true.
+        /// If exactMatch == false it returns true if 
+        /// </summary>
+        /// <param name="one"></param>
+        /// <param name="another"></param>
+        /// <param name="exactMatch"></param>
+        /// <returns></returns>
+        private static bool CompareClasses(string[] one, string[] another, bool exactMatch)
+        {
+            if (exactMatch)
+            {
+                if (one.Length != another.Length)
+                    return false;
+
+                foreach (string oneClass in one)
+                    if (Array.IndexOf(another, oneClass) == -1)
+                        return false;
+
+                return true;
+            }
+
+            foreach (string anotherClass in another)
+                if (Array.IndexOf(one, anotherClass) != -1)
+                    return true;
+
+            return false;
         }
     }
 }

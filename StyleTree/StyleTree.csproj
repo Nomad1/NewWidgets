@@ -43,5 +43,16 @@
     <Compile Include="CSSParser.cs" />
     <Compile Include="HtmlNode.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Test1\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Test1\style.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Test1\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

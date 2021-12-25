@@ -184,10 +184,10 @@ namespace StyleTree
 
             for (int i = 0; i < other.Count; i++)
             {
-                if (m_operators[i] != other.m_operators[i])
+                if (m_operators[i] != other.Operators[i])
                     return false;
 
-                if (!m_selectors[i].Equals(other.m_selectors[i], true))
+                if (!m_selectors[i].Equals(other.Selectors[i], true))
                     return false;
             }
 
@@ -207,7 +207,7 @@ namespace StyleTree
             // if other.Selectors is already enumerated but we have something in this.Selectors - we fail
             // otherwise we have a complete match
 
-            int position = other.m_selectors.Count;
+            int position = other.Selectors.Count;
 
             for (int i = m_selectors.Count - 1; i >= 0; i--)
             {
@@ -215,7 +215,7 @@ namespace StyleTree
 
                 while (--position >= 0)
                 {
-                    if (m_selectors[i].Equals(other.m_selectors[position], false))
+                    if (m_selectors[i].Equals(other.Selectors[position], false))
                     {
                         found = true;
                         break;
@@ -232,15 +232,6 @@ namespace StyleTree
             // right now below part is not working properly
             // it should take
             // "this = ul li b" and successfuly compare to "other = html ul li ul li b#b"
-
-            //for (int i = 0; i < other.Count; i++)
-            //{
-            //    if (m_operators[i] != other.m_operators[i])
-            //        return false;
-
-            //    if (!m_selectors[i].Equals(other.m_selectors[i], false))
-            //        return false;
-            //}
 
             return true;
         }

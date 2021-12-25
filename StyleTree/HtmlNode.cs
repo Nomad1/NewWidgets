@@ -39,8 +39,8 @@ namespace StyleTree
         {
             m_parent = parent;
             m_element = element;
-            m_id = string.IsNullOrEmpty(id) ? "" : id[0] == '#' ? id : "#" + id;
-            m_class = string.IsNullOrEmpty(@class) ? "" : @class[0] == '.' ? @class : "." + @class;
+            m_id = id;
+            m_class = @class;
             m_text = text;
             m_children = new List<HtmlNode>();
 
@@ -102,7 +102,7 @@ namespace StyleTree
             foreach (XmlNode child in node.ChildNodes)
                 if (child.NodeType == XmlNodeType.Text)
                 {
-                    text = child.Value;
+                    text = child.Value.Trim();
                     break;
                 }
 
@@ -113,7 +113,7 @@ namespace StyleTree
 
             foreach (XmlNode child in node.ChildNodes)
                 if (child.NodeType != XmlNodeType.Text)
-                RecursiveParse(htmlNode, child);
+                    RecursiveParse(htmlNode, child);
 
             return htmlNode;
         }
@@ -123,7 +123,7 @@ namespace StyleTree
             XmlDocument document = new XmlDocument();
             document.LoadXml(text);
 
-            return RecursiveParse(null, document.FirstChild);
+            return RecursiveParse(null, document.DocumentElement);
         }
     }
 }
