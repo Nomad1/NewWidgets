@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace StyleTree
+namespace NewWidgets.UI.Styles
 {
     /// <summary>
     /// Basic CSS selector description parsed from form E.class#id:hover

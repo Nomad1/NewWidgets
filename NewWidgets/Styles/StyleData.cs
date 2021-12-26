@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace StyleTree
+namespace NewWidgets.UI.Styles
 {
     /// <summary>
     /// Simple data storage for properties. Theoretically short-hand properties should be expanded before going there

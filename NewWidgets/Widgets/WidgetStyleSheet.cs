@@ -5,37 +5,37 @@ using System.Collections.Generic;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetStyleTable
-    {
-        private readonly string m_elementType;
-        private readonly string m_elementId;
-        private readonly string m_elementClass;
-        private WidgetStyleTable m_parentTable;
+    //public class WidgetStyleTable
+    //{
+    //    private readonly string m_elementType;
+    //    private readonly string m_elementId;
+    //    private readonly string m_elementClass;
+    //    private WidgetStyleTable m_parentTable;
 
-        //private readonly IDictionary<WidgetState, WidgetStyleSheet> m_styles = new Dictionary<WidgetState, WidgetStyleSheet>();
+    //    //private readonly IDictionary<WidgetState, WidgetStyleSheet> m_styles = new Dictionary<WidgetState, WidgetStyleSheet>();
 
-        // in CSS world we could:
-        // 1. Get names of all parents and their classes to build a string like this: panel .foo #acc.bar button#wee .l
-        // 2. append our own name in form type#id.class
-        // 3. append our current state pseudo-class in form :hover
-        // 4. run a selector function on all possible styles, keep in mind pseudo-classes of all parents, use + > and || combinators, etc.
-        // 5. look for a property value in this cascading style shit.
+    //    // in CSS world we could:
+    //    // 1. Get names of all parents and their classes to build a string like this: panel .foo #acc.bar button#wee .l
+    //    // 2. append our own name in form type#id.class
+    //    // 3. append our current state pseudo-class in form :hover
+    //    // 4. run a selector function on all possible styles, keep in mind pseudo-classes of all parents, use + > and || combinators, etc.
+    //    // 5. look for a property value in this cascading style shit.
 
-        // in WSS we will cheat:
-        // 1. get current style name in form type#id.class:pseudo-class (anything ending with it but with extras in front should be checked somehow)
-        // 2. if the style is absent strip pseudo-class (starting from less significant bit), than class, then id then try again
-        // 3. try getting the property from it, otherwise goto 2
-        // 4. if we have a link to parent style, move to it and goto 1
+    //    // in WSS we will cheat:
+    //    // 1. get current style name in form type#id.class:pseudo-class (anything ending with it but with extras in front should be checked somehow)
+    //    // 2. if the style is absent strip pseudo-class (starting from less significant bit), than class, then id then try again
+    //    // 3. try getting the property from it, otherwise goto 2
+    //    // 4. if we have a link to parent style, move to it and goto 1
 
-        private WidgetStyleSheet GetStyle(WidgetState state)
-        {
-            // 
+    //    private WidgetStyleSheet GetStyle(WidgetState state)
+    //    {
+    //        // 
 
 
 
-        }
+    //    }
 
-    }
+    //}
 
     /// <summary>
     /// Style sheet for various widget parameters

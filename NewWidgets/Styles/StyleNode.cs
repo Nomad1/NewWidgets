@@ -1,7 +1,19 @@
 ﻿using System.Collections.Generic;
 
-namespace StyleTree
+namespace NewWidgets.UI.Styles
 {
+    /// <summary>
+    /// Operator that shows how two CSS selectors are combined
+    /// </summary>
+    public enum StyleSelectorOperator
+    {
+        None = 1, // comma
+        Inherit = 2, // E F an F element descendant of an E element
+        Child = 3, // E > F an F element child of an E element
+        DirectSibling = 4, // E + F  an F element immediately preceded by an E element
+        Sibling = 5, // E ~ F   an F element preceded by an E element
+    }
+
     /// <summary>
     /// Style node container
     /// </summary>

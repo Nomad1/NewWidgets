@@ -2,11 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace StyleTree
+namespace NewWidgets.Utility
 {
     /// <summary>
     /// ReadOnly collection that uses specified range of provided IList class and supports enumeration and indexed access to a range
-    /// without copying the elements
+    /// without copying the elements.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class ListRange<T> : IEnumerable<T>, IList<T>

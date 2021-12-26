@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using NewWidgets.UI.Styles;
+using NUnit.Framework;
 
 namespace StyleTree
 {
-    class MainClass
+    [TestFixture]
+    public static class HtmlTest
     {
         private static StyleSelector GetHtmlStyle(HtmlNode node)
         {
             return new StyleSelector(node.Element, node.Class, node.Id, "");
         }
 
-        private static void PrintStyle(StyleCollection collection, HtmlNode htmlNode)
+        private static IDictionary<string, string> PrintStyle(StyleCollection collection, HtmlNode htmlNode)
         {
             List<StyleSelector> styleList = new List<StyleSelector>();
 
@@ -41,9 +45,11 @@ namespace StyleTree
             else
                 Console.WriteLine("Style search result for \"{0}\":\n{1}", list, data);
 
+            return data.Properties;
+
         }
 
-        private static void PerformTest(string htmlName, string cssName, string elementId)
+        private static IDictionary<string, string> PerformTest(string htmlName, string cssName, string elementId)
         {
             if (!File.Exists(htmlName))
                 throw new ArgumentException("File " + htmlName + " not found for CSS test");
@@ -61,15 +67,27 @@ namespace StyleTree
             if (element == null)
                 throw new ArgumentException("Element " + elementId + " not found for CSS test");
 
-            PrintStyle(collection, element);
+            return PrintStyle(collection, element);
 
             //Console.WriteLine(html);
 
         }
 
-        public static void Main(string[] args)
+        [Test]
+        public static void Test1()
         {
-            PerformTest("Test1/index.html", "Test1/style.css", "b");
+            Dictionary<string, string> compare = new Dictionary<string, string>()
+            {
+                { "border" , "2px solid #ccc"},
+                { "color" , "green"},
+                { "padding" , "1em"},
+                { "font-weight" , "bold"},
+                { "background-color" , "green"}
+            };
+
+            IDictionary<string, string> result = PerformTest("Test1/index.html", "Test1/style.css", "b");
+
+            Assert.IsTrue(result.OrderBy(kvp => kvp.Key).SequenceEqual(compare.OrderBy(kvp => kvp.Key)));
         }
     }
 }

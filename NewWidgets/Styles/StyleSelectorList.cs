@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using NewWidgets.Utility;
 
-namespace StyleTree
+namespace NewWidgets.UI.Styles
 {
     /// <summary>
     /// Helper class processed from CSS string. Can contain one or main selector chains
@@ -124,7 +125,7 @@ namespace StyleTree
             Analyze(out m_chainCount, out m_complex);
         }
 
-        internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorOperator> operators)
+        public StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorOperator> operators)
         {
             m_selectors = selectors;
             m_operators = operators;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace StyleTree
+namespace NewWidgets.UI.Styles
 {
     /// <summary>
     /// Manager for cascading styles
