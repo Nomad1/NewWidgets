@@ -37,7 +37,7 @@ namespace StyleTree
 
             AddToCollection(m_idCollection, selector.Id, node); // if it starts with # it should be an ID
 
-            if (selector.Classes.Length > 0)
+            if (selector.Classes != null && selector.Classes.Length > 0)
                 AddToCollection(m_classCollection, selector.Classes[selector.Classes.Length -1], node); // last class should be stored
 
             AddToCollection(m_elementCollection, selector.Element, node); // it's an element name
@@ -51,7 +51,7 @@ namespace StyleTree
             if (string.IsNullOrEmpty(key))
                 return;
 
-            ICollection<StyleNode> list = null;
+            ICollection<StyleNode> list;
 
             if (!collection.TryGetValue(key, out list))
                 collection[key] = list = new List<StyleNode>();
@@ -154,15 +154,16 @@ namespace StyleTree
                                 Console.WriteLine("Found match for id #{0} to style {1}", selector.Id, node);
                             }
 
-                foreach (string @class in selector.Classes) // if it has a class, check class collection
-                    if (m_classCollection.TryGetValue(@class, out collection))
-                        foreach (StyleNode node in collection)
-                            if (node.SelectorList.AppliesTo(selectorPart))
-                            {
-                                styles.Add(node);
+                if (selector.Classes != null)
+                    foreach (string @class in selector.Classes) // if it has a class, check class collection
+                        if (m_classCollection.TryGetValue(@class, out collection))
+                            foreach (StyleNode node in collection)
+                                if (node.SelectorList.AppliesTo(selectorPart))
+                                {
+                                    styles.Add(node);
 
-                                Console.WriteLine("Found match for class {0} to style {1}", @class, node);
-                            }
+                                    Console.WriteLine("Found match for class {0} to style {1}", @class, node);
+                                }
 
             }
 
@@ -218,21 +219,5 @@ namespace StyleTree
                     Console.WriteLine(node);
             }
         }
-
-
-        //private StyleNode RecursiveFindExact(StyleNode node, string selectorString)
-        //{
-        //    foreach (StyleNode child in node.Children)
-        //    {
-        //        if (IsExactNode(child.Selector, selectorString))
-        //            return child;
-
-        //        StyleNode result = RecursiveFindExact(child, selectorString);
-        //        if (result != null)
-        //            return result;
-        //    }
-        //    return null;
-        //}
-
     }
 }

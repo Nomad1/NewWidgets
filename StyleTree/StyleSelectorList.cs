@@ -15,6 +15,7 @@ namespace StyleTree
         private readonly IList<StyleSelector> m_selectors;
         private readonly IList<StyleSelectorOperator> m_operators;
         private readonly int m_chainCount;
+        private readonly bool m_complex;
 
         public bool IsEmpty
         {
@@ -35,6 +36,14 @@ namespace StyleTree
         public bool IsSingleChain
         {
             get { return m_chainCount == 1; }
+        }
+
+        /// <summary>
+        /// Returns true if there are complex operators in selector
+        /// </summary>
+        public bool IsComplex
+        {
+            get { return m_complex; }
         }
 
         public int Count
@@ -107,19 +116,19 @@ namespace StyleTree
 
             Match last = splitStrings[splitStrings.Count - 1];
             if (lastOperator != StyleSelectorOperator.None)
-                    throw new ArgumentException("StyleSelectorList constructor got a string ending with operator " + last, selectorsString);
+                throw new ArgumentException("StyleSelectorList constructor got a string ending with operator " + last, selectorsString);
 
             m_selectors = selectors.ToArray();
             m_operators = operators.ToArray();
 
-            m_chainCount = CountChains();
+            Analyze(out m_chainCount, out m_complex);
         }
 
         internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorOperator> operators)
         {
             m_selectors = selectors;
             m_operators = operators;
-            m_chainCount = CountChains();
+            Analyze(out m_chainCount, out m_complex);
         }
 
         internal StyleSelectorList(StyleSelectorList other, int start, int count)
@@ -131,19 +140,28 @@ namespace StyleTree
 
 
         /// <summary>
-        /// Returns amount of separate chains
+        /// This method analyzes the operators and sets the flags for them
         /// </summary>
-        private int CountChains()
+        private void Analyze(out int chainCount, out bool complex)
         {
-            int count = 0;
+            chainCount = 0;
+            complex = false;
 
             // operators array is always the length of selector array having None as a last member
-
             for (int i = 0; i < m_operators.Count; i++)
-                if (m_operators[i] == StyleSelectorOperator.None)
-                    count++;
-
-            return count;
+            {
+                switch (m_operators[i])
+                {
+                    case StyleSelectorOperator.None: // separator
+                        chainCount++;
+                        break;
+                    case StyleSelectorOperator.Inherit: // non complex
+                        break;
+                    default: // complex
+                        complex = true;
+                        break;
+                }
+            }
         }
 
         public IList<StyleSelectorList> Split()
@@ -195,12 +213,18 @@ namespace StyleTree
         }
 
         /// <summary>
-        /// Check two selector lists if one can be applied to another
+        /// Check two selector lists if one can be applied to another. TODO: right now all selectors are assumed to be inheritance " "
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
         public bool AppliesTo(StyleSelectorList other)
         {
+            if (!this.IsSingleChain)
+                throw new ArgumentException("StyleSelectorList.AppliesTo called for non-single chain selector!");
+
+            if (this.IsComplex)
+                throw new ArgumentException("StyleSelectorList.AppliesTo called for complex selector!");
+
             // Here we are enumeration two collections from the tail.
             // for each entry from this.Selectors we need to find at least one entry in other.Selectors
             // if there is no corresponding entry - we fail
@@ -225,8 +249,6 @@ namespace StyleTree
                 if (!found)
                     return false;
             }
-            //if (IsSimple)
-                //return m_selectors[0].Equals(other.m_selectors[other.Count - 1], false);
 
             // TODO: deep search using operators and everything.
             // right now below part is not working properly

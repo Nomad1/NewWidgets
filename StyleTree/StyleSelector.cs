@@ -9,7 +9,14 @@ namespace StyleTree
     /// </summary>
     public class StyleSelector
     {
+        /// <summary>
+        /// Regular expression to parse selectors
+        /// </summary>
         private static readonly Regex s_selectorParser = new Regex(@"^(?<element>[\*|\w|\-]+)?(?<id>#[\w|\-]+)?(?<class>\.[\w|\-|\.]+)?(?<attributes>\[.+\])?(?<pseudostyle>:.+)?$", RegexOptions.Compiled);
+
+        /// <summary>
+        /// Regular expression to parse pseudo classes separated by :
+        /// </summary>
         private static readonly Regex s_pseudoClassParser = new Regex(@"(:{1,2}[^:]+)", RegexOptions.Compiled);
 
         private readonly string m_element;
@@ -63,19 +70,11 @@ namespace StyleTree
             }
         }
 
-        public StyleSelector(string element, string [] classes, string id, string [] pseudoClasses)
-        {
-            m_element = element;
-            m_classes = classes;
-            m_id = id;
-            m_pseudoClasses = pseudoClasses;
-        }
-
         public StyleSelector(string element, string classes, string id, string pseudoClasses)
         {
             m_id = id.TrimStart('#'); // element ID should not have leading #
             m_element = element; // element type goes as is
-            m_classes = classes.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries); // classes should be split. May be we need to use Regex as well, but right now simple split would work
+            m_classes = string.IsNullOrEmpty(classes) ? null : classes.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries); // classes should be split. May be we need to use Regex as well, but right now simple split would work
 
             if (!string.IsNullOrEmpty(pseudoClasses)) // Pseudo-classes are tricky and can be in form ::first-child, :disabled or even :not(enabled)
             {

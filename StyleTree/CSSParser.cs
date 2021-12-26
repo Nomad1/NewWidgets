@@ -4,7 +4,11 @@ using System.Text;
 
 namespace StyleTree
 {
-    public class CSSParser
+    /// <summary>
+    /// This class takes .css file text and splits it to styles, parameters and comments
+    /// It is definitelly incomplete but still could be of use
+    /// </summary>
+    public static class CSSParser
     {
         private enum CSSParserState
         {
@@ -13,21 +17,6 @@ namespace StyleTree
             Comment = 0x2, // we're inside the comment /* ... */
             ParameterBlock = 0x4, // we're inside the parameters block { ... }
             Parameter = 0x08, // we're inside the parameter definition
-        }
-
-        private static void LogError(string text, params object[] parameters)
-        {
-            Console.WriteLine("ERROR: {0}", string.Format(text, parameters));
-        }
-
-        private static void LogWarning(string text, params object[] parameters)
-        {
-            Console.WriteLine("WARNING: {0}", string.Format(text, parameters));
-        }
-
-        private static void LogTrace(string text, params object[] parameters)
-        {
-            Console.WriteLine(string.Format(text, parameters));
         }
 
         public static void ParseCSS(string cssText, StyleCollection targetCollection)
@@ -61,12 +50,12 @@ namespace StyleTree
 
                             if (!string.IsNullOrEmpty(currentStyle))
                             {
-                                LogWarning("New style block started while {0} is in process", currentStyle);
+                                Console.WriteLine("WARNING: New style block started while {0} is in process", currentStyle);
                             }
 
                             if (parameters.Count != 0)
                             {
-                                LogWarning("New style block started while parameters collection has {0} entries", parameters.Count);
+                                Console.WriteLine("WARNING: New style block started while parameters collection has {0} entries", parameters.Count);
                             }
 
                             currentStyle = text.ToString();
@@ -76,7 +65,7 @@ namespace StyleTree
                             continue;
                         }
                         else
-                            LogError("Starting parameter block without style name");
+                            Console.WriteLine("ERROR: Starting parameter block without style name");
                         break;
                     case '}': // TODO: ignore inside of the parameter text string
                         if ((state & CSSParserState.Parameter) != 0) // parameter is ending without trailing ;. Not an issue
@@ -93,7 +82,7 @@ namespace StyleTree
 
                             if (string.IsNullOrEmpty(currentStyle))
                             {
-                                LogError("Parameter block finished without style name");
+                                Console.WriteLine("ERROR: Parameter block finished without style name");
                                 continue;
                             }
 
@@ -161,7 +150,7 @@ namespace StyleTree
         {
             if (string.IsNullOrEmpty(text))
             {
-                LogError("Empty parameter string provided");
+                Console.WriteLine("ERROR: Empty parameter string provided");
                 return false;
             }
 
@@ -169,7 +158,7 @@ namespace StyleTree
 
             if (split.Length != 2)
             {
-                LogError("Invalid parameter string provided {0}", text);
+                Console.WriteLine("ERROR: Invalid parameter string provided {0}", text);
                 return false;
             }
 
@@ -177,7 +166,9 @@ namespace StyleTree
 
             if (parameters.ContainsKey(key))
             {
-                LogWarning("Overriding data for parameter {0}", key);
+                // TODO: it's needed only for debug purposes. CSS standard does not forbid duplicate declarations
+
+                Console.WriteLine("WARNING: Overriding data for parameter {0}", key);
             }
 
             parameters[key] = split[1].Trim();

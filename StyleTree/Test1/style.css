@@ -14,8 +14,10 @@
     color: yellow
 }
 
-/*li ul li ul li b { font-color: red; }
-b { color: green; }*/
+ul li ul li {
+    background-color: gray;
+}
+
 .tmp.tmp2 {
     color: red;
 }
@@ -24,6 +26,3 @@ b { color: green; }*/
     background-color: green;
     color: green;
 }
-
-
-/*html ul.main li ul.special li ul li b#b { color: red; }*/

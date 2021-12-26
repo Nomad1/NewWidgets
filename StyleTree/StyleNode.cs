@@ -9,7 +9,7 @@ namespace StyleTree
     {
         private readonly StyleSelectorList m_selectorList;
 
-        //// reference to actual data. Different nodes (i.e. "tr, .someclass, #number { }") are using the same data object
+        // reference to actual data. Different nodes (i.e. "tr, .someclass, #number { }") are using the same data object
         private readonly StyleData m_data;
 
         internal StyleData Data

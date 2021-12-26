@@ -4,6 +4,10 @@ using System.Xml;
 
 namespace StyleTree
 {
+    /// <summary>
+    /// Simplest possible HTML node wrapper for storing provided attributes
+    /// Static method ParseXHmlt allows loading HTML markup from XHTML file with XmlDocument
+    /// </summary>
     public class HtmlNode
     {
         private readonly string m_element;
@@ -48,6 +52,11 @@ namespace StyleTree
                 m_parent.m_children.Add(this);
         }
 
+        /// <summary>
+        /// This method is needed to serialize the node to HTML compatible string
+        /// Note that it follows IJW idea, so it's definitelly not optimal and should not be used in production 
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
@@ -80,6 +89,11 @@ namespace StyleTree
             return builder.ToString();
         }
 
+        /// <summary>
+        /// Helper method to find the element with specified id in the hierarchy
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public HtmlNode GetElementById(string id)
         {
             if (!string.IsNullOrEmpty(m_id) && m_id == id)
@@ -118,10 +132,16 @@ namespace StyleTree
             return htmlNode;
         }
 
-        public static HtmlNode ParseXHmlt(string text)
+        /// <summary>
+        /// This method tries to parse XHTML string with XmlDocument
+        /// It will fail if file name is provided or the document is HTML, not a XHTML
+        /// </summary>
+        /// <param name="xhtmlString"></param>
+        /// <returns></returns>
+        public static HtmlNode ParseXHmlt(string xhtmlString)
         {
             XmlDocument document = new XmlDocument();
-            document.LoadXml(text);
+            document.LoadXml(xhtmlString);
 
             return RecursiveParse(null, document.DocumentElement);
         }
