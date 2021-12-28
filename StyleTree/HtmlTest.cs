@@ -67,10 +67,9 @@ namespace StyleTree
             if (element == null)
                 throw new ArgumentException("Element " + elementId + " not found for CSS test");
 
+            Console.WriteLine(HtmlNode.SaveXHmlt(html));
+
             return PrintStyle(collection, element);
-
-            //Console.WriteLine(html);
-
         }
 
         [Test]

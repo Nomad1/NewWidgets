@@ -54,12 +54,16 @@ namespace StyleTree
 
         /// <summary>
         /// This method is needed to serialize the node to HTML compatible string
-        /// Note that it follows IJW idea, so it's definitelly not optimal and should not be used in production 
+        /// Note that it follows IJW idea, so it's definitelly not optimal and should NOT be used in production 
         /// </summary>
-        /// <returns></returns>
-        public override string ToString()
+        private void Serialize(StringBuilder builder, int level = 0)
         {
-            StringBuilder builder = new StringBuilder();
+            if (level != 0)
+                builder.AppendLine(); // no need for empty line before the <html> tag
+
+            for (int i = 0; i < level; i++)
+                builder.Append("    "); // 4 spaces for tabs ;)
+
             builder.Append('<');
             builder.Append(m_element);
 
@@ -79,14 +83,20 @@ namespace StyleTree
                     builder.Append(m_text);
 
                 foreach (HtmlNode child in m_children)
-                    builder.Append(child);
+                    child.Serialize(builder, level + 1);
+
+                if (m_children.Count > 0)
+                {
+                    builder.AppendLine();
+
+                    for (int i = 0; i < level; i++)
+                        builder.Append("    "); // 4 spaces for tabs ;)
+                }
 
                 builder.Append("</");
                 builder.Append(m_element);
                 builder.Append('>');
             }
-
-            return builder.ToString();
         }
 
         /// <summary>
@@ -144,6 +154,23 @@ namespace StyleTree
             document.LoadXml(xhtmlString);
 
             return RecursiveParse(null, document.DocumentElement);
+        }
+
+        /// <summary>
+        /// Converts HTML hierarchy to XHtml string with padding
+        /// Note that it's just a simple serialization, it does not use XmlDocument and never checks
+        /// the integrity of files produced
+        /// </summary>
+        /// <param name="node"></param>
+        /// <returns></returns>
+        public static string SaveXHmlt(HtmlNode node)
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
+
+            node.Serialize(builder);
+
+            return builder.ToString();
         }
     }
 }

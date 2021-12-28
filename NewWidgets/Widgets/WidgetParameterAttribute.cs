@@ -1,20 +1,15 @@
 ﻿using System;
+using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
     /// <summary>
-    /// Helper attribute for pre-defined parameters. It's faster to have this than look up strings all the time
+    /// Helper attribute for pre-defined parameters
     /// </summary>
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
-    internal class WidgetParameterAttribute : Attribute
+    internal class WidgetParameterAttribute : NameAttribute
     {
-        private readonly string m_name;
         private readonly Type m_type;
-
-        public string Name
-        {
-            get { return m_name; }
-        }
 
         public Type Type
         {
@@ -22,8 +17,8 @@ namespace NewWidgets.Widgets
         }
 
         public WidgetParameterAttribute(string name, Type type = null)
+            : base(name)
         {
-            m_name = name;
             m_type = type ?? typeof(string);
         }
     }

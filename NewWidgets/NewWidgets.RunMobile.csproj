@@ -103,6 +103,7 @@
     <Compile Include="Styles\StyleSelector.cs" />
     <Compile Include="Styles\StyleSelectorList.cs" />
     <Compile Include="Utility\SubList.cs" />
+    <Compile Include="Utility\IndexNameMap.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

@@ -12,12 +12,16 @@ namespace NewWidgets.UI.Styles
         private readonly IDictionary<string, ICollection<StyleNode>> m_idCollection = new Dictionary<string, ICollection<StyleNode>>();
         private readonly IDictionary<string, ICollection<StyleNode>> m_classCollection = new Dictionary<string, ICollection<StyleNode>>();
 
-        public StyleCollection()
+        /// <summary>
+        /// Creates an empty collection with specified root element (html by default)
+        /// </summary>
+        /// <param name="rootName"></param>
+        public StyleCollection(string rootName = "html")
         {
             // html selector is always a root. There is also a special case with :root pseudo-class but it's not supported for now
             StyleNode root = new StyleNode(
                 new StyleSelectorList(
-                    new[] { new StyleSelector("html", "", "", "") },
+                    new[] { new StyleSelector(rootName, "", "", "") },
                     new[] { StyleSelectorOperator.None }),
                 new StyleData());
 

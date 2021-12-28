@@ -1,7 +1,6 @@
-﻿#define MEMORY_PRIORITY // undefine for speed priority
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
@@ -37,6 +36,7 @@ namespace NewWidgets.Widgets
 
     //}
 
+  
     /// <summary>
     /// Style sheet for various widget parameters
     /// </summary>
@@ -45,12 +45,7 @@ namespace NewWidgets.Widgets
         private class StyleSheetData
         {
             private StyleSheetData m_parent;
-#if MEMORY_PRIORITY
             private readonly IDictionary<WidgetParameterIndex, object> m_indexedParameters = new Dictionary<WidgetParameterIndex, object>();
-#else
-            public readonly object[] m_indexedParameters = new object[(int)WidgetParameterIndex.Max]; // internal storage for known indexed parameters
-#endif
-            private readonly IDictionary<string, object> m_namedParameters = new Dictionary<string, object>(); // external storage for custom parameters
 
             public StyleSheetData(StyleSheetData parent)
             {
@@ -68,12 +63,7 @@ namespace NewWidgets.Widgets
 
                 // check if we have this parameter in local dictionary
 
-#if MEMORY_PRIORITY
                 if (!m_indexedParameters.TryGetValue(index, out result))
-#else
-                result = m_indexedParameters[(int)index];
-                if (result == null)
-#endif
                 {
                     if (m_parent != null)
                         result = m_parent.GetParameter(index);
@@ -84,45 +74,17 @@ namespace NewWidgets.Widgets
 
             public object GetParameter(string name)
             {
-                object result;
-
-                if (m_namedParameters.TryGetValue(name, out result))
-                    return result; // returns string, not object!
-
-                Tuple<WidgetParameterIndex, Type> index = WidgetManager.GetParameterIndexByName(name);
-
-                if (index != null)
-                    return GetParameter(index.Item1);
-
-                // we need this to find non-indexed named params in parent tree
-                if (m_parent != null)
-                    return m_parent.GetParameter(name);
-
-                return null;
+                return GetParameter(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name));
             }
 
             public void SetParameter(WidgetParameterIndex index, object value)
             {
-#if MEMORY_PRIORITY
                 m_indexedParameters[index] = value;
-#else
-                m_indexedParameters[(int)index] = value;
-#endif
             }
 
             public void SetParameter(string name, object value)
             {
-                Tuple<WidgetParameterIndex,Type> index = WidgetManager.GetParameterIndexByName(name);
-
-                if (index != null)
-                {
-                    if (index.Item2 != value.GetType())
-                        throw new WidgetException("Invalid data of type " + value.GetType() + " set for index " + name);
-
-                    SetParameter(index.Item1, value);
-                }
-                else
-                    m_namedParameters[name] = value;
+                SetParameter(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name), value);
             }
 
         }
