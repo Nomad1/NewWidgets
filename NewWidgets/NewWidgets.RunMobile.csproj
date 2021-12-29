@@ -98,7 +98,6 @@
     <Compile Include="Widgets\Controls\Experimental\WidgetTable.cs" />
     <Compile Include="Widgets\WidgetPreudoClassAttribute.cs" />
     <Compile Include="Styles\StyleCollection.cs" />
-    <Compile Include="Styles\StyleData.cs" />
     <Compile Include="Styles\StyleNode.cs" />
     <Compile Include="Styles\StyleSelector.cs" />
     <Compile Include="Styles\StyleSelectorList.cs" />

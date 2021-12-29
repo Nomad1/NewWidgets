@@ -10,7 +10,7 @@ namespace NewWidgets.UI.Styles
     public class StyleSelector
     {
         /// <summary>
-        /// Regular expression to parse selectors
+        /// Regular expression to parse selectors to basic parts
         /// </summary>
         private static readonly Regex s_selectorParser = new Regex(@"^(?<element>[\*|\w|\-]+)?(?<id>#[\w|\-]+)?(?<class>\.[\w|\-|\.]+)?(?<attributes>\[.+\])?(?<pseudostyle>:.+)?$", RegexOptions.Compiled);
 
@@ -129,6 +129,8 @@ namespace NewWidgets.UI.Styles
                     CompareClasses(m_classes, other.Classes, true) &&
                     CompareClasses(m_pseudoClasses, other.PseudoClasses, true);
 
+            // TODO: calculate specificity as well and return it
+
             // returns true if this style can be applied to target string, i.t.
             // this = button and other = button.foo:hover
             // but fails if this class has specifications, i.e.
@@ -144,7 +146,7 @@ namespace NewWidgets.UI.Styles
 
         /// <summary>
         /// This method compares two arrays and returns true if they are equal if exactMatch == true.
-        /// If exactMatch == false it returns true if 
+        /// If (exactMatch == false) it returns true if at least one of another classes is in one collection
         /// </summary>
         /// <param name="one"></param>
         /// <param name="another"></param>

@@ -15,7 +15,7 @@ namespace StyleTree
             return new StyleSelector(node.Element, node.Class, node.Id, "");
         }
 
-        private static IDictionary<string, string> PrintStyle(StyleCollection collection, HtmlNode htmlNode)
+        private static IDictionary<string, string> GetStyle(StyleCollection collection, HtmlNode htmlNode)
         {
             List<StyleSelector> styleList = new List<StyleSelector>();
 
@@ -38,14 +38,22 @@ namespace StyleTree
             operators[operators.Length - 1] = StyleSelectorOperator.None; // trailing None operator
 
             StyleSelectorList list = new StyleSelectorList(styles, operators);
-            StyleData data = collection.GetStyleData(list);
+
+            SimpleStyleData result = new SimpleStyleData();
+
+            ICollection<IStyleData> data = collection.GetStyleData(list);
 
             if (data == null)
                 Console.WriteLine("Style for \"{0}\" not found!", list);
             else
-                Console.WriteLine("Style search result for \"{0}\":\n{1}", list, data);
+            {
+                foreach (IStyleData styleData in data)
+                    result.LoadData(styleData);
 
-            return data.Properties;
+                Console.WriteLine("Style search result for \"{0}\":\n{1}", list, result);
+            }
+
+            return result.Properties;
 
         }
 
@@ -69,7 +77,7 @@ namespace StyleTree
 
             Console.WriteLine(HtmlNode.SaveXHmlt(html));
 
-            return PrintStyle(collection, element);
+            return GetStyle(collection, element);
         }
 
         [Test]

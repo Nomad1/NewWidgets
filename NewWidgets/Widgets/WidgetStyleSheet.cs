@@ -86,7 +86,6 @@ namespace NewWidgets.Widgets
             {
                 SetParameter(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name), value);
             }
-
         }
 
         private string m_name;

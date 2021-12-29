@@ -13,19 +13,10 @@ namespace NewWidgets.UI.Styles
         private readonly IDictionary<string, ICollection<StyleNode>> m_classCollection = new Dictionary<string, ICollection<StyleNode>>();
 
         /// <summary>
-        /// Creates an empty collection with specified root element (html by default)
+        /// Creates an empty style collection 
         /// </summary>
-        /// <param name="rootName"></param>
-        public StyleCollection(string rootName = "html")
+        public StyleCollection()
         {
-            // html selector is always a root. There is also a special case with :root pseudo-class but it's not supported for now
-            StyleNode root = new StyleNode(
-                new StyleSelectorList(
-                    new[] { new StyleSelector(rootName, "", "", "") },
-                    new[] { StyleSelectorOperator.None }),
-                new StyleData());
-
-            AddStyle(root);
         }
 
         /// <summary>
@@ -68,14 +59,12 @@ namespace NewWidgets.UI.Styles
         /// </summary>
         /// <param name="selectorsString"></param>
         /// <param name="properties"></param>
-        public void AddStyle(string selectorsString, IDictionary<string, string> properties)
+        public void AddStyle(string selectorsString, IStyleData data)
         {
             // TODO: process properties to remove scripts, shorthand values, unit conversion, tc.
             // properties = ProcessProperties(properties)
 
             StyleSelectorList selectorList = new StyleSelectorList(selectorsString);
-
-            StyleData data = null;
 
             foreach (StyleSelectorList selector in selectorList.Split())
             {
@@ -83,13 +72,11 @@ namespace NewWidgets.UI.Styles
 
                 if (node != null) // we have a node that is 100% matching the new one
                 {
-                    node.Data.LoadData(properties);
+                    node.Data.LoadData(data);
                     continue;
                 }
-                if (data == null)
-                    data = new StyleData(properties);
 
-                AddStyle(new StyleNode(selector, new StyleData(properties)));
+                AddStyle(new StyleNode(selector, data));
             }
         }
 
@@ -123,7 +110,13 @@ namespace NewWidgets.UI.Styles
             return null;
         }
 
-        public StyleData GetStyleData(StyleSelectorList selectorList)
+        /// <summary>
+        /// This method retrieves an ordered list (cascade) of style properties
+        /// for given selector list
+        /// </summary>
+        /// <param name="selectorList"></param>
+        /// <returns></returns>
+        public ICollection<IStyleData> GetStyleData(StyleSelectorList selectorList)
         {
             if (selectorList == null || selectorList.IsEmpty)
                 throw new ArgumentException("Invalid StyleNode for FindStyle call");
@@ -177,16 +170,12 @@ namespace NewWidgets.UI.Styles
                 return null;
 
             if (styles.Count == 1)
-                return styles[0].Data;
+                return new[] { styles[0].Data };
 
-            StyleData result = new StyleData();
+            IStyleData[] result = new IStyleData[styles.Count];
 
-            foreach (StyleNode styleNode in styles)
-                result.LoadData(styleNode.Data.Properties);
-
-            //Console.Error.WriteLine("Complex search not implemented yet!");
-
-            // TODO: implement cascading.
+            for (int i = 0; i < styles.Count; i++)
+                result[i] = styles[i].Data;
 
             // 1. find hierarchy match (considering operators) for each list entry. It's different from exact match because it should consider inheritance and incapsulation
             // 2. compose a specificity list and sort the results
@@ -195,7 +184,13 @@ namespace NewWidgets.UI.Styles
             return result;
         }
 
-        public StyleData GetStyleData(string selectorsString)
+        /// <summary>
+        /// This method retrieves an ordered list (cascade) of style properties
+        /// for given selector string
+        /// </summary>
+        /// <param name="selectorsString"></param>
+        /// <returns></returns>
+        public ICollection<IStyleData> GetStyleData(string selectorsString)
         {
             return GetStyleData(new StyleSelectorList(selectorsString));
         }

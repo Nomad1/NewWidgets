@@ -89,7 +89,7 @@ namespace StyleTree
 
                             //LogTrace("{0}: {1} params", currentStyle.Trim(), parameters.Count);
 
-                            targetCollection.AddStyle(currentStyle.Trim(), parameters);
+                            targetCollection.AddStyle(currentStyle.Trim(), new SimpleStyleData(parameters));
 
                             currentStyle = null;
                             parameters = new Dictionary<string, string>();

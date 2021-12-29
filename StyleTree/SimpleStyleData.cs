@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using NewWidgets.UI.Styles;
 
-namespace NewWidgets.UI.Styles
+namespace StyleTree
 {
     /// <summary>
     /// Simple data storage for properties. Theoretically short-hand properties should be expanded before going there
     /// Also there is no support for expressions ATM
     /// </summary>
-    public class StyleData
+    public class SimpleStyleData : IStyleData
     {
         private IDictionary<string, string> m_properties;
         private bool m_owner;
@@ -23,13 +24,13 @@ namespace NewWidgets.UI.Styles
             get { return m_properties; }
         }
 
-        public StyleData()
+        public SimpleStyleData()
         {
             m_properties = new Dictionary<string, string>();
             m_owner = true;
         }
 
-        public StyleData(IDictionary<string, string> data)
+        public SimpleStyleData(IDictionary<string, string> data)
         {
             m_properties = data;
             m_owner = false;
@@ -67,6 +68,11 @@ namespace NewWidgets.UI.Styles
                 builder.AppendFormat("\t{0}: {1};\n", pair.Key, pair.Value);
 
             return builder.ToString();
+        }
+
+        public void LoadData(IStyleData data)
+        {
+            LoadData(((SimpleStyleData)data).Properties);
         }
     }
 }

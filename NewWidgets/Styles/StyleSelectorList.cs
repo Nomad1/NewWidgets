@@ -11,6 +11,9 @@ namespace NewWidgets.UI.Styles
     /// </summary>
     public class StyleSelectorList
     {
+        /// <summary>
+        /// Regular expression to separate selectors to different groups
+        /// </summary>
         private static readonly Regex s_selectorParser = new Regex(@"([\w#:\-\[\]()\.\='\^\/]+)([\s,+>~]+)", RegexOptions.Compiled);
 
         private readonly IList<StyleSelector> m_selectors;
@@ -110,9 +113,6 @@ namespace NewWidgets.UI.Styles
                 operators.Add(@operator);
 
                 lastOperator = @operator;
-
-                //if (@operator != StyleSelectorOperator.Inherit)
-                //i++;
             }
 
             Match last = splitStrings[splitStrings.Count - 1];
@@ -165,6 +165,10 @@ namespace NewWidgets.UI.Styles
             }
         }
 
+        /// <summary>
+        /// Split selector name to different chains if there is a comma sign
+        /// </summary>
+        /// <returns></returns>
         public IList<StyleSelectorList> Split()
         {
             if (m_chainCount == 1)
@@ -184,11 +188,6 @@ namespace NewWidgets.UI.Styles
             }
 
             return result.ToArray();
-        }
-
-        public StyleSelectorList Range(int from, int length)
-        {
-            return new StyleSelectorList(this, from, length);
         }
 
         /// <summary>

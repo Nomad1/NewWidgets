@@ -15,6 +15,15 @@ namespace NewWidgets.UI.Styles
     }
 
     /// <summary>
+    /// This is an interface for property storage container
+    /// Simplest version of this container is just a Dictionary with all the properties
+    /// </summary>
+    public interface IStyleData
+    {
+        void LoadData(IStyleData data);
+    }
+
+    /// <summary>
     /// Style node container
     /// </summary>
     public class StyleNode
@@ -22,9 +31,9 @@ namespace NewWidgets.UI.Styles
         private readonly StyleSelectorList m_selectorList;
 
         // reference to actual data. Different nodes (i.e. "tr, .someclass, #number { }") are using the same data object
-        private readonly StyleData m_data;
+        private readonly IStyleData m_data;
 
-        internal StyleData Data
+        internal IStyleData Data
         {
             get { return m_data; }
         }
@@ -44,12 +53,7 @@ namespace NewWidgets.UI.Styles
             get { return m_selectorList.ToString(); }
         }
 
-        public IDictionary<string, string> Properties
-        {
-            get { return m_data.Properties; }
-        }
-
-        internal StyleNode(StyleSelectorList selector, StyleData data)
+        internal StyleNode(StyleSelectorList selector, IStyleData data)
         {
             m_selectorList = selector;
             m_data = data;
