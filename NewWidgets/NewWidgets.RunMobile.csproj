@@ -72,7 +72,7 @@
     <Compile Include="UI\SimpleWindow.cs" />
     <Compile Include="Utility\ResourceLoader.cs" />
     <Compile Include="Widgets\WidgetException.cs" />
-    <Compile Include="Widgets\WidgetParameterAttribute.cs" />
+    <Compile Include="Widgets\Attributes.cs" />
     <Compile Include="UI\AnimationManager.cs" />
     <Compile Include="UI\WindowController.cs" />
     <Compile Include="UI\Enums.cs" />
@@ -96,7 +96,6 @@
     <Compile Include="Widgets\Controls\Experimental\WidgetSelect.cs" />
     <Compile Include="Widgets\Controls\Experimental\WidgetSlider.cs" />
     <Compile Include="Widgets\Controls\Experimental\WidgetTable.cs" />
-    <Compile Include="Widgets\WidgetPreudoClassAttribute.cs" />
     <Compile Include="Styles\StyleCollection.cs" />
     <Compile Include="Styles\StyleNode.cs" />
     <Compile Include="Styles\StyleSelector.cs" />

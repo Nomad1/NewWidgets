@@ -85,17 +85,14 @@ namespace NewWidgets.Widgets
             m_background = new WindowObjectArray<WindowObject>();
         }
 
-        public override bool SwitchStyle(WidgetState styleType)
+        public override void UpdateStyle()
         {
-            if (base.SwitchStyle(styleType))
-            {
-                InvalidateBackground();
-                return true;
-            }
-            return false;
+            base.UpdateStyle();
+
+            InvalidateBackground();
         }
 
-        protected virtual void PrepareBackground()
+        protected void UpdateBackground()
         {
             InitBackground(BackgroundStyle, BackgroundTexture, BackgroundScale, BackgroundRotation, BackgroundPivot, BackgroundPadding);
         }
@@ -367,15 +364,15 @@ namespace NewWidgets.Widgets
                 return false;
 
             if (!m_backgroundInited)
-                PrepareBackground();
+                UpdateBackground();
 
             if (m_background.Count > 0)
             {
-                int ialpha = MathHelper.Clamp((int)(Opacity * BackgroundAlpha * 255 + float.Epsilon), 0, 255); // I'm adding epsilon there to avoid 0.999999 rounding to 254
+                int ialpha = MathHelper.Clamp((int)(OpacityValue * BackgroundAlpha * 255 + float.Epsilon), 0, 255); // I'm adding epsilon there to avoid 0.999999 rounding to 254
 
                 WindowObject[] array = m_background.List;
 
-                for (int i = array.Length - 1; i >= 0; i--)
+                for (int i = 0; i < array.Length; i++)
                     if (array[i] != null && array[i].Visible && array[i] is ImageObject)
                     {
                         ((ImageObject)array[i]).Sprite.Alpha = (byte)ialpha;
@@ -388,7 +385,7 @@ namespace NewWidgets.Widgets
             return true;
         }
 
-        public override void Draw()
+        public sealed override void Draw()
         {
             if (!Visible)
                 return;
@@ -396,8 +393,9 @@ namespace NewWidgets.Widgets
             if (BackgroundDepth == WidgetBackgroundDepth.Back)
                 m_background.Draw();
 
-          
-            if (ClipContents)
+            bool clip = ClipContents; // I'm caching this variable to make sure we apply clipping and then cancel it accordingly
+
+            if (clip)
             {
                 Vector2 clipTopLeft = this.Transform.GetScreenPoint(new Vector2(ClipMargin.Left, ClipMargin.Top));
                 Vector2 clipBottomRight = this.Transform.GetScreenPoint(new Vector2(this.Size.X - ClipMargin.Right, this.Size.Y - ClipMargin.Bottom));
@@ -417,8 +415,10 @@ namespace NewWidgets.Widgets
             if (BackgroundDepth == WidgetBackgroundDepth.TopClipped)
                 m_background.Draw();
 
-            if (ClipContents)
+            if (clip)
+            {
                 WindowController.Instance.CancelClipRect();
+            }
 
             if (BackgroundDepth == WidgetBackgroundDepth.Top)
                 m_background.Draw();

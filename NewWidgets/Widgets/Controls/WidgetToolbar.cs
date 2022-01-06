@@ -20,8 +20,6 @@ namespace NewWidgets.Widgets
         private readonly WidgetPanel m_buttons;
         private readonly bool m_vertical;
 
-        private bool m_needLayout;
-
         public IList<Widget> Buttons
         {
             get { return m_buttons.Children; }
@@ -34,84 +32,78 @@ namespace NewWidgets.Widgets
             m_buttons.Parent = this;
             m_vertical = vertical;
 
-            m_needLayout = true;
-
         }
 
         public void AddChild(WidgetButton obj)
         {
             m_buttons.AddChild(obj);
-            m_needLayout = true;
+            InvalidateLayout();
         }
 
         public void RemoveChild(WidgetButton obj)
         {
             if (m_buttons.RemoveChild(obj)) // we're doing RemoveChild instead of Remove to make sure buttons are refreshed
-            {
-                m_needLayout = true;
-            }
+                InvalidateLayout();
         }
 
         public void Clear()
         {
             m_buttons.Clear();
-            m_needLayout = true;
+            InvalidateLayout();
         }
 
-        private void Relayout()
+        public override void UpdateLayout()
         {
-            m_needLayout = false;
-
-            if (m_buttons.Children.Count <= 0)
+            if (m_buttons.Children.Count > 0)
             {
-                Visible = false;
-                return;
-            }
+                float x = s_offsetX;
+                float y = s_offsetY;
+                float max = 0;
 
-            float x = s_offsetX;
-            float y = s_offsetY;
-            float max = 0;
-
-            foreach (var button in m_buttons.Children)
-            {
-                if (button.Visible)
+                foreach (var button in m_buttons.Children)
                 {
-                    button.Position = new Vector2(x, y);
-
-                    if (m_vertical)
+                    if (button.Visible)
                     {
-                        y += button.Size.Y + s_buttonSpacing;
+                        button.Position = new Vector2(x, y);
 
-                        if (button.Size.X + x > max)
-                            max = x + button.Size.X;
-                    }
-                    else
-                    {
-                        x += button.Size.X + s_buttonSpacing;
+                        if (m_vertical)
+                        {
+                            y += button.Size.Y + s_buttonSpacing;
 
-                        if (button.Size.Y + y > max)
-                            max = y + button.Size.Y;
+                            if (button.Size.X + x > max)
+                                max = x + button.Size.X;
+                        }
+                        else
+                        {
+                            x += button.Size.X + s_buttonSpacing;
+
+                            if (button.Size.Y + y > max)
+                                max = y + button.Size.Y;
+                        }
                     }
                 }
+
+                if (m_vertical)
+                    x = max;
+                else
+                    y = max;
+
+                // Update global size
+                Vector2 size = new Vector2(x + s_offsetX, y + s_offsetY);
+                m_buttons.Size = Size = size;
+
+                Visible = true;
+            }
+            else
+            {
+                Visible = false;
             }
 
-            if (m_vertical)
-                x = max;
-            else
-                y = max;
-
-            // Update global size
-            Vector2 size = new Vector2(x + s_offsetX, y + s_offsetY);
-            m_buttons.Size = Size = size;
-
-            Visible = true;
+            base.UpdateLayout();
         }
 
         public override bool Update()
         {
-            if (m_needLayout)
-                Relayout();
-
             if (m_buttons != null)
                 m_buttons.Update();
 

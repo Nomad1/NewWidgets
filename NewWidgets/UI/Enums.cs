@@ -115,13 +115,6 @@ namespace NewWidgets.UI
         Default = Visible | Enabled | Changed
     }
 
-    public enum LabelAlign
-    {
-        Start = 0,
-        Center = 1,
-        End = 2
-    }
-
     [Flags]
     public enum WindowFlags
     {

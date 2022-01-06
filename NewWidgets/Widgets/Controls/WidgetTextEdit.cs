@@ -22,8 +22,6 @@ namespace NewWidgets.Widgets
         private string m_preffix;
         private string m_text;
 
-        private bool m_needLayout;
-
         private bool m_tabToValidate;
 
         public event Action<WidgetTextEdit, string> OnFocusLost;
@@ -72,17 +70,17 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public uint FocusedTextColor
-        {
-            get { return GetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, (uint)0xffffff); }
-            set
-            {
-                SetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, value);
+        //public uint FocusedTextColor
+        //{
+        //    get { return GetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, (uint)0xffffff); }
+        //    set
+        //    {
+        //        SetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, value);
 
-                if (CurrentState == WidgetState.Selected && m_label != null) // try to avoid InvalidateLayout
-                    m_label.Color = value;
-            }
-        }
+        //        if (CurrentState == WidgetState.Selected && m_label != null) // try to avoid InvalidateLayout
+        //            m_label.Color = value;
+        //    }
+        //}
 
         public uint CursorColor
         {
@@ -185,7 +183,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "textedit"; }
         }
@@ -199,36 +197,14 @@ namespace NewWidgets.Widgets
         {
             m_text = string.Empty;
             m_preffix = string.Empty;
-            m_needLayout = true;
             ClipMargin = TextPadding;
         }
 
-        private void InvalidateLayout()
-        {
-            m_needLayout = true;
-        }
-
-        protected override void Resize(Vector2 size)
-        {
-            base.Resize(size);
-            InvalidateLayout();
-        }
-
-        public override bool SwitchStyle(WidgetState styleType)
-        {
-            if (base.SwitchStyle(styleType))
-            {
-                InvalidateLayout();
-                return true;
-            }
-            return false;
-        }
-
-        private void Relayout()
+        public override void UpdateLayout()
         {
             if (m_label == null)
             {
-                m_label = new LabelObject(this, Font, MaskText(m_text, MaskChar), LabelAlign.Start, LabelAlign.Start);
+                m_label = new LabelObject(this, Font, MaskText(m_text, MaskChar));
                 m_label.Position = TextPadding.TopLeft;
             }
             else
@@ -253,20 +229,17 @@ namespace NewWidgets.Widgets
              if (minSize.Y < Size.Y)
                  minSize.Y = Size.Y;
 
-             Size = minSize;*/
-
-            m_needLayout = false;
+             Size = minSize;*/            
 
             UpdateCursor(0);
+
+            base.UpdateLayout();
         }
 
         public override bool Update()
         {
             if (!base.Update())
                 return false;
-
-            if (m_needLayout)
-                Relayout();
 
             if (m_label != null)
                 m_label.Update();
@@ -356,7 +329,7 @@ namespace NewWidgets.Widgets
                         OnTextChanged(this, m_text);
 
                     m_cursorPosition += toAdd.Length;
-                    Relayout();
+                    UpdateLayout();
                     return true;
                 }
             }
@@ -374,7 +347,7 @@ namespace NewWidgets.Widgets
                                 OnTextChanged(this, m_text);
 
                             m_cursorPosition--;
-                            Relayout();
+                            UpdateLayout();
                         }
                         break;
                     case SpecialKey.Delete:
@@ -385,7 +358,7 @@ namespace NewWidgets.Widgets
                             if (OnTextChanged != null)
                                 OnTextChanged(this, m_text);
 
-                            Relayout();
+                            UpdateLayout();
                         }
                         break;
                     case SpecialKey.Left:
@@ -413,7 +386,7 @@ namespace NewWidgets.Widgets
 
         private void UpdateCursor(int change)
         {
-            if (m_needLayout)
+            if (NeedsLayout)
                 return;
 
             if (IsFocused)

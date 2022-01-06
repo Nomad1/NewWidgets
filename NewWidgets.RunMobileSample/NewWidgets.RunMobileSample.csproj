@@ -28,8 +28,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="OpenTK3">
-      <HintPath>..\..\RunMobile\RunMobile.OpenTK\Lib\OpenTK3\OpenTK3.dll</HintPath>
+    <Reference Include="OpenTK">
+      <HintPath>..\..\RunMobile\RunMobile.OpenTK\Lib\OpenTK.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

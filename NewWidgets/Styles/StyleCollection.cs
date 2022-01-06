@@ -70,7 +70,7 @@ namespace NewWidgets.UI.Styles
             {
                 StyleNode node = FindExactStyle(selector);
 
-                if (node != null) // we have a node that is 100% matching the new one
+                if (node != null) // we have a node that is 100% matching the new one, so we need to append new data to it
                 {
                     node.Data.LoadData(data);
                     continue;
@@ -171,6 +171,8 @@ namespace NewWidgets.UI.Styles
 
             if (styles.Count == 1)
                 return new[] { styles[0].Data };
+
+            styles.Sort((one, another) => one.SelectorList.Specificity.CompareTo(another.SelectorList.Specificity));
 
             IStyleData[] result = new IStyleData[styles.Count];
 

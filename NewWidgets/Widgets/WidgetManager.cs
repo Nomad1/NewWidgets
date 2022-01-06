@@ -68,7 +68,6 @@ namespace NewWidgets.Widgets
 
             s_isInited = true;
             s_fontScale = fontScale; 
-            s_styles.Clear();
 
             WindowController.Instance.OnTouch += HandleTouch;
         }

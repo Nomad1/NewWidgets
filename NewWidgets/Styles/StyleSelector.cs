@@ -72,8 +72,8 @@ namespace NewWidgets.UI.Styles
 
         public StyleSelector(string element, string classes, string id, string pseudoClasses)
         {
-            m_id = id.TrimStart('#'); // element ID should not have leading #
-            m_element = element; // element type goes as is
+            m_id = string.IsNullOrEmpty(id) ? "" : id.TrimStart('#'); // element ID should not have leading #
+            m_element = string.IsNullOrEmpty(element) ? "" : element; // element type goes as is
             m_classes = string.IsNullOrEmpty(classes) ? null : classes.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries); // classes should be split. May be we need to use Regex as well, but right now simple split would work
 
             if (!string.IsNullOrEmpty(pseudoClasses)) // Pseudo-classes are tricky and can be in form ::first-child, :disabled or even :not(enabled)

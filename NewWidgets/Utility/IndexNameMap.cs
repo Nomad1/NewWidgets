@@ -5,7 +5,10 @@ using System.Reflection;
 
 namespace NewWidgets.Utility
 {
-    [AttributeUsage(AttributeTargets.Field, AllowMultiple = true)]
+    /// <summary>
+    /// Attribute for enum member name
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Enum, AllowMultiple = false)]
     internal class NameAttribute : Attribute
     {
         private readonly string m_name;
@@ -31,6 +34,7 @@ namespace NewWidgets.Utility
         private static int s_maximumIndex;
 
         private static readonly IDictionary<string, TIndex> s_indexCache = new ConcurrentDictionary<string, TIndex>();
+        private static readonly IDictionary<TIndex, NameAttribute[]> s_attributeCache = new ConcurrentDictionary<TIndex, NameAttribute[]>();
 
         /// <summary>
         /// This constructor checks the input type and also enu,erates all of Enum members
@@ -45,13 +49,22 @@ namespace NewWidgets.Utility
                 throw new ArgumentException("IndexedData<> supports only Enum members based on Int32");
 
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
+            List<NameAttribute> attributes = new List<NameAttribute>();
 
             foreach (FieldInfo field in fields)
             {
                 TIndex index = (TIndex)field.GetValue(null);
 
+                attributes.Clear();
+
                 foreach (NameAttribute attribute in field.GetCustomAttributes(typeof(NameAttribute), true))
+                {
                     s_indexCache[attribute.Name] = index;
+                    attributes.Add(attribute);
+                }
+
+                if (attributes.Count > 0)
+                    s_attributeCache[index] = attributes.ToArray();
 
                 int iindex = index.ToInt32(null);
 
@@ -72,6 +85,24 @@ namespace NewWidgets.Utility
             s_indexCache[stringIndex] = result; // will be trasformed to AddOrUpdate
 
             return result;
+        }
+
+        /// <summary>
+        /// Returns first attribute of specified TAttribute type. Note that if there are many attributes they will be skipped
+        /// </summary>
+        /// <typeparam name="TAttribute"></typeparam>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static TAttribute GetAttributeByIndex<TAttribute>(TIndex index) where TAttribute : NameAttribute
+        {
+            NameAttribute[] result;
+
+            if (s_attributeCache.TryGetValue(index, out result))
+                foreach(NameAttribute attribute in result)
+                    if (attribute is TAttribute)
+                        return (TAttribute)attribute;
+
+            return default(TAttribute);
         }
     }
 }

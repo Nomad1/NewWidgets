@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
@@ -36,128 +37,106 @@ namespace NewWidgets.Widgets
 
     //}
 
-  
     /// <summary>
-    /// Style sheet for various widget parameters
+    /// This class is a simple wrapper for IDictionary with LoadData working as AddRange
+    /// </summary>
+    internal class StyleSheetData : IStyleData
+    {
+        private readonly IDictionary<WidgetParameterIndex, object> m_parameters;
+
+        public StyleSheetData()
+        {
+            m_parameters = new Dictionary<WidgetParameterIndex, object>();
+        }
+
+        public StyleSheetData(IDictionary<WidgetParameterIndex, object> parameters)
+        {
+            m_parameters = parameters;
+        }
+
+        public bool TryGetParameter(WidgetParameterIndex index, out object result)
+        {
+            return m_parameters.TryGetValue(index, out result);
+        }
+
+        public void SetParameter(WidgetParameterIndex index, object value)
+        {
+            m_parameters[index] = value;
+        }
+
+        void IStyleData.LoadData(IStyleData data)
+        {
+            StyleSheetData styleData = data as StyleSheetData;
+
+            if (styleData == null)
+                throw new ArgumentException("Invalid data providede to LoadData");
+
+            foreach (var pair in styleData.m_parameters)
+                m_parameters[pair.Key] = pair.Value;
+        }
+    }
+
+    /// <summary>
+    /// This one is a simple wrapper to a collection of StyleSheetData structures for particular widget.
+    /// In case of local modifications it also adds a new Data object to the collection to store local changes
     /// </summary>
     public struct WidgetStyleSheet
     {
-        private class StyleSheetData
-        {
-            private StyleSheetData m_parent;
-            private readonly IDictionary<WidgetParameterIndex, object> m_indexedParameters = new Dictionary<WidgetParameterIndex, object>();
+        private bool m_hasOwnStyle; // This flag indicates that personal style has been created for the object
 
-            public StyleSheetData(StyleSheetData parent)
-            {
-                m_parent = parent;
-            }
+        private readonly LinkedList<StyleSheetData> m_data;
+        private readonly string m_name;
 
-            public void SetParent(StyleSheetData parent)
-            {
-                m_parent = parent;
-            }
-
-            public object GetParameter(WidgetParameterIndex index)
-            {
-                object result;
-
-                // check if we have this parameter in local dictionary
-
-                if (!m_indexedParameters.TryGetValue(index, out result))
-                {
-                    if (m_parent != null)
-                        result = m_parent.GetParameter(index);
-                }
-
-                return result;
-            }
-
-            public object GetParameter(string name)
-            {
-                return GetParameter(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name));
-            }
-
-            public void SetParameter(WidgetParameterIndex index, object value)
-            {
-                m_indexedParameters[index] = value;
-            }
-
-            public void SetParameter(string name, object value)
-            {
-                SetParameter(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name), value);
-            }
-        }
-
-        private string m_name;
-        private int m_instancedFor; // This variable contains hash code of specific object for which this instance of style sheet was created
-                                    // raises assertion if zero and any setter is called
-
-        private StyleSheetData m_data;
         // Internal properties
-
-        public string Name
-        {
-            get { return m_name; }
-        }
 
         public bool IsEmpty
         {
             get { return m_data == null; }
         }
 
-        internal int InstancedFor
+        public string Name
         {
-            get { return m_instancedFor; }
-            set { m_instancedFor = value; }
+            get { return m_name; }
         }
 
-        internal WidgetStyleSheet(string name, WidgetStyleSheet parent)
+        internal WidgetStyleSheet(string name, ICollection<IStyleData> data)
         {
             m_name = name;
-            m_data = new StyleSheetData(parent.m_data);
-            m_instancedFor = 0;
+
+            m_hasOwnStyle = false;
+
+            m_data = new LinkedList<StyleSheetData>();
+
+            if (data != null)
+                foreach (StyleSheetData sheetData in data)
+                    m_data.AddLast(sheetData);
         }
 
-        /// <summary>
-        /// This method is needed to repair hierarchy that could be broken because of premature load
-        /// </summary>
-        /// <param name="parent">Parent.</param>
-        internal void SetParent(WidgetStyleSheet parent)
+        internal void SetOwnStyle(StyleSheetData ownStyle)
         {
-            m_data.SetParent(parent.m_data);
-        }
+            if (m_hasOwnStyle)
+                throw new WidgetException("Trying to set own style when it is already set!");
 
-        private bool MakeWritable(object instance)
-        {
-            if (instance == null)
-                return false;
+            m_data.AddFirst(ownStyle);
 
-            int instanceHash = instance.GetHashCode();
-
-            if (instanceHash == m_instancedFor)
-                return true;
-
-            m_instancedFor = instanceHash;
-            m_name = m_name + "_" + m_instancedFor;
-            m_data = new StyleSheetData(m_data);
-
-            return true;
-        }
-
-        public override string ToString()
-        {
-            return string.Format("Style: {0}, instanced {1}", m_name, m_instancedFor != 0);
+            m_hasOwnStyle = true;
         }
 
         internal T Get<T>(WidgetParameterIndex index, T defaultValue)
         {
-            object result = m_data.GetParameter(index);
+            object result = null;
+
+            foreach (StyleSheetData data in m_data)
+                if (data.TryGetParameter(index, out result))
+                {
+                    break;
+                }
 
             if (result == null)
                 return defaultValue;
 
             if (result.GetType() != typeof(T))
-                throw new WidgetException("Trying to retrieve parameter " + index + " with cast to incompatible type " + typeof(T));
+                throw new WidgetException(string.Format("Trying to retrieve parameter {0} with cast to incompatible type {1} from type {2}", index, typeof(T), result.GetType()));
 
             return (T)result;
         }
@@ -171,37 +150,31 @@ namespace NewWidgets.Widgets
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         public T Get<T>(string name, T defaultValue)
         {
-            object result = m_data.GetParameter(name);
-
-            if (result == null)
-                return defaultValue;
-
-            if (result.GetType() != typeof(T))
-                throw new WidgetException("Trying to retrieve parameter " + name + " with cast to incompatible type " + typeof(T));
-
-            return (T)result;
+            return Get(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name), defaultValue);
         }
 
-        internal void Set(object instance, WidgetParameterIndex index, object value)
+        internal void Set(WidgetParameterIndex index, object value)
         {
-            if (instance != null)
-                MakeWritable(instance);
+            if (!m_hasOwnStyle)
+                throw new WidgetException("Trying to set data for read only style!");
 
-            m_data.SetParameter(index, value);
+            WidgetCSSParameterAttribute attribute = IndexNameMap<WidgetParameterIndex>.GetAttributeByIndex<WidgetCSSParameterAttribute>(index);
+
+            if (attribute != null && attribute.Type != null && value != null)
+                if (value.GetType() != attribute.Type)
+                    throw new WidgetException(string.Format("Setting attribute {0} to value {1} type {2} while expecting type {3}", index, value, value.GetType(), attribute.Type));
+
+            m_data.First.Value.SetParameter(index, value);
         }
       
         /// <summary>
         /// Set the specified parameter by name
         /// </summary>
-        /// <param name="instance">Instance.</param>
         /// <param name="name">Name.</param>
         /// <param name="value">Value.</param>
-        public void Set(object instance, string name, string value)
+        public void Set(string name, object value)
         {
-            if (instance != null)
-                MakeWritable(instance);
-
-            m_data.SetParameter(name, value);
+            Set(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name), value);
         }
     }
 }

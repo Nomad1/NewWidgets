@@ -15,19 +15,12 @@ namespace NewWidgets.UI
     /// </summary>
     public class LabelObject : WindowObject
     {
-        private readonly Font m_font;
-        private readonly Vector2 m_pivot;
-
+        private Font m_font;
         private uint m_color;
         private float m_opacity;
         private ISprite[] m_sprites;
         private string m_text;
         private bool m_richText;
-
-        public Font Font
-        {
-            get { return m_font; }
-        }
 
         public float Opacity
         {
@@ -55,6 +48,8 @@ namespace NewWidgets.UI
             }
         }
 
+        // Following three properties recreates the label completely
+
         public string Text
         {
             get { return m_text; }
@@ -67,36 +62,18 @@ namespace NewWidgets.UI
             set { Init(m_text, value); }
         }
 
-        public LabelObject(WindowObject parent, Font font, string text, LabelAlign horizontalAlign, LabelAlign verticalAlign, bool richText = false)
+        public Font Font
+        {
+            get { return m_font; }
+            set { m_font = value; Init(m_text, m_richText); }
+        }
+
+        public LabelObject(WindowObject parent, Font font, string text, bool richText = false)
             : base(parent)
         {
             m_color = 0xffffff;
             m_opacity = 1.0f;
             m_font = font;
-
-            float x = 1;
-            float y = 1;
-
-            switch (horizontalAlign)
-            {
-                case LabelAlign.Start:
-                    x = 0;
-                    break;
-                case LabelAlign.Center:
-                    x = 0.5f;
-                    break;
-            }
-            switch (verticalAlign)
-            {
-                case LabelAlign.Start:
-                    y = 0;
-                    break;
-                case LabelAlign.Center:
-                    y = 0.5f;
-                    break;
-            }
-
-            m_pivot = new Vector2(x, y);
 
             Init(text, richText);
         }
@@ -265,7 +242,7 @@ namespace NewWidgets.UI
 
             this.Size = m_font.MeasureString(text);
 
-            Vector2 position = m_pivot * Size * -1;
+            Vector2 position = Vector2.Zero;// m_pivot * Size * -1;
 
             if (richText)
                 m_sprites = null;

@@ -121,29 +121,43 @@ namespace NewWidgets.Widgets
         [WidgetPseudoClass("enabled")] // by design all our widgets are enabled meaning that :enabled class is default
         Normal = 0x0, // :default
 
+        // hovered style
+        [WidgetPseudoClass("hover")]
+        Hovered = 0x01, // :hover
+        SelectedHovered = Selected | Hovered, // :hover:selected
+        SelectedDisabledHovered = Selected | Disabled | Hovered, // :hover:selected:disabled
+        DisabledHovered = Normal | Disabled | Hovered, // hover:disabled
+
         // 1st grade, can be only subset of Normal
         [WidgetPseudoClass("checked")] // :checked is used for checkboxes
         [WidgetPseudoClass("selected")] // :selected is for Panorama UI compatibility
-        Selected = 0x01, // :checked , :selected
-
-        //[WidgetPseudoClass("active")] // :active represents the state when the element is currently being activated by the user
-        //[WidgetPseudoClass("focus")] // :focus represents the state when the element is currently selected to receive input
-        //// in our case it's all the same
-        //Focused = 0x02, // :active, :focus
+        [WidgetPseudoClass("active")] // :active represents the state when the element is currently being activated by the user
+        [WidgetPseudoClass("focus")] // :focus represents the state when the element is currently selected to receive input
+        Selected = 0x02, // :checked , :selected, :active
 
         // 2nd grade, can be only subset of Normal or Selected
         [WidgetPseudoClass("disabled")]
         Disabled = 0x04, // :disabled
         SelectedDisabled = Selected | Disabled, // :selected:disabled
 
-        // 3rd grade, can be only subset of Normal, Disabled, Selected or SelectedDisabled
-        [WidgetPseudoClass("hover")]
-        Hovered = 0x08, // :hover
-        SelectedHovered = Selected | Hovered, // :hover:selected
-        SelectedDisabledHovered = Selected | Disabled | Hovered, // :hover:selected:disabled
-        DisabledHovered = Normal | Disabled | Hovered, // hover:disabled
-
         Max = 0x0F
+    }
+
+    internal enum WidgetParameterInheritance
+    {
+        Inherit, // always inherit from the parent
+        Initial, // always have default value
+        Unset, // goes back to inherit/initial
+        Revert // NYI
+    }
+
+    [Flags]
+    internal enum WidgetParameterUnits
+    {
+        None, // default for the data type
+        Pixels, // px
+        Percentage, // %
+        Auto,
     }
 
     // List of default parameters. We need to use it as Enum to get fast access instead of dictionary search
@@ -151,123 +165,175 @@ namespace NewWidgets.Widgets
     {
         // Invalid
         None,
-        // Common
-        [WidgetParameter("size", typeof(Vector2))]
+
+        [WidgetCSSParameter("opacity", typeof(float))]
+        [WidgetXMLParameter("opacity", typeof(float))]
+        Opacity, // opacity is a special value that should not be inherited but multiplied with parent
+
+        [WidgetCSSParameter("width", typeof(float))]
+        Width, // part of size, width and height are not inherited
+
+        [WidgetCSSParameter("height", typeof(float))]
+        Height, // part of size,width and height are not inherited
+
+        [WidgetXMLParameter("size", typeof(Vector2))] // non CSS
         Size,
-        [WidgetParameter("clip", typeof(bool))]
+
+        [WidgetCSSParameter("x", typeof(float))] // Panorama UI compat
+        X, // part of position
+        [WidgetCSSParameter("y", typeof(float))] // Panorama UI compat
+        Y, // part of position
+        [WidgetCSSParameter("z", typeof(float))] // Panorama UI compat
+        Z, // part of position
+        [WidgetCSSParameter("position", typeof(Vector3))]
+        Position,
+
+
+        // Common
+        [WidgetCSSParameter("overflow", typeof(bool))] // TODO: enum for this
+        [WidgetXMLParameter("clip", typeof(bool))] // instead of `visible` and `hidden` we use `true` and `false`. It doesn't cover `scroll` option although
         Clip,
-        [WidgetParameter("clip_margin", typeof(Margin))]
+        [WidgetCSSParameter("clip", typeof(Margin))] // clip margin is a Margin type, not a rect. TODO:
+        [WidgetXMLParameter("clip_margin", typeof(Margin))] // xml clip margin is a Margin type, not a rect. TODO:
         ClipMargin,
-        [WidgetParameter("hovered_style", typeof(WidgetStyleSheet))]
+        [WidgetCSSParameter("padding", typeof(Margin))] // padding is of type Margin
+        [WidgetXMLParameter("padding", typeof(Margin))] // padding is of type Margin
+        Padding,
+
+        //
+        [WidgetXMLParameter("hovered_style", typeof(string))] // obsolete style reference. TODO: get rid of it
         HoveredStyle,
-        [WidgetParameter("disabled_style", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("disabled_style", typeof(string))] // obsolete style reference. TODO: get rid of it
         DisabledStyle,
-        [WidgetParameter("selected_style", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("selected_style", typeof(string))] // obsolete style reference. TODO: get rid of it
         SelectedStyle,
-        [WidgetParameter("selected_hovered_style", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("selected_hovered_style", typeof(string))] // obsolete style reference. TODO: get rid of it
         SelectedHoveredStyle,
 
         // Background
 
-        [WidgetParameter("back_style", typeof(WidgetBackgroundStyle))]
-        BackStyle,
-        [WidgetParameter("back_depth", typeof(WidgetBackgroundDepth))]
-        BackDepth,
-        [WidgetParameter("back_image")]
-        BackImage,
-        [WidgetParameter("back_scale", typeof(float))]
-        BackScale,
-        [WidgetParameter("back_angle", typeof(float))]
-        BackAngle,
-        [WidgetParameter("back_pivot", typeof(Vector2))]
-        BackPivot,
-        [WidgetParameter("back_padding", typeof(Margin))]
-        BackPadding,
-        [WidgetParameter("back_opacity", typeof(float))]
-        BackOpacity,
-        [WidgetParameter("back_color", typeof(uint))]
+        [WidgetCSSParameter("background-color", typeof(uint))] // unlike HTML it doesn't supports transparency yet. TODO: wrapper type for Color
+        [WidgetXMLParameter("back_color", typeof(uint))] // unlike HTML it doesn't supports transparency yet
         BackColor,
+        [WidgetCSSParameter("background-image", typeof(string))]
+        [WidgetXMLParameter("back_image", typeof(string))]
+        BackImage,
+        [WidgetCSSParameter("background-repeat", typeof(WidgetBackgroundStyle))] // we have own repeat modes so this needs to be worked out
+        [WidgetXMLParameter("back_style", typeof(WidgetBackgroundStyle))] // TODO: another parameter that converts to one of our styles
+        BackStyle,
 
+
+        [WidgetXMLParameter("back_depth", typeof(WidgetBackgroundDepth))] // nothing like that in HTML
+        BackDepth,
+        [WidgetCSSParameter("background-size", typeof(Vector2))] // right now its a single percentage value. TODO: another property to support two values and exact length
+        [WidgetXMLParameter("back_scale", typeof(float))] // right now its a single percentage value. TODO: another property to support two values and exact length
+        BackScale,
+        [WidgetXMLParameter("back_angle", typeof(float))]
+        BackAngle,
+        [WidgetXMLParameter("back_pivot", typeof(Vector2))] // pivot + padding are powerful but in CSS there is only background-origin, TODO: implement it
+        BackPivot,
+        [WidgetXMLParameter("back_padding", typeof(Margin))]
+        BackPadding,
+        [WidgetCSSParameter("background-color-opacity", typeof(float))] // Panorama UI compat
+        [WidgetXMLParameter("back_opacity", typeof(float))]
+        BackOpacity,
+        
         // Text
 
-        [WidgetParameter("font", typeof(Font))]
+        [WidgetXMLParameter("font", typeof(Font))]
         Font,
-        [WidgetParameter("font_size", typeof(float))]
+        [WidgetXMLParameter("font_size", typeof(float))]
         FontSize,
-        [WidgetParameter("text_color", typeof(uint))]
+        [WidgetXMLParameter("text_color", typeof(uint))]
         TextColor,
-        [WidgetParameter("line_spacing", typeof(float))]
+        [WidgetXMLParameter("line_spacing", typeof(float))]
         LineSpacing,
-        [WidgetParameter("text_align", typeof(WidgetAlign))]
+        [WidgetXMLParameter("text_align", typeof(WidgetAlign))]
         TextAlign,
-        [WidgetParameter("text_padding", typeof(Margin))]
-        [WidgetParameter("padding", typeof(Margin))]
+        [WidgetXMLParameter("text_padding", typeof(Margin))]
+//        [WidgetParameter("padding", typeof(Margin))]
         TextPadding,
-        [WidgetParameter("richtext", typeof(bool))]
+        [WidgetXMLParameter("richtext", typeof(bool))]
         RichText,
 
         // Image
 
-        [WidgetParameter("image")]
+        [WidgetXMLParameter("image")]
         Image,
-        [WidgetParameter("image_style", typeof(WidgetBackgroundStyle))]
+        [WidgetXMLParameter("image_style", typeof(WidgetBackgroundStyle))]
         ImageStyle,
-        [WidgetParameter("image_angle", typeof(float))]
+        [WidgetXMLParameter("image_angle", typeof(float))]
         ImageAngle,
-        [WidgetParameter("image_pivot", typeof(Vector2))]
+        [WidgetXMLParameter("image_pivot", typeof(Vector2))]
         ImagePivot,
-        [WidgetParameter("image_padding", typeof(Margin))]
+        [WidgetXMLParameter("image_padding", typeof(Margin))]
         ImagePadding,
-        [WidgetParameter("image_color", typeof(uint))]
+        [WidgetXMLParameter("image_color", typeof(uint))]
         ImageColor,
-        [WidgetParameter("image_opacity", typeof(float))]
+        [WidgetXMLParameter("image_opacity", typeof(float))]
         ImageOpacity,
 
         // Text edit
 
-        [WidgetParameter("cursor_color", typeof(uint))]
+        [WidgetXMLParameter("cursor_color", typeof(uint))]
         CursorColor,
-        [WidgetParameter("cursor_char")]
+        [WidgetXMLParameter("cursor_char")]
         CursorChar,
-        [WidgetParameter("mask_char")]
+        [WidgetXMLParameter("mask_char")]
         MaskChar,
 
 
         // Button
 
-        [WidgetParameter("button_layout", typeof(WidgetButtonLayout))]
+        [WidgetXMLParameter("button_layout", typeof(WidgetButtonLayout))]
         ButtonLayout,
-        [WidgetParameter("button_text_style", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("button_text_style", typeof(string))]
         ButtonTextStyle,
-        [WidgetParameter("button_image_style", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("button_image_style", typeof(string))]
         ButtonImageStyle,
-        [WidgetParameter("button_image_padding", typeof(Margin))]
+        [WidgetXMLParameter("button_image_padding", typeof(Margin))]
         ButtonImagePadding,
-        [WidgetParameter("button_text_padding", typeof(Margin))]
+        [WidgetXMLParameter("button_text_padding", typeof(Margin))]
         ButtonTextPadding,
-        [WidgetParameter("button_animate_scale", typeof(float))]
+        [WidgetXMLParameter("button_animate_scale", typeof(float))]
         ButtonAnimateScale,
-        [WidgetParameter("button_animate_pivot", typeof(Vector2))]
+        [WidgetXMLParameter("button_animate_pivot", typeof(Vector2))]
         ButtonAnimatePivot,
-        [WidgetParameter("button_animate_time", typeof(int))]
+        [WidgetXMLParameter("button_animate_time", typeof(int))]
         ButtonAnimateTime,
 
         // Scroll view
 
-        [WidgetParameter("horizontal_scroll", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("horizontal_scroll", typeof(string))] // obsolete style reference. TODO: get rid of it
         HorizontalScrollStyle,
-        [WidgetParameter("vertical_scroll", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("vertical_scroll", typeof(string))] // obsolete style reference. TODO: get rid of it
         VerticalcrollStyle,
-        [WidgetParameter("horizontal_indicator", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("horizontal_indicator", typeof(string))] // obsolete style reference. TODO: get rid of it
         HorizontalIndicatorStyle,
-        [WidgetParameter("vertical_indicator", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("vertical_indicator", typeof(string))] // obsolete style reference. TODO: get rid of it
         VerticalIndicatorStyle,
 
         // Text field
-        [WidgetParameter("scroll_style", typeof(WidgetStyleSheet))]
+        [WidgetXMLParameter("scroll_style", typeof(string))] // obsolete style reference. TODO: get rid of it
         TextFieldScrollStyle,
 
         Max = TextFieldScrollStyle + 1
+    }
+
+    public enum WidgetType : int
+    {
+        Widget = 0, // basic widget, does nothing
+        Background,
+        Button,
+        Panel,
+        Image,
+        CheckBox,
+        Label,
+        Line,
+        ScrollView,
+        Text,
+        TextEdit,
+        TextField,
     }
 
 }

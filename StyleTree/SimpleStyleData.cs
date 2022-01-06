@@ -11,8 +11,7 @@ namespace StyleTree
     /// </summary>
     public class SimpleStyleData : IStyleData
     {
-        private IDictionary<string, string> m_properties;
-        private bool m_owner;
+        private readonly IDictionary<string, string> m_properties;
 
         public bool IsEmpty
         {
@@ -24,29 +23,13 @@ namespace StyleTree
             get { return m_properties; }
         }
 
-        public SimpleStyleData()
-        {
-            m_properties = new Dictionary<string, string>();
-            m_owner = true;
-        }
-
         public SimpleStyleData(IDictionary<string, string> data)
         {
             m_properties = data;
-            m_owner = false;
         }
 
         public void LoadData(IDictionary<string, string> data)
         {
-            if (m_properties == data)
-                return;
-
-            if (!m_owner) // we don't have an unique dictionary, make a copy right now
-            {
-                m_properties = new Dictionary<string, string>(m_properties);
-                m_owner = true;
-            }
-
             foreach (KeyValuePair<string, string> pair in data)
             {
                 string oldValue;
@@ -60,6 +43,11 @@ namespace StyleTree
             }
         }
 
+        public void LoadData(IStyleData data)
+        {
+            LoadData(((SimpleStyleData)data).Properties);
+        }
+
         public override string ToString()
         {
             StringBuilder builder = new StringBuilder();
@@ -68,11 +56,6 @@ namespace StyleTree
                 builder.AppendFormat("\t{0}: {1};\n", pair.Key, pair.Value);
 
             return builder.ToString();
-        }
-
-        public void LoadData(IStyleData data)
-        {
-            LoadData(((SimpleStyleData)data).Properties);
         }
     }
 }

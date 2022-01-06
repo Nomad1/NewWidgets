@@ -27,19 +27,19 @@ namespace StyleTree
             }
 
             StyleSelector[] styles = new StyleSelector[styleList.Count];
-            StyleSelectorOperator[] operators = new StyleSelectorOperator[styleList.Count];
+            StyleSelectorCombinator[] combinators = new StyleSelectorCombinator[styleList.Count];
 
             for (int i = 0; i < styleList.Count; i++)
             {
                 styles[styleList.Count - i - 1] = styleList[i];
-                operators[i] = StyleSelectorOperator.Inherit;
+                combinators[i] = StyleSelectorCombinator.Descendant;
             }
 
-            operators[operators.Length - 1] = StyleSelectorOperator.None; // trailing None operator
+            combinators[combinators.Length - 1] = StyleSelectorCombinator.None; // trailing None operator
 
-            StyleSelectorList list = new StyleSelectorList(styles, operators);
+            StyleSelectorList list = new StyleSelectorList(styles, combinators);
 
-            SimpleStyleData result = new SimpleStyleData();
+            SimpleStyleData result = new SimpleStyleData(new Dictionary<string, string>());
 
             ICollection<IStyleData> data = collection.GetStyleData(list);
 
@@ -86,7 +86,7 @@ namespace StyleTree
             Dictionary<string, string> compare = new Dictionary<string, string>()
             {
                 { "border" , "2px solid #ccc"},
-                { "color" , "green"},
+                { "color" , "red"},
                 { "padding" , "1em"},
                 { "font-weight" , "bold"},
                 { "background-color" , "green"}

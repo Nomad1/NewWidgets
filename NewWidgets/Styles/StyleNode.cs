@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-
-namespace NewWidgets.UI.Styles
+﻿namespace NewWidgets.UI.Styles
 {
     /// <summary>
     /// Operator that shows how two CSS selectors are combined
     /// </summary>
-    public enum StyleSelectorOperator
+    public enum StyleSelectorCombinator
     {
         None = 1, // comma
-        Inherit = 2, // E F an F element descendant of an E element
+        Descendant = 2, // E F an F element descendant of an E element
         Child = 3, // E > F an F element child of an E element
-        DirectSibling = 4, // E + F  an F element immediately preceded by an E element
+        AdjacentSibling = 4, // E + F  an F element immediately preceded by an E element
         Sibling = 5, // E ~ F   an F element preceded by an E element
     }
 
@@ -20,6 +18,10 @@ namespace NewWidgets.UI.Styles
     /// </summary>
     public interface IStyleData
     {
+        /// <summary>
+        /// This method is used when we need to append new data to existing data collection
+        /// </summary>
+        /// <param name="data"></param>
         void LoadData(IStyleData data);
     }
 

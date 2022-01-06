@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using NewWidgets.UI;
+using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
 #if RUNMOBILE
@@ -14,38 +16,90 @@ namespace NewWidgets.Widgets
     /// </summary>
     public abstract class Widget : WindowObject
     {
+        [Obsolete]
         public static readonly WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default", true);
 
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
-        internal protected readonly WidgetStyleSheet[] m_styles;
+        private bool m_needUpdateStyle;
+        private bool m_needsLayout; // flag to indicate that inner label size/opacity/formatting has changed
+
+        private WidgetStyleSheet m_style;
+        private readonly StyleSheetData m_ownStyle;
 
         private WidgetState m_currentState;
         private string m_styleClass;
-        private string m_styleElementName;
-
-        private float m_alpha = 1.0f; // the only property that could be changed for simple widget without affecting its stylesheet
+        private string m_id;
 
         private string m_tooltip;
 
         #region Style-related stuff
 
+        /// <summary>
+        /// Pseudo-class flag
+        /// </summary>
         public WidgetState CurrentState
         {
             get { return m_currentState; }
+            protected set
+            {
+                if (m_currentState != value)
+                {
+                    m_currentState = value;
+                    InvalidateStyle();
+                }
+            }
         }
 
+        /// <summary>
+        /// Class name
+        /// </summary>
         public string StyleClass
         {
             get { return m_styleClass; }
         }
 
-        public string StyleElementName
+        /// <summary>
+        /// Element #id
+        /// </summary>
+        public string StyleId
         {
-            get { return m_styleElementName; }
+            get { return m_id; }
         }
 
-        public virtual string StyleClassType
+        /// <summary>
+        /// Pseudo-class name. TODO: get rid of strings
+        /// </summary>
+        public string StyleState
+        {
+            get
+            {
+                switch (m_currentState)
+                {
+                    case WidgetState.Disabled:
+                        return ":disabled";
+                    case WidgetState.Hovered:
+                        return ":hover";
+                    case WidgetState.Selected:
+                        return ":active";
+                    case WidgetState.SelectedDisabled:
+                        return ":active:disabled";
+                    case WidgetState.SelectedHovered:
+                        return ":hover:active";
+                    case WidgetState.SelectedDisabledHovered:
+                        return ":hover:active:disabled";
+                    case WidgetState.DisabledHovered:
+                        return ":hover:disabled";
+                    default:
+                        return "";
+                }
+            }
+        }
+
+        /// <summary>
+        /// Element type name. TODO: get rid of strings
+        /// </summary>
+        public virtual string StyleElementType
         {
             get { return "panel"; }
         }
@@ -59,8 +113,12 @@ namespace NewWidgets.Widgets
             {
                 if (Enabled != value)
                 {
+                    if (!value)
+                        CurrentState |= WidgetState.Disabled;
+                    else
+                        CurrentState &= ~WidgetState.Disabled;
+
                     base.Enabled = value;
-                    DelayedUpdateStyle();
                 }
             }
         }
@@ -72,8 +130,12 @@ namespace NewWidgets.Widgets
             {
                 if (Selected != value)
                 {
+                    if (value)
+                        CurrentState |= WidgetState.Selected;
+                    else
+                        CurrentState &= ~WidgetState.Selected;
+
                     base.Selected = value;
-                    DelayedUpdateStyle();
                 }
             }
         }
@@ -85,34 +147,72 @@ namespace NewWidgets.Widgets
             {
                 if (Hovered != value)
                 {
+                    if (value)
+                        CurrentState |= WidgetState.Hovered;
+                    else
+                        CurrentState &= ~WidgetState.Hovered;
+
                     base.Hovered = value;
-                    DelayedUpdateStyle();
                 }
             }
         }
-       
+
+        /// <summary>
+        /// Indicates if the contents should be clipped. Almost the same as overflow:hidden and overflow:visible in HTML
+        /// </summary>
         public bool ClipContents
         {
             get { return GetProperty(WidgetParameterIndex.Clip, false); }
-            set { SetProperty(WidgetParameterIndex.Clip, value); }
+            set { SetProperty(WidgetParameterIndex.Clip, value); } // clipping is applied on each redraw so we don't need to call Invalidate of any kind
         }
 
+        /// <summary>
+        /// Margin for border clipping if ClipContents is on
+        /// </summary>
         public Margin ClipMargin
         {
             get { return GetProperty(WidgetParameterIndex.ClipMargin, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.ClipMargin, value); }
+            set { SetProperty(WidgetParameterIndex.ClipMargin, value); } // clipping is applied on each redraw so we don't need to call Invalidate of any kind
         }
 
-        public virtual float Opacity
+        /// <summary>
+        /// Overall opacity of this Widget. TODO: think of the difference between content and background opacity
+        /// </summary>
+        public float Opacity
         {
-            get { return m_alpha; }
-            set { m_alpha = value; }
+            get { return GetProperty(WidgetParameterIndex.Opacity, 1.0f); }
+            set { SetProperty(WidgetParameterIndex.Opacity, value); } // Opacity and color should be applied on each redraw - it's cheap and it is the best way to handle colors and transparency
         }
 
+        /// <summary>
+        /// Gets actual opacity value as multiplication of current and all parent values
+        /// </summary>
+        public float OpacityValue
+        {
+            get { return Parent == null ? Opacity : Opacity * Parent.Opacity; }
+        }
+
+        /// <summary>
+        /// Gets tooltip string for this control
+        /// </summary>
         public string Tooltip
         {
             get { return m_tooltip; }
             set { m_tooltip = value; }
+        }
+
+        /// <summary>
+        /// Widget parent up in the control tree
+        /// </summary>
+        public new Widget Parent
+        {
+            get { return base.Parent as Widget; }
+            set { base.Parent = value; }
+        }
+
+        public bool NeedsLayout
+        {
+            get { return m_needsLayout; }
         }
 
         public event TooltipDelegate OnTooltip;
@@ -124,58 +224,47 @@ namespace NewWidgets.Widgets
         protected Widget(WidgetStyleSheet style = default(WidgetStyleSheet))
             : base(null)
         {
+            m_ownStyle = new StyleSheetData();
 
-            if (style.IsEmpty)
-                style = DefaultStyle;
-            Size = style.Get(WidgetParameterIndex.Size, new Vector2(0, 0));
+            m_style = style;
+            m_style.SetOwnStyle(m_ownStyle);
+
+            m_styleClass = style.Name;
+
+            if (!style.IsEmpty) // obsolete, needed in some very rare cases
+                Size = style.Get(WidgetParameterIndex.Size, new Vector2(0, 0));
 
             m_currentState = WidgetState.Normal;
 
-            m_styles = new WidgetStyleSheet[(int)WidgetState.Max];
-
-            LoadStyle(WidgetState.Normal, style);
+            m_needUpdateStyle = true;
+            m_needsLayout = true;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.Widget"/> class for internal use
         /// </summary>
         /// <param name="styles">Styles.</param>
-        internal protected Widget(WidgetStyleSheet[] styles)
+        protected Widget(string id, string style)
            : base(null)
         {
-            Size = new Vector2(0, 0);
+            m_styleClass = style;
+            m_id = id;
+
             m_currentState = WidgetState.Normal;
-            m_styles = styles; // use the same styles as parent
+            m_needUpdateStyle = true;
+            m_needsLayout = true;
         }
 
         #region Styles
 
         internal T GetProperty<T>(WidgetParameterIndex index, T defaultValue)
         {
-            return m_styles[(int)m_currentState].Get(index, defaultValue);
-        }
-
-        internal T GetProperty<T>(WidgetState style, WidgetParameterIndex index, T defaultValue)
-        {
-            if (!HasStyle(style))
-                style = m_currentState;
-
-            return m_styles[(int)style].Get(index, defaultValue);
+            return m_style.Get(index, defaultValue);
         }
 
         internal void SetProperty<T>(WidgetParameterIndex index, T value)
         {
-            for (int i = 0; i < m_styles.Length; i++)
-                if (!m_styles[i].IsEmpty)
-                    m_styles[i].Set(m_styles, index, value);
-        }
-
-        internal void SetProperty<T>(WidgetState style, WidgetParameterIndex index, T value)
-        {
-            if (!HasStyle(style))
-                throw new ArgumentException("Widget doesn't have style " + style + " assigned!");
-
-            m_styles[(int)style].Set(m_styles, index, value);
+            m_style.Set(index, value);
         }
 
         /// <summary>
@@ -187,7 +276,7 @@ namespace NewWidgets.Widgets
         /// <returns></returns>
         public T GetProperty<T>(string name, T defaultValue)
         {
-            return m_styles[(int)m_currentState].Get(name, defaultValue);
+            return m_style.Get(name, defaultValue);
         }
 
         /// <summary>
@@ -197,161 +286,79 @@ namespace NewWidgets.Widgets
         /// <param name="value"></param>
         public void SetProperty(string name, string value)
         {
-            for (int i = 0; i < m_styles.Length; i++)
-                if (!m_styles[i].IsEmpty)
-                    m_styles[i].Set(m_styles, name, value);
-        }
-
-        private bool HasStyle(WidgetState styleType)
-        {
-            return !m_styles[(int)styleType].IsEmpty;
-        }
-
-        private void DelayedSwitchStyle(WidgetState styleType)
-        {
-            AnimationManager.Instance.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, () => SwitchStyle(styleType));
-        }
-
-        private void DelayedUpdateStyle()
-        {
-            AnimationManager.Instance.StartCustomAnimation(this, AnimationKind.Custom, null, 1, null, UpdateStyle);
-        }
-
-        public void UpdateStyle()
-        {
-            WidgetState type = WidgetState.Normal;
-
-            if (Selected)
-                type |= WidgetState.Selected;
-
-            if (!Enabled)
-                type |= WidgetState.Disabled;
-
-            if (Hovered)
-                type |= WidgetState.Hovered;
-
-            if (!HasStyle(type)) // try to fall back
-            {
-                if (HasStyle(type & ~WidgetState.Selected))
-                    type &= ~WidgetState.Selected;
-
-                if (HasStyle(type & ~WidgetState.Disabled))
-                    type &= ~WidgetState.Disabled;
-
-                if (HasStyle(type & ~WidgetState.Hovered))
-                    type &= ~WidgetState.Hovered;
-            }
-
-            if (HasStyle(type)) // only perform switch if we have where to switch
-            {
-                if (type == m_currentState)
-                    return;
-
-                DelayedSwitchStyle(type);
-            }
+            m_style.Set(name, value);
         }
 
         /// <summary>
-        /// Switches the style.
+        /// This method should be called if the hierarchy or parent state are changed
         /// </summary>
-        /// <param name="styleType">Style type.</param>
-        public virtual bool SwitchStyle(WidgetState styleType)
+        public void InvalidateStyle()
         {
-            if (!HasStyle(styleType))
-                return false;
-
-            if (m_currentState == styleType)
-                return false;
-
-            m_currentState = styleType;
-
-            return true;
+            m_needUpdateStyle = true;
         }
 
         /// <summary>
-        /// Loads the style and possible sub-styles
+        /// This method should be called when widget layout is changed (size, padding, etc.)
         /// </summary>
-        /// <param name="styleType">Style type.</param>
-        /// <param name="style">Style.</param>
-        public void LoadStyle(WidgetState styleType, WidgetStyleSheet style)
+        public void InvalidateLayout()
         {
-            if (style.IsEmpty)
-                return;
+            m_needsLayout = true;
+        }
 
-            m_styles[(int)styleType] = style;
+        /// <summary>
+        /// This method is to be called when:
+        /// 1. Widget size has changed (Resize was called)
+        /// 2. Widget style has changed
+        /// 3. Widget content has changed and widget should be resized
+        /// </summary>
+        public virtual void UpdateLayout()
+        {
+            m_needsLayout = false;
+            // nothing to do in base
+        }
 
-            // Hovered can be only subset of Normal, Disabled, Selected or SelectedDisabled
-            if (styleType == WidgetState.Normal || styleType == WidgetState.Disabled || styleType == WidgetState.Selected || styleType == WidgetState.SelectedDisabled)
+        protected override void Resize(Vector2 size)
+        {
+            base.Resize(size);
+            InvalidateLayout();
+        }
+
+        public virtual void UpdateStyle()
+        {
+            m_needUpdateStyle = false;
+            m_needsLayout = true; // make sure that any style changes result in layout updates as well
+
+            List<StyleSelector> styles = new List<StyleSelector>();
+            List<StyleSelectorCombinator> combinators = new List<StyleSelectorCombinator>();
+
+            Widget current = this;
+
+            do
             {
-                var hoveredStyleReference = style.Get(WidgetParameterIndex.HoveredStyle, default(WidgetStyleSheet));
+                styles.Insert(0, new StyleSelector(StyleElementType, StyleClass, StyleId, StyleState));
+                current = current.Parent;
 
-                if (!hoveredStyleReference.IsEmpty)
-                {
-                    WidgetState targetStyleType = 0;
-                    switch (styleType)
-                    {
-                        case WidgetState.Normal:
-                            targetStyleType = WidgetState.Hovered;
-                            break;
-                        case WidgetState.Selected:
-                            targetStyleType = WidgetState.SelectedHovered;
-                            break;
-                        case WidgetState.Disabled:
-                            if (style.Name == m_styles[(int)WidgetState.Normal].Name)
-                                targetStyleType = 0; // workaround to prevent using hovered style when disabled is set to same style as normal
-                            else
-                                targetStyleType = WidgetState.DisabledHovered;
-                            break;
-                        case WidgetState.SelectedDisabled:
-                            targetStyleType = WidgetState.SelectedDisabledHovered;
-                            break;
-                    }
-
-                    if (targetStyleType != 0)
-                        LoadStyle(targetStyleType, hoveredStyleReference);
-
-                }
+                combinators.Add(current == null ? StyleSelectorCombinator.None : StyleSelectorCombinator.Descendant);
             }
+            while (current != null);
 
-            // Disabled can be only subset of Normal or Selected
-            if (styleType == WidgetState.Normal || styleType == WidgetState.Selected)
-            {
-                var disabledStyleReference = style.Get(WidgetParameterIndex.DisabledStyle, default(WidgetStyleSheet));
+            m_style = WidgetManager.GetStyle(new StyleSelectorList(styles, combinators));
 
-                if (!disabledStyleReference.IsEmpty)
-                {
-                    WidgetState targetStyleType = 0;
-                    switch (styleType)
-                    {
-                        case WidgetState.Normal:
-                            targetStyleType = WidgetState.Disabled;
-                            break;
-                        case WidgetState.Selected:
-                            targetStyleType = WidgetState.SelectedDisabled;
-                            break;
-                    }
-
-                    if (targetStyleType != 0)
-                        LoadStyle(targetStyleType, disabledStyleReference);
-                }
-            }
-
-            // Selected can be only subset of Normal
-            if (styleType == WidgetState.Normal)
-            {
-                var selectedStyleReference = style.Get(WidgetParameterIndex.SelectedStyle, default(WidgetStyleSheet));
-
-                if (!selectedStyleReference.IsEmpty)
-                    LoadStyle(WidgetState.Selected, selectedStyleReference);
-
-                var selectedHoveredStyleReference = style.Get(WidgetParameterIndex.SelectedHoveredStyle, default(WidgetStyleSheet));
-
-                if (!selectedHoveredStyleReference.IsEmpty)
-                    LoadStyle(WidgetState.SelectedHovered, selectedHoveredStyleReference);
-            }
+            m_style.SetOwnStyle(m_ownStyle);
         }
 
         #endregion
+
+        public override bool Update()
+        {
+            if (m_needUpdateStyle)
+                UpdateStyle();
+
+            if (m_needsLayout)
+                UpdateLayout();
+
+            return base.Update();
+        }
 
         public override void Draw()
         {
@@ -386,6 +393,9 @@ namespace NewWidgets.Widgets
             return base.Touch(x, y, press, unpress, pointer);
         }
 
+        /// <summary>
+        /// This method draws widget contents with clipping
+        /// </summary>
         protected virtual void DrawContents()
         {
         }

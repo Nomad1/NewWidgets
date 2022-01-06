@@ -1,43 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using System.Reflection;
 using System.Xml;
 using NewWidgets.UI;
+using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
     public static partial class WidgetManager
     {
-        // styles
-        private static readonly IDictionary<string, WidgetStyleSheet> s_styles = new Dictionary<string, WidgetStyleSheet>();
-        private static readonly IDictionary<string, Tuple<WidgetParameterIndex, Type>> s_styleParameters = InitStyleParameterMap();
+        // this is primary CSS style collection for now
+        private static readonly StyleCollection m_styleCollection = new StyleCollection();
 
         /// <summary>
-        /// Gets the style by name
+        /// Gets the style by name. This method is here only for compatibility purposes and it would be removed in later versions
         /// </summary>
         /// <returns>The style.</returns>
         /// <param name="name">Name.</param>
-        public static WidgetStyleSheet GetStyle(string name, bool autoCreate = false)
+        public static WidgetStyleSheet GetStyle(string name, bool notUsed = false)
         {
             if (!string.IsNullOrEmpty(name))
-            {
-                WidgetStyleSheet result;
-
-                if (s_styles.TryGetValue(name, out result))
-                    return result;
-
-                if (autoCreate)
-                {
-                    return s_styles[name] = new WidgetStyleSheet(name, Widget.DefaultStyle);
-                }
-            }
+                return GetStyle("", name, "", "");
 
             return default(WidgetStyleSheet);
         }
 
-        #region XML CSS loading
+        /// <summary>
+        /// Gets the style for single element ignoring the hierarchy. Should not be used in general case
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="class"></param>
+        /// <param name="id"></param>
+        /// <param name="pseudoClass"></param>
+        /// <returns></returns>
+        private static WidgetStyleSheet GetStyle(string type, string @class, string id, string pseudoClass)
+        {
+            return GetStyle(new StyleSelectorList(new StyleSelector(type, @class, id, pseudoClass)));
+        }
+
+        /// <summary>
+        /// Gets the style by selector list. It works with hierarchy, specificity and all the stuff
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static WidgetStyleSheet GetStyle(StyleSelectorList list)
+        {
+            ICollection<IStyleData> result = m_styleCollection.GetStyleData(list);
+
+            return new WidgetStyleSheet(list.ToString(), result);
+        }
+
+        #region XML style loading
 
         /// <summary>
         /// Loads ui data from a XML string
@@ -133,52 +147,24 @@ namespace NewWidgets.Widgets
         private static void RegisterStyle(XmlNode node)
         {
             string name = GetAttribute(node, "name");
+            if (string.IsNullOrEmpty(name))
+                throw new WidgetException("Got style without a name!");
 
-            string parent = GetAttribute(node, "parent");
+                string parent = GetAttribute(node, "parent");
 
-            WidgetStyleSheet parentStyle = GetStyle(parent, true); // creates the parent!
+            IDictionary<WidgetParameterIndex, object> parameters = InitStyle(node);
 
-            WidgetStyleSheet style = GetStyle(name, false); // don't create the child yet!
-
-            if (style.IsEmpty)
-            {
-                style = new WidgetStyleSheet(name, parentStyle); // creates the child!
-                s_styles[name] = style;
-            }
-            else
-                style.SetParent(parentStyle);
-
-            InitStyle(ref style, node);
+            m_styleCollection.AddStyle(string.IsNullOrEmpty(parent) ? ("." + name) : ("." + parent + "." + name), new StyleSheetData(parameters));
 
             WindowController.Instance.LogMessage("Registered style {0}", name);
         }
 
         #endregion
 
-        /// <summary>
-        /// This method enumerates all items of WidgetParameterIndex looking for WidgetParameter attribute
-        /// and storing data in a dictionary
-        /// </summary>
-        /// <returns></returns>
-        private static IDictionary<string, Tuple<WidgetParameterIndex, Type>> InitStyleParameterMap()
+        private static IDictionary<WidgetParameterIndex, object> InitStyle(XmlNode node)
         {
-            Dictionary<string, Tuple<WidgetParameterIndex, Type>> result = new Dictionary<string, Tuple<WidgetParameterIndex, Type>>();
+            Dictionary<WidgetParameterIndex, object> style = new Dictionary<WidgetParameterIndex, object>();
 
-            FieldInfo[] fields = typeof(WidgetParameterIndex).GetFields(BindingFlags.Public | BindingFlags.Static);
-
-            foreach (FieldInfo field in fields)
-            {
-                WidgetParameterIndex index = (WidgetParameterIndex)field.GetValue(null);
-
-                foreach (WidgetParameterAttribute attribute in field.GetCustomAttributes(typeof(WidgetParameterAttribute), false))
-                    result[attribute.Name] = new Tuple<WidgetParameterIndex, Type>(index, attribute.Type);
-            }
-
-            return result;
-        }
-
-        private static void InitStyle(ref WidgetStyleSheet style, XmlNode node)
-        {
             foreach (XmlNode element in node.ChildNodes)
             {
                 try
@@ -192,40 +178,52 @@ namespace NewWidgets.Widgets
                     else
                         value = value.Trim('\r', '\n', '\t', ' ');
 
-                    Tuple<WidgetParameterIndex, Type> field;
+                    // Old XML stylesheets should be converted to CSS, but for compatibility reasons
+                    // I'm adding fake CSS elements starting with "-nw-" solely for parsing purposes
 
-                    if (s_styleParameters.TryGetValue(element.Name, out field))
-                        style.Set(null, field.Item1, ParseValue(field.Item2, value));
+                    WidgetParameterIndex index = IndexNameMap<WidgetParameterIndex>.GetIndexByName("-nw-" + element.Name);
 
-                    //style.Set(null, element.Name, value);
+                    if (index == 0)
+                    {
+                        WindowController.Instance.LogMessage("Got unknown attribute -nw-{0} in xml style sheet for {1}", element.Name, node.Name);
+                        continue;
+                    }
+
+                    // Here we're retrieving WidgetXMLParameterAttribute that helps with conversion of
+                    // XML string to one or several CSS indexed values. 
+
+                    WidgetXMLParameterAttribute attribute = IndexNameMap<WidgetParameterIndex>.GetAttributeByIndex<WidgetXMLParameterAttribute>(index);
+
+                    // TODO: replace ParseValue with smarter conversion taking Dictionary and Type as an input and able to split short-hand properties
+
+                    if (attribute != null && attribute.Type != null)
+                        style[index] = ParseValue(attribute.Type, value);
+                    else
+                        style[index] = value;
 
                 }
                 catch (Exception ex)
                 {
-                    WindowController.Instance.LogError("Error parsing style {0}, element {1}: {2}", style.Name, element.Name, ex);
+                    WindowController.Instance.LogError("Error parsing style {0}, element -nw-{1}: {2}", node.Name, element.Name, ex);
                     throw new WidgetException("Error parsing style!", ex);
                 }
             }
+
+            return style;
         }
 
-        internal static Tuple<WidgetParameterIndex, Type> GetParameterIndexByName(string name)
-        {
-            Tuple<WidgetParameterIndex, Type> field;
-
-            if (s_styleParameters.TryGetValue(name, out field))
-                return field;
-
-            return null;
-        }
-
+        /// <summary>
+        /// Tries to parse string to specified type
+        /// </summary>
+        /// <param name="targetType"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         internal static object ParseValue(Type targetType, string value)
         {
             object memberValue;
 
             if (targetType == typeof(Font))
                 memberValue = GetFont(value); // font should be registered first to avoid confusion
-            else if (targetType == typeof(WidgetStyleSheet))
-                memberValue = GetStyle(value, true); // saves only reference
             else if (targetType == typeof(string))
                 memberValue = value;
             else if (targetType == typeof(float))

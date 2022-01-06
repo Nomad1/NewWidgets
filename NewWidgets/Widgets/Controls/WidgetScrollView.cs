@@ -43,8 +43,6 @@ namespace NewWidgets.Widgets
 
         private bool m_animating;
 
-        private bool m_needLayout;
-
         public override bool Enabled
         {
             get { return m_contentView.Enabled; }
@@ -63,7 +61,7 @@ namespace NewWidgets.Widgets
                 m_contentView.Size = value;
                 SetScroll(m_contentView.Position.X, m_contentView.Position.Y, true);
                 if (relayout)
-                    m_needLayout = true;
+                    InvalidateLayout();
             }
         }
 
@@ -75,7 +73,7 @@ namespace NewWidgets.Widgets
                 bool relayout = (value & WidgetScrollType.Visible) != (m_horizontalScroll & WidgetScrollType.Visible);
                 m_horizontalScroll = value;
                 if (relayout)
-                    m_needLayout = true;
+                    InvalidateLayout();
             }
         }
 
@@ -87,7 +85,7 @@ namespace NewWidgets.Widgets
                 bool relayout = (value & WidgetScrollType.Visible) != (m_verticalScroll & WidgetScrollType.Visible);
                 m_verticalScroll = value;
                 if (relayout)
-                    m_needLayout = true;
+                    InvalidateLayout();
             }
         }
 
@@ -111,7 +109,7 @@ namespace NewWidgets.Widgets
             get { return m_contentView; }
         }
 
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "scrollview"; }
         }
@@ -137,8 +135,6 @@ namespace NewWidgets.Widgets
             m_verticalScrollBarIndicator.Parent = this;
 
             ClipContents = true;
-
-            m_needLayout = true;
         }
 
         protected override void Resize(Vector2 size)
@@ -150,11 +146,11 @@ namespace NewWidgets.Widgets
                 Vector2 contentSize = new Vector2(Math.Max(size.X, m_contentView.Size.X), Math.Max(size.Y, m_contentView.Size.Y));
                 m_contentView.Size = contentSize;
 
-                m_needLayout = true;
+                InvalidateLayout();
             }
         }
 
-        public void Relayout()
+        public override void UpdateLayout()
         {
             m_horizontalBarVisible = (m_horizontalScroll & WidgetScrollType.Visible) != 0;
             m_verticalBarVisible = (m_verticalScroll & WidgetScrollType.Visible) != 0;
@@ -211,16 +207,13 @@ namespace NewWidgets.Widgets
 
             UpdateScroll();
 
-            m_needLayout = false;
+            base.UpdateLayout();
         }
 
         public override bool Update()
         {
             if (!base.Update())
                 return false;
-
-            if (m_needLayout)
-                Relayout();
 
             m_contentView.Update();
 

@@ -75,7 +75,6 @@ namespace NewWidgets.Widgets
         private Margin m_margin;
 
         // Internal 
-        private bool m_needsLayout;
         private int m_currentSortDirection;
         private TColumnIdentifier m_currentSortField;
 
@@ -358,10 +357,7 @@ namespace NewWidgets.Widgets
         /// This method marks the widget for full relayout including adding
         /// new rows from DataReader and removing absent ones.
         /// </summary>
-        public void InvalidateLayout()
-        {
-            m_needsLayout = true;
-        }
+        //public void InvalidateLayout()
 
         private WidgetTableRow DoAddRow(uint rowId, ITableDataReader reader, bool invalidate = true)
         {
@@ -382,7 +378,7 @@ namespace NewWidgets.Widgets
             return row;
         }
 
-        private void UpdateLayout()
+        public override void UpdateLayout()
         {
             int index = -1;
 
@@ -455,16 +451,7 @@ namespace NewWidgets.Widgets
 
             this.ContentSize = new Vector2(m_layout.RowWidth + m_margin.Width, position + m_margin.Bottom);
 
-            m_needsLayout = false;
-
-        }
-
-        public override bool Update()
-        {
-            if (m_needsLayout)
-                UpdateLayout();
-
-            return base.Update();
+            base.UpdateLayout();
         }
 
         private int SortComparison(WidgetTableRow x, WidgetTableRow y)
@@ -687,7 +674,7 @@ namespace NewWidgets.Widgets
             public void UpdateStyle(TableLayout layout, WidgetStyleSheet style)
             {
                 this.Size = new Vector2(layout.RowWidth + layout.RowPadding.Width, layout.RowHeight + layout.RowPadding.Height);
-                this.LoadStyle(WidgetState.Normal, style);
+                //this.LoadStyle(WidgetState.Normal, style);
 
                 var data = EnsureData(layout);
 
@@ -760,7 +747,7 @@ namespace NewWidgets.Widgets
 
                     ((WidgetText)cell).Text = value == null ? "" : value.ToString();
                     ((WidgetText)cell).TextAlign = column.TextAlign;
-                    ((WidgetText)cell).Relayout();
+                    ((WidgetText)cell).UpdateLayout();
                     return;
                 }
 

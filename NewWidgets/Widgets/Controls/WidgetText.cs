@@ -10,7 +10,7 @@ namespace NewWidgets.Widgets
     {
         public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_text", true);
 
-        private static char[] s_separatorChars = { ' ', '\t' };
+        private static readonly char[] s_separatorChars = { ' ', '\t' };
 
         private LabelObject[] m_labels;
 
@@ -18,36 +18,34 @@ namespace NewWidgets.Widgets
 
         private float m_maxWidth;
 
-        private bool m_needLayout;
-
         public Font Font
         {
             get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
-            set { SetProperty(WidgetParameterIndex.Font, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.Font, value); InvalidateLayout(); }
         }
 
         public float FontSize
         {
             get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
-            set { SetProperty(WidgetParameterIndex.FontSize, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.FontSize, value); InvalidateLayout(); }
         }
 
         public WidgetAlign TextAlign
         {
             get { return GetProperty(WidgetParameterIndex.TextAlign, WidgetAlign.Left | WidgetAlign.Top); }
-            set { SetProperty(WidgetParameterIndex.TextAlign, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.TextAlign, value); InvalidateLayout(); }
         }
 
         public float LineSpacing
         {
             get { return GetProperty(WidgetParameterIndex.LineSpacing, 1.0f); }
-            set { SetProperty(WidgetParameterIndex.LineSpacing, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.LineSpacing, value); InvalidateLayout(); }
         }
 
         public float MaxWidth
         {
             get { return m_maxWidth; }
-            set { m_maxWidth = value; InivalidateLayout(); }
+            set { m_maxWidth = value; InvalidateLayout(); }
         }
 
         public string Text
@@ -62,14 +60,14 @@ namespace NewWidgets.Widgets
                     return;
 
                 m_text = value;
-                InivalidateLayout();
+                InvalidateLayout();
             }
         }
 
         public bool RichText
         {
             get { return GetProperty(WidgetParameterIndex.RichText, true); }
-            set { SetProperty(WidgetParameterIndex.RichText, value); InivalidateLayout(); }
+            set { SetProperty(WidgetParameterIndex.RichText, value); InvalidateLayout(); }
         }
 
         public uint Color
@@ -85,25 +83,12 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override float Opacity
-        {
-            get { return base.Opacity; }
-            set
-            {
-                base.Opacity = value;
-
-                if (m_labels != null)
-                    foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
-                        label.Opacity = value;
-            }
-        }
-
         public int LineCount
         {
             get { return m_labels == null ? 0 : m_labels.Length; }
         }
 
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "label"; }
         }
@@ -119,28 +104,16 @@ namespace NewWidgets.Widgets
             Text = text;
         }
 
-        private void InivalidateLayout()
-        {
-            m_needLayout = true;
-        }
-
-        protected override void Resize(Vector2 size)
-        {
-            base.Resize(size);
-            InivalidateLayout();
-        }
-
-        public override bool SwitchStyle(WidgetState styleType)
-        {
-            if (base.SwitchStyle(styleType))
-            {
-                InivalidateLayout();
-                return true;
-            }
-            return false;
-        }
-
+        /// <summary>
+        /// Synonym to UpdateLoayout
+        /// </summary>
+        [Obsolete]
         public void Relayout()
+        {
+            UpdateLayout();
+        }
+
+        public override void UpdateLayout()
         {
             string[] lines = string.IsNullOrEmpty(m_text) ? new string[0]: m_text.Split(new string[] { Environment.NewLine, "\r", "\n", "|n", "\\n" }, StringSplitOptions.None);
 
@@ -272,7 +245,7 @@ namespace NewWidgets.Widgets
 
             for (int i = 0; i < lines.Length; i++)
             {
-                LabelObject label = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, false);
+                LabelObject label = new LabelObject(this, Font, string.Empty, false);
                 label.Color = Color;
                 label.Scale = FontSize;
                 label.Opacity = Opacity;
@@ -295,7 +268,7 @@ namespace NewWidgets.Widgets
                 y += lineHeight;
             }
 
-            m_needLayout = false;
+            base.UpdateLayout();
         }
 
         public override bool Update()
@@ -303,8 +276,6 @@ namespace NewWidgets.Widgets
             if (!base.Update())
                 return false;
 
-            if (m_needLayout)
-                Relayout();
 
             if (m_labels != null)
                 foreach (LabelObject label in m_labels)

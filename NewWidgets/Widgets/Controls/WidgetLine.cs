@@ -20,36 +20,34 @@ namespace NewWidgets.Widgets
         private float m_width;
         private int m_angleSnap;
 
-        private bool m_needLayout;
-
         public Vector2 From
         {
             get { return m_from; }
-            set { m_from = value; m_needLayout = true; }
+            set { m_from = value; InvalidateLayout(); }
         }
 
         public Vector2 To
         {
             get { return m_to; }
-            set { m_to = value; m_needLayout = true; }
+            set { m_to = value; InvalidateLayout(); }
         }
 
         public int AngleSnap
         {
             get { return m_angleSnap; }
-            set { m_angleSnap = value; m_needLayout = true; }
+            set { m_angleSnap = value; InvalidateLayout(); }
         }
 
         public float Gap
         {
             get { return m_gap; }
-            set { m_gap = value; m_needLayout = true; }
+            set { m_gap = value; InvalidateLayout(); }
         }
 
         public float Width
         {
             get { return m_width; }
-            set { m_width = value; m_needLayout = true; }
+            set { m_width = value; InvalidateLayout(); }
         }
 
         public uint Color
@@ -58,7 +56,7 @@ namespace NewWidgets.Widgets
             set { BackgroundColor = value; }
         }
 
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "line"; }
         }
@@ -93,7 +91,6 @@ namespace NewWidgets.Widgets
             m_gap = gap;
             m_width = width;
             m_angleSnap = angleSnap;
-            m_needLayout = true;
             m_simpleLine = false;
         }
 
@@ -110,7 +107,6 @@ namespace NewWidgets.Widgets
             m_gap = 0;
             m_width = 2;
             m_angleSnap = 0;
-            m_needLayout = true;
         }
 
         protected override void Resize(Vector2 size)
@@ -122,11 +118,11 @@ namespace NewWidgets.Widgets
                 m_from = new Vector2(0, size.Y / 2);
                 m_to = new Vector2(size.X, size.Y / 2);
                 m_width = size.Y / 2;
-                m_needLayout = true;
+                InvalidateLayout();
             }
         }
 
-        private void Relayout()
+        public override void UpdateLayout()
         {
             if (!m_simpleLine)
             {
@@ -152,14 +148,7 @@ namespace NewWidgets.Widgets
                 Position = m_to + (direction) * m_gap;// - new Vector2(0, m_width / 2);
             }
 
-            m_needLayout = false;
-        }
-
-        public override bool Update()
-        {
-            if (m_needLayout)
-                Relayout();
-            return base.Update();
+            base.UpdateLayout();
         }
     }
 }

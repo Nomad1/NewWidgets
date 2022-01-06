@@ -52,7 +52,7 @@ namespace NewWidgets.Widgets
                 m_selectedIndex = m_items.Count == 0 ? -1 : value % m_items.Count;
 
                 m_label.Text = SelectedItem.Key;
-                m_label.Relayout();
+                m_label.UpdateLayout();
                 if (m_animated)
                     m_label.AnimateAppear(false);
             }
@@ -78,7 +78,7 @@ namespace NewWidgets.Widgets
                 }
 
                 m_label.Text = SelectedItem.Key;
-                m_label.Relayout();
+                m_label.UpdateLayout();
                 if (m_animated)
                     m_label.AnimateAppear(false);
             }
@@ -130,7 +130,7 @@ namespace NewWidgets.Widgets
             m_label = new WidgetLabel(labelStyle, items.Count > 0 ? items[0].Key : string.Empty);
             //m_label.FontSize = WidgetManager.FontScale * 1.25f;
             AddChild(m_label);
-            m_label.Relayout();
+            m_label.UpdateLayout();
 
             m_rightButton = new WidgetButton(rightButtonStyle);
             AddChild(m_rightButton);

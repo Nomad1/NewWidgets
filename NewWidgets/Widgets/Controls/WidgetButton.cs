@@ -19,8 +19,8 @@ namespace NewWidgets.Widgets
     {
         public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_button", true);
 
-        private WidgetLabel m_label;
-        private WidgetImage m_image;
+        private readonly WidgetLabel m_label;
+        private readonly WidgetImage m_image;
 
         private string m_clickSound;
 
@@ -31,20 +31,18 @@ namespace NewWidgets.Widgets
         public event Action<WidgetButton> OnHover;
         public event Action<WidgetButton> OnUnhover;
 
-        private bool m_needLayout;        
-
         // Dynamic properties
 
         public string Text
         {
             get { return m_label.Text; }
-            set { m_label.Text = value; m_needLayout = true; }
+            set { m_label.Text = value; InvalidateLayout(); }
         }
 
         public string Image
         {
             get { return m_image.Image; }
-            set { m_image.Image = value; m_needLayout = true; }
+            set { m_image.Image = value; InvalidateLayout(); }
         }
 
         // Forwarded style properties
@@ -64,13 +62,13 @@ namespace NewWidgets.Widgets
         public Font Font
         {
             get { return m_label.Font; }
-            set { m_label.Font = value; m_needLayout = true; }
+            set { m_label.Font = value; InvalidateLayout(); }
         }
 
         public float FontSize
         {
             get { return m_label.FontSize; }
-            set { m_label.FontSize = value; m_needLayout = true; }
+            set { m_label.FontSize = value; InvalidateLayout(); }
         }
 
         // Own style properties
@@ -78,19 +76,19 @@ namespace NewWidgets.Widgets
         public WidgetButtonLayout Layout
         {
             get { return GetProperty(WidgetParameterIndex.ButtonLayout, WidgetButtonLayout.Center); }
-            set { SetProperty(WidgetParameterIndex.ButtonLayout, value); m_needLayout = true; }
+            set { SetProperty(WidgetParameterIndex.ButtonLayout, value); InvalidateLayout(); }
         }
 
         public Margin ImagePadding
         {
             get { return GetProperty(WidgetParameterIndex.ButtonImagePadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); m_needLayout = true; }
+            set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); InvalidateLayout(); }
         }
 
         public Margin TextPadding
         {
             get { return GetProperty(WidgetParameterIndex.ButtonTextPadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.ButtonTextPadding, value); m_needLayout = true; }
+            set { SetProperty(WidgetParameterIndex.ButtonTextPadding, value); InvalidateLayout(); }
         }
 
         public Vector2 AnimatePivot
@@ -124,7 +122,17 @@ namespace NewWidgets.Widgets
             get { return m_overridePress; }
             set { m_overridePress = value; }
         }
-       
+
+        public bool IsImageVisible
+        {
+            get { return !string.IsNullOrEmpty(m_image.Image); }
+        }
+
+        public bool IsLabelVisible
+        {
+            get { return !string.IsNullOrEmpty(m_label.Text); }
+        }
+
         protected WidgetImage InternalImage
         {
             get { return m_image; }
@@ -135,21 +143,7 @@ namespace NewWidgets.Widgets
             get { return m_label; }
         }
 
-        public override float Opacity
-        {
-            get { return base.Opacity;}
-            set
-            {
-                base.Opacity = value;
-                if (m_image != null)
-                    m_image.Opacity = value;
-
-                if (m_label != null)
-                    m_label.Opacity = value;
-            }
-        }
-
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "button"; }
         }
@@ -171,82 +165,81 @@ namespace NewWidgets.Widgets
         public WidgetButton(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
            : base(style.IsEmpty ? DefaultStyle : style)
         {
-
-            m_needLayout = true;
-
-            WidgetStyleSheet buttonTextStyle = GetProperty(WidgetParameterIndex.ButtonTextStyle, default(WidgetStyleSheet));
-
-            if (buttonTextStyle.IsEmpty)
-                m_label = new WidgetLabel(m_styles, text); // label will use the same stylesheet as the button
-            else
-                m_label = new WidgetLabel(buttonTextStyle, text);
-
+            // This one is for compatibility reasons: nested styles were used in XML stylesheet
+            m_label = new WidgetLabel(WidgetManager.GetStyle(GetProperty(WidgetParameterIndex.ButtonTextStyle, "")), text);
             m_label.Parent = this;
 
-            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style.IsEmpty ? DefaultStyle : style));
+            //m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style.IsEmpty ? DefaultStyle : style));
+            m_image = new WidgetImage(WidgetManager.GetStyle(GetProperty(WidgetParameterIndex.ButtonImageStyle, "")));
             m_image.Parent = this;
 
             m_clickSound = "click";
         }
 
-        public override bool SwitchStyle(WidgetState styleType)
+        /// <summary>
+        /// Updates 
+        /// </summary>
+        public override void UpdateStyle()
         {
-            if (base.SwitchStyle(styleType))
-            {
-                m_label.SwitchStyle(styleType);
-                m_image.SwitchStyle(styleType);
+            base.UpdateStyle();
 
-                return true;
+            m_label.UpdateStyle();
+
+            m_image.UpdateStyle();
+        }
+
+        public override void UpdateLayout()
+        {
+            if (IsImageVisible)
+            {
+                m_image.Size = Size - ImagePadding.Size;
+                m_image.UpdateLayout();
             }
-            return false;
-        }
 
-        protected override void Resize(Vector2 size)
-        {
-            base.Resize(size);
 
-            m_needLayout = true;
-        }
-
-        public virtual void Relayout()
-        {
-            if (m_label != null && (Size.X <= 0 || Size.Y <= 0))
+            if (IsLabelVisible)
             {
-                m_label.Relayout();
+                m_label.Size = Size - TextPadding.Size;
+                m_label.UpdateLayout();
 
+            }
+
+            // now we're ready for automatic resize if needed
+
+            // auto-resize attempt. Little bit clumsy and ignores image size and button layout. TODO: re-implement this part
+            if (Size.X <= 0 || Size.Y <= 0)
+            {
                 Size = new Vector2(Math.Max(TextPadding.Width + m_label.Size.X, ImagePadding.Width + m_image.Size.X), Math.Max(TextPadding.Height + m_label.Size.Y, ImagePadding.Height + m_image.Size.Y));
             }
 
-            if (m_label != null && !string.IsNullOrEmpty(m_label.Text))
+
+            if (IsLabelVisible)
             {
+                m_label.Position = TextPadding.TopLeft;
+
                 if ((Layout & WidgetButtonLayout.TextLeft) != 0)
                 {
-                    m_label.Size = new Vector2(Size.X - TextPadding.Width, Size.Y - TextPadding.Height);
-                    m_label.Position = TextPadding.TopLeft;
                     m_label.TextAlign = WidgetAlign.Left | WidgetAlign.Top;
                 }
                 else
                 {
                     m_label.TextAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
-                    m_label.Size = new Vector2(Size.X - TextPadding.Width, Size.Y - TextPadding.Height);
-                    m_label.Position = TextPadding.TopLeft;
                 }
             }
 
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
             {
+                m_image.Position = ImagePadding.TopLeft;
+
                 if ((Layout & WidgetButtonLayout.ImageLeft) != 0)
                 {
-                    m_image.Size = new Vector2(Size.X - ImagePadding.Width, Size.Y - ImagePadding.Height);
                     m_image.ImageStyle = WidgetBackgroundStyle.ImageTopLeft;
                     m_image.ImagePivot = new Vector2(0, 0);
-                    m_image.Position = ImagePadding.TopLeft;
                 }
                 else
                 {
-                    m_image.Size = new Vector2(Size.X - ImagePadding.Width, Size.Y - ImagePadding.Height);
-                    m_image.Position = ImagePadding.TopLeft;
                     m_image.ImageStyle = WidgetBackgroundStyle.ImageFit;
+                    // ImagePivot?
                 }
             }
             /*else
@@ -256,28 +249,20 @@ namespace NewWidgets.Widgets
                 m_label.Position = m_textPadding.TopLeft;
             }*/
 
-            m_needLayout = false;
+
+            base.UpdateLayout();
         }
 
         public override bool Update()
         {
-            if (m_needLayout)
-                Relayout();
-        
             if (!base.Update())
                 return false;
             
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
-            {
-                m_image.Opacity = Opacity;
                 m_image.Update();
-            }
 
-            if (m_label != null)
-            {
-                m_label.Opacity = Opacity;
+            if (m_label != null && !string.IsNullOrEmpty(m_label.Text))
                 m_label.Update();
-            }
 
             return true;
         }
@@ -285,11 +270,11 @@ namespace NewWidgets.Widgets
         protected override void DrawContents()
         {
             base.DrawContents();
-            
-            if (!string.IsNullOrEmpty(Image))
+
+            if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
                 m_image.Draw();
-            
-            if (!string.IsNullOrEmpty(Text))
+
+            if (m_label != null && !string.IsNullOrEmpty(m_label.Text))
                 m_label.Draw();
         }
 

@@ -16,33 +16,8 @@ namespace NewWidgets.Widgets
 
         private string m_text;
 
-        private bool m_needLayout; // flag to indicate that inner label size/opacity/formatting has changed
-        private bool m_needRecreate; // flag to indicate that we need a new inner label
         private bool m_needAnimate; // flag to indicate that animation is in progress
         private bool m_needAnimateRandom; // animation type
-
-        private uint m_color = 0xffffff;
-        
-        public Font Font
-        {
-            get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
-            set
-            {
-                SetProperty(WidgetParameterIndex.Font, value);
-                InivalidateLayout();
-                m_needRecreate = true; // there is no way to change the font without label recreation
-            }
-        }
-
-        public float FontSize
-        {
-            get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
-            set
-            {
-                SetProperty(WidgetParameterIndex.FontSize, value);
-                InivalidateLayout();
-            }
-        }
 
         public WidgetAlign TextAlign
         {
@@ -50,11 +25,40 @@ namespace NewWidgets.Widgets
             set
             {
                 SetProperty(WidgetParameterIndex.TextAlign, value);
-                InivalidateLayout();
-                m_needRecreate = true; // there is no way to change text alignment without label recreation
+                InvalidateLayout();
             }
         }
 
+        /// <summary>
+        /// Right now font size is a relative scale. Every change to scale factor results in label resize and realignment
+        /// </summary>
+        public float FontSize
+        {
+            get { return GetProperty(WidgetParameterIndex.FontSize, 1.0f); }
+            set
+            {
+                SetProperty(WidgetParameterIndex.FontSize, value);
+                InvalidateLayout();
+            }
+        }
+      
+        public Font Font
+        {
+            get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
+            set
+            {
+                SetProperty(WidgetParameterIndex.Font, value);
+
+                if (m_label != null)
+                    m_label.Font = value;
+
+                InvalidateLayout();
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether we need to decode special symbols in the text
+        /// </summary>
         public bool RichText
         {
             get { return GetProperty(WidgetParameterIndex.RichText, false); }
@@ -62,13 +66,16 @@ namespace NewWidgets.Widgets
             {
                 SetProperty(WidgetParameterIndex.RichText, value);
 
-                if (m_label != null) // try to avoid settings m_needLayout
+                if (m_label != null)
                     m_label.RichText = value;
 
-                InivalidateLayout();
+                InvalidateLayout();
             }
         }
 
+        /// <summary>
+        /// Text string value. If starts with @ it is considered a localized resource string
+        /// </summary>
         public string Text
         {
             get { return m_text; }
@@ -76,12 +83,12 @@ namespace NewWidgets.Widgets
             {
                 if (!string.IsNullOrEmpty(value) && value[0] == '@')
                     value = ResourceLoader.Instance.GetString(value);
-                
-                if (m_text == value)
-                    return;
-                
+
+                if (m_label != null)
+                    m_label.Text = value;
+
                 m_text = value;
-                InivalidateLayout();
+                InvalidateLayout();
             }
         }
 
@@ -90,30 +97,14 @@ namespace NewWidgets.Widgets
             get { return GetProperty(WidgetParameterIndex.TextColor, (uint)0xffffff); }
             set
             {
-                if (m_color == value)
-                    return;
-
                 SetProperty(WidgetParameterIndex.TextColor, value);
 
-                if (m_label != null) // try to avoid settings m_needLayout
+                if (m_label != null)
                     m_label.Color = value;
-
-                m_color = value;
             }
         }
 
-        public override float Opacity
-        {
-            get { return base.Opacity; }
-            set
-            {
-                base.Opacity = value;
-                if (m_label != null) // try to avoid settings m_needLayout
-                    m_label.Opacity = value;
-            }
-        }
-
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "label"; }
         }
@@ -138,67 +129,24 @@ namespace NewWidgets.Widgets
             Text = text;
         }
 
-        internal WidgetLabel(WidgetStyleSheet [] styles, string text = "")
-           : base(styles)
+        public override void UpdateLayout()
         {
-            Text = text;
-        }
-
-        private void InivalidateLayout()
-        {
-            m_needLayout = true;
-        }
-
-        protected override void Resize(Vector2 size)
-        {
-            base.Resize(size);
-            InivalidateLayout();
-        }
-
-        public override bool SwitchStyle(WidgetState styleType)
-        {
-            if (base.SwitchStyle(styleType))
-            {
-                InivalidateLayout();
-                return true;
-            }
-            return false;
-        }
-
-        public void Relayout()
-        {
-            if (m_label != null && m_needRecreate)
-            {
-                m_label.Remove();
-                m_label = null;
-            }
-
+            // If label is not yet created - create it. Otherwise all the changes are already it
             if (m_label == null)
-                m_label = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, RichText);
-            
+                m_label = new LabelObject(this, Font, m_text, RichText);
+
             m_label.Color = Color;
-            m_label.Opacity = Opacity;
             m_label.Scale = FontSize;
 
-            if (!string.IsNullOrEmpty(m_text))
-                m_label.Text = m_text;
-
-            Vector2 minSize = m_label.Size * FontSize;
-            if (minSize.X < Size.X)
-                minSize.X = Size.X;
-            if (minSize.Y < Size.Y)
-                minSize.Y = Size.Y;
-
-            Size = minSize;
-            
-            RelayoutText();
-
-            m_needLayout = false;
-        }
-
-        private void RelayoutText()
-        {
             Vector2 labelSize = m_label.Size * FontSize;
+            if (labelSize.X < Size.X)
+                labelSize.X = Size.X;
+            if (labelSize.Y < Size.Y)
+                labelSize.Y = Size.Y;
+
+            Size = labelSize; // TODO: here we're autosizing the widget to fit the label, but there whould be an option to choose between sizing and overflow modes
+
+            // very simple alignment
 
             float x = 0;
 
@@ -215,6 +163,8 @@ namespace NewWidgets.Widgets
                 y = Size.Y - labelSize.Y;
 
             m_label.Position = new Vector2(x, y);
+
+            base.UpdateLayout();
         }
 
         public override bool Update()
@@ -222,11 +172,11 @@ namespace NewWidgets.Widgets
             if (!base.Update())
                 return false;
 
-            if (m_needLayout)
-                Relayout();
-
             if (m_label != null)
+            {
                 m_label.Update();
+                m_label.Opacity = OpacityValue;
+            }
 
             if (m_needAnimate)
                 DoAnimateAppear(m_needAnimateRandom);

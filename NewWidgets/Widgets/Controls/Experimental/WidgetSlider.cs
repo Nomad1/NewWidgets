@@ -89,7 +89,7 @@ namespace NewWidgets.Widgets
             m_label.TextAlign = WidgetAlign.Top | WidgetAlign.VerticalCenter;
             m_label.FontSize = WidgetManager.FontScale * 0.7f;
             m_label.Color = 0xffffff;
-            m_label.Relayout();
+            m_label.UpdateLayout();
             AddChild(m_label);
 
             // Shift progress line to get room for the button to stick out a little
@@ -116,7 +116,7 @@ namespace NewWidgets.Widgets
         {
             //m_progressLine.Text = string.Format(m_text, m_value);
             m_label.Text = string.Format(m_text, m_value);
-            m_label.Relayout();
+            m_label.UpdateLayout();
             m_label.Position = m_lowerButton.Position + new Vector2(m_lowerButton.Scale * m_lowerButton.Size.X /2 - m_label.Size.X / 2, m_lowerButton.Scale * m_lowerButton.Size.Y - 10.0f);
         }
 

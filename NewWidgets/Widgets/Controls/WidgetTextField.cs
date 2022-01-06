@@ -24,8 +24,6 @@ namespace NewWidgets.Widgets
         private Vector2 m_contentOffset;
         private int m_lineHeight;
 
-        private bool m_needLayout;
-
         public event Action<WidgetTextField, string> OnFocusLost;
         public event Action<WidgetTextField, string> OnTextEntered;
         public event Action<WidgetTextField, string> OnTextChanged;
@@ -118,31 +116,31 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public uint FocusedTextColor
-        {
-            get { return GetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, (uint)0xffffff); }
-            set
-            {
-                SetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, value);
+        //public uint FocusedTextColor
+        //{
+        //    get { return GetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, (uint)0xffffff); }
+        //    set
+        //    {
+        //        SetProperty(WidgetState.Selected, WidgetParameterIndex.TextColor, value);
 
-                if (CurrentState == WidgetState.Selected  && m_labels != null)
-                    foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
-                        label.Color = value;
-            }
-        }
+        //        if (CurrentState == WidgetState.Selected  && m_labels != null)
+        //            foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
+        //                label.Color = value;
+        //    }
+        //}
 
-        public override float Opacity
-        {
-            get { return base.Opacity; }
-            set
-            {
-                base.Opacity = value;
+        //public override float Opacity
+        //{
+        //    get { return base.Opacity; }
+        //    set
+        //    {
+        //        base.Opacity = value;
 
-                if (m_labels != null)
-                    foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
-                        label.Opacity = value;
-            }
-        }
+        //        if (m_labels != null)
+        //            foreach (LabelObject label in m_labels) // try to avoid settings m_needLayout
+        //                label.Opacity = value;
+        //    }
+        //}
 
         public int LineCount
         {
@@ -150,7 +148,7 @@ namespace NewWidgets.Widgets
         }
 
 
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "textedit"; }
         }
@@ -163,32 +161,10 @@ namespace NewWidgets.Widgets
             : base(style.IsEmpty ? DefaultStyle : style)
         {
             m_text = string.Empty;
-            m_needLayout = true;
             ClipMargin = TextPadding;
         }
 
-        private void InvalidateLayout()
-        {
-            m_needLayout = true;
-        }
-
-        protected override void Resize(Vector2 size)
-        {
-            base.Resize(size);
-            InvalidateLayout();
-        }
-
-        public override bool SwitchStyle(WidgetState styleType)
-        {
-            if (base.SwitchStyle(styleType))
-            {
-                InvalidateLayout();
-                return true;
-            }
-            return false;
-        }
-
-        private void Relayout()
+        public override void UpdateLayout()
         {
             m_lines = m_text.Split(new string[] { "\r", "\n" }, StringSplitOptions.None);
 
@@ -224,11 +200,11 @@ namespace NewWidgets.Widgets
             for (int i = 0; i < m_lines.Length; i++)
             {
                 if (m_labels[i] == null)
-                    m_labels[i] = new LabelObject(this, Font, string.Empty, LabelAlign.Start, LabelAlign.Start, false);
+                    m_labels[i] = new LabelObject(this, Font, string.Empty, false);
 
                 m_labels[i].Color = TextColor;
                 m_labels[i].Scale = FontSize;
-                m_labels[i].Opacity = Opacity;
+                m_labels[i].Opacity = OpacityValue;
                 m_labels[i].Text = m_lines[i];
                 m_labels[i].Size = sizes[i] / FontSize;
             }
@@ -241,7 +217,7 @@ namespace NewWidgets.Widgets
                 m_cursor.Transform.Parent = Transform;
             }
 
-            m_needLayout = false;
+            base.UpdateLayout();
 
             UpdateCursor(0, 0);
         }
@@ -250,9 +226,6 @@ namespace NewWidgets.Widgets
         {
             if (!base.Update())
                 return false;
-
-            if (m_needLayout)
-                Relayout();
 
             if (m_labels != null)
                 foreach (LabelObject label in m_labels)
@@ -330,7 +303,7 @@ namespace NewWidgets.Widgets
 
                     m_cursorPosition += toAdd.Length;
                     m_cursorLinePosition += toAdd.Length;
-                    Relayout();
+                    UpdateLayout();
                     return true;
                 }
             }
@@ -349,7 +322,7 @@ namespace NewWidgets.Widgets
 
                             m_cursorPosition--;
                             m_cursorLinePosition--;
-                            Relayout();
+                            UpdateLayout();
                         }
                         break;
                     case SpecialKey.Delete:
@@ -360,7 +333,7 @@ namespace NewWidgets.Widgets
                             if (OnTextChanged != null)
                                 OnTextChanged(this, m_text);
 
-                            Relayout();
+                            UpdateLayout();
                         }
                         break;
                     case SpecialKey.Enter:
@@ -377,7 +350,7 @@ namespace NewWidgets.Widgets
                             m_cursorLine++;
                             m_cursorLinePosition = 0;
 
-                            Relayout();
+                            UpdateLayout();
                         }
                         break;
                     case SpecialKey.Left:
@@ -411,7 +384,7 @@ namespace NewWidgets.Widgets
 
         private void UpdateCursor(int symbolChange, int lineChange)
         {
-            if (m_needLayout)
+            if (NeedsLayout)
                 return;
 
             if (IsFocused)

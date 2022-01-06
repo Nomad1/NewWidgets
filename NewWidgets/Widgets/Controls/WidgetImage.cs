@@ -14,69 +14,55 @@ namespace NewWidgets.Widgets
 
         private ImageObject m_imageObject;
 
-        private bool m_imageInited;
-
         private string m_lastTexture;
 
         public string Image
         {
             get { return GetProperty(WidgetParameterIndex.Image, ""); }
-            set { SetProperty(WidgetParameterIndex.Image, value); InvalidateImage(); }
+            set { SetProperty(WidgetParameterIndex.Image, value); InvalidateLayout(); }
         }
 
         public float ImageRotation
         {
             get { return GetProperty(WidgetParameterIndex.ImageAngle, 0.0f); }
-            set { SetProperty(WidgetParameterIndex.ImageAngle, value); InvalidateImage(); }
+            set { SetProperty(WidgetParameterIndex.ImageAngle, value); InvalidateLayout(); }
         }
 
         public Vector2 ImagePivot
         {
             get { return GetProperty(WidgetParameterIndex.ImagePivot, new Vector2(0.5f, 0.5f)); }
-            set { SetProperty(WidgetParameterIndex.ImagePivot, value); InvalidateImage(); }
+            set { SetProperty(WidgetParameterIndex.ImagePivot, value); InvalidateLayout(); }
         }
 
         public Margin ImagePadding
         {
             get { return GetProperty(WidgetParameterIndex.ImagePadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.ImagePadding, value); InvalidateImage(); }
+            set { SetProperty(WidgetParameterIndex.ImagePadding, value); InvalidateLayout(); }
         }
 
         public WidgetBackgroundStyle ImageStyle
         {
             get { return GetProperty(WidgetParameterIndex.ImageStyle, WidgetBackgroundStyle.ImageFit); }
-            set { SetProperty(WidgetParameterIndex.ImageStyle, value); InvalidateImage(); }
+            set { SetProperty(WidgetParameterIndex.ImageStyle, value); InvalidateLayout(); }
         }
 
-        public float ImageAlpha
-        {
-            get { return GetProperty(WidgetParameterIndex.ImageOpacity, 1.0f); }
-            set
-            {
-                if (ImageAlpha != value)
-                {
-                    SetProperty(WidgetParameterIndex.ImageOpacity, value);
-                    UpdateColor();
-                }
-            }
-        }
+        //public float ImageAlpha
+        //{
+        //    get { return GetProperty(WidgetParameterIndex.ImageOpacity, 1.0f); }
+        //    set
+        //    {
+        //        if (ImageAlpha != value)
+        //        {
+        //            SetProperty(WidgetParameterIndex.ImageOpacity, value);
+        //            UpdateColor();
+        //        }
+        //    }
+        //}
 
         public uint Color
         {
             get { return GetProperty(WidgetParameterIndex.ImageColor, (uint)0xffffff); }
-            set {
-                if (Color != value)
-                {
-                    SetProperty(WidgetParameterIndex.ImageColor, value);
-                    UpdateColor();
-                }
-            }
-        }
-
-        public override float Opacity
-        {
-            get { return base.Opacity; }
-            set { base.Opacity = value; UpdateColor(); }
+            set { SetProperty(WidgetParameterIndex.ImageColor, value); }
         }
 
         public Vector2 ImageSize
@@ -86,10 +72,16 @@ namespace NewWidgets.Widgets
 
         public ImageObject ImageObject
         {
-            get { PrepareImage(); return m_imageObject; }
+            get
+            {
+                if (m_imageObject == null)
+                    UpdateLayout(); // this call creates the image ahead of time. Try not to abuse it
+                /*PrepareImage();*/
+                return m_imageObject;
+            }
         }
 
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "image"; }
         }
@@ -135,49 +127,26 @@ namespace NewWidgets.Widgets
                 Image = image;
         }
 
-        public override bool SwitchStyle(WidgetState styleType)
+        public override void UpdateLayout()
         {
-            if (base.SwitchStyle(styleType))
-            {
-                InvalidateImage();
-                return true;
-            }
-            return false;
-        }
-
-        private void InvalidateImage()
-        {
-            m_imageInited = false;
-        }
-
-        protected void PrepareImage()
-        {
-            InitImage(ImageStyle, Image, ImageRotation, ImagePivot, ImagePadding);
-        }
-
-        protected void InitImage(WidgetBackgroundStyle style, string texture, float rotation, Vector2 pivot, Margin padding)
-        {
-            m_imageInited = true;
-
-            if (m_imageObject != null && m_lastTexture != texture) // TODO: check if image was not changed meaning no need to remove it
+            if (m_imageObject != null && m_lastTexture != Image) // TODO: check if image was not changed meaning no need to remove it
             {
                 m_imageObject.Remove();
                 m_imageObject = null;
             }
 
-            m_lastTexture = texture;
+            m_lastTexture = Image;
 
-            if (string.IsNullOrEmpty(texture))
+            if (string.IsNullOrEmpty(Image))
             {
-                if (style != WidgetBackgroundStyle.None)
+                if (ImageStyle != WidgetBackgroundStyle.None)
                     WindowController.Instance.LogMessage("Initing WidgetImage {0} without texture", this);
                 return;
             }
 
             if (m_imageObject == null)
             {
-
-                ISprite textureSprite = WindowController.Instance.CreateSprite(texture);
+                ISprite textureSprite = WindowController.Instance.CreateSprite(Image);
                 if (textureSprite == null)
                 {
                     WindowController.Instance.LogError("WidgetImage texture not found for sprite {0}", textureSprite);
@@ -187,9 +156,17 @@ namespace NewWidgets.Widgets
                 m_imageObject = new ImageObject(this, textureSprite);
             }
 
-            Vector2 size = new Vector2(Size.X - padding.Left - padding.Right, Size.Y - padding.Top - padding.Bottom);
-            Vector2 start = new Vector2(padding.Left, padding.Top);
+            Vector2 size = Size - ImagePadding.Size;
+            Vector2 spriteSize = m_imageObject.Sprite.Size;
+            Vector2 start = ImagePadding.TopLeft;
             Vector2 center = start + size / 2;
+
+            Vector2 position;
+            float scale;
+            bool nonUniformScale = false;
+            float scaleY = 1.0f;
+
+            WidgetBackgroundStyle style = ImageStyle;
 
             switch (style)
             {
@@ -197,17 +174,15 @@ namespace NewWidgets.Widgets
                 case WidgetBackgroundStyle.ImageTopLeft:
                     {
                         if (style == WidgetBackgroundStyle.ImageTopLeft)
-                            m_imageObject.Position = Vector2.Zero;
+                            position = Vector2.Zero;
                         else
-                            m_imageObject.Position = center;
+                            position = center;
 
                         // Center and aspect fit. Good only for fixed size windows
-                        m_imageObject.Sprite.PivotShift = pivot;
-                        m_imageObject.Scale = size.X / m_imageObject.Sprite.Size.X;
-                        m_imageObject.Rotation = rotation;
+                        scale = size.X / spriteSize.X;
 
-                        if (m_imageObject.Scale * m_imageObject.Sprite.Size.Y > size.Y)
-                            m_imageObject.Scale = size.Y / m_imageObject.Sprite.Size.Y;
+                        if (scale * spriteSize.Y > size.Y)
+                            scale = size.Y / spriteSize.Y;
 
                         break;
                     }
@@ -215,37 +190,33 @@ namespace NewWidgets.Widgets
                 case WidgetBackgroundStyle.ImageTopLeftFill:
                     {
                         if (style == WidgetBackgroundStyle.ImageTopLeftFill)
-                            m_imageObject.Position = Vector2.Zero;
+                            position = Vector2.Zero;
                         else
-                            m_imageObject.Position = center;
+                            position = center;
 
                         // Center and aspect fill
-                        m_imageObject.Sprite.PivotShift = pivot;
-                        m_imageObject.Scale = size.X / m_imageObject.Sprite.Size.X;
-                        m_imageObject.Rotation = rotation;
+                        scale = size.X / spriteSize.X;
 
-                        if (m_imageObject.Scale * m_imageObject.Sprite.Size.Y < size.Y)
-                            m_imageObject.Scale = size.Y / m_imageObject.Sprite.Size.Y;
+                        if (scale * spriteSize.Y < size.Y)
+                            scale = size.Y / spriteSize.Y;
 
                         break;
                     }
                 case WidgetBackgroundStyle.ImageStretch:
                     {
-                        m_imageObject.Position = center;
+                        position = center;
 
                         // Center and stretch
-                        m_imageObject.Sprite.PivotShift = pivot;
-                        m_imageObject.Transform.FlatScale = size / m_imageObject.Sprite.Size;
-                        m_imageObject.Rotation = rotation;
+                        scale = size.X / m_imageObject.Sprite.Size.X;
+                        scaleY = size.Y / m_imageObject.Sprite.Size.Y;
+                        nonUniformScale = true;
                         break;
                     }
                 case WidgetBackgroundStyle.Image:
                     {
-                        m_imageObject.Position = start;
-
+                        position = start;
+                        scale = 1.0f;
                         // Center and no stretch
-                        m_imageObject.Sprite.PivotShift = pivot;
-                        m_imageObject.Rotation = rotation;
                         break;
                     }
                 default:
@@ -255,48 +226,41 @@ namespace NewWidgets.Widgets
                     return;
             }
 
+            m_imageObject.Sprite.PivotShift = ImagePivot;
+            m_imageObject.Transform.FlatScale = new Vector2(scale, nonUniformScale ? scaleY : scale);
+            m_imageObject.Position = position;
+            m_imageObject.Rotation = ImageRotation;
+
+
+            // TODO: here we're autosizing the widget to fit the image, but there whould be an option to choose between sizing and overflow modes
+            // also rotation is not counted for new size
             if (Size.X <= 0 && Size.Y <= 0)
                 Size = size;
 
-            UpdateColor();
+            base.UpdateLayout();
         }
 
-        protected override void Resize(Vector2 size)
-        {
-            if (Vector2.DistanceSquared(Size, size) > float.Epsilon)
-            {
-                base.Resize(size);
-
-                InvalidateImage();
-            }
-        }
-
-        public void Relayout()
-        {
-            InvalidateImage();
-            if (Size.X <= 0 && Size.Y <= 0 && ImageStyle == WidgetBackgroundStyle.Image)
-                Size = ImageSize;
-        }
-
-        private void UpdateColor()
-        {
-            if (m_imageObject != null)
-            {
-                m_imageObject.Sprite.Color = Color;
-                m_imageObject.Sprite.Alpha = (byte)MathHelper.Clamp((int)(Opacity * ImageAlpha * 255 + float.Epsilon), 0, 255);
-            }
-        }
+        //private void UpdateColor()
+        //{
+        //    if (m_imageObject != null)
+        //    {
+        //        m_imageObject.Sprite.Color = Color;
+        //        m_imageObject.Sprite.Alpha = (byte)MathHelper.Clamp((int)(Opacity * ImageAlpha * 255 + float.Epsilon), 0, 255);
+        //    }
+        //}
 
         public override bool Update()
         {
             if (!base.Update())
                 return false;
 
-            if (!m_imageInited)
-                PrepareImage();
-
             if (m_imageObject != null)
+            {
+                m_imageObject.Sprite.Color = Color;
+                m_imageObject.Sprite.Alpha = (byte)MathHelper.Clamp((int)(OpacityValue * /*ImageAlpha **/ 255 + float.Epsilon), 0, 255);
+
                 m_imageObject.Update();
+            }
 
             return true;
         }
@@ -305,6 +269,7 @@ namespace NewWidgets.Widgets
         {
             if (m_imageObject != null)
                 m_imageObject.Draw();
+
             base.DrawContents();
         }
     }

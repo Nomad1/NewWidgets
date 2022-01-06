@@ -67,7 +67,7 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); }
         }
 
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "checkbox"; }
         }
@@ -89,7 +89,7 @@ namespace NewWidgets.Widgets
         public WidgetCheckBox(WidgetStyleSheet style = default(WidgetStyleSheet), bool isChecked = false)
             : base(style.IsEmpty ? DefaultStyle : style)
         {
-            m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style.IsEmpty ? DefaultStyle : style));
+            m_image = new WidgetImage(WidgetManager.GetStyle(GetProperty(WidgetParameterIndex.ButtonImageStyle, "")));
             m_image.Parent = this;
 
             Selected = isChecked;
@@ -97,30 +97,24 @@ namespace NewWidgets.Widgets
             Resize(Size);
         }
 
-        protected override void Resize(Vector2 size)
+        public override void UpdateLayout()
         {
-            base.Resize(size);
-
             if (m_image != null)
             {
-                m_image.Size = new Vector2(size.X - ImagePadding.Width, size.Y - ImagePadding.Height);
+                m_image.Size = Size - ImagePadding.Size;
                 m_image.Position = ImagePadding.TopLeft;
             }
+
+            base.UpdateLayout();
         }
 
-        public override bool SwitchStyle(WidgetState styleType)
+
+        public override void UpdateStyle()
         {
-            if (base.SwitchStyle(styleType))
-            {
-                if (m_image != null)
-                    m_image.SwitchStyle(styleType);
+            base.UpdateStyle();
 
-                if (m_linkedLabel != null)
-                    m_linkedLabel.SwitchStyle(styleType);
-
-                return true;
-            }
-            return false;
+            if (m_image != null)
+                m_image.UpdateStyle();
         }
 
         public override bool Update()
@@ -128,7 +122,8 @@ namespace NewWidgets.Widgets
             if (!base.Update())
                 return false;
 
-            m_image.Update();
+            if (m_image != null)
+                m_image.Update();
 
             return true;
         }

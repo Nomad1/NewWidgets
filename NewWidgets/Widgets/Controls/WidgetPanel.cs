@@ -109,7 +109,7 @@ namespace NewWidgets.Widgets
 
         public void AddChild(Widget child)
         {
-            var parentContainer = child.Parent as IWindowContainer;
+            IWindowContainer parentContainer = child.Parent as IWindowContainer;
             if (parentContainer != null && parentContainer != this)
                 parentContainer.RemoveChild(child);
 
@@ -119,7 +119,7 @@ namespace NewWidgets.Widgets
 
         public bool RemoveChild(WindowObject child)
         {
-            var childWidget = child as Widget;
+            Widget childWidget = child as Widget;
             if (child.Parent != this)
                 return false;
 

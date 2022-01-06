@@ -17,9 +17,10 @@ namespace NewWidgets.UI.Styles
         private static readonly Regex s_selectorParser = new Regex(@"([\w#:\-\[\]()\.\='\^\/]+)([\s,+>~]+)", RegexOptions.Compiled);
 
         private readonly IList<StyleSelector> m_selectors;
-        private readonly IList<StyleSelectorOperator> m_operators;
+        private readonly IList<StyleSelectorCombinator> m_combinators;
         private readonly int m_chainCount;
         private readonly bool m_complex;
+        private readonly int m_specificity;
 
         public bool IsEmpty
         {
@@ -55,14 +56,19 @@ namespace NewWidgets.UI.Styles
             get { return m_selectors.Count; }
         }
 
+        public int Specificity
+        {
+            get { return m_specificity; }
+        }
+
         public IList<StyleSelector> Selectors
         {
             get { return m_selectors; }
         }
 
-        public IList<StyleSelectorOperator> Operators
+        public IList<StyleSelectorCombinator> Operators
         {
-            get { return m_operators; }
+            get { return m_combinators; }
         }
 
         public StyleSelectorList(string selectorsString)
@@ -76,13 +82,13 @@ namespace NewWidgets.UI.Styles
                 throw new ArgumentException("Invalid argument passed to StyleSelectorList constructor - not a style string", selectorsString);
 
             List<StyleSelector> selectors = new List<StyleSelector>();
-            List<StyleSelectorOperator> operators = new List<StyleSelectorOperator>();
+            List<StyleSelectorCombinator> combinators = new List<StyleSelectorCombinator>();
 
-            StyleSelectorOperator lastOperator = StyleSelectorOperator.None;
+            StyleSelectorCombinator lastCombinator = StyleSelectorCombinator.None;
 
             foreach (Match match in splitStrings)
             {
-                StyleSelectorOperator @operator = StyleSelectorOperator.Inherit; // space by default
+                StyleSelectorCombinator @operator = StyleSelectorCombinator.Descendant; // space by default
 
                 string selector = match.Groups[1].Value;
                 string splitOperator = match.Groups[2].Value.Trim();
@@ -92,77 +98,122 @@ namespace NewWidgets.UI.Styles
                     switch (splitOperator[0])
                     {
                         case ',':
-                            @operator = StyleSelectorOperator.None;
+                            @operator = StyleSelectorCombinator.None;
                             break;
                         case '+':
-                            @operator = StyleSelectorOperator.DirectSibling;
+                            @operator = StyleSelectorCombinator.AdjacentSibling;
                             break;
                         case '>':
-                            @operator = StyleSelectorOperator.Child;
+                            @operator = StyleSelectorCombinator.Child;
                             break;
                         case '~':
-                            @operator = StyleSelectorOperator.Sibling;
+                            @operator = StyleSelectorCombinator.Sibling;
                             break;
                         default: // there was a space symbol but it was removed during Split call so now first character is the name of the class or element
-                            @operator = StyleSelectorOperator.Inherit;
+                            @operator = StyleSelectorCombinator.Descendant;
                             break;
                     }
                 }
 
                 selectors.Add(new StyleSelector(selector));
-                operators.Add(@operator);
+                combinators.Add(@operator);
 
-                lastOperator = @operator;
+                lastCombinator = @operator;
             }
 
             Match last = splitStrings[splitStrings.Count - 1];
-            if (lastOperator != StyleSelectorOperator.None)
+            if (lastCombinator != StyleSelectorCombinator.None)
                 throw new ArgumentException("StyleSelectorList constructor got a string ending with operator " + last, selectorsString);
 
             m_selectors = selectors.ToArray();
-            m_operators = operators.ToArray();
+            m_combinators = combinators.ToArray();
 
-            Analyze(out m_chainCount, out m_complex);
+            m_specificity = Analyze(out m_chainCount, out m_complex);
         }
 
-        public StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorOperator> operators)
+        /// <summary>
+        /// Creates style list with single selector
+        /// </summary>
+        /// <param name="singleSelector"></param>
+        public StyleSelectorList(StyleSelector singleSelector)
+        {
+            m_selectors = new[] { singleSelector };
+            m_combinators = new[] { StyleSelectorCombinator.None };
+            m_specificity = Analyze(out m_chainCount, out m_complex);
+        }
+
+        /// <summary>
+        /// Creates the list with specified collection of selectors and combinators
+        /// </summary>
+        /// <param name="selectors"></param>
+        /// <param name="combinators"></param>
+        public StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorCombinator> combinators)
         {
             m_selectors = selectors;
-            m_operators = operators;
-            Analyze(out m_chainCount, out m_complex);
+            m_combinators = combinators;
+            m_specificity = Analyze(out m_chainCount, out m_complex);
         }
 
         internal StyleSelectorList(StyleSelectorList other, int start, int count)
             : this(new ListRange<StyleSelector>(other.m_selectors, start, count),
-                  new ListRange<StyleSelectorOperator>(other.m_operators, start, count))
+                  new ListRange<StyleSelectorCombinator>(other.m_combinators, start, count))
         {
 
         }
 
 
-        /// <summary>
-        /// This method analyzes the operators and sets the flags for them
+        // <summary>
+        // This method analyzes the selector and combinators and sets the flags for them
         /// </summary>
-        private void Analyze(out int chainCount, out bool complex)
+        /// <param name="chainCount"></param>
+        /// <param name="complex"></param>
+        /// <returns>Specificity number</returns>
+        private int Analyze(out int chainCount, out bool complex)
         {
             chainCount = 0;
             complex = false;
 
-            // operators array is always the length of selector array having None as a last member
-            for (int i = 0; i < m_operators.Count; i++)
+            bool universal = false;
+
+            int countA = 0; // ids
+            int countB = 0; // classes, pseudo-classes, attributes (not supported)
+            int countC = 0; // types, pseudo-elements
+
+            // combinators array is always the length of selector array having None as a last member
+            for (int i = 0; i < m_combinators.Count; i++)
             {
-                switch (m_operators[i])
+                switch (m_combinators[i])
                 {
-                    case StyleSelectorOperator.None: // separator
+                    case StyleSelectorCombinator.None: // separator
                         chainCount++;
                         break;
-                    case StyleSelectorOperator.Inherit: // non complex
+                    case StyleSelectorCombinator.Descendant: // non complex, just an inheritance chain
                         break;
                     default: // complex
                         complex = true;
                         break;
                 }
+
+                if (!string.IsNullOrEmpty(m_selectors[i].Id))
+                    countA++;
+
+                if (m_selectors[i].Classes != null)
+                    countB += m_selectors[i].Classes.Length;
+
+                if (m_selectors[i].PseudoClasses != null) // TODO: different arrays for pseudo classes and pseudo-elements
+                    countB += m_selectors[i].PseudoClasses.Length;
+
+                // TODO: count of attributes
+
+                if (!string.IsNullOrEmpty(m_selectors[i].Element))
+                {
+                    countC++;
+                    if (m_selectors[i].Element == "*") // universal selector
+                        universal = true;
+                }
             }
+
+            return complex || universal ? 0 : countA * 100000 + countB * 100 + countC; // instead of 1,2,3 we're returning 1002003
         }
 
         /// <summary>
@@ -178,9 +229,9 @@ namespace NewWidgets.UI.Styles
 
             int chainStart = 0;
 
-            for (int i = 0; i < m_operators.Count; i++)
+            for (int i = 0; i < m_combinators.Count; i++)
             {
-                if (m_operators[i] == StyleSelectorOperator.None)
+                if (m_combinators[i] == StyleSelectorCombinator.None)
                 {
                     result.Add(new StyleSelectorList(this, chainStart, i - chainStart + 1));
                     chainStart = i + 1;
@@ -202,7 +253,7 @@ namespace NewWidgets.UI.Styles
 
             for (int i = 0; i < other.Count; i++)
             {
-                if (m_operators[i] != other.Operators[i])
+                if (m_combinators[i] != other.Operators[i])
                     return false;
 
                 if (!m_selectors[i].Equals(other.Selectors[i], true))
@@ -262,26 +313,26 @@ namespace NewWidgets.UI.Styles
         {
             StringBuilder builder = new StringBuilder();
 
-            for (int i = 0; i < m_operators.Count - 1; i++)
+            for (int i = 0; i < m_combinators.Count - 1; i++)
             {
                 builder.Append(m_selectors[i].ToString());
 
-                switch (m_operators[i])
+                switch (m_combinators[i])
                 {
-                    case StyleSelectorOperator.None:
+                    case StyleSelectorCombinator.None:
                         builder.Append(", ");
                         break;
-                    case StyleSelectorOperator.Child:
+                    case StyleSelectorCombinator.Child:
                         builder.Append(" > ");
                         break;
-                    case StyleSelectorOperator.DirectSibling:
+                    case StyleSelectorCombinator.AdjacentSibling:
                         builder.Append(" + ");
                         break;
-                    case StyleSelectorOperator.Sibling:
+                    case StyleSelectorCombinator.Sibling:
                         builder.Append(" ~ ");
                         break;
                     default:
-                    case StyleSelectorOperator.Inherit:
+                    case StyleSelectorCombinator.Descendant:
                         builder.Append(' ');
                         break;
                 }

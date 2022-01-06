@@ -34,7 +34,7 @@ namespace NewWidgets.Widgets
             set { m_draggable = value; }
         }
 
-        public override string StyleClassType
+        public override string StyleElementType
         {
             get { return "window"; }
         }
