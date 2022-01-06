@@ -138,13 +138,17 @@ namespace NewWidgets.Widgets
             m_label.Color = Color;
             m_label.Scale = FontSize;
 
-            Vector2 labelSize = m_label.Size * FontSize;
-            if (labelSize.X < Size.X)
-                labelSize.X = Size.X;
-            if (labelSize.Y < Size.Y)
-                labelSize.Y = Size.Y;
+            Vector2 labelSize = m_label.Size * m_label.Scale;
+            Vector2 newSize = Size;
 
-            Size = labelSize; // TODO: here we're autosizing the widget to fit the label, but there whould be an option to choose between sizing and overflow modes
+            if (newSize.X <= 0)
+                newSize.X = labelSize.X;
+            if (newSize.Y <= 0)
+                newSize.Y = labelSize.Y;
+
+            Size = newSize;
+
+            // TODO: here we're autosizing the widget to fit the label, but there whould be an option to choose between sizing and overflow modes
 
             // very simple alignment
 
