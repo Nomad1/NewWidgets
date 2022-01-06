@@ -55,7 +55,7 @@ namespace NewWidgets.Widgets
 
             if (m_draggable && !m_dragging && press && (pointer == 0 || WindowController.Instance.IsTouchScreen))
             {
-                Vector2 local = this.Parent.Transform.GetClientPoint(new Vector2(x, y));
+                Vector2 local = Parent == null ? new Vector2(x,y) : Parent.Transform.GetClientPoint(new Vector2(x, y));
                 m_dragShift = local;
                 m_dragStart = Position;
                 m_dragging = true;
@@ -72,7 +72,7 @@ namespace NewWidgets.Widgets
         {
             if (m_dragging)
             {
-                Vector2 local = this.Parent.Transform.GetClientPoint(new Vector2(x, y));
+                Vector2 local = Parent == null ? new Vector2(x,y): Parent.Transform.GetClientPoint(new Vector2(x, y));
                 Vector2 move = local - m_dragShift;
 
                 if (move.LengthSquared() > 0)

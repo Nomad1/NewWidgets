@@ -138,7 +138,7 @@ namespace NewWidgets.UI.Styles
                             {
                                 styles.Add(node);
 
-                                Console.WriteLine("Found match for element {0} to style {1}", selector.Element, node);
+                                //Console.WriteLine("Found match for element {0} to style {1}", selector.Element, node);
                             }
 
                 if (!string.IsNullOrEmpty(selector.Id)) // if it has an id, check id collection
@@ -148,7 +148,7 @@ namespace NewWidgets.UI.Styles
                             {
                                 styles.Add(node);
 
-                                Console.WriteLine("Found match for id #{0} to style {1}", selector.Id, node);
+                                //Console.WriteLine("Found match for id #{0} to style {1}", selector.Id, node);
                             }
 
                 if (selector.Classes != null)
@@ -159,7 +159,7 @@ namespace NewWidgets.UI.Styles
                                 {
                                     styles.Add(node);
 
-                                    Console.WriteLine("Found match for class {0} to style {1}", @class, node);
+                                    //Console.WriteLine("Found match for class {0} to style {1}", @class, node);
                                 }
 
             }

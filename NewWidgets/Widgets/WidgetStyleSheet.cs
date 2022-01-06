@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
@@ -74,6 +75,16 @@ namespace NewWidgets.Widgets
             foreach (var pair in styleData.m_parameters)
                 m_parameters[pair.Key] = pair.Value;
         }
+
+        public override string ToString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            foreach (var pair in m_parameters)
+                builder.AppendFormat("\t{0}: {1};\n", pair.Key, pair.Value);
+
+            return builder.ToString();
+        }
     }
 
     /// <summary>
@@ -109,7 +120,7 @@ namespace NewWidgets.Widgets
 
             if (data != null)
                 foreach (StyleSheetData sheetData in data)
-                    m_data.AddLast(sheetData);
+                    m_data.AddFirst(sheetData);
         }
 
         internal void SetOwnStyle(StyleSheetData ownStyle)
@@ -175,6 +186,16 @@ namespace NewWidgets.Widgets
         public void Set(string name, object value)
         {
             Set(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name), value);
+        }
+
+        public override string ToString()
+        {
+            IStyleData temp = new StyleSheetData();
+
+            for (var node = m_data.Last; node != null; node = node.Previous)
+                temp.LoadData(node.Value);
+
+            return temp.ToString();
         }
     }
 }

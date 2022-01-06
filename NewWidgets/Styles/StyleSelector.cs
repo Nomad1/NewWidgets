@@ -154,6 +154,12 @@ namespace NewWidgets.UI.Styles
         /// <returns></returns>
         private static bool CompareClasses(string[] one, string[] another, bool exactMatch)
         {
+            if (one == null && another == null)
+                return true;
+
+            if (one == null || another == null)
+                return false;
+
             if (exactMatch)
             {
                 if (one.Length != another.Length)

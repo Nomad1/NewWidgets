@@ -225,7 +225,7 @@ namespace NewWidgets.Widgets
 
         [WidgetXMLParameter("back_depth", typeof(WidgetBackgroundDepth))] // nothing like that in HTML
         BackDepth,
-        [WidgetCSSParameter("background-size", typeof(Vector2))] // right now its a single percentage value. TODO: another property to support two values and exact length
+        [WidgetCSSParameter("background-size", typeof(float))] // right now its a single percentage value. TODO: another property to support two values and exact length
         [WidgetXMLParameter("back_scale", typeof(float))] // right now its a single percentage value. TODO: another property to support two values and exact length
         BackScale,
         [WidgetXMLParameter("back_angle", typeof(float))]

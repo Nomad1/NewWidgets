@@ -81,13 +81,13 @@ namespace NewWidgets.Widgets
                     case WidgetState.Hovered:
                         return ":hover";
                     case WidgetState.Selected:
-                        return ":active";
+                        return ":selected";
                     case WidgetState.SelectedDisabled:
-                        return ":active:disabled";
+                        return ":selected:disabled";
                     case WidgetState.SelectedHovered:
-                        return ":hover:active";
+                        return ":hover:selected";
                     case WidgetState.SelectedDisabledHovered:
-                        return ":hover:active:disabled";
+                        return ":hover:selected:disabled";
                     case WidgetState.DisabledHovered:
                         return ":hover:disabled";
                     default:
@@ -335,16 +335,20 @@ namespace NewWidgets.Widgets
 
             do
             {
-                styles.Insert(0, new StyleSelector(StyleElementType, StyleClass, StyleId, StyleState));
+                styles.Insert(0, new StyleSelector(current.StyleElementType, current.StyleClass, current.StyleId, current.StyleState));
                 current = current.Parent;
 
                 combinators.Add(current == null ? StyleSelectorCombinator.None : StyleSelectorCombinator.Descendant);
             }
             while (current != null);
 
-            m_style = WidgetManager.GetStyle(new StyleSelectorList(styles, combinators));
+            StyleSelectorList list = new StyleSelectorList(styles, combinators);
+
+            m_style = WidgetManager.GetStyle(list);
 
             m_style.SetOwnStyle(m_ownStyle);
+
+            Console.WriteLine("Resolved style: {0} {{\n{1}\n}}", list, m_style);
         }
 
         #endregion
