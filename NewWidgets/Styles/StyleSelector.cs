@@ -72,9 +72,9 @@ namespace NewWidgets.UI.Styles
 
         public StyleSelector(string element, string classes, string id, string pseudoClasses)
         {
-            m_id = string.IsNullOrEmpty(id) ? "" : id.TrimStart('#'); // element ID should not have leading #
             m_element = string.IsNullOrEmpty(element) ? "" : element; // element type goes as is
             m_classes = string.IsNullOrEmpty(classes) ? null : classes.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries); // classes should be split. May be we need to use Regex as well, but right now simple split would work
+            m_id = string.IsNullOrEmpty(id) ? "" : id.TrimStart('#'); // element ID should not have leading #
 
             if (!string.IsNullOrEmpty(pseudoClasses)) // Pseudo-classes are tricky and can be in form ::first-child, :disabled or even :not(enabled)
             {
@@ -84,6 +84,14 @@ namespace NewWidgets.UI.Styles
                 for (int i = 0; i < m_pseudoClasses.Length; i++)
                     m_pseudoClasses[i] = psMatches[i].Groups[0].Value;
             }
+        }
+
+        public StyleSelector(string element, string [] classes, string id, string [] pseudoClasses = null)
+        {
+            m_element = string.IsNullOrEmpty(element) ? "" : element; // element type goes as is
+            m_classes = classes;
+            m_id = string.IsNullOrEmpty(id) ? "" : id;
+            m_pseudoClasses = pseudoClasses;
         }
 
         public override string ToString()

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using System.Collections.Generic;
-using NewWidgets.Widgets;
 using RunMobile.Utility;
 
 namespace NewWidgets.Widgets
@@ -11,6 +10,12 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetSelect : WidgetPanel
     {
+        public new const string ElementType = "select";
+        public const string LeftButtonId = "select_left";
+        public const string RightButtonId = "select_left";
+        public const string LabelId = "select_label";
+        //
+
         private readonly SimpleListDictionary<string, object> m_items;
         private readonly WidgetLabel m_label;
         private readonly WidgetButton m_leftButton;
@@ -95,44 +100,76 @@ namespace NewWidgets.Widgets
             get { return m_items.List; }
         }
 
-        public WidgetSelect(
-            string[] items = null,
-            object[] values = null)
-            : this(WidgetManager.GetStyle("left_button"),
-                  WidgetManager.GetStyle("default_select"),
-                  WidgetManager.GetStyle("right_button"),
-                  new SimpleListDictionary<string,object>(items, values))
+        /// <summary>
+        /// Creates a selector control
+        /// </summary>
+        /// <param name="style"></param>
+        public WidgetSelect(WidgetStyle style = default(WidgetStyle))
+           : this(ElementType, style, new SimpleListDictionary<string, object>())
         {
         }
 
-        public WidgetSelect(
-            IList<KeyValuePair<string, object>> items)
-            : this(WidgetManager.GetStyle("left_button"),
-                  WidgetManager.GetStyle("default_select"),
-                  WidgetManager.GetStyle("right_button"),
-                  new SimpleListDictionary<string, object>(items))
+        /// <summary>
+        /// Creates a selector control
+        /// </summary>
+        /// <param name="items"></param>
+        /// <param name="values"></param>
+        public WidgetSelect(string[] items, object[] values)
+           : this(ElementType, default(WidgetStyle), new SimpleListDictionary<string, object>(items, values))
         {
         }
 
-        public WidgetSelect(WidgetStyleSheet leftButtonStyle,
-            WidgetStyleSheet labelStyle,
-            WidgetStyleSheet rightButtonStyle,
-            SimpleListDictionary<string, object> items
-            )
-            : base(Widget.DefaultStyle)
+        /// <summary>
+        /// Creates a selector control
+        /// </summary>
+        /// <param name="style"></param>
+        /// <param name="items"></param>
+        /// <param name="values"></param>
+        public WidgetSelect(WidgetStyle style, string[] items, object[] values)
+            : this(ElementType, style, new SimpleListDictionary<string,object>(items, values))
+        {
+        }
+
+        /// <summary>
+        /// Creates a selector control
+        /// </summary>
+        /// <param name="items"></param>
+        public WidgetSelect(IList<KeyValuePair<string, object>> items)
+            : this(ElementType, default(WidgetStyle), new SimpleListDictionary<string, object>(items))
+        {
+        }
+
+        /// <summary>
+        /// Creates a selector control
+        /// </summary>
+        /// <param name="style"></param>
+        /// <param name="items"></param>
+        public WidgetSelect(WidgetStyle style, IList<KeyValuePair<string, object>> items)
+            : this(ElementType, style, new SimpleListDictionary<string, object>(items))
+        {
+        }
+
+        /// <summary>
+        /// Inheritance constructor
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <param name="style"></param>
+        /// <param name="items"></param>
+        protected WidgetSelect(string elementType, WidgetStyle style, SimpleListDictionary<string, object> items)
+            : base(elementType, style)
         {
             m_items = items;
 
-            m_leftButton = new WidgetButton(leftButtonStyle);
+            m_leftButton = new WidgetButton(new WidgetStyle(LeftButtonId));
             AddChild(m_leftButton);
             m_leftButton.OnPress += (obj) => HandleChange(-1);
 
-            m_label = new WidgetLabel(labelStyle, items.Count > 0 ? items[0].Key : string.Empty);
+            m_label = new WidgetLabel(new WidgetStyle(LabelId), items.Count > 0 ? items[0].Key : string.Empty);
             //m_label.FontSize = WidgetManager.FontScale * 1.25f;
             AddChild(m_label);
             m_label.UpdateLayout();
 
-            m_rightButton = new WidgetButton(rightButtonStyle);
+            m_rightButton = new WidgetButton(new WidgetStyle(RightButtonId));
             AddChild(m_rightButton);
             m_rightButton.OnPress += (obj) => HandleChange(+1);
 

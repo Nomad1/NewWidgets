@@ -3,12 +3,19 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
-    public class WidgetProgressLine : WidgetPanel // TODO: rename to WidgetProgress, apply styles and move to NewWidgets
+    /// <summary>
+    /// Progress line control
+    /// </summary>
+    public class WidgetProgressLine : WidgetPanel // TODO: rename to WidgetProgress
     {
+        public new const string ElementType = "progress";
+        public const string LabelId = "progress_label";
+        public const string LineId = "progress_line";
+        //
         private string m_text;
         private float m_progress;
 
-        private readonly WidgetBackground m_progressLineBack;
+        //private readonly WidgetBackground m_progressLineBack;
         private readonly WidgetBackground m_progressLine;
         private readonly WidgetLabel m_backText;
         private readonly WidgetLabel m_frontText;
@@ -27,8 +34,8 @@ namespace NewWidgets.Widgets
 
         public uint ProgressBackgroundColor
         {
-            get { return m_progressLineBack.BackgroundColor; }
-            set { m_progressLineBack.BackgroundColor = value; }
+            get { return BackgroundColor; }
+            set { BackgroundColor = value; }
         }
 
         public float ProgressForegroundAlpha
@@ -39,8 +46,8 @@ namespace NewWidgets.Widgets
 
         public float ProgressBackgroundAlpha
         {
-            get { return m_progressLineBack.Opacity; }
-            set { m_progressLineBack.Opacity = value; }
+            get { return Opacity; }
+            set { Opacity = value; }
         }
 
         public float Progress
@@ -49,18 +56,41 @@ namespace NewWidgets.Widgets
             set { SetProgress(value); }
         }
 
-        public WidgetProgressLine(string text = "", string barStyle = "progress_bar")
-            : base(Widget.DefaultStyle)
+        /// <summary>
+        /// Creates progress line control
+        /// </summary>
+        /// <param name="style"></param>
+        public WidgetProgressLine(string text = "")
+            : this(ElementType, default(WidgetStyle), text)
+        {
+        }
+
+        /// <summary>
+        /// Creates progress line control
+        /// </summary>
+        /// <param name="text"></param>
+        public WidgetProgressLine(WidgetStyle style, string text = "")
+           : this(ElementType, style, text)
+        {
+        }
+
+        /// <summary>
+        /// Creates progress line control
+        /// </summary>
+        /// <param name="style"></param>
+        /// <param name="text"></param>
+        protected WidgetProgressLine(string elementType, WidgetStyle style, string text)
+            : base(elementType, style)
         {
             Size = new Vector2(300, 20);
 
-            m_progressLineBack = new WidgetBackground(WidgetManager.GetStyle(barStyle));
-            m_progressLineBack.Size = Size;
-            m_progressLineBack.Position = new Vector2(0, 0);
-            m_progressLineBack.Opacity = 0.5f;
-            AddChild(m_progressLineBack);
+            //m_progressLineBack = new WidgetBackground(WidgetManager.GetStyle(barStyle));
+            //m_progressLineBack.Size = Size;
+            //m_progressLineBack.Position = new Vector2(0, 0);
+            //m_progressLineBack.Opacity = 0.5f;
+            //AddChild(m_progressLineBack);
 
-            m_backText = new WidgetLabel("");
+            m_backText = new WidgetLabel(new WidgetStyle(LabelId));
             m_backText.TextAlign = WidgetAlign.HorizontalCenter | WidgetAlign.VerticalCenter;
             m_backText.Size = Size;
             m_backText.Position = new Vector2(0, -3);
@@ -68,9 +98,9 @@ namespace NewWidgets.Widgets
             m_backText.Color = 0x222222;
             AddChild(m_backText);
 
-            m_progressLine = new WidgetBackground(WidgetManager.GetStyle(barStyle));
-            m_progressLine.Size = m_progressLineBack.Size;
-            m_progressLine.Position = m_progressLineBack.Position;
+            m_progressLine = new WidgetBackground(new WidgetStyle(LineId));
+            m_progressLine.Size = Size;
+            m_progressLine.Position = Position;
             m_progressLine.ClipContents = true;
             m_progressLine.BackgroundDepth = WidgetBackgroundDepth.BackClipped;
             AddChild(m_progressLine);
@@ -90,9 +120,8 @@ namespace NewWidgets.Widgets
 
         protected override void Resize(Vector2 size)
         {
-            if (m_progressLineBack != null)
+            if (m_progressLine != null)
             {
-                m_progressLineBack.Size = size;
                 m_progressLine.Size = size;
                 m_backText.Size = size;
                 m_frontText.Size = size;

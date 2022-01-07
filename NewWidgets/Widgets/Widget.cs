@@ -12,12 +12,45 @@ using RunMobile.Utility;
 namespace NewWidgets.Widgets
 {
     /// <summary>
+    /// Simple tuple struct to hold id and class name of the Widget
+    /// </summary>
+    public struct WidgetStyle
+    {
+        public readonly string Id;
+        public readonly string[] Classes;
+        public readonly bool IsEmpty;
+
+        /// <summary>
+        /// Creates WidgetStyle with classes and id
+        /// </summary>
+        /// <param name="classes"></param>
+        /// <param name="id"></param>
+        public WidgetStyle(string[] classes, string id)
+        {
+            IsEmpty = false;
+            Id = id;
+            Classes = classes;
+        }
+
+        /// <summary>
+        /// Creates WidgetStyle with id and no classes
+        /// </summary>
+        /// <param name="class"></param>
+        public WidgetStyle(string id)
+        {
+            IsEmpty = false;
+            Id = id;
+            Classes = null;
+        }
+    }
+
+    /// <summary>
     /// Base class for abstract widgets, i.e. Image or Label
     /// </summary>
     public abstract class Widget : WindowObject
     {
-        [Obsolete]
-        public static readonly WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default", true);
+        public const string ElementType = "*";
+        //
 
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
@@ -27,9 +60,10 @@ namespace NewWidgets.Widgets
         private WidgetStyleSheet m_style;
         private readonly StyleSheetData m_ownStyle;
 
-        private WidgetState m_currentState;
-        private string m_styleClass;
+        private readonly string m_elementType;
         private string m_id;
+        private string[] m_styleClasses;
+        private WidgetState m_currentState;
 
         private string m_tooltip;
 
@@ -52,11 +86,20 @@ namespace NewWidgets.Widgets
         }
 
         /// <summary>
+        /// Element type, i.e. button, label, checkbox
+        /// </summary>
+        public string StyleElementType
+        {
+            get { return m_elementType; }
+        }
+
+        /// <summary>
         /// Class name
         /// </summary>
-        public string StyleClass
+        public string [] StyleClasses
         {
-            get { return m_styleClass; }
+            get { return m_styleClasses; }
+            set { m_styleClasses = value; InvalidateStyle(); }
         }
 
         /// <summary>
@@ -65,43 +108,27 @@ namespace NewWidgets.Widgets
         public string StyleId
         {
             get { return m_id; }
+            set { m_id = value; InvalidateStyle(); }
         }
 
         /// <summary>
         /// Pseudo-class name. TODO: get rid of strings
         /// </summary>
-        public string StyleState
+        public string [] StyleState
         {
             get
             {
-                switch (m_currentState)
-                {
-                    case WidgetState.Disabled:
-                        return ":disabled";
-                    case WidgetState.Hovered:
-                        return ":hover";
-                    case WidgetState.Selected:
-                        return ":selected";
-                    case WidgetState.SelectedDisabled:
-                        return ":selected:disabled";
-                    case WidgetState.SelectedHovered:
-                        return ":hover:selected";
-                    case WidgetState.SelectedDisabledHovered:
-                        return ":hover:selected:disabled";
-                    case WidgetState.DisabledHovered:
-                        return ":hover:disabled";
-                    default:
-                        return "";
-                }
-            }
-        }
+                List<string> pseudoClasses = new List<string>(3);
 
-        /// <summary>
-        /// Element type name. TODO: get rid of strings
-        /// </summary>
-        public virtual string StyleElementType
-        {
-            get { return "panel"; }
+                if ((m_currentState & WidgetState.Hovered) != 0)
+                    pseudoClasses.Add(":hover");
+                if ((m_currentState & WidgetState.Selected) != 0)
+                    pseudoClasses.Add(":selected");
+                if ((m_currentState & WidgetState.Disabled) != 0)
+                    pseudoClasses.Add(":disabled");
+
+                return pseudoClasses.ToArray();
+            }
         }
 
         #endregion
@@ -215,45 +242,49 @@ namespace NewWidgets.Widgets
             get { return m_needsLayout; }
         }
 
+    
         public event TooltipDelegate OnTooltip;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.Widget"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        protected Widget(WidgetStyleSheet style = default(WidgetStyleSheet))
+        protected Widget(string elementType, WidgetStyle style = default(WidgetStyle))
             : base(null)
         {
+            m_elementType = elementType;
+            m_id = string.IsNullOrEmpty(style.Id) ? string.Empty : style.Id;
+            m_styleClasses = style.Classes;
+
+            m_currentState = WidgetState.Normal;
+
+            // creating own style sheet
             m_ownStyle = new StyleSheetData();
 
-            m_style = style;
+            // and complex object containing only that sheet
+            m_style = new WidgetStyleSheet(elementType + "_" + GetHashCode(), null);
             m_style.SetOwnStyle(m_ownStyle);
 
-            m_styleClass = style.Name;
-
-            if (!style.IsEmpty) // obsolete, needed in some very rare cases
-                Size = style.Get(WidgetParameterIndex.Size, new Vector2(0, 0));
-
-            m_currentState = WidgetState.Normal;
+            //Size = m_style.Get(WidgetParameterIndex.Size, new Vector2(0, 0)); // obsolete, needed in some very rare cases
 
             m_needUpdateStyle = true;
             m_needsLayout = true;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.Widget"/> class for internal use
-        /// </summary>
-        /// <param name="styles">Styles.</param>
-        protected Widget(string id, string style)
-           : base(null)
-        {
-            m_styleClass = style;
-            m_id = id;
+        ///// <summary>
+        ///// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.Widget"/> class for internal use
+        ///// </summary>
+        ///// <param name="styles">Styles.</param>
+        //protected Widget(string id, string style)
+        //   : base(null)
+        //{
+        //    m_styleClass = style;
+        //    m_id = id;
 
-            m_currentState = WidgetState.Normal;
-            m_needUpdateStyle = true;
-            m_needsLayout = true;
-        }
+        //    m_currentState = WidgetState.Normal;
+        //    m_needUpdateStyle = true;
+        //    m_needsLayout = true;
+        //}
 
         #region Styles
 
@@ -335,7 +366,7 @@ namespace NewWidgets.Widgets
 
             do
             {
-                styles.Insert(0, new StyleSelector(current.StyleElementType, current.StyleClass, current.StyleId, current.StyleState));
+                styles.Insert(0, new StyleSelector(current.StyleElementType, current.StyleClasses, current.StyleId, current.StyleState));
                 current = current.Parent;
 
                 combinators.Add(current == null ? StyleSelectorCombinator.None : StyleSelectorCombinator.Descendant);

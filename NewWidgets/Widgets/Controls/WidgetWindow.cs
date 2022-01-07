@@ -8,8 +8,8 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetWindow : WidgetPanel
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_window", true);
-
+        public new const string ElementType = "window";
+        //
         private static readonly float s_dragEpsilonSquared = 10.0f*10.0f;
 
         private bool m_draggable = true;
@@ -34,13 +34,23 @@ namespace NewWidgets.Widgets
             set { m_draggable = value; }
         }
 
-        public override string StyleElementType
+        /// <summary>
+        /// Creates a WidgetWindow
+        /// </summary>
+        /// <param name="style"></param>
+        public WidgetWindow(WidgetStyle style = default(WidgetStyle))
+            : base(ElementType, style)
         {
-            get { return "window"; }
+
         }
 
-        public WidgetWindow(WidgetStyleSheet style = default(WidgetStyleSheet))
-            : base(style.IsEmpty ? DefaultStyle : style)
+        /// <summary>
+        /// Constuctor for inheritance
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <param name="style"></param>
+        protected WidgetWindow(string elementType, WidgetStyle style)
+            : base(elementType, style)
         {
 
         }

@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 
 using NewWidgets.UI;
-using NewWidgets.Utility;
+using NewWidgets.UI.Styles;
 
 #if !RUNMOBILE
 using System.Drawing;
@@ -11,8 +11,13 @@ using RunMobile.Utility;
 
 namespace NewWidgets.Widgets
 {
+    /// <summary>
+    /// Simple panel with a tooltip
+    /// </summary>
     public class WidgetTooltip : WidgetPanel
     {
+        public new const string ElementType = "tooltip";
+        //
         private Vector2 m_shift;
         private RectangleF m_region;
 
@@ -28,8 +33,22 @@ namespace NewWidgets.Widgets
             set { m_region = value; }
         }
 
-        public WidgetTooltip(WidgetStyleSheet style)
-            : base(style)
+        /// <summary>
+        /// Creates a tooltip panel
+        /// </summary>
+        /// <param name="style"></param>
+        public WidgetTooltip(WidgetStyle style = default(WidgetStyle))
+            : base(ElementType, style)
+        {
+
+        }
+
+        /// <summary>
+        /// Creates a tooltip panel
+        /// </summary>
+        /// <param name="style"></param>
+        protected WidgetTooltip(string elementType, WidgetStyle style)
+            : base(elementType, style)
         {
         }
 

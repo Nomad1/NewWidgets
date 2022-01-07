@@ -52,7 +52,12 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetTable<TColumnIdentifier> : WidgetScrollView
     {
+        public new const string ElementType = "table";
+        //
         private static readonly uint s_headerRowIndex = uint.MaxValue;
+        private static readonly string[] s_headerRowStyle = new[] { "row_header" };
+        private static readonly string[] s_oddRowStyle = new[] { "row_odd" };
+        private static readonly string[] s_evenRowStyle = new[] { "row_even" };
 
         private readonly List<WidgetTableRow> m_rows;
         private readonly TableLayout m_layout;
@@ -65,10 +70,6 @@ namespace NewWidgets.Widgets
         private bool m_allowSort;
 
         // Simple styling. TODO: change to different styles
-
-        private WidgetStyleSheet m_headerRowStyle;
-        private WidgetStyleSheet m_rowStyle;
-        private WidgetStyleSheet m_alternateRowStyle;
 
         private string m_upSortString;
         private string m_downSortString;
@@ -89,24 +90,6 @@ namespace NewWidgets.Widgets
         {
             get { return m_allowSort; }
             set { m_allowSort = value; }
-        }
-
-        public WidgetStyleSheet RowStyle
-        {
-            get { return m_rowStyle; }
-            set { m_rowStyle = value; }
-        }
-
-        public WidgetStyleSheet AlternateRowStyle
-        {
-            get { return m_alternateRowStyle; }
-            set { m_alternateRowStyle = value; }
-        }
-
-        public WidgetStyleSheet HeaderRowStyle
-        {
-            get { return m_headerRowStyle; }
-            set { m_headerRowStyle = value; }
         }
 
         public string UpSortString
@@ -172,8 +155,21 @@ namespace NewWidgets.Widgets
 
         public event Func<uint, TColumnIdentifier, bool> OnRowClick;
 
-        public WidgetTable(WidgetStyleSheet style = default(WidgetStyleSheet))
-            : base(style.IsEmpty ? DefaultStyle : style)
+        /// <summary>
+        /// Creates a table
+        /// </summary>
+        /// <param name="style"></param>
+        public WidgetTable(WidgetStyle style = default(WidgetStyle))
+            : base(ElementType, style)
+        {
+        }
+
+        /// <summary>
+        /// Creates a table
+        /// </summary>
+        /// <param name="style"></param>
+        protected WidgetTable(string elementType, WidgetStyle style)
+            : base(elementType, style)
         {
             m_layout = new TableLayout();
             m_rows = new List<WidgetTableRow>();
@@ -424,11 +420,11 @@ namespace NewWidgets.Widgets
 
             foreach (WidgetTableRow row in m_rows)
             {
-                WidgetStyleSheet style;
+                string [] style;
 
                 if (row.Id == s_headerRowIndex)
                 {
-                    style = m_headerRowStyle;
+                    style = s_headerRowStyle;
 
                     if (!m_showHeader)
                     {
@@ -438,7 +434,7 @@ namespace NewWidgets.Widgets
                 }
                 else
                 {
-                    style = index % 2 == 0 ? m_rowStyle : m_alternateRowStyle;
+                    style = index % 2 == 0 ? s_evenRowStyle : s_oddRowStyle;
                 }
 
                 row.Visible = true;
@@ -629,6 +625,8 @@ namespace NewWidgets.Widgets
 
         private class WidgetTableRow : WidgetPanel
         {
+            public new const string ElementType = "tablerow";
+            //
             private readonly uint m_id;
             private readonly ITableDataReader m_reader;
 
@@ -644,7 +642,7 @@ namespace NewWidgets.Widgets
             public event Func<TColumnIdentifier, bool> OnCellClick;
 
             public WidgetTableRow(uint id, ITableDataReader reader)
-                : base(Widget.DefaultStyle)
+                : base(ElementType, default(WidgetStyle))
             {
                 m_id = id;
                 m_reader = reader;
@@ -671,9 +669,11 @@ namespace NewWidgets.Widgets
                 return m_lastData;
             }
 
-            public void UpdateStyle(TableLayout layout, WidgetStyleSheet style)
+            public void UpdateStyle(TableLayout layout, string [] styleClass)
             {
                 this.Size = new Vector2(layout.RowWidth + layout.RowPadding.Width, layout.RowHeight + layout.RowPadding.Height);
+
+                this.StyleClasses = styleClass;
                 //this.LoadStyle(WidgetState.Normal, style);
 
                 var data = EnsureData(layout);
@@ -779,7 +779,7 @@ namespace NewWidgets.Widgets
 
                 if (column.Custom && value is Widget)
                 {
-                    WidgetPanel panel = new WidgetPanel(Widget.DefaultStyle);
+                    WidgetPanel panel = new WidgetPanel();
                     panel.Size = new Vector2(column.Width, height);
                     ((Widget)value).Size = panel.Size;
                     panel.AddChild((Widget)value);

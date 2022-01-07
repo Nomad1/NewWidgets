@@ -9,13 +9,19 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetSlider : WidgetPanel
     {
+        public new const string ElementType = "slider";
+
+        private const string TrackerId = "slider_track";
+        private const string LabelId = "slider_label";
+        private const string LineId = "slider_line";
+
         // TODO: make configurable
         private static readonly float s_height = 10f;
         private static readonly float s_width = 250f;
         private static readonly float s_inset = 15f;
 
         private readonly WidgetProgressLine m_progressLine;
-        private readonly DraggableButton m_lowerButton;
+        private readonly TrackingButton m_lowerButton;
         private readonly WidgetLabel m_label;
 
         private float m_max;
@@ -67,25 +73,55 @@ namespace NewWidgets.Widgets
         // TODO: update to NewWidgets common style of events
         public Action<WidgetSlider, float> OnValueChanged;
 
-        public WidgetSlider(float max = 1.00f, float min = 0.0f)
-            : base(Widget.DefaultStyle)
+        /// <summary>
+        /// Creates a slider
+        /// </summary>
+        /// <param name="style"></param>
+        public WidgetSlider(WidgetStyle style = default(WidgetStyle))
+            : this(ElementType, style, 0.0f, 1.0f)
         {
-            m_max = max;
-            m_min = min;
+        }
+
+        /// <summary>
+        /// Creates a slider
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        public WidgetSlider(float min, float max)
+            : this(ElementType, default(WidgetStyle), min, max)
+        {
+        }
+
+        public WidgetSlider(WidgetStyle style, float min, float max)
+            : this(ElementType, style, min, max)
+        {
+        }
+
+        /// <summary>
+        /// Creates a slider
+        /// </summary>
+        /// <param name="style"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        protected WidgetSlider(string elementType, WidgetStyle style, float min, float max)
+            : base(elementType, style)
+        {
+            m_max = Math.Max(max, min);
+            m_min = Math.Min(min, max);
             m_text = "{0:0%}";
 
-            m_progressLine = new WidgetProgressLine();
+            m_progressLine = new WidgetProgressLine(new WidgetStyle(LineId));
             m_progressLine.Size = new Vector2(s_width, s_height);
             AddChild(m_progressLine);
 
-            m_lowerButton = new DraggableButton(WidgetManager.GetStyle("left_button"));
+            m_lowerButton = new TrackingButton(new WidgetStyle(TrackerId));
             m_lowerButton.Rotation = 90;
             m_lowerButton.Scale = 0.75f;
             m_lowerButton.Position = new Vector2(0, m_progressLine.Size.Y - s_inset);
             m_lowerButton.OnDrag += HandleDrag;
             AddChild(m_lowerButton);
 
-            m_label = new WidgetLabel("0");
+            m_label = new WidgetLabel(new WidgetStyle(LabelId), "0");
             m_label.TextAlign = WidgetAlign.Top | WidgetAlign.VerticalCenter;
             m_label.FontSize = WidgetManager.FontScale * 0.7f;
             m_label.Color = 0xffffff;
@@ -130,7 +166,7 @@ namespace NewWidgets.Widgets
                 return (x - m_progressLine.Position.X) * (m_max - m_min) / m_progressLine.Size.X + m_min;
         }
 
-        private void HandleDrag(DraggableButton btn, Vector2 pos)
+        private void HandleDrag(TrackingButton btn, Vector2 pos)
         {
             Value = ClickToProgress(pos.X);
         }
@@ -150,18 +186,19 @@ namespace NewWidgets.Widgets
             return res;
         }
 
-        private class DraggableButton : WidgetButton
+        private class TrackingButton : WidgetButton
         {
             private bool m_dragged;
 
-            public event Action<DraggableButton, Vector2> OnDrag;
+            public event Action<TrackingButton, Vector2> OnDrag;
 
             public bool Dragged
             {
                 get { return m_dragged; }
             }
 
-            public DraggableButton(WidgetStyleSheet style) : base(style)
+            public TrackingButton(WidgetStyle style)
+                : base(style)
             {
             }
 

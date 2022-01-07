@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System;
 
-using NewWidgets.Widgets;
-
 namespace NewWidgets.Widgets
 {
     /// <summary>
@@ -11,6 +9,8 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetList : WidgetTable<WidgetList.NameOnlyField>
     {
+        public new const string ElementType = "list";
+        //
         #region Helpers
 
         public enum NameOnlyField
@@ -117,8 +117,36 @@ namespace NewWidgets.Widgets
 
         public event Func<int, object, bool> OnSelectedIndexChanged;
 
-        public WidgetList(WidgetStyleSheet styleSheet = default(WidgetStyleSheet), string header = "")
-            : base(styleSheet.IsEmpty ? DefaultStyle : styleSheet)
+        /// <summary>
+        /// Creates a list control
+        /// </summary>
+        /// <param name="style"></param>
+        public WidgetList(WidgetStyle style = default(WidgetStyle))
+            : this(ElementType, style, "")
+        {
+        }
+
+        /// <summary>
+        /// Creates a list control
+        /// </summary>
+        /// <param name="header"></param>
+        public WidgetList(string header)
+            : this(ElementType, default(WidgetStyle), header)
+        {
+        }
+
+        public WidgetList(WidgetStyle style, string header)
+            : this(ElementType, style, header)
+        {
+        }
+
+        /// <summary>
+        /// Creates a list control
+        /// </summary>
+        /// <param name="style"></param>
+        /// <param name="header"></param>
+        protected WidgetList(string elementType, WidgetStyle style, string header)
+            : base(elementType, style)
         {
             m_data = new List<ListElement>();
 

@@ -6,10 +6,13 @@ using System.Numerics;
 
 namespace NewWidgets.Widgets
 {
+    /// <summary>
+    /// Multi-line label
+    /// </summary>
     public class WidgetText : Widget
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_text", true);
-
+        public new const string ElementType = "label";
+        //
         private static readonly char[] s_separatorChars = { ' ', '\t' };
 
         private LabelObject[] m_labels;
@@ -88,18 +91,33 @@ namespace NewWidgets.Widgets
             get { return m_labels == null ? 0 : m_labels.Length; }
         }
 
-        public override string StyleElementType
-        {
-            get { return "label"; }
-        }
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetText"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="text">Text.</param>
         public WidgetText(string text)
-            : this(default(WidgetStyleSheet), text)
+            : this(ElementType, default(WidgetStyle), text)
         {
         }
 
-        public WidgetText(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
-            : base(style.IsEmpty? DefaultStyle : style)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetText"/> class.
+        /// </summary>
+        /// <param name="style"></param>
+        /// <param name="text"></param>
+        public WidgetText(WidgetStyle style = default(WidgetStyle), string text = "")
+            : this(ElementType, style, text)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetText"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="text">Text.</param>
+        public WidgetText(string elementType, WidgetStyle style, string text)
+            : base(elementType, style)
         {
             Text = text;
         }

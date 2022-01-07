@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using NewWidgets.UI;
+using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
@@ -17,7 +18,11 @@ namespace NewWidgets.Widgets
 
     public class WidgetButton : WidgetBackground
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_button", true);
+        public new const string ElementType = "button";
+        //
+        public const string ImageId = "button_image";
+        public const string LabelId = "button_label";
+        //
 
         private readonly WidgetLabel m_label;
         private readonly WidgetImage m_image;
@@ -143,17 +148,12 @@ namespace NewWidgets.Widgets
             get { return m_label; }
         }
 
-        public override string StyleElementType
-        {
-            get { return "button"; }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetButton"/> class.
         /// </summary>
         /// <param name="text">Text.</param>
-        public WidgetButton(string text)
-            : this(default(WidgetStyleSheet), text)
+        public WidgetButton(string text = "")
+            : this(ElementType, default(WidgetStyle), text)
         {
         }
 
@@ -162,15 +162,27 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="text">Text.</param>
-        public WidgetButton(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
-           : base(style.IsEmpty ? DefaultStyle : style)
+        public WidgetButton(WidgetStyle style, string text = "")
+           : this(ElementType, style, text)
+        {
+           
+        }
+
+        /// <summary>
+        /// Protected constructor for inheritance
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <param name="style"></param>
+        /// <param name="text"></param>
+        protected WidgetButton(string elementType, WidgetStyle style, string text)
+           : base(elementType, style)
         {
             // This one is for compatibility reasons: nested styles were used in XML stylesheet
-            m_label = new WidgetLabel(WidgetManager.GetStyle(GetProperty(WidgetParameterIndex.ButtonTextStyle, "")), text);
+            m_label = new WidgetLabel(new WidgetStyle(LabelId), text);
             m_label.Parent = this;
 
             //m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style.IsEmpty ? DefaultStyle : style));
-            m_image = new WidgetImage(WidgetManager.GetStyle(GetProperty(WidgetParameterIndex.ButtonImageStyle, "")));
+            m_image = new WidgetImage(new WidgetStyle(ImageId));
             m_image.Parent = this;
 
             m_clickSound = "click";

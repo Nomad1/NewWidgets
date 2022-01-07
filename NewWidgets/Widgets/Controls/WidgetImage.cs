@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using NewWidgets.UI;
+using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
 #if RUNMOBILE
@@ -10,10 +11,12 @@ namespace NewWidgets.Widgets
 {
     public class WidgetImage : Widget
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_image", true);
+        public new const string ElementType = "image";
 
+        // internal component for image
         private ImageObject m_imageObject;
 
+        // cached last texture name
         private string m_lastTexture;
 
         public string Image
@@ -81,19 +84,14 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override string StyleElementType
-        {
-            get { return "image"; }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetImage"/> class.
         /// Unlike <see cref="T:NewWidgets.Widgets.WidgetBackground"/> it does not allows tiling
         /// and always contain only one image
         /// </summary>
         /// <param name="image">Image.</param>
-        public WidgetImage(string image = "")
-            : this(default(WidgetStyleSheet), string.IsNullOrEmpty(image) ? 0 : WidgetBackgroundStyle.ImageFit, image)
+        public WidgetImage(string image)
+            : this(ElementType, default(WidgetStyle), string.IsNullOrEmpty(image) ? 0 : WidgetBackgroundStyle.ImageFit, image)
         {
 
         }
@@ -104,10 +102,22 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetBackgroundStyle imageStyle = WidgetBackgroundStyle.ImageFit, string image = "")
-            : this(default(WidgetStyleSheet), string.IsNullOrEmpty(image)? 0 : imageStyle, image)
+        public WidgetImage(WidgetBackgroundStyle imageStyle, string image)
+            : this(ElementType, default(WidgetStyle), string.IsNullOrEmpty(image)? 0 : imageStyle, image)
         {
            
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetImage"/> class.
+        /// Unlike <see cref="T:NewWidgets.Widgets.WidgetBackground"/> it does not allows tiling
+        /// </summary>
+        /// <param name="imageStyle">Image style.</param>
+        /// <param name="image">Image.</param>
+        public WidgetImage(WidgetStyle style = default(WidgetStyle), WidgetBackgroundStyle imageStyle = 0, string image = "")
+            : this(ElementType, style, string.IsNullOrEmpty(image) ? 0 : imageStyle, image)
+        {
+
         }
 
         /// <summary>
@@ -117,8 +127,8 @@ namespace NewWidgets.Widgets
         /// <param name="style">Style.</param>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetStyleSheet style = default(WidgetStyleSheet), WidgetBackgroundStyle imageStyle = WidgetBackgroundStyle.ImageFit, string image = "")
-            : base(style.IsEmpty ? DefaultStyle : style)
+        protected WidgetImage(string elementType, WidgetStyle style, WidgetBackgroundStyle imageStyle, string image)
+            : base(elementType, style)
         {
             if (imageStyle != 0)
                 ImageStyle = imageStyle;

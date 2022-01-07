@@ -6,10 +6,13 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
+    /// <summary>
+    /// Multi-line text edit
+    /// </summary>
     public class WidgetTextField : WidgetBackground, IFocusable
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_textedit", true);
-
+        public new const string ElementType = "textedit";
+        //
         private int m_cursorPosition;
         private int m_cursorLine;
         private int m_cursorLinePosition;
@@ -147,18 +150,21 @@ namespace NewWidgets.Widgets
             get { return m_labels == null ? 0 : m_labels.Length; }
         }
 
-
-        public override string StyleElementType
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextField"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        public WidgetTextField(WidgetStyle style = default(WidgetStyle))
+            : this(ElementType, style)
         {
-            get { return "textedit"; }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextEdit"/> class.
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextField"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetTextField(WidgetStyleSheet style = default(WidgetStyleSheet))
-            : base(style.IsEmpty ? DefaultStyle : style)
+        protected WidgetTextField(string elementType, WidgetStyle style)
+            : base(elementType, style)
         {
             m_text = string.Empty;
             ClipMargin = TextPadding;

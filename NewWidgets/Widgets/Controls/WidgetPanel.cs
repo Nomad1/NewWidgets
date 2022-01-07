@@ -6,9 +6,10 @@ namespace NewWidgets.Widgets
 {
     public class WidgetPanel : WidgetBackground, IWindowContainer
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_panel", true);
+        public new const string ElementType = "panel";
+        //
 
-        private readonly WindowObjectArray<Widget> m_children;
+        private readonly WindowObjectArray<Widget> m_children = new WindowObjectArray<Widget>();
 
         public IList<Widget> Children
         {
@@ -25,14 +26,18 @@ namespace NewWidgets.Widgets
             get { return m_children.MaximumZIndex; }
         }
 
+        public WidgetPanel(WidgetStyle style = default(WidgetStyle))
+           : this(ElementType, style)
+        {
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetPanel"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetPanel(WidgetStyleSheet style = default(WidgetStyleSheet))
-            : base(style.IsEmpty ? DefaultStyle : style)
+        protected WidgetPanel(string elementType, WidgetStyle style)
+            : base(elementType, style)
         {
-            m_children = new WindowObjectArray<Widget>();
         }
 
         public override bool Update()

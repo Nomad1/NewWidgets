@@ -17,26 +17,10 @@ namespace NewWidgets.Widgets
         /// Gets the style by name. This method is here only for compatibility purposes and it would be removed in later versions
         /// </summary>
         /// <returns>The style.</returns>
-        /// <param name="name">Name.</param>
-        public static WidgetStyleSheet GetStyle(string name, bool notUsed = false)
+        /// <param name="class">Name.</param>
+        public static WidgetStyle GetStyle(string @class, bool notUsed = false)
         {
-            if (!string.IsNullOrEmpty(name))
-                return GetStyle("", name, "", "");
-
-            return default(WidgetStyleSheet);
-        }
-
-        /// <summary>
-        /// Gets the style for single element ignoring the hierarchy. Should not be used in general case
-        /// </summary>
-        /// <param name="type"></param>
-        /// <param name="class"></param>
-        /// <param name="id"></param>
-        /// <param name="pseudoClass"></param>
-        /// <returns></returns>
-        private static WidgetStyleSheet GetStyle(string type, string @class, string id, string pseudoClass)
-        {
-            return GetStyle(new StyleSelectorList(new StyleSelector(type, @class, id, pseudoClass)));
+            return new WidgetStyle(new string[] { @class }, string.Empty);
         }
 
         /// <summary>
@@ -44,11 +28,21 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="list"></param>
         /// <returns></returns>
-        public static WidgetStyleSheet GetStyle(StyleSelectorList list)
+        internal static WidgetStyleSheet GetStyle(StyleSelectorList list)
         {
             ICollection<IStyleData> result = m_styleCollection.GetStyleData(list);
 
             return new WidgetStyleSheet(list.ToString(), result);
+        }
+
+        /// <summary>
+        /// Gets the style by single style selector
+        /// </summary>
+        /// <param name="singleSelector"></param>
+        /// <returns></returns>
+        internal static WidgetStyleSheet GetStyle(StyleSelector singleSelector)
+        {
+            return GetStyle(new StyleSelectorList(singleSelector));
         }
 
         #region XML style loading
@@ -147,14 +141,18 @@ namespace NewWidgets.Widgets
         private static void RegisterStyle(XmlNode node)
         {
             string name = GetAttribute(node, "name");
+
             if (string.IsNullOrEmpty(name))
                 throw new WidgetException("Got style without a name!");
 
-                string parent = GetAttribute(node, "parent");
+            string parent = GetAttribute(node, "parent");
 
             IDictionary<WidgetParameterIndex, object> parameters = InitStyle(node);
 
-            m_styleCollection.AddStyle(string.IsNullOrEmpty(parent) ? ("." + name) : ("." + parent + "." + name), new StyleSheetData(parameters));
+            if (name.StartsWith("default_"))
+                m_styleCollection.AddStyle(name.Substring(8), new StyleSheetData(parameters));
+            else
+                m_styleCollection.AddStyle(string.IsNullOrEmpty(parent) ? ("." + name) : ("." + parent + "." + name), new StyleSheetData(parameters));
 
             WindowController.Instance.LogMessage("Registered style {0}", name);
         }

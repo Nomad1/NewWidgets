@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using NewWidgets.UI;
-using NewWidgets.Widgets;
+using NewWidgets.UI.Styles;
 
 namespace NewWidgets.Widgets
 {
@@ -11,7 +11,9 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetToolbar : Widget
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("toolbar_panel", true);
+        public new const string ElementType = "toolbar";
+        private const string PanelId = "toolbar_panel";
+        //
 
         private const float s_offsetX = 8f;
         private const float s_offsetY = 8f;
@@ -25,13 +27,37 @@ namespace NewWidgets.Widgets
             get { return m_buttons.Children; }
         }
 
+        /// <summary>
+        /// Creates a toolbar
+        /// </summary>
+        /// <param name="vertical"></param>
         public WidgetToolbar(bool vertical = false)
-            : base(Widget.DefaultStyle)
+            : this(ElementType, default(WidgetStyle), vertical)
         {
-            m_buttons = new WidgetPanel(DefaultStyle);
+
+        }
+
+        /// <summary>
+        /// Creates a toolbar
+        /// </summary>
+        /// <param name="style"></param>
+        /// <param name="vertical"></param>
+        public WidgetToolbar(WidgetStyle style, bool vertical = false)
+            : this(ElementType, style, vertical)
+        {
+        }
+
+        /// <summary>
+        /// Creates a toolbar
+        /// </summary>
+        /// <param name="style"></param>
+        /// <param name="vertical"></param>
+        protected WidgetToolbar(string elementType, WidgetStyle style, bool vertical = false)
+            : base(elementType, style)
+        {
+            m_buttons = new WidgetPanel(new WidgetStyle(PanelId));
             m_buttons.Parent = this;
             m_vertical = vertical;
-
         }
 
         public void AddChild(WidgetButton obj)
@@ -152,13 +178,21 @@ namespace NewWidgets.Widgets
         }
     }
 
+    /// <summary>
+    /// Helper class for toolbar separators
+    /// </summary>
     public class WidgetToolbarSeparator : WidgetButton
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("toolbar_separator", true);
-        public static readonly WidgetStyleSheet DefaultHorizontalStyle = WidgetManager.GetStyle("toolbar_separator_horizontal", true);
+        public new const string ElementType = "toolbarvseparator";
+        public const string HorizontalElementType = "toolbarhseparator";
 
-        public WidgetToolbarSeparator(bool vertical = true)
-            : base(vertical ? DefaultStyle : DefaultHorizontalStyle)
+        /// <summary>
+        /// Creates a toolbar separator with element type set not to button but to specific string
+        /// </summary>
+        /// <param name="style"></param>
+        /// <param name="vertical"></param>
+        public WidgetToolbarSeparator(WidgetStyle style = default(WidgetStyle), bool vertical = true)
+            : base(vertical ? ElementType : HorizontalElementType, style, string.Empty)
         {
             Enabled = false;
         }

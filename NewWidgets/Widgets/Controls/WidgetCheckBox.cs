@@ -7,7 +7,9 @@ namespace NewWidgets.Widgets
 {
     public class WidgetCheckBox : WidgetBackground
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_checkbox", true);
+        public new const string ElementType = "checkbox";
+        //
+        private const string ImageId = "checkbox_image";
 
         private readonly WidgetImage m_image;
         private WidgetLabel m_linkedLabel;
@@ -67,29 +69,28 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); }
         }
 
-        public override string StyleElementType
-        {
-            get { return "checkbox"; }
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetCheckBox"/> class.
         /// </summary>
         /// <param name="isChecked">If set to <c>true</c> is checked.</param>
-        public WidgetCheckBox(bool isChecked)
-            : this(default(WidgetStyleSheet), isChecked)
+        public WidgetCheckBox(bool isChecked = false)
+            : this(ElementType, default(WidgetStyle), isChecked)
         {
         }
 
+        protected WidgetCheckBox(WidgetStyle style, bool isChecked = false)
+            :this(ElementType, style, isChecked)
+        {
+        }
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetCheckBox"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="isChecked">If set to <c>true</c> is checked.</param>
-        public WidgetCheckBox(WidgetStyleSheet style = default(WidgetStyleSheet), bool isChecked = false)
-            : base(style.IsEmpty ? DefaultStyle : style)
+        protected WidgetCheckBox(string elementType, WidgetStyle style, bool isChecked)
+            : base(elementType, style)
         {
-            m_image = new WidgetImage(WidgetManager.GetStyle(GetProperty(WidgetParameterIndex.ButtonImageStyle, "")));
+            m_image = new WidgetImage(new WidgetStyle(ImageId));
             m_image.Parent = this;
 
             Selected = isChecked;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using NewWidgets.UI;
+using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
 #if RUNMOBILE
@@ -15,7 +16,8 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetBackground : Widget
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_background", true);
+        public new const string ElementType = "background";
+        //
 
         protected readonly WindowObjectArray<WindowObject> m_background;
 
@@ -79,8 +81,19 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetBackground"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        public WidgetBackground(WidgetStyleSheet style = default(WidgetStyleSheet))
-            : base(style.IsEmpty ? DefaultStyle : style)
+        public WidgetBackground(WidgetStyle style = default(WidgetStyle))
+            : base(ElementType, style)
+        {
+            m_background = new WindowObjectArray<WindowObject>();
+        }
+
+        /// <summary>
+        /// Protected constructor for inheritance
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <param name="style"></param>
+        protected WidgetBackground(string elementType, WidgetStyle style)
+            : base(elementType, style)
         {
             m_background = new WindowObjectArray<WindowObject>();
         }

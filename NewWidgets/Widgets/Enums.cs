@@ -160,6 +160,11 @@ namespace NewWidgets.Widgets
         Auto,
     }
 
+    public enum WidgetStyleClassIndex
+    {
+        None = 0,
+    }
+
     // List of default parameters. We need to use it as Enum to get fast access instead of dictionary search
     internal enum WidgetParameterIndex
     {
@@ -322,18 +327,34 @@ namespace NewWidgets.Widgets
 
     public enum WidgetType : int
     {
+        [Name("*")]
         Widget = 0, // basic widget, does nothing
+        [Name("background")]
         Background,
+        [Name("button")]
         Button,
+        [Name("panel")]
         Panel,
+        [Name("image")]
         Image,
+        [Name("checkbox")]
         CheckBox,
+        [Name("label")]
         Label,
-        Line,
-        ScrollView,
+        [Name("label")]
         Text,
+        [Name("line")]
+        Line,
+        [Name("scrollview")]
+        ScrollView,
+        [Name("textedit")]
         TextEdit,
+        [Name("textedit")]
         TextField,
+        [Name("toolbar")]
+        Toolbar,
+        [Name("tooltip")]
+        tooltip,
     }
 
 }

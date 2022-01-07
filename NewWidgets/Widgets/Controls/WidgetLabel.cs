@@ -1,5 +1,6 @@
 ﻿using System.Numerics;
 using NewWidgets.UI;
+using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
 #if RUNMOBILE
@@ -10,14 +11,18 @@ namespace NewWidgets.Widgets
 {
     public class WidgetLabel : Widget
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_label", true);
+        public new const string ElementType = "label";
 
+        // internal component for text label
         private LabelObject m_label;
 
+        // cached label text
         private string m_text;
 
-        private bool m_needAnimate; // flag to indicate that animation is in progress
-        private bool m_needAnimateRandom; // animation type
+        // flag to indicate that animation is in progress
+        private bool m_needAnimate;
+        // animation type
+        private bool m_needAnimateRandom;
 
         public WidgetAlign TextAlign
         {
@@ -104,17 +109,21 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override string StyleElementType
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetLabel"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        public WidgetLabel(WidgetStyle style, string text = "")
+           : this(ElementType, style, text)
         {
-            get { return "label"; }
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetLabel"/> class.
         /// </summary>
         /// <param name="text">Text.</param>
-        public WidgetLabel(string text)
-            : this(default(WidgetStyleSheet), text)
+        public WidgetLabel(string text = "")
+            : this(ElementType, default(WidgetStyle), text)
         {
         }
 
@@ -123,8 +132,8 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="text">Text.</param>
-        public WidgetLabel(WidgetStyleSheet style = default(WidgetStyleSheet), string text = "")
-           : base(style.IsEmpty ? DefaultStyle : style)
+        protected WidgetLabel(string elementType, WidgetStyle style, string text)
+           : base(elementType, style)
         {
             Text = text;
         }
@@ -133,7 +142,7 @@ namespace NewWidgets.Widgets
         {
             // If label is not yet created - create it. Otherwise all the changes are already it
             if (m_label == null)
-                m_label = new LabelObject(this, Font, m_text, RichText);
+                m_label = new LabelObject(this, Font, Text, RichText);
 
             m_label.Color = Color;
             m_label.Scale = FontSize;

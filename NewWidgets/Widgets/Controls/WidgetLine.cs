@@ -11,7 +11,8 @@ namespace NewWidgets.Widgets
 {
     public class WidgetLine : WidgetBackground
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_line", true);
+        public new const string ElementType = "line";
+        //
 
         private readonly bool m_simpleLine;
         private Vector2 m_from;
@@ -56,9 +57,29 @@ namespace NewWidgets.Widgets
             set { BackgroundColor = value; }
         }
 
-        public override string StyleElementType
+        /// <summary>
+        /// Draws a simple line
+        /// </summary>
+        /// <param name="style">Style.</param>
+        public WidgetLine(WidgetStyle style = default(WidgetStyle))
+           : this(ElementType, style)
         {
-            get { return "line"; }
+            
+        }
+
+        /// <summary>
+        /// Inheritance constructor
+        /// </summary>
+        /// <param name="style">Style.</param>
+        protected WidgetLine(string elementType, WidgetStyle style)
+           : base(elementType, style)
+        {
+            m_simpleLine = true;
+            m_from = Vector2.Zero;
+            m_to = Vector2.Zero;
+            m_gap = 0;
+            m_width = 2;
+            m_angleSnap = 0;
         }
 
         /// <summary>
@@ -70,7 +91,7 @@ namespace NewWidgets.Widgets
         /// <param name="width">Width</param>
         /// <param name="angleSnap">Angle snap</param>
         public WidgetLine(Vector2 from, Vector2 to, float gap = 0, float width = 4, int angleSnap = 180)
-            : this(DefaultStyle, from, to, gap, width, angleSnap)
+            : this(ElementType, default(WidgetStyle), from, to, gap, width, angleSnap)
         {
         }
 
@@ -83,8 +104,24 @@ namespace NewWidgets.Widgets
         /// <param name="gap">Gap.</param>
         /// <param name="width">Width.</param>
         /// <param name="angleSnap">Angle snap.</param>
-        public WidgetLine(WidgetStyleSheet style, Vector2 from, Vector2 to, float gap = 0, float width = 4, int angleSnap = 180)
-            : base(style.IsEmpty ? DefaultStyle : style)
+        public WidgetLine(WidgetStyle style, Vector2 from, Vector2 to, float gap = 0, float width = 4, int angleSnap = 180)
+            : this(ElementType, style, from, to, gap, width, angleSnap)
+        {
+           
+        }
+
+        /// <summary>
+        /// Inheritance constructor
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <param name="style"></param>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="gap"></param>
+        /// <param name="width"></param>
+        /// <param name="angleSnap"></param>
+        protected WidgetLine(string elementType, WidgetStyle style, Vector2 from, Vector2 to, float gap, float width, int angleSnap)
+           : base(elementType, style)
         {
             m_from = from;
             m_to = to;
@@ -92,21 +129,6 @@ namespace NewWidgets.Widgets
             m_width = width;
             m_angleSnap = angleSnap;
             m_simpleLine = false;
-        }
-
-        /// <summary>
-        /// Draws a simple line
-        /// </summary>
-        /// <param name="style">Style.</param>
-        public WidgetLine(WidgetStyleSheet style = default(WidgetStyleSheet))
-           : base(style.IsEmpty ? DefaultStyle : style)
-        {
-            m_simpleLine = true;
-            m_from = Vector2.Zero;
-            m_to = Vector2.Zero;
-            m_gap = 0;
-            m_width = 2;
-            m_angleSnap = 0;
         }
 
         protected override void Resize(Vector2 size)

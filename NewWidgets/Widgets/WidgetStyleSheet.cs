@@ -91,7 +91,7 @@ namespace NewWidgets.Widgets
     /// This one is a simple wrapper to a collection of StyleSheetData structures for particular widget.
     /// In case of local modifications it also adds a new Data object to the collection to store local changes
     /// </summary>
-    public struct WidgetStyleSheet
+    internal struct WidgetStyleSheet
     {
         private bool m_hasOwnStyle; // This flag indicates that personal style has been created for the object
 

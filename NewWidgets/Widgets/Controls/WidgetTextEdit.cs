@@ -11,8 +11,8 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetTextEdit : WidgetBackground, IFocusable
     {
-        public static readonly new WidgetStyleSheet DefaultStyle = WidgetManager.GetStyle("default_textedit", true);
-
+        public new const string ElementType = "textedit";
+        //
         private int m_cursorPosition;
         private Vector2 m_contentOffset;
 
@@ -183,17 +183,22 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override string StyleElementType
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextEdit"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        public WidgetTextEdit(WidgetStyle style = default(WidgetStyle))
+            : this(ElementType, style)
         {
-            get { return "textedit"; }
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetTextEdit"/> class.
         /// </summary>
-        /// <param name="style">Style.</param>
-        public WidgetTextEdit(WidgetStyleSheet style = default(WidgetStyleSheet))
-            : base(style.IsEmpty ? DefaultStyle : style)
+        /// <param name="elementType"></param>
+        /// <param name="style"></param>
+        protected WidgetTextEdit(string elementType, WidgetStyle style)
+            : base(elementType, style)
         {
             m_text = string.Empty;
             m_preffix = string.Empty;

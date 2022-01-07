@@ -64,8 +64,16 @@ namespace NewWidgets.UI.Styles
             // TODO: process properties to remove scripts, shorthand values, unit conversion, tc.
             // properties = ProcessProperties(properties)
 
-            StyleSelectorList selectorList = new StyleSelectorList(selectorsString);
+            AddStyle(new StyleSelectorList(selectorsString), data);
+        }
 
+        /// <summary>
+        /// This is a main method for adding new styles to the collection
+        /// </summary>
+        /// <param name="selectorList"></param>
+        /// <param name="properties"></param>
+        public void AddStyle(StyleSelectorList selectorList, IStyleData data)
+        {
             foreach (StyleSelectorList selector in selectorList.Split())
             {
                 StyleNode node = FindExactStyle(selector);
