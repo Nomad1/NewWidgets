@@ -186,10 +186,16 @@ namespace NewWidgets.Widgets
 
         [WidgetCSSParameter("x", typeof(float))] // Panorama UI compat
         X, // part of position
+        [WidgetCSSParameter("left", typeof(float))] // CSS
+        Left, // part of position
         [WidgetCSSParameter("y", typeof(float))] // Panorama UI compat
         Y, // part of position
+        [WidgetCSSParameter("top", typeof(float))] // CSS
+        Top, // part of position
         [WidgetCSSParameter("z", typeof(float))] // Panorama UI compat
         Z, // part of position
+        [WidgetCSSParameter("z", typeof(int))] // CSS
+        ZIndex,
         [WidgetCSSParameter("position", typeof(Vector3))]
         Position,
 
@@ -204,16 +210,6 @@ namespace NewWidgets.Widgets
         [WidgetCSSParameter("padding", typeof(Margin))] // padding is of type Margin
         [WidgetXMLParameter("padding", typeof(Margin))] // padding is of type Margin
         Padding,
-
-        //
-        [WidgetXMLParameter("hovered_style", typeof(string))] // obsolete style reference. TODO: get rid of it
-        HoveredStyle,
-        [WidgetXMLParameter("disabled_style", typeof(string))] // obsolete style reference. TODO: get rid of it
-        DisabledStyle,
-        [WidgetXMLParameter("selected_style", typeof(string))] // obsolete style reference. TODO: get rid of it
-        SelectedStyle,
-        [WidgetXMLParameter("selected_hovered_style", typeof(string))] // obsolete style reference. TODO: get rid of it
-        SelectedHoveredStyle,
 
         // Background
 
@@ -242,18 +238,23 @@ namespace NewWidgets.Widgets
         [WidgetCSSParameter("background-color-opacity", typeof(float))] // Panorama UI compat
         [WidgetXMLParameter("back_opacity", typeof(float))]
         BackOpacity,
-        
+
         // Text
 
-        [WidgetXMLParameter("font", typeof(Font))]
+        [WidgetCSSParameter("font-family", typeof(string), WidgetParameterInheritance.Inherit)]
+        [WidgetXMLParameter("font", typeof(Font), WidgetParameterInheritance.Inherit)]
         Font,
-        [WidgetXMLParameter("font_size", typeof(float))]
+        [WidgetCSSParameter("font-size", typeof(float), WidgetParameterInheritance.Inherit)]
+        [WidgetXMLParameter("font_size", typeof(float), WidgetParameterInheritance.Inherit)]
         FontSize,
-        [WidgetXMLParameter("text_color", typeof(uint))]
+        [WidgetCSSParameter("color", typeof(uint), WidgetParameterInheritance.Inherit)]
+        [WidgetXMLParameter("text_color", typeof(uint), WidgetParameterInheritance.Inherit)]
         TextColor,
-        [WidgetXMLParameter("line_spacing", typeof(float))]
+        [WidgetCSSParameter("line-height", typeof(float), WidgetParameterInheritance.Inherit)]
+        [WidgetXMLParameter("line_spacing", typeof(float), WidgetParameterInheritance.Inherit)]
         LineSpacing,
-        [WidgetXMLParameter("text_align", typeof(WidgetAlign))]
+        [WidgetCSSParameter("text-align", typeof(WidgetAlign), WidgetParameterInheritance.Inherit)]
+        [WidgetXMLParameter("text_align", typeof(WidgetAlign), WidgetParameterInheritance.Inherit)]
         TextAlign,
         [WidgetXMLParameter("text_padding", typeof(Margin))]
 //        [WidgetParameter("padding", typeof(Margin))]
@@ -307,22 +308,7 @@ namespace NewWidgets.Widgets
         [WidgetXMLParameter("button_animate_time", typeof(int))]
         ButtonAnimateTime,
 
-        // Scroll view
-
-        [WidgetXMLParameter("horizontal_scroll", typeof(string))] // obsolete style reference. TODO: get rid of it
-        HorizontalScrollStyle,
-        [WidgetXMLParameter("vertical_scroll", typeof(string))] // obsolete style reference. TODO: get rid of it
-        VerticalcrollStyle,
-        [WidgetXMLParameter("horizontal_indicator", typeof(string))] // obsolete style reference. TODO: get rid of it
-        HorizontalIndicatorStyle,
-        [WidgetXMLParameter("vertical_indicator", typeof(string))] // obsolete style reference. TODO: get rid of it
-        VerticalIndicatorStyle,
-
-        // Text field
-        [WidgetXMLParameter("scroll_style", typeof(string))] // obsolete style reference. TODO: get rid of it
-        TextFieldScrollStyle,
-
-        Max = TextFieldScrollStyle + 1
+        Max = ButtonAnimateTime + 1
     }
 
     public enum WidgetType : int

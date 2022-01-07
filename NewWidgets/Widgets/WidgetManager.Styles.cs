@@ -149,10 +149,9 @@ namespace NewWidgets.Widgets
 
             IDictionary<WidgetParameterIndex, object> parameters = InitStyle(node);
 
-            if (name.StartsWith("default_"))
-                m_styleCollection.AddStyle(name.Substring(8), new StyleSheetData(parameters));
-            else
-                m_styleCollection.AddStyle(string.IsNullOrEmpty(parent) ? ("." + name) : ("." + parent + "." + name), new StyleSheetData(parameters));
+            name = name.StartsWith("default_") ? name.Substring(8) : string.IsNullOrEmpty(parent) ? ("." + name) : ("." + parent + "." + name);
+
+            m_styleCollection.AddStyle(name, new StyleSheetData(parameters));
 
             WindowController.Instance.LogMessage("Registered style {0}", name);
         }

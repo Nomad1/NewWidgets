@@ -176,7 +176,6 @@
     <back_image>checkbox_back_normal</back_image>
     <size>40;40</size>
     <text_color>#cceeff</text_color>
-    <button_image_style>default_checkbox_image</button_image_style>
   </style>
     
   <style name="default_checkbox:selected" _parent="default_checkbox">
@@ -229,7 +228,6 @@
     <font_size>0.6</font_size>
     <text_color>0xcceeff</text_color>
     <text_padding>4;2;4;2</text_padding>
-    <hovered_style>text_button_hovered</hovered_style>
   </style>
 
   <style name="text_button:hover" _parent="default_button_hovered">
@@ -241,7 +239,6 @@
     <back_style>None</back_style>
     <image_padding>6</image_padding>
     <size>64;64</size>
-    <hovered_style>image_button_hovered</hovered_style>
   </style>
 
   <style name="image_button:hover" _parent="image_button">
@@ -250,7 +247,7 @@
     <back_scale>0.5</back_scale>
   </style>
 
-  <style name="dialog_window" class="window">
+  <style name="dialog_window">
     <back_style>NineImage</back_style>
     <back_image>window_dialog_9</back_image>
     <back_scale>1.0</back_scale>

@@ -81,7 +81,7 @@ namespace NewWidgets.Widgets
             StringBuilder builder = new StringBuilder();
 
             foreach (var pair in m_parameters)
-                builder.AppendFormat("\t{0}: {1};\n", pair.Key, pair.Value);
+                builder.AppendFormat("\t{0}: {1};\n", IndexNameMap<WidgetParameterIndex>.GetNameByIndex<WidgetParameterAttribute>(pair.Key), pair.Value);
 
             return builder.ToString();
         }
@@ -150,6 +150,29 @@ namespace NewWidgets.Widgets
                 throw new WidgetException(string.Format("Trying to retrieve parameter {0} with cast to incompatible type {1} from type {2}", index, typeof(T), result.GetType()));
 
             return (T)result;
+        }
+
+        internal bool TryGetValue<T>(WidgetParameterIndex index, out T tresult)
+        {
+            object result = null;
+
+            foreach (StyleSheetData data in m_data)
+                if (data.TryGetParameter(index, out result))
+                {
+                    break;
+                }
+
+            if (result == null)
+            {
+                tresult = default(T);
+                return false;
+            }
+
+            if (result.GetType() != typeof(T))
+                throw new WidgetException(string.Format("Trying to retrieve parameter {0} with cast to incompatible type {1} from type {2}", index, typeof(T), result.GetType()));
+
+            tresult = (T)result;
+            return true;
         }
 
         /// <summary>

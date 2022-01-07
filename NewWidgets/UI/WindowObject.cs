@@ -166,7 +166,7 @@ namespace NewWidgets.UI
             }
         }
 
-        public Vector2 Size
+        public virtual Vector2 Size
         {
             get { return m_size; }
             set

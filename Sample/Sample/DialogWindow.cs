@@ -37,6 +37,7 @@ namespace NewWidgets.Sample
             : base(WindowFlags.CustomAnim | WindowFlags.Blackout)
         {
             m_panel = new WidgetWindow(WidgetManager.GetStyle("dialog_window"));
+            m_panel.UpdateStyle();
             Vector2 size = m_panel.Size;
 
             m_text = new WidgetText();

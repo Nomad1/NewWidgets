@@ -351,6 +351,9 @@ namespace NewWidgets.Widgets
         protected override void Resize(Vector2 size)
         {
             base.Resize(size);
+
+            SetProperty(WidgetParameterIndex.Size, size);
+
             InvalidateLayout();
         }
 
@@ -380,6 +383,11 @@ namespace NewWidgets.Widgets
             m_style.SetOwnStyle(m_ownStyle);
 
             Console.WriteLine("Resolved style: {0} {{\n{1}\n}}", list, m_style);
+
+            Vector2 size;
+
+            if (m_style.TryGetValue(WidgetParameterIndex.Size, out size))
+                Size = size;
         }
 
         #endregion

@@ -104,5 +104,22 @@ namespace NewWidgets.Utility
 
             return default(TAttribute);
         }
+
+        /// <summary>
+        /// Returns first name-attribute value corresponding to TAttribute type
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string GetNameByIndex<TAttribute>(TIndex index) where TAttribute : NameAttribute
+        {
+            NameAttribute[] result;
+
+            if (s_attributeCache.TryGetValue(index, out result))
+                foreach (NameAttribute attribute in result)
+                    if (attribute is TAttribute)
+                        return attribute.Name;
+
+            return index.ToString();
+        }
     }
 }

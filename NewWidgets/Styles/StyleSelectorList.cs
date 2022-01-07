@@ -14,7 +14,7 @@ namespace NewWidgets.UI.Styles
         /// <summary>
         /// Regular expression to separate selectors to different groups
         /// </summary>
-        private static readonly Regex s_selectorParser = new Regex(@"([\w#:\-\[\]()\.\='\^\/]+)([\s,+>~]+)", RegexOptions.Compiled);
+        private static readonly Regex s_selectorParser = new Regex(@"([\w#:_\-\[\]()\.\='\^\/]+)([\s,+>~]+)", RegexOptions.Compiled);
 
         private readonly IList<StyleSelector> m_selectors;
         private readonly IList<StyleSelectorCombinator> m_combinators;

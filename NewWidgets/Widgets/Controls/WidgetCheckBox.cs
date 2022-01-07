@@ -95,7 +95,7 @@ namespace NewWidgets.Widgets
 
             Selected = isChecked;
 
-            Resize(Size);
+            //Resize(Size);
         }
 
         public override void UpdateLayout()
