@@ -192,7 +192,22 @@ namespace NewWidgets.Widgets
         [Name("toolbar")]
         Toolbar,
         [Name("tooltip")]
-        tooltip,
+        Tooltip,
+    }
+
+    // Nomad: one day we'll migrate to these
+    public enum StyleParameterType
+    {
+        None = 0,
+        Integer = 1, //  An <integer> consists of one or more digits "0" to "9"
+        Number = 2, // A <number> can either be an <integer>, or it can be zero or more digits followed by a dot (.) followed by one or more digits.
+        Length = 3, // a <number> (with or without a decimal point) immediately followed by a unit identifier (e.g., px, em, etc.).
+        Percentage = 4, // a <number> immediately followed by '%'.
+        Uri = 5, // The format of a URI value is 'url(' followed by optional white space followed by an optional single quote (') or double quote (") character followed by the URI itself, followed by an optional single quote (') or double quote (") character followed by optional white space followed by ')'. The two quote characters must be the same.
+        Counter = 6, // NYU
+        Color = 7, // A <color> is either a keyword or a numerical RGB specification.
+        String = 8, // Strings can either be written with double quotes or with single quotes
+        Enum = 9, // special type for enumerations
     }
 
 }

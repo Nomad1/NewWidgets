@@ -7,7 +7,7 @@ using NewWidgets.Utility;
 namespace NewWidgets.UI.Styles
 {
     /// <summary>
-    /// Helper class processed from CSS string. Can contain one or main selector chains
+    /// Helper class processed from CSS string. Can contain one or many selector chains
     /// </summary>
     public class StyleSelectorList
     {

@@ -1,4 +1,6 @@
-﻿namespace NewWidgets.UI.Styles
+﻿using System.Collections.Generic;
+
+namespace NewWidgets.UI.Styles
 {
     /// <summary>
     /// Operator that shows how two CSS selectors are combined
@@ -45,14 +47,14 @@
             get { return m_selectorList; }
         }
 
-        internal StyleSelector MainSelector
-        {
-            get { return m_selectorList.Selectors[m_selectorList.Count - 1]; }
-        }
-
         public string StyleSelector
         {
             get { return m_selectorList.ToString(); }
+        }
+
+        public int Specificity
+        {
+            get { return m_selectorList.Specificity; }
         }
 
         internal StyleNode(StyleSelectorList selector, IStyleData data)
@@ -64,6 +66,16 @@
         public override string ToString()
         {
             return string.Format("{0} {{\n{1}}}\n", m_selectorList, m_data);
+        }
+
+        public class Comparer : IComparer<StyleNode>
+        {
+            public static readonly Comparer Instance = new Comparer();
+
+            public int Compare(StyleNode x, StyleNode y)
+            {
+                return x.Specificity.CompareTo(y.Specificity);
+            }
         }
     }
 }

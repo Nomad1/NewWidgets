@@ -71,14 +71,6 @@ namespace NewWidgets.Utility
             return string.Format("[Top:{0} Left:{1} Bottom:{2} Right:{3}]", Top, Left, Bottom, Right);
         }
 
-        public string ToString(bool css)
-        {
-            if (!css)
-                return ToString();
-
-            return string.Format("{0}px {1}px {2}px {3}px", Top, Left, Bottom, Right);
-        }
-
         public static bool IsEmpty(Margin margin)
         {
             return margin.Left == 0 && margin.Top == 0 && margin.Bottom == 0 && margin.Right == 0;

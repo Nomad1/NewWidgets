@@ -1,4 +1,5 @@
-﻿using NewWidgets.Sample;
+﻿using System;
+using NewWidgets.Sample;
 using NewWidgets.Widgets;
 using RunMobile;
 using RunMobile.Graphics;
@@ -66,6 +67,8 @@ namespace NewWidgets.RunMobileSample
             SpriteManager.Instance.LoadSpriteAtlas("font5"); // loads font5.bin with font MSDF atlas
             WidgetManager.Init(0.5f); // 0.5 is font scale
             WidgetManager.LoadUI(AssetManager.GetAssetTextFile("ui.xml"));
+
+            WidgetManager.SaveUI(Console.Out);
 
             // Here we're creating main window and it's added to the Game Controller
             m_window = new TestWindow();

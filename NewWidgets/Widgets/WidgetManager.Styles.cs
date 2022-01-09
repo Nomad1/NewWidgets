@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
 using System.Xml;
 using NewWidgets.UI;
 using NewWidgets.UI.Styles;
@@ -11,7 +10,7 @@ namespace NewWidgets.Widgets
     public static partial class WidgetManager
     {
         // this is primary CSS style collection for now
-        private static readonly StyleCollection m_styleCollection = new StyleCollection();
+        private static readonly StyleCollection s_styleCollection = new StyleCollection();
 
         /// <summary>
         /// Gets the style by name. This method is here only for compatibility purposes and it would be removed in later versions
@@ -30,7 +29,7 @@ namespace NewWidgets.Widgets
         /// <returns></returns>
         internal static WidgetStyleSheet GetStyle(StyleSelectorList list)
         {
-            ICollection<IStyleData> result = m_styleCollection.GetStyleData(list);
+            ICollection<IStyleData> result = s_styleCollection.GetStyleData(list);
 
             return new WidgetStyleSheet(list.ToString(), result);
         }
@@ -92,6 +91,10 @@ namespace NewWidgets.Widgets
             }
         }
 
+        public static void SaveUI(System.IO.TextWriter outputStream)
+        {
+            s_styleCollection.Dump(outputStream);
+        }
 
         private static void RegisterFont(XmlNode node)
         {
@@ -151,7 +154,7 @@ namespace NewWidgets.Widgets
 
             name = name.StartsWith("default_") ? name.Substring(8) : string.IsNullOrEmpty(parent) ? char.IsLetter(name[0]) ? ("." + name) : name : ("." + parent + "." + name);
 
-            m_styleCollection.AddStyle(name, new StyleSheetData(parameters));
+            s_styleCollection.AddStyle(name, new StyleSheetData(parameters));
 
             WindowController.Instance.LogMessage("Registered style {0}", name);
         }

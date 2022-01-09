@@ -11,6 +11,8 @@ namespace NewWidgets.Utility
     /// </summary>
     public static class ConversionHelper
     {
+        // theoretically we need custom enum for type number, to make sure that percent is parsed differently than float, uint separated from color, etc.
+
         private static readonly IDictionary<Type, Func<Type, string, object>> s_parsers = new Dictionary<Type, Func<Type, string, object>>()
         {
             { typeof(string), (type, str) => str },
@@ -24,9 +26,13 @@ namespace NewWidgets.Utility
 
         private static readonly IDictionary<Type, Func<object, string>> s_formatters = new Dictionary<Type, Func<object, string>>()
         {
-            { typeof(Margin), (value) => ((Margin)value).ToString(true) },
-            { typeof(float), (value) => ((float)value).ToString(CultureInfo.InvariantCulture.NumberFormat) },
-            { typeof(uint), (value) => string.Format(((uint)value >> 24) != 0 ? "#{0:x8}" : "#{0:x6}", value) },
+            { typeof(Margin), (value) => ToString((Margin)value) },
+            { typeof(Vector2), (value) => ToString((Vector2)value) },
+            { typeof(Vector3), (value) => ToString((Vector3)value) },
+            { typeof(Vector4), (value) => ToString((Vector4)value) },
+            { typeof(string), (value) => (string)value },
+            { typeof(float), (value) => ToString((float)value) },
+            { typeof(uint), (value) => string.Format(((uint)value >> 24) != 0 ? "#{0:x8}" : "#{0:x6}", value) }, // TODO: separate class for color
         };
 
         /// <summary>
@@ -73,6 +79,57 @@ namespace NewWidgets.Utility
 
             return value.ToString().ToLower();
         }
+
+        /// <summary>
+        /// Converts float to text with dot as decimal separator
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ToString(float value)
+        {
+            return value.ToString(CultureInfo.InvariantCulture.NumberFormat);
+        }
+
+        /// <summary>
+        /// Converts Margin to set of floats separated by spaces
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ToString(Margin value)
+        {
+            return string.Format("{0} {1} {2} {3}", ToString(value.Top), ToString(value.Left), ToString(value.Bottom), ToString(value.Right)); 
+        }
+
+        /// <summary>
+        /// Converts Vector2 to set of floats separated by spaces
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ToString(Vector2 value)
+        {
+            return string.Format("{0} {1}", ToString(value.X), ToString(value.Y));
+        }
+
+        /// <summary>
+        /// Converts Vector3 to set of floats separated by spaces
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ToString(Vector3 value)
+        {
+            return string.Format("{0} {1} {2}", ToString(value.X), ToString(value.Y), ToString(value.Z));
+        }
+
+        /// <summary>
+        /// Converts Vector4 to set of floats separated by spaces
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string ToString(Vector4 value)
+        {
+            return string.Format("{0} {1} {2} {3}", ToString(value.X), ToString(value.Y), ToString(value.Z), ToString(value.W));
+        }
+
 
         /// <summary>
         /// Culture invariant float parsing.
@@ -150,9 +207,9 @@ namespace NewWidgets.Utility
                 throw new FormatException("Invalid Color value");
 
             if (value.Length >= 7 && value[0] == '#') // StartsWith("#")
-                return uint.Parse(value.Substring(1), System.Globalization.NumberStyles.HexNumber);
+                return uint.Parse(value.Substring(1), NumberStyles.HexNumber);
             if (value.Length >= 8 && value[0] == '0' && value[1] == 'x')  // StartsWith("0x")
-                return uint.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
+                return uint.Parse(value.Substring(2), NumberStyles.HexNumber);
 
             return uint.Parse(value);
         }
@@ -261,7 +318,7 @@ namespace NewWidgets.Utility
         {
             int result = 0; // TODO: GetUnderlyingType()?
 
-            string[] strings = value.Split(new[] { '|', ',' });
+            string[] strings = value.Split(new[] { '|', ',', '+' });
 
             foreach (string str in strings)
                 result |= (int)Enum.Parse(typeof(T), str, true);
@@ -279,7 +336,7 @@ namespace NewWidgets.Utility
         {
             int result = 0; // TODO: GetUnderlyingType()?
 
-            string[] strings = value.Split(new[] { '|', ',' });
+            string[] strings = value.Split(new[] { '|', ',', '+' });
 
             foreach (string str in strings)
                 result |= (int)Enum.Parse(enumType, str, true);

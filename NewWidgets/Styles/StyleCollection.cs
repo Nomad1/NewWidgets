@@ -28,14 +28,16 @@ namespace NewWidgets.UI.Styles
             if (node == null || !node.SelectorList.IsSingleChain)
                 throw new ArgumentException("Invalid StyleNode for AddStyle call");
 
-            StyleSelector selector = node.MainSelector;
+            StyleSelector selector = node.SelectorList.Selectors[node.SelectorList.Count - 1]; // last selector in the list
 
-            AddToCollection(m_idCollection, selector.Id, node); // if it starts with # it should be an ID
+            if (!string.IsNullOrEmpty(selector.Id)) // we have an explicit id, i.e. tr#myid
+                AddToCollection(m_idCollection, selector.Id, node);
 
-            if (selector.Classes != null && selector.Classes.Length > 0)
+            if (selector.Classes != null && selector.Classes.Length > 0) // we have one or more classes: .mytable.something, only .something will be used
                 AddToCollection(m_classCollection, selector.Classes[selector.Classes.Length -1], node); // last class should be stored
 
-            AddToCollection(m_elementCollection, selector.Element, node); // it's an element name
+            if (!string.IsNullOrEmpty(selector.Element))
+                AddToCollection(m_elementCollection, selector.Element, node); // there is an element name, i.e. button
         }
 
         /// <summary>
@@ -61,9 +63,6 @@ namespace NewWidgets.UI.Styles
         /// <param name="properties"></param>
         public void AddStyle(string selectorsString, IStyleData data)
         {
-            // TODO: process properties to remove scripts, shorthand values, unit conversion, tc.
-            // properties = ProcessProperties(properties)
-
             AddStyle(new StyleSelectorList(selectorsString), data);
         }
 
@@ -129,7 +128,9 @@ namespace NewWidgets.UI.Styles
             if (selectorList == null || selectorList.IsEmpty)
                 throw new ArgumentException("Invalid StyleNode for FindStyle call");
 
-            List<StyleNode> styles = new List<StyleNode>();
+            // Styles are now sorted by specificity
+            SortedSet<StyleNode> styles = new SortedSet<StyleNode>(StyleNode.Comparer.Instance);
+
             for (int i = 0; i < selectorList.Count; i++)
             {
                 StyleSelectorList selectorPart = new StyleSelectorList(selectorList, 0, i + 1);
@@ -142,7 +143,7 @@ namespace NewWidgets.UI.Styles
                 if (!string.IsNullOrEmpty(selector.Element)) // if it has an element name, check element collection
                     if (m_elementCollection.TryGetValue(selector.Element, out collection))
                         foreach (StyleNode node in collection)
-                            if (node.SelectorList.AppliesTo(selectorPart))
+                            if (!styles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
                             {
                                 styles.Add(node);
 
@@ -152,7 +153,7 @@ namespace NewWidgets.UI.Styles
                 if (!string.IsNullOrEmpty(selector.Id)) // if it has an id, check id collection
                     if (m_idCollection.TryGetValue(selector.Id, out collection))
                         foreach (StyleNode node in collection)
-                            if (node.SelectorList.AppliesTo(selectorPart))
+                            if (!styles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
                             {
                                 styles.Add(node);
 
@@ -163,7 +164,7 @@ namespace NewWidgets.UI.Styles
                     foreach (string @class in selector.Classes) // if it has a class, check class collection
                         if (m_classCollection.TryGetValue(@class, out collection))
                             foreach (StyleNode node in collection)
-                                if (node.SelectorList.AppliesTo(selectorPart))
+                                if (!styles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
                                 {
                                     styles.Add(node);
 
@@ -172,20 +173,24 @@ namespace NewWidgets.UI.Styles
 
             }
 
-            // TODO: sort styles by specificity. Right now order element-class-id gives us a little bit of similarity to specificity system
+            // rule out some very simple cases
 
             if (styles.Count == 0)
                 return null;
 
             if (styles.Count == 1)
-                return new[] { styles[0].Data };
-
-            styles.Sort((one, another) => one.SelectorList.Specificity.CompareTo(another.SelectorList.Specificity));
+                foreach (StyleNode node in styles)
+                    return new[] { node.Data };
 
             IStyleData[] result = new IStyleData[styles.Count];
 
-            for (int i = 0; i < styles.Count; i++)
-                result[i] = styles[i].Data;
+            // here we're storing data as an array. The only problem is that we don't store selector hierarchy so we don't know if there is `button:hover` that
+            // should inherit everything from `button` however `button label` should not.
+
+            int j = 0;
+
+            foreach (StyleNode node in styles)
+                result[j++] = node.Data;
 
             // 1. find hierarchy match (considering operators) for each list entry. It's different from exact match because it should consider inheritance and incapsulation
             // 2. compose a specificity list and sort the results
@@ -205,28 +210,31 @@ namespace NewWidgets.UI.Styles
             return GetStyleData(new StyleSelectorList(selectorsString));
         }
 
-        public void Dump()
+        /// <summary>
+        /// Saves the collection to output stream
+        /// </summary>
+        /// <param name="outputStream"></param>
+        public void Dump(System.IO.TextWriter outputStream)
         {
-            Console.WriteLine("Elements ({0}):", m_elementCollection.Count);
+            SortedSet<StyleNode> styles = new SortedSet<StyleNode>(StyleNode.Comparer.Instance);
+
             foreach (var pair in m_elementCollection)
-            {
-                foreach(StyleNode node in pair.Value)
-                    Console.WriteLine(node);
-            }
+                foreach (var node in pair.Value)
+                    if (!styles.Contains(node))
+                        styles.Add(node);
 
-            Console.WriteLine("Classes ({0}):", m_classCollection.Count);
-            foreach (var pair in m_classCollection)
-            {
-                foreach (StyleNode node in pair.Value)
-                    Console.WriteLine(node);
-            }
-
-            Console.WriteLine("IDs ({0}):", m_idCollection.Count);
             foreach (var pair in m_idCollection)
-            {
-                foreach (StyleNode node in pair.Value)
-                    Console.WriteLine(node);
-            }
+                foreach (var node in pair.Value)
+                    if (!styles.Contains(node))
+                        styles.Add(node);
+
+            foreach (var pair in m_classCollection)
+                foreach (var node in pair.Value)
+                    if (!styles.Contains(node))
+                        styles.Add(node);
+
+            foreach (StyleNode node in styles)
+                outputStream.WriteLine(node);
         }
     }
 }
