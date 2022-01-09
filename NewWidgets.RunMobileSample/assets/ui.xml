@@ -72,7 +72,7 @@
     <text_color>#ffffff</text_color>
   </style>
 
-  <style name="default_textedit:hover:selected" _parent="default_textedit_selected">
+  <style name="default_textedit:hover:selected" parent="default_textedit:selected">
     <back_color>#ffee88</back_color>
   </style>
     
@@ -234,7 +234,7 @@
     <text_color>#ffffff</text_color>
   </style>
 
-  <style name="image_button" parent="default_button">
+  <style name="image_button" _parent="default_button">
     <back_style>None</back_style>
     <image_padding>6</image_padding>
     <size>64;64</size>

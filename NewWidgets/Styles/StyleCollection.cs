@@ -129,10 +129,14 @@ namespace NewWidgets.UI.Styles
                 throw new ArgumentException("Invalid StyleNode for FindStyle call");
 
             // Styles are now sorted by specificity
-            SortedSet<StyleNode> styles = new SortedSet<StyleNode>(StyleNode.Comparer.Instance);
+            //SortedSet<StyleNode> styles = new SortedSet<StyleNode>(StyleNode.Comparer.Instance);
+
+            List<StyleNode> styles = new List<StyleNode>();
 
             for (int i = 0; i < selectorList.Count; i++)
             {
+                SortedSet<StyleNode> partStyles = new SortedSet<StyleNode>();
+
                 StyleSelectorList selectorPart = new StyleSelectorList(selectorList, 0, i + 1);
 
                 StyleSelector selector = selectorPart.Selectors[selectorPart.Count - 1];
@@ -143,9 +147,9 @@ namespace NewWidgets.UI.Styles
                 if (!string.IsNullOrEmpty(selector.Element)) // if it has an element name, check element collection
                     if (m_elementCollection.TryGetValue(selector.Element, out collection))
                         foreach (StyleNode node in collection)
-                            if (!styles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
+                            if (!partStyles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
                             {
-                                styles.Add(node);
+                                partStyles.Add(node);
 
                                 //Console.WriteLine("Found match for element {0} to style {1}", selector.Element, node);
                             }
@@ -153,9 +157,9 @@ namespace NewWidgets.UI.Styles
                 if (!string.IsNullOrEmpty(selector.Id)) // if it has an id, check id collection
                     if (m_idCollection.TryGetValue(selector.Id, out collection))
                         foreach (StyleNode node in collection)
-                            if (!styles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
+                            if (!partStyles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
                             {
-                                styles.Add(node);
+                                partStyles.Add(node);
 
                                 //Console.WriteLine("Found match for id #{0} to style {1}", selector.Id, node);
                             }
@@ -164,13 +168,14 @@ namespace NewWidgets.UI.Styles
                     foreach (string @class in selector.Classes) // if it has a class, check class collection
                         if (m_classCollection.TryGetValue(@class, out collection))
                             foreach (StyleNode node in collection)
-                                if (!styles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
+                                if (!partStyles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
                                 {
-                                    styles.Add(node);
+                                    partStyles.Add(node);
 
                                     //Console.WriteLine("Found match for class {0} to style {1}", @class, node);
                                 }
 
+                styles.AddRange(partStyles);
             }
 
             // rule out some very simple cases
@@ -178,9 +183,9 @@ namespace NewWidgets.UI.Styles
             if (styles.Count == 0)
                 return null;
 
-            if (styles.Count == 1)
-                foreach (StyleNode node in styles)
-                    return new[] { node.Data };
+            //if (styles.Count == 1)
+                //foreach (StyleNode node in styles)
+                    //return new[] { node.Data };
 
             IStyleData[] result = new IStyleData[styles.Count];
 
@@ -189,8 +194,18 @@ namespace NewWidgets.UI.Styles
 
             int j = 0;
 
+            string resultString = "";
+
             foreach (StyleNode node in styles)
+            {
+                if (j != 0)
+                    resultString += " ";
+                resultString += string.Format("[{0} = {1}]", node.StyleSelector, node.Specificity);
+
                 result[j++] = node.Data;
+            }
+
+            Console.WriteLine("Resolved {0} for {1}", resultString, selectorList);
 
             // 1. find hierarchy match (considering operators) for each list entry. It's different from exact match because it should consider inheritance and incapsulation
             // 2. compose a specificity list and sort the results
@@ -216,7 +231,7 @@ namespace NewWidgets.UI.Styles
         /// <param name="outputStream"></param>
         public void Dump(System.IO.TextWriter outputStream)
         {
-            SortedSet<StyleNode> styles = new SortedSet<StyleNode>(StyleNode.Comparer.Instance);
+            List<StyleNode> styles = new List<StyleNode>();
 
             foreach (var pair in m_elementCollection)
                 foreach (var node in pair.Value)

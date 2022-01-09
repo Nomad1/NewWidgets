@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 
 namespace NewWidgets.UI.Styles
 {
@@ -30,7 +30,7 @@ namespace NewWidgets.UI.Styles
     /// <summary>
     /// Style node container
     /// </summary>
-    public class StyleNode
+    public class StyleNode : IComparable<StyleNode>
     {
         private readonly StyleSelectorList m_selectorList;
 
@@ -68,14 +68,12 @@ namespace NewWidgets.UI.Styles
             return string.Format("{0} {{\n{1}}}\n", m_selectorList, m_data);
         }
 
-        public class Comparer : IComparer<StyleNode>
+        public int CompareTo(StyleNode other)
         {
-            public static readonly Comparer Instance = new Comparer();
-
-            public int Compare(StyleNode x, StyleNode y)
-            {
-                return x.Specificity.CompareTo(y.Specificity);
-            }
+            int result = Specificity.CompareTo(other.Specificity);
+            if (result <= 0) // we need to avoid result of 0
+                return -1;
+            return 1;
         }
     }
 }

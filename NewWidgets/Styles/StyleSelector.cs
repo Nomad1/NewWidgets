@@ -168,23 +168,19 @@ namespace NewWidgets.UI.Styles
             if (one == null || another == null)
                 return false;
 
-            if (exactMatch)
+            if (exactMatch) // both arrays should be equal
             {
                 if (one.Length != another.Length)
                     return false;
-
-                foreach (string oneClass in one)
-                    if (Array.IndexOf(another, oneClass) == -1)
-                        return false;
-
-                return true;
             }
 
-            foreach (string anotherClass in another)
-                if (Array.IndexOf(one, anotherClass) != -1)
-                    return true;
+            // all elements of One array should be in Another
 
-            return false;
+            foreach (string oneClass in one)
+                if (Array.IndexOf(another, oneClass) == -1)
+                    return false;
+
+            return true;
         }
     }
 }
