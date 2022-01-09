@@ -352,7 +352,8 @@ namespace NewWidgets.Widgets
         {
             base.Resize(size);
 
-            SetProperty(WidgetParameterIndex.Size, size);
+            SetProperty(WidgetParameterIndex.Width, size.X);
+            SetProperty(WidgetParameterIndex.Height, size.Y);
 
             InvalidateLayout();
         }
@@ -384,10 +385,18 @@ namespace NewWidgets.Widgets
 
             Console.WriteLine("Resolved style: {0} {{\n{1}\n}}", list, m_style);
 
-            Vector2 size;
+            Vector2 size = Size;
 
-            if (m_style.TryGetValue(WidgetParameterIndex.Size, out size))
-                Size = size;
+            float width;
+
+            if (m_style.TryGetValue(WidgetParameterIndex.Width, out width))
+                size.X = width;
+
+            float height;
+            if (m_style.TryGetValue(WidgetParameterIndex.Height, out height))
+                size.Y = height;
+
+            Size = size;
         }
 
         #endregion

@@ -81,7 +81,7 @@ namespace NewWidgets.Widgets
             StringBuilder builder = new StringBuilder();
 
             foreach (var pair in m_parameters)
-                builder.AppendFormat("\t{0}: {1};\n", IndexNameMap<WidgetParameterIndex>.GetNameByIndex<WidgetParameterAttribute>(pair.Key), pair.Value);
+                builder.AppendFormat("\t{0}: {1};\n", WidgetParameterMap.GetNameByIndex(pair.Key), ConversionHelper.FormatValue(pair.Value.GetType(), pair.Value));
 
             return builder.ToString();
         }
@@ -184,7 +184,7 @@ namespace NewWidgets.Widgets
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         public T Get<T>(string name, T defaultValue)
         {
-            return Get(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name), defaultValue);
+            return Get(WidgetParameterMap.GetIndexByName(name), defaultValue);
         }
 
         internal void Set(WidgetParameterIndex index, object value)
@@ -192,7 +192,7 @@ namespace NewWidgets.Widgets
             if (!m_hasOwnStyle)
                 throw new WidgetException("Trying to set data for read only style!");
 
-            WidgetCSSParameterAttribute attribute = IndexNameMap<WidgetParameterIndex>.GetAttributeByIndex<WidgetCSSParameterAttribute>(index);
+            WidgetParameterAttribute attribute = WidgetParameterMap.GetAttributeByIndex(index);
 
             if (attribute != null && attribute.Type != null && value != null)
                 if (value.GetType() != attribute.Type)
@@ -208,7 +208,7 @@ namespace NewWidgets.Widgets
         /// <param name="value">Value.</param>
         public void Set(string name, object value)
         {
-            Set(IndexNameMap<WidgetParameterIndex>.GetIndexByName(name), value);
+            Set(WidgetParameterMap.GetIndexByName(name), value);
         }
 
         public override string ToString()

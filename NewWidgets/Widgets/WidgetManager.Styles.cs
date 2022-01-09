@@ -97,7 +97,7 @@ namespace NewWidgets.Widgets
         {
             string name = node.Attributes.GetNamedItem("name").Value;
             string resource = node.Attributes.GetNamedItem("resource").Value;
-            float spacing = FloatParse(node.Attributes.GetNamedItem("spacing").Value);
+            float spacing = ConversionHelper.FloatParse(node.Attributes.GetNamedItem("spacing").Value);
             int baseline = int.Parse(node.Attributes.GetNamedItem("baseline").Value);
 
             int shift = 0;
@@ -149,7 +149,7 @@ namespace NewWidgets.Widgets
 
             IDictionary<WidgetParameterIndex, object> parameters = InitStyle(node);
 
-            name = name.StartsWith("default_") ? name.Substring(8) : string.IsNullOrEmpty(parent) ? ("." + name) : ("." + parent + "." + name);
+            name = name.StartsWith("default_") ? name.Substring(8) : string.IsNullOrEmpty(parent) ? char.IsLetter(name[0]) ? ("." + name) : name : ("." + parent + "." + name);
 
             m_styleCollection.AddStyle(name, new StyleSheetData(parameters));
 
@@ -175,29 +175,12 @@ namespace NewWidgets.Widgets
                     else
                         value = value.Trim('\r', '\n', '\t', ' ');
 
-                    // Old XML stylesheets should be converted to CSS, but for compatibility reasons
-                    // I'm adding fake CSS elements starting with "-nw-" solely for parsing purposes
+                    IParameterProcessor processor = WidgetParameterMap.GetProcessorByXmlName(element.Name);
 
-                    WidgetParameterIndex index = IndexNameMap<WidgetParameterIndex>.GetIndexByName("-nw-" + element.Name);
-
-                    if (index == 0)
-                    {
-                        WindowController.Instance.LogMessage("Got unknown attribute -nw-{0} in xml style sheet for {1}", element.Name, node.Name);
-                        continue;
-                    }
-
-                    // Here we're retrieving WidgetXMLParameterAttribute that helps with conversion of
-                    // XML string to one or several CSS indexed values. 
-
-                    WidgetXMLParameterAttribute attribute = IndexNameMap<WidgetParameterIndex>.GetAttributeByIndex<WidgetXMLParameterAttribute>(index);
-
-                    // TODO: replace ParseValue with smarter conversion taking Dictionary and Type as an input and able to split short-hand properties
-
-                    if (attribute != null && attribute.Type != null)
-                        style[index] = ParseValue(attribute.Type, value);
+                    if (processor == null)
+                        WindowController.Instance.LogMessage("Got unknown attribute {0} in xml style sheet for {1}", element.Name, node.Name);
                     else
-                        style[index] = value;
-
+                        processor.Process(style, value);
                 }
                 catch (Exception ex)
                 {
@@ -209,191 +192,11 @@ namespace NewWidgets.Widgets
             return style;
         }
 
-        /// <summary>
-        /// Tries to parse string to specified type
-        /// </summary>
-        /// <param name="targetType"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        internal static object ParseValue(Type targetType, string value)
-        {
-            object memberValue;
-
-            if (targetType == typeof(Font))
-                memberValue = GetFont(value); // font should be registered first to avoid confusion
-            else if (targetType == typeof(string))
-                memberValue = value;
-            else if (targetType == typeof(float))
-                memberValue = FloatParse(value); // bo-oxing (
-            else if (targetType == typeof(uint))
-                memberValue = ColorParse(value); // assume uint field is color by default
-            else if (targetType == typeof(Margin))
-                memberValue = MarginParse(value);
-            else if (targetType == typeof(Vector2))
-                memberValue = Vector2Parse(value);
-            else if (targetType == typeof(Vector3))
-                memberValue = Vector3Parse(value);
-            else if (targetType == typeof(Vector4))
-                memberValue = Vector4Parse(value);
-            else if (targetType.IsEnum)
-                memberValue = EnumParse(targetType, value);
-            else
-                memberValue = Convert.ChangeType(value, targetType); // fallback, may crash
-
-            return memberValue;
-        }
-
-        #region String parsers
-
-        /// <summary>
-        /// Culture invariant float parsing
-        /// </summary>
-        /// <returns>The parse.</returns>
-        /// <param name="value">Value.</param>
-        public static float FloatParse(string value)
-        {
-            return float.Parse(value.Replace(",", "."), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture);
-        }
-
-        /// <summary>
-        /// Parse string value to color. Accepts 0x and # as a preffix for 24-bit hex colors
-        /// </summary>
-        /// <returns>The parse.</returns>
-        /// <param name="value">Value.</param>
-        public static uint ColorParse(string value)
-        {
-            if (value.Length >= 7 && value[0] == '#')
-                return uint.Parse(value.Substring(1), System.Globalization.NumberStyles.HexNumber);
-            if (value.Length >= 8 && value[0] == '0' && value[1] == 'x')
-                return uint.Parse(value.Substring(2), System.Globalization.NumberStyles.HexNumber);
-
-            return uint.Parse(value);
-        }
-
-        /// <summary>
-        /// Parse a string to a 2-component vector
-        /// </summary>
-        /// <returns>The parse.</returns>
-        /// <param name="value">Value.</param>
-        public static Vector2 Vector2Parse(string value)
-        {
-            string[] values = value.Split(';');
-
-            if (values.Length != 2)
-                throw new ArgumentException("Invalid string value for Vector2 type!");
-
-            float x = FloatParse(values[0]);
-            float y = FloatParse(values[1]);
-            return new Vector2(x, y);
-        }
-
-        /// <summary>
-        /// Parse a string to a 3-component vector
-        /// </summary>
-        /// <returns>The parse.</returns>
-        /// <param name="value">Value.</param>
-        public static Vector3 Vector3Parse(string value)
-        {
-            string[] values = value.Split(';');
-
-            if (values.Length != 3)
-                throw new ArgumentException("Invalid string value for Vector3 type!");
-
-            float x = FloatParse(values[0]);
-            float y = FloatParse(values[1]);
-            float z = FloatParse(values[2]);
-            return new Vector3(x, y, z);
-        }
-
-        /// <summary>
-        /// Parse a string to a 4-component vector
-        /// </summary>
-        /// <returns>The parse.</returns>
-        /// <param name="value">Value.</param>
-        public static Vector4 Vector4Parse(string value)
-        {
-            string[] values = value.Split(';');
-
-            if (values.Length != 4)
-                throw new ArgumentException("Invalid string value for Vector4 type!");
-
-            float x = FloatParse(values[0]);
-            float y = FloatParse(values[1]);
-            float z = FloatParse(values[2]);
-            float w = FloatParse(values[3]);
-            return new Vector4(x, y, z, w);
-        }
-
-
-        /// <summary>
-        /// Pastse a string to 4-component or 1-component margin
-        /// </summary>
-        /// <returns>The parse.</returns>
-        /// <param name="value">Value.</param>
-        public static Margin MarginParse(string value)
-        {
-            string[] values = value.Split(';');
-
-            if (values.Length != 1 && values.Length != 4)
-                throw new ArgumentException("Invalid string value for Margin type!");
-
-            if (values.Length == 1)
-            {
-                float a = FloatParse(values[0]);
-                return new Margin(a, a, a, a);
-            }
-
-            float l = FloatParse(values[0]);
-            float t = FloatParse(values[1]);
-            float r = FloatParse(values[2]);
-            float b = FloatParse(values[3]);
-
-            return new Margin(l, t, r, b);
-        }
-
-        /// <summary>
-        /// Parse a string to specific enum tpye
-        /// </summary>
-        /// <returns>The parse.</returns>
-        /// <param name="value">Value.</param>
-        /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public static T EnumParse<T>(string value)
-        {
-            int result = 0; // TODO: GetUnderlyingType()?
-
-            string[] strings = value.Split('|');
-
-            foreach (string str in strings)
-                result |= (int)Enum.Parse(typeof(T), str, true);
-
-            return (T)Enum.ToObject(typeof(T), result);
-        }
-
-        /// <summary>
-        /// Parse a string to specific enum type
-        /// </summary>
-        /// <returns>The parse.</returns>
-        /// <param name="value">Value.</param>
-        /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public static Enum EnumParse(Type enumType, string value)
-        {
-            int result = 0; // TODO: GetUnderlyingType()?
-
-            string[] strings = value.Split('|');
-
-            foreach (string str in strings)
-                result |= (int)Enum.Parse(enumType, str, true);
-
-            return (Enum)Enum.ToObject(enumType, result);
-        }
-
         public static string GetAttribute(XmlNode node, string name)
         {
             var attribute = node.Attributes.GetNamedItem(name);
 
             return attribute == null ? null : attribute.Value;
         }
-
-        #endregion
     }
 }

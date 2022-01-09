@@ -82,25 +82,25 @@
 
   <!-- ScrollView -->
 
-  <style name="scroll_horizontal">
+  <style name="#scrollview_hscroll">
     <back_style>NineImage</back_style>
     <back_image>scroll_horizontal</back_image>
     <back_scale>1.0</back_scale>
   </style>
 
-  <style name="scroll_indicator_horizontal">
+  <style name="#scrollview_htrack">
     <back_style>NineImage</back_style>
     <back_image>scroll_indicator_horizontal</back_image>
     <back_scale>1.0</back_scale>
   </style>
 
-  <style name="scroll_vertical">
+  <style name="#scrollview_vscroll">
     <back_style>NineImage</back_style>
     <back_image>scroll_vertical</back_image>
     <back_scale>1.0</back_scale>
   </style>
 
-  <style name="scroll_indicator_vertical">
+  <style name="#scrollview_vtrack">
     <back_style>NineImage</back_style>
     <back_image>scroll_indicator_vertical</back_image>
     <back_scale>1.0</back_scale>
@@ -113,7 +113,6 @@
     <back_image>panel_9</back_image>
     <back_scale>1.0</back_scale>
     <padding>4;4;4;4</padding>
-    <item_style>default_context_menu_item</item_style>
   </style>
 
   <style name="default_context_menu_item" class="panel">
@@ -130,7 +129,7 @@
     <text_color>#ffffff</text_color>
   </style>
 
-  <style name="tooltip" class="panel">
+  <style name="default_tooltip" class="panel">
     <back_style>NineImage</back_style>
     <back_image>panel_9</back_image>
     <back_scale>0.5</back_scale>

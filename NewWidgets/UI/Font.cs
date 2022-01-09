@@ -16,6 +16,7 @@ namespace NewWidgets.UI
         private readonly int m_height;
         private readonly int m_baseline;
         private readonly int m_shift;
+        private readonly string m_fontName;
 
         public int Height
         {
@@ -55,10 +56,13 @@ namespace NewWidgets.UI
         public Font(string font, float spacing, int leading, int baseline, int shift)
             : this(WindowController.Instance.CreateSprite(font), spacing, leading, baseline, shift)
         {
+            m_fontName = font;
         }
 
         public Font(ISprite fontSprite, float spacing, int leading, int baseline, int shift)
         {
+            m_fontName = fontSprite.ToString();
+
             m_baseline = baseline;
             m_shift = shift;
             m_fontSprite = fontSprite;
@@ -175,6 +179,11 @@ namespace NewWidgets.UI
         public bool HaveSymbol(char symbol)
         {
             return m_glyphs.ContainsKey(symbol);
+        }
+
+        public override string ToString()
+        {
+            return m_fontName;
         }
 
         private struct Glyph

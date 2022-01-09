@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace NewWidgets.Utility
@@ -29,97 +30,73 @@ namespace NewWidgets.Utility
     /// This class is thread safe 
     /// </summary>
     /// <typeparam name="TIndex"></typeparam>
-    internal static class IndexNameMap<TIndex> where TIndex : struct, IConvertible  // Enum specification is only available in C# 7.3
+    internal class IndexNameMap<TIndex> where TIndex : struct, IConvertible  // Enum specification is only available in C# 7.3
     {
-        private static int s_maximumIndex;
+        #region static
 
-        private static readonly IDictionary<string, TIndex> s_indexCache = new ConcurrentDictionary<string, TIndex>();
-        private static readonly IDictionary<TIndex, NameAttribute[]> s_attributeCache = new ConcurrentDictionary<TIndex, NameAttribute[]>();
+        // This is for general use
 
+        private static readonly Lazy<IndexNameMap<TIndex>> s_instance = new Lazy<IndexNameMap<TIndex>>();
+
+        public static IndexNameMap<TIndex> Instance
+        {
+            get { return s_instance.Value; }
+        }
+
+        public static TIndex GetIndexByName(string stringIndex)
+        {
+            return Instance.DoGetIndexByName(stringIndex);
+        }
+
+        #endregion
+
+        // implementation
+
+        private int m_maximumIndex;
+
+        private readonly IDictionary<string, TIndex> m_indexCache = new ConcurrentDictionary<string, TIndex>();
+
+        
         /// <summary>
         /// This constructor checks the input type and also enu,erates all of Enum members
         /// to find the one with maximum index and also check NameAttribute on the each field
         /// for string-value mapping
         /// </summary>
-        static IndexNameMap()
+        protected IndexNameMap()
         {
             Type type = typeof(TIndex);
 
-            if (!type.IsEnum || Enum.GetUnderlyingType(type) != typeof(int))
-                throw new ArgumentException("IndexedData<> supports only Enum members based on Int32");
+            Debug.Assert(type.IsEnum && Enum.GetUnderlyingType(type) != typeof(int), "IndexedData<> supports only Enum members based on Int32");
 
             FieldInfo[] fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
-            List<NameAttribute> attributes = new List<NameAttribute>();
 
             foreach (FieldInfo field in fields)
             {
                 TIndex index = (TIndex)field.GetValue(null);
 
-                attributes.Clear();
-
                 foreach (NameAttribute attribute in field.GetCustomAttributes(typeof(NameAttribute), true))
-                {
-                    s_indexCache[attribute.Name] = index;
-                    attributes.Add(attribute);
-                }
-
-                if (attributes.Count > 0)
-                    s_attributeCache[index] = attributes.ToArray();
+                    m_indexCache[attribute.Name] = index;
 
                 int iindex = index.ToInt32(null);
 
-                if (s_maximumIndex < iindex)
-                    s_maximumIndex = iindex;
+                if (m_maximumIndex < iindex)
+                    m_maximumIndex = iindex;
             }
         }
 
-        public static TIndex GetIndexByName(string stringIndex)
+        private TIndex DoGetIndexByName(string stringIndex)
         {
             TIndex result;
-            if (s_indexCache.TryGetValue(stringIndex, out result))
+            if (m_indexCache.TryGetValue(stringIndex, out result))
                 return result;
 
             // Guaranteed unique
-            result = (TIndex)Enum.ToObject(typeof(TIndex), System.Threading.Interlocked.Increment(ref s_maximumIndex));
+            result = (TIndex)Enum.ToObject(typeof(TIndex), System.Threading.Interlocked.Increment(ref m_maximumIndex));
 
-            s_indexCache[stringIndex] = result; // will be trasformed to AddOrUpdate
+            m_indexCache[stringIndex] = result; // will be trasformed to AddOrUpdate
 
             return result;
         }
 
-        /// <summary>
-        /// Returns first attribute of specified TAttribute type. Note that if there are many attributes they will be skipped
-        /// </summary>
-        /// <typeparam name="TAttribute"></typeparam>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public static TAttribute GetAttributeByIndex<TAttribute>(TIndex index) where TAttribute : NameAttribute
-        {
-            NameAttribute[] result;
-
-            if (s_attributeCache.TryGetValue(index, out result))
-                foreach(NameAttribute attribute in result)
-                    if (attribute is TAttribute)
-                        return (TAttribute)attribute;
-
-            return default(TAttribute);
-        }
-
-        /// <summary>
-        /// Returns first name-attribute value corresponding to TAttribute type
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        public static string GetNameByIndex<TAttribute>(TIndex index) where TAttribute : NameAttribute
-        {
-            NameAttribute[] result;
-
-            if (s_attributeCache.TryGetValue(index, out result))
-                foreach (NameAttribute attribute in result)
-                    if (attribute is TAttribute)
-                        return attribute.Name;
-
-            return index.ToString();
-        }
     }
 }

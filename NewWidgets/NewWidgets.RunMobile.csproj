@@ -102,6 +102,9 @@
     <Compile Include="Styles\StyleSelectorList.cs" />
     <Compile Include="Utility\SubList.cs" />
     <Compile Include="Utility\IndexNameMap.cs" />
+    <Compile Include="Widgets\WidgetParameterIndex.cs" />
+    <Compile Include="Widgets\WidgetParameterMap.cs" />
+    <Compile Include="Utility\ConversionHelper.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

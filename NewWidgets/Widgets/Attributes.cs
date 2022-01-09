@@ -3,10 +3,26 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
-    internal class WidgetParameterAttribute : NameAttribute
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Enum, AllowMultiple = true)]
+    internal class WidgetParameterAttribute : Attribute
     {
+       
+        private readonly string m_name;
+        private readonly string m_xmlName;
         private readonly Type m_type;
         private readonly WidgetParameterInheritance m_inheritance;
+        private readonly Type m_processorType;
+        private readonly string [] m_processorParams;
+
+        public string Name
+        {
+            get { return m_name; }
+        }
+
+        public string XmlName
+        {
+            get { return m_xmlName; }
+        }
 
         public Type Type
         {
@@ -18,40 +34,39 @@ namespace NewWidgets.Widgets
             get { return m_inheritance; }
         }
 
-        public WidgetParameterAttribute(string name, Type type, WidgetParameterInheritance inheritance)
-            : base(name)
+        public Type ProcessorType
         {
+            get { return m_processorType; }
+        }
+
+        public string [] ProcessorParams
+        {
+            get { return m_processorParams; }
+        }
+
+        public WidgetParameterAttribute(string name, Type type = null, WidgetParameterInheritance inheritance = WidgetParameterInheritance.Initial)
+            : this (name, name, type, inheritance)
+        {
+        }
+
+        public WidgetParameterAttribute(string xmlName, string name, Type type = null, WidgetParameterInheritance inheritance = WidgetParameterInheritance.Initial,
+            Type processorType = null,
+            params string [] parameters)
+        {
+            m_name = name;
+            m_xmlName = xmlName;
             m_type = type ?? typeof(string);
             m_inheritance = inheritance;
+            m_processorType = processorType;
+            m_processorParams = parameters;
         }
     }
 
-    /// <summary>
-    /// Helper attribute for pre-defined parameters
-    /// </summary>
-    internal class WidgetCSSParameterAttribute : WidgetParameterAttribute
-    {
-        public WidgetCSSParameterAttribute(string name, Type type = null, WidgetParameterInheritance inheritance = WidgetParameterInheritance.Initial)
-            : base(name, type, inheritance)
-        {
-        }
-    }
 
-    internal class WidgetXMLParameterAttribute : WidgetParameterAttribute
-    {
-        public WidgetXMLParameterAttribute(string name, Type type = null, WidgetParameterInheritance inheritance = WidgetParameterInheritance.Initial)
-            : base("-nw-" + name, type, inheritance)
-        {
-        }
-    }
-
-    /// <summary>
-    /// Helper attribute to map CSS pseudo-classes to WidgetStyleType
-    /// </summary>
     [AttributeUsage(AttributeTargets.Field | AttributeTargets.Enum, AllowMultiple = true)]
-    internal class WidgetPseudoClassAttribute : NameAttribute
+    internal class WidgetPseudoClass : NameAttribute
     {
-        public WidgetPseudoClassAttribute(string name)
+        public WidgetPseudoClass(string name)
             : base(name)
         {
         }
