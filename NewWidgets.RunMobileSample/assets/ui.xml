@@ -72,7 +72,7 @@
     <text_color>#ffffff</text_color>
   </style>
 
-  <style name="default_textedit:hover:selected" parent="default_textedit:selected">
+  <style name="default_textedit:hover:selected" _parent="default_textedit:selected">
     <back_color>#ffee88</back_color>
   </style>
     
@@ -151,6 +151,13 @@
     <text_color>0xffffff</text_color>
   </style>
 
+  <style name="default_button label">
+    <font>default</font>
+    <font_size>0.6</font_size>
+    <text_color>0xcceeff</text_color>
+  </style>
+
+
   <style name="default_button:hover" _parent="default_button">
     <back_image>button_white_hovered_3</back_image>
     <text_color>0xffffff</text_color>
@@ -203,7 +210,7 @@
     <image_color>#000032</image_color>
   </style>
     
-  <style name="default_checkbox image:hover">
+  <style name="default_checkbox:hover image">
     <image>check_icon</image>
     <image_color>#ffffff</image_color>
   </style>
@@ -223,14 +230,16 @@
 
   <style name="text_button" class="button">
     <back_style>None</back_style>
+  </style>
+
+   <style name="text_button label">
     <font>default</font>
     <font_size>0.6</font_size>
     <text_color>0xcceeff</text_color>
     <text_padding>4;2;4;2</text_padding>
   </style>
 
-  <style name="text_button:hover" _parent="default_button_hovered">
-    <back_style>None</back_style>
+  <style name="text_button:hover label" _parent="default_button_hovered">
     <text_color>#ffffff</text_color>
   </style>
 

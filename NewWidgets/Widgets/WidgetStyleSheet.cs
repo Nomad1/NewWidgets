@@ -95,7 +95,7 @@ namespace NewWidgets.Widgets
     {
         private bool m_hasOwnStyle; // This flag indicates that personal style has been created for the object
 
-        private readonly LinkedList<StyleSheetData> m_data;
+        private readonly LinkedList<StyleNode> m_data;
         private readonly string m_name;
 
         // Internal properties
@@ -110,16 +110,16 @@ namespace NewWidgets.Widgets
             get { return m_name; }
         }
 
-        internal WidgetStyleSheet(string name, ICollection<IStyleData> data)
+        internal WidgetStyleSheet(string name, ICollection<StyleNode> data)
         {
             m_name = name;
 
             m_hasOwnStyle = false;
 
-            m_data = new LinkedList<StyleSheetData>();
+            m_data = new LinkedList<StyleNode>();
 
             if (data != null)
-                foreach (StyleSheetData sheetData in data)
+                foreach (StyleNode sheetData in data)
                     m_data.AddFirst(sheetData);
         }
 
@@ -128,20 +128,41 @@ namespace NewWidgets.Widgets
             if (m_hasOwnStyle)
                 throw new WidgetException("Trying to set own style when it is already set!");
 
-            m_data.AddFirst(ownStyle);
+            m_data.AddFirst(new StyleNode(new StyleSelectorList(new StyleSelector("", null, "")), ownStyle)); // local style, the same as HTML tag style="..."
 
             m_hasOwnStyle = true;
         }
 
         internal T Get<T>(WidgetParameterIndex index, T defaultValue)
         {
+            WidgetParameterAttribute attr = WidgetParameterMap.GetAttributeByIndex(index);
+
+            bool inherited = attr != null && attr.Inheritance == WidgetParameterInheritance.Inherit;
+
             object result = null;
 
-            foreach (StyleSheetData data in m_data)
-                if (data.TryGetParameter(index, out result))
+            LinkedListNode<StyleNode> node = m_data.First;
+
+            while (node != null)
+            {
+                StyleNode data = node.Value;
+
+                if (((StyleSheetData)data.Data).TryGetParameter(index, out result))
                 {
                     break;
                 }
+
+                // if next style is the same as this one less on pseudo-class, we can think of it as a parent and do a one-time exception for data lookup
+                // otherwise we need to check if the property inheritance is Initial and then break
+
+                if (inherited || node == m_data.First || (node.Next != null && node.Next.Value.IsPseudoClassParent(node.Value)))
+                {
+                    node = node.Next;
+                }
+                else
+                    break;
+
+            }
 
             if (result == null)
                 return defaultValue;
@@ -156,8 +177,8 @@ namespace NewWidgets.Widgets
         {
             object result = null;
 
-            foreach (StyleSheetData data in m_data)
-                if (data.TryGetParameter(index, out result))
+            foreach (StyleNode data in m_data)
+                if (((StyleSheetData)data.Data).TryGetParameter(index, out result))
                 {
                     break;
                 }
@@ -198,7 +219,7 @@ namespace NewWidgets.Widgets
                 if (value.GetType() != attribute.Type)
                     throw new WidgetException(string.Format("Setting attribute {0} to value {1} type {2} while expecting type {3}", index, value, value.GetType(), attribute.Type));
 
-            m_data.First.Value.SetParameter(index, value);
+            ((StyleSheetData)m_data.First.Value.Data).SetParameter(index, value);
         }
       
         /// <summary>
@@ -216,7 +237,7 @@ namespace NewWidgets.Widgets
             IStyleData temp = new StyleSheetData();
 
             for (var node = m_data.Last; node != null; node = node.Previous)
-                temp.LoadData(node.Value);
+                temp.LoadData(node.Value.Data);
 
             return temp.ToString();
         }

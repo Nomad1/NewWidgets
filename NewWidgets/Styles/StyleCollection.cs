@@ -8,6 +8,9 @@ namespace NewWidgets.UI.Styles
     /// </summary>
     public class StyleCollection
     {
+        /// All possible nodes
+        private readonly IDictionary<string, StyleNode> m_allNodes = new Dictionary<string, StyleNode>();
+
         private readonly IDictionary<string, ICollection<StyleNode>> m_elementCollection = new Dictionary<string, ICollection<StyleNode>>();
         private readonly IDictionary<string, ICollection<StyleNode>> m_idCollection = new Dictionary<string, ICollection<StyleNode>>();
         private readonly IDictionary<string, ICollection<StyleNode>> m_classCollection = new Dictionary<string, ICollection<StyleNode>>();
@@ -29,6 +32,9 @@ namespace NewWidgets.UI.Styles
                 throw new ArgumentException("Invalid StyleNode for AddStyle call");
 
             StyleSelector selector = node.SelectorList.Selectors[node.SelectorList.Count - 1]; // last selector in the list
+
+            // All nodes
+            m_allNodes[selector.ToString()] = node;
 
             if (!string.IsNullOrEmpty(selector.Id)) // we have an explicit id, i.e. tr#myid
                 AddToCollection(m_idCollection, selector.Id, node);
@@ -80,10 +86,12 @@ namespace NewWidgets.UI.Styles
                 if (node != null) // we have a node that is 100% matching the new one, so we need to append new data to it
                 {
                     node.Data.LoadData(data);
-                    continue;
                 }
-
-                AddStyle(new StyleNode(selector, data));
+                else
+                {
+                    node = new StyleNode(selector, data);
+                    AddStyle(node);
+                }
             }
         }
 
@@ -96,6 +104,12 @@ namespace NewWidgets.UI.Styles
 
             StyleSelector selector = selectorList.Selectors[selectorList.Count - 1];
 
+            StyleNode result;
+
+            if (m_allNodes.TryGetValue(selector.ToString(), out result))
+                return result;
+
+#if OLD
             // then we look in our dictionaries for nodes having some of the target parts
             ICollection<StyleNode> collection = null;
 
@@ -113,6 +127,7 @@ namespace NewWidgets.UI.Styles
                     if (node.SelectorList.Equals(selectorList)) // here we check only for exact 100% match
                         return node;
             }
+#endif
 
             return null;
         }
@@ -123,7 +138,7 @@ namespace NewWidgets.UI.Styles
         /// </summary>
         /// <param name="selectorList"></param>
         /// <returns></returns>
-        public ICollection<IStyleData> GetStyleData(StyleSelectorList selectorList)
+        public ICollection<StyleNode> GetStyleData(StyleSelectorList selectorList)
         {
             if (selectorList == null || selectorList.IsEmpty)
                 throw new ArgumentException("Invalid StyleNode for FindStyle call");
@@ -183,35 +198,33 @@ namespace NewWidgets.UI.Styles
             if (styles.Count == 0)
                 return null;
 
-            //if (styles.Count == 1)
-                //foreach (StyleNode node in styles)
-                    //return new[] { node.Data };
-
-            IStyleData[] result = new IStyleData[styles.Count];
+#if !DEBUG
+            if (styles.Count == 1)
+                foreach (StyleNode node in styles)
+                    return new[] { node };
+#endif
 
             // here we're storing data as an array. The only problem is that we don't store selector hierarchy so we don't know if there is `button:hover` that
             // should inherit everything from `button` however `button label` should not.
 
             int j = 0;
 
+#if DEBUG
             string resultString = "";
-
             foreach (StyleNode node in styles)
             {
                 if (j != 0)
                     resultString += " ";
                 resultString += string.Format("[{0} = {1}]", node.StyleSelector, node.Specificity);
-
-                result[j++] = node.Data;
             }
 
             Console.WriteLine("Resolved {0} for {1}", resultString, selectorList);
-
+#endif
             // 1. find hierarchy match (considering operators) for each list entry. It's different from exact match because it should consider inheritance and incapsulation
             // 2. compose a specificity list and sort the results
             // 3. mix all the properties to one list and return new style. Note: we'll need to backtrack parent stylesheet to make sure new style is invalidated if parents are modified
 
-            return result;
+            return styles;
         }
 
         /// <summary>
@@ -220,7 +233,7 @@ namespace NewWidgets.UI.Styles
         /// </summary>
         /// <param name="selectorsString"></param>
         /// <returns></returns>
-        public ICollection<IStyleData> GetStyleData(string selectorsString)
+        public ICollection<StyleNode> GetStyleData(string selectorsString)
         {
             return GetStyleData(new StyleSelectorList(selectorsString));
         }
@@ -231,25 +244,19 @@ namespace NewWidgets.UI.Styles
         /// <param name="outputStream"></param>
         public void Dump(System.IO.TextWriter outputStream)
         {
-            List<StyleNode> styles = new List<StyleNode>();
-
-            foreach (var pair in m_elementCollection)
-                foreach (var node in pair.Value)
-                    if (!styles.Contains(node))
-                        styles.Add(node);
-
-            foreach (var pair in m_idCollection)
-                foreach (var node in pair.Value)
-                    if (!styles.Contains(node))
-                        styles.Add(node);
-
-            foreach (var pair in m_classCollection)
-                foreach (var node in pair.Value)
-                    if (!styles.Contains(node))
-                        styles.Add(node);
-
-            foreach (StyleNode node in styles)
+            foreach (StyleNode node in m_allNodes.Values)
                 outputStream.WriteLine(node);
+        }
+
+        /// <summary>
+        /// This method extends all pseudo-class nodes with data from their parents. I.e. if there is 'a' and 'a:hover' all non-conflicting data from 'a' is loaded
+        /// </summary>
+        public void PreLoadPseudoClasses()
+        {
+            foreach (var pair in m_allNodes)
+                if (pair.Key.IndexOf(':') != -1) // very fast method to check if there are any pseudo classes in this chain
+                {
+                }
         }
     }
 }

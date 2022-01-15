@@ -46,7 +46,7 @@ namespace NewWidgets.Sample
             m_text.MaxWidth = size.X - 40;
             m_text.FontSize *= 1.25f;
             m_text.TextAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
-            m_text.Relayout();
+            m_text.UpdateLayout();
             size = m_panel.Size = m_panel.Size + new Vector2(0, m_text.Size.Y - 80);
             m_text.Position = new Vector2(0, size.Y / 2 - m_text.Size.Y / 2);
             m_panel.AddChild(m_text);

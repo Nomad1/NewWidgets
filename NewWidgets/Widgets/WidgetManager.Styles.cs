@@ -29,7 +29,7 @@ namespace NewWidgets.Widgets
         /// <returns></returns>
         internal static WidgetStyleSheet GetStyle(StyleSelectorList list)
         {
-            ICollection<IStyleData> result = s_styleCollection.GetStyleData(list);
+            ICollection<StyleNode> result = s_styleCollection.GetStyleData(list);
 
             return new WidgetStyleSheet(list.ToString(), result);
         }

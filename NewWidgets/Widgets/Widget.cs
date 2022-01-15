@@ -383,7 +383,7 @@ namespace NewWidgets.Widgets
 
             m_style.SetOwnStyle(m_ownStyle);
 
-            Console.WriteLine("Resolved style: {0} {{\n{1}\n}}", list, m_style);
+            //Console.WriteLine("Resolved style: {0} {{\n{1}\n}}", list, m_style);
 
             Vector2 size = Size;
 

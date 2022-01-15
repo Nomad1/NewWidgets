@@ -37,7 +37,7 @@ namespace NewWidgets.UI.Styles
         // reference to actual data. Different nodes (i.e. "tr, .someclass, #number { }") are using the same data object
         private readonly IStyleData m_data;
 
-        internal IStyleData Data
+        public IStyleData Data
         {
             get { return m_data; }
         }
@@ -74,6 +74,17 @@ namespace NewWidgets.UI.Styles
             if (result <= 0) // we need to avoid result of 0
                 return -1;
             return 1;
+        }
+
+        public bool IsPseudoClassParent(StyleNode child)
+        {
+            if (child == null)
+                return false;
+
+            if (child.SelectorList.Selectors[child.SelectorList.Selectors.Count - 1].PseudoClasses != null)
+                return true;
+
+            return false;
         }
     }
 }

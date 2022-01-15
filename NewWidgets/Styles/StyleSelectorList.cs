@@ -256,7 +256,7 @@ namespace NewWidgets.UI.Styles
                 if (m_combinators[i] != other.Operators[i])
                     return false;
 
-                if (!m_selectors[i].Equals(other.Selectors[i], true))
+                if (!m_selectors[i].Equals(other.Selectors[i]))
                     return false;
             }
 
@@ -290,7 +290,7 @@ namespace NewWidgets.UI.Styles
 
                 while (--position >= 0)
                 {
-                    if (m_selectors[i].Equals(other.Selectors[position], false))
+                    if (m_selectors[i].IsSubset(other.Selectors[position]))
                     {
                         found = true;
                         break;

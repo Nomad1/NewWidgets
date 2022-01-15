@@ -125,19 +125,33 @@ namespace NewWidgets.UI.Styles
             return builder.ToString();
         }
 
-        public bool Equals(StyleSelector other, bool exactMatch)
+        /// <summary>
+        /// Returns true if styles are equal
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool Equals(StyleSelector other)
         {
             if (other == null)
                 return false;
 
-            if (exactMatch)
-                return
-                    m_element == other.Element &&
-                    m_id == other.Id &&
-                    CompareClasses(m_classes, other.Classes, true) &&
-                    CompareClasses(m_pseudoClasses, other.PseudoClasses, true);
+            return
+                m_element == other.Element &&
+                m_id == other.Id &&
+                CompareClasses(m_classes, other.Classes, true) &&
+                CompareClasses(m_pseudoClasses, other.PseudoClasses, true);
 
-            // TODO: calculate specificity as well and return it
+        }
+
+        /// <summary>
+        /// Returns true if other is a subset of this selector
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool IsSubset(StyleSelector other)
+        {
+            if (other == null)
+                return false;
 
             // returns true if this style can be applied to target string, i.t.
             // this = button and other = button.foo:hover
@@ -149,6 +163,23 @@ namespace NewWidgets.UI.Styles
                 (string.IsNullOrEmpty(m_element) || m_element == other.Element) &&
                 (string.IsNullOrEmpty(m_id) || m_id == other.Id) &&
                 (m_classes == null || m_classes.Length == 0 || CompareClasses(m_classes, other.Classes, false)) &&
+                (m_pseudoClasses == null || m_pseudoClasses.Length == 0 || CompareClasses(m_pseudoClasses, other.PseudoClasses, false));
+        }
+
+        /// <summary>
+        /// Returns true if other is mostly equals to this one except for pseudo classes
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
+        public bool IsChild(StyleSelector other)
+        {
+            if (other == null)
+                return false;
+
+            return
+                (m_element == other.Element) &&
+                (m_id == other.Id) &&
+                CompareClasses(m_classes, other.Classes, true) &&
                 (m_pseudoClasses == null || m_pseudoClasses.Length == 0 || CompareClasses(m_pseudoClasses, other.PseudoClasses, false));
         }
 

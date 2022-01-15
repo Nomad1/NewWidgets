@@ -41,14 +41,14 @@ namespace StyleTree
 
             SimpleStyleData result = new SimpleStyleData(new Dictionary<string, string>());
 
-            ICollection<IStyleData> data = collection.GetStyleData(list);
+            ICollection<StyleNode> data = collection.GetStyleData(list);
 
             if (data == null)
                 Console.WriteLine("Style for \"{0}\" not found!", list);
             else
             {
-                foreach (IStyleData styleData in data)
-                    result.LoadData(styleData);
+                foreach (StyleNode styleNode in data)
+                    result.LoadData(styleNode.Data);
 
                 Console.WriteLine("Style search result for \"{0}\":\n{1}", list, result);
             }
