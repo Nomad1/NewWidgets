@@ -53,10 +53,10 @@ namespace NewWidgets.UI
             get { return m_fontSprite; }
         }
 
-        public Font(string font, float spacing, int leading, int baseline, int shift)
+        public Font(string name, string font, float spacing, int leading, int baseline, int shift)
             : this(WindowController.Instance.CreateSprite(font), spacing, leading, baseline, shift)
         {
-            m_fontName = font;
+            m_fontName = name;
         }
 
         public Font(ISprite fontSprite, float spacing, int leading, int baseline, int shift)

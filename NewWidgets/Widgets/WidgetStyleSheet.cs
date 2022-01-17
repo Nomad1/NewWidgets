@@ -60,6 +60,15 @@ namespace NewWidgets.Widgets
             return m_parameters.TryGetValue(index, out result);
         }
 
+        public T GetParameter<T>(WidgetParameterIndex index, T defaultValue)
+        {
+            object result;
+            if (!m_parameters.TryGetValue(index, out result) || result.GetType() != typeof(T))
+                return defaultValue;
+
+            return (T)result;
+        }
+
         public void SetParameter(WidgetParameterIndex index, object value)
         {
             m_parameters[index] = value;

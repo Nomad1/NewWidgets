@@ -133,6 +133,22 @@ namespace NewWidgets.UI.Styles
         }
 
         /// <summary>
+        /// Returns all styles for selected element type
+        /// </summary>
+        /// <param name="selector"></param>
+        /// <returns></returns>
+        public ICollection<StyleNode> GetElementNodes(StyleSelector selector)
+        {
+            ICollection<StyleNode> collection;
+
+            if (!string.IsNullOrEmpty(selector.Element)) // if it has an element name, check element collection
+                if (m_elementCollection.TryGetValue(selector.Element, out collection))
+                    return collection;
+
+            return null;
+        }
+
+        /// <summary>
         /// This method retrieves an ordered list (cascade) of style properties
         /// for given selector list
         /// </summary>
@@ -246,17 +262,6 @@ namespace NewWidgets.UI.Styles
         {
             foreach (StyleNode node in m_allNodes.Values)
                 outputStream.WriteLine(node);
-        }
-
-        /// <summary>
-        /// This method extends all pseudo-class nodes with data from their parents. I.e. if there is 'a' and 'a:hover' all non-conflicting data from 'a' is loaded
-        /// </summary>
-        public void PreLoadPseudoClasses()
-        {
-            foreach (var pair in m_allNodes)
-                if (pair.Key.IndexOf(':') != -1) // very fast method to check if there are any pseudo classes in this chain
-                {
-                }
         }
     }
 }

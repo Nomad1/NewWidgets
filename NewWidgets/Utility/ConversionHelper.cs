@@ -97,7 +97,7 @@ namespace NewWidgets.Utility
         /// <returns></returns>
         public static string ToString(Margin value)
         {
-            return string.Format("{0} {1} {2} {3}", ToString(value.Top), ToString(value.Left), ToString(value.Bottom), ToString(value.Right)); 
+            return string.Format("{0} {1} {2} {3}", ToString(value.Left), ToString(value.Top), ToString(value.Right), ToString(value.Bottom)); 
         }
 
         /// <summary>

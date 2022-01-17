@@ -26,3 +26,15 @@ ul li ul li {
     background-color: green;
     color: green;
 }
+
+@define color-primary: #FF0000;
+
+.example {
+    background-color: color-primary;
+}
+
+@import "navigation.css"; /* Using a string */
+
+@define {
+    color-secondary: #FF0000;
+}

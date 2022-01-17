@@ -68,12 +68,14 @@ namespace StyleTree
             StyleCollection collection = new StyleCollection();
 
             HtmlNode html = HtmlNode.ParseXHmlt(File.ReadAllText(htmlName));
-            CSSParser.ParseCSS(File.ReadAllText(cssName), collection);
+            CSSParser.ParseCSS(File.ReadAllText(cssName), collection, (name, parameters) => new SimpleStyleData(parameters));
 
             HtmlNode element = html.GetElementById(elementId);
 
             if (element == null)
                 throw new ArgumentException("Element " + elementId + " not found for CSS test");
+
+            collection.Dump(Console.Out);
 
             Console.WriteLine(HtmlNode.SaveXHmlt(html));
 

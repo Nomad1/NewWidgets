@@ -68,7 +68,7 @@ namespace NewWidgets.Utility
         
         public override string ToString()
         {
-            return string.Format("[Top:{0} Left:{1} Bottom:{2} Right:{3}]", Top, Left, Bottom, Right);
+            return string.Format("[Left:{0} Top:{1} Right:{2} Bottom:{3}]", Left, Top, Right, Bottom);
         }
 
         public static bool IsEmpty(Margin margin)

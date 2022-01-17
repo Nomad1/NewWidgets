@@ -16,7 +16,8 @@ namespace NewWidgets.Widgets
         
         private static readonly IDictionary<WidgetParameterIndex, WidgetParameterAttribute> s_attributeCache = new Dictionary<WidgetParameterIndex, WidgetParameterAttribute>();
 
-        private static readonly IDictionary<string, IParameterProcessor> s_parserCache = new Dictionary<string, IParameterProcessor>();
+        private static readonly IDictionary<string, IParameterProcessor> s_xmlParserCache = new Dictionary<string, IParameterProcessor>();
+        private static readonly IDictionary<string, IParameterProcessor> s_cssParserCache = new Dictionary<string, IParameterProcessor>();
 
         static WidgetParameterMap()
         {
@@ -37,7 +38,8 @@ namespace NewWidgets.Widgets
 
                     processor.Init(attribute.Name, attribute.Type, attribute.ProcessorParams);
 
-                    s_parserCache[attribute.XmlName] = processor;
+                    s_cssParserCache[attribute.Name] = processor;
+                    s_xmlParserCache[attribute.XmlName] = processor;
                 }
             }
         }
@@ -95,7 +97,17 @@ namespace NewWidgets.Widgets
         {
             IParameterProcessor result;
 
-            if (s_parserCache.TryGetValue(name, out result))
+            if (s_xmlParserCache.TryGetValue(name, out result))
+                return result;
+
+            return null;
+        }
+
+        public static IParameterProcessor GetProcessorByCssName(string name)
+        {
+            IParameterProcessor result;
+
+            if (s_cssParserCache.TryGetValue(name, out result))
                 return result;
 
             return null;

@@ -12,7 +12,7 @@ namespace NewWidgets.UI.Styles
         /// <summary>
         /// Regular expression to parse selectors to basic parts
         /// </summary>
-        private static readonly Regex s_selectorParser = new Regex(@"^(?<element>[\*|\w|\-_]+)?(?<id>#[\w|\-_]+)?(?<class>\.[\w|\-|\._]+)?(?<attributes>\[.+\])?(?<pseudostyle>:.+)?$", RegexOptions.Compiled);
+        private static readonly Regex s_selectorParser = new Regex(@"^(?<element>@{0,1}[\*|\w|\-_]+)?(?<id>#[\w|\-_]+)?(?<class>\.[\w|\-|\._]+)?(?<attributes>\[.+\])?(?<pseudostyle>:.+)?$", RegexOptions.Compiled);
 
         /// <summary>
         /// Regular expression to parse pseudo classes separated by :

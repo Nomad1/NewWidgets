@@ -44,6 +44,133 @@ namespace NewWidgets.Widgets
             return GetStyle(new StyleSelectorList(singleSelector));
         }
 
+        public static void LoadCSS(string uiData)
+        {
+            CSSParser.ParseCSS(uiData, s_styleCollection, (name, parameters) => InitCssData(name, parameters));
+
+            /*ICollection<StyleNode> fonts = s_styleCollection.GetElementNodes(new StyleSelector("@font"));
+
+            
+            foreach (StyleNode node in fonts)
+            {
+                StyleSheetData data = (StyleSheetData)node.Data;
+
+                StyleSelector selector = node.SelectorList.Selectors[node.SelectorList.Count - 1];
+
+                if (data == null || selector == null || selector.Classes == null || selector.Classes.Length != 1)
+                {
+                    WindowController.Instance.LogError("Invalid font loaded from CSS " + node);
+                    continue;
+                }
+
+                string name = node.SelectorList.Selectors[node.SelectorList.Count - 1].Classes[0];
+
+                Font font = new Font(
+                    name,
+                    data.GetParameter(WidgetParameterIndex.FontResource, ""),
+                    data.GetParameter(WidgetParameterIndex.FontSpacing, 0.0f),
+                    data.GetParameter(WidgetParameterIndex.FontLeading, 0),
+                    data.GetParameter(WidgetParameterIndex.FontBaseline, 10),
+                    data.GetParameter(WidgetParameterIndex.FontShift, 0));
+
+                s_fonts[name] = font;
+
+                if (name == "default")
+                    s_mainFont = font;
+            }
+
+            ICollection<StyleNode> sprites = s_styleCollection.GetElementNodes(new StyleSelector("@sprite"));
+
+            foreach (StyleNode node in sprites)
+            {
+                StyleSheetData data = (StyleSheetData)node.Data;
+
+                StyleSelector selector = node.SelectorList.Selectors[node.SelectorList.Count - 1];
+
+                if (data == null || selector == null || selector.Classes == null || selector.Classes.Length != 1)
+                {
+                    WindowController.Instance.LogError("Invalid sprite loaded from CSS " + node);
+                    continue;
+                }
+
+                string name = node.SelectorList.Selectors[node.SelectorList.Count - 1].Classes[0];
+
+                WindowController.Instance.SetSpriteSubdivision(
+                    name,
+                    data.GetParameter(WidgetParameterIndex.SpriteTileX, 1),
+                    data.GetParameter(WidgetParameterIndex.SpriteTileY, 1));
+            }*/
+        }
+
+        private static IStyleData InitCssData(string name, Dictionary<string, string> parameters)
+        {
+            IDictionary<WidgetParameterIndex, object> style = InitCssParameters(parameters);
+            StyleSheetData data = new StyleSheetData(style);
+
+            if (name.StartsWith("@font."))
+            {
+                string fontName = name.Split('.')[1];
+
+                Font font = new Font(
+                    fontName,
+                    data.GetParameter(WidgetParameterIndex.FontResource, ""),
+                    data.GetParameter(WidgetParameterIndex.FontSpacing, 0.0f),
+                    data.GetParameter(WidgetParameterIndex.FontLeading, 0),
+                    data.GetParameter(WidgetParameterIndex.FontBaseline, 10),
+                    data.GetParameter(WidgetParameterIndex.FontShift, 0));
+
+                s_fonts[fontName] = font;
+
+                if (fontName == "default")
+                    s_mainFont = font;
+            }
+            else if (name.StartsWith("@sprite"))
+            {
+                string spriteName = name.Split('.')[1];
+
+                WindowController.Instance.SetSpriteSubdivision(
+                    spriteName,
+                    data.GetParameter(WidgetParameterIndex.SpriteTileX, 1),
+                    data.GetParameter(WidgetParameterIndex.SpriteTileY, 1));
+            }
+
+            return data;
+        }
+
+        private static IDictionary<WidgetParameterIndex, object> InitCssParameters(IDictionary<string, string> parameters)
+        {
+            Dictionary<WidgetParameterIndex, object> style = new Dictionary<WidgetParameterIndex, object>();
+
+            foreach (KeyValuePair<string,string> pair in parameters)
+            {
+                string key = pair.Key;
+                string value = pair.Value;
+
+                try
+                {
+                    if (value == null)
+                        value = string.Empty;
+                    else
+                        value = value.Trim('\r', '\n', '\t', ' ');
+
+                    IParameterProcessor processor = WidgetParameterMap.GetProcessorByCssName(key);
+
+                    if (processor == null)
+                        WindowController.Instance.LogMessage("Got unknown attribute {0} in CSS style sheet", key);
+                    else
+                        processor.Process(style, value);
+                }
+                catch (Exception ex)
+                {
+                    WindowController.Instance.LogError("Error parsing style, element {0}: {1}", key, ex);
+                    throw new WidgetException("Error parsing style!", ex);
+                }
+            }
+
+            return style;
+        }
+
+
         #region XML style loading
 
         /// <summary>
@@ -113,12 +240,21 @@ namespace NewWidgets.Widgets
             if (node.Attributes.GetNamedItem("leading") != null)
                 leading = int.Parse(node.Attributes.GetNamedItem("leading").Value);
 
-            Font font = new Font(resource, spacing, leading, baseline, shift);
+            Font font = new Font(name, resource, spacing, leading, baseline, shift);
 
             s_fonts[name] = font;
 
             if (name == "default")
                 s_mainFont = font;
+
+            Dictionary<WidgetParameterIndex, object> fontStyle = new Dictionary<WidgetParameterIndex, object>();
+            fontStyle[WidgetParameterIndex.FontResource] = resource;
+            fontStyle[WidgetParameterIndex.FontSpacing] = spacing;
+            fontStyle[WidgetParameterIndex.FontShift] = shift;
+            fontStyle[WidgetParameterIndex.FontLeading] = leading;
+            fontStyle[WidgetParameterIndex.FontBaseline] = baseline;
+
+            s_styleCollection.AddStyle("@font." + name, new StyleSheetData(fontStyle));
 
             WindowController.Instance.LogMessage("Registered font {0}, resource {1}, spacing {2}", name, resource, spacing);
         }
@@ -129,6 +265,12 @@ namespace NewWidgets.Widgets
 
             WindowController.Instance.SetSpriteSubdivision(name, 3, 3);
 
+            Dictionary<WidgetParameterIndex, object> spriteStyle = new Dictionary<WidgetParameterIndex, object>();
+            spriteStyle[WidgetParameterIndex.SpriteTileX] = 3;
+            spriteStyle[WidgetParameterIndex.SpriteTileY] = 3;
+
+            s_styleCollection.AddStyle("@sprite." + name, new StyleSheetData(spriteStyle));
+
             WindowController.Instance.LogMessage("Registered nine patch {0}", name);
         }
 
@@ -137,6 +279,12 @@ namespace NewWidgets.Widgets
             string name = node.Attributes.GetNamedItem("name").Value;
 
             WindowController.Instance.SetSpriteSubdivision(name, 3, 1);
+
+            Dictionary<WidgetParameterIndex, object> spriteStyle = new Dictionary<WidgetParameterIndex, object>();
+            spriteStyle[WidgetParameterIndex.SpriteTileX] = 3;
+            spriteStyle[WidgetParameterIndex.SpriteTileY] = 1;
+
+            s_styleCollection.AddStyle("@sprite." + name, new StyleSheetData(spriteStyle));
 
             WindowController.Instance.LogMessage("Registered three patch {0}", name);
         }
@@ -170,8 +318,9 @@ namespace NewWidgets.Widgets
                 try
                 {
                     string value = element.InnerText;
-                    if (string.IsNullOrEmpty(value) && element.Attributes.GetNamedItem("value") != null)
-                        value = element.Attributes.GetNamedItem("value").Value;
+
+                    if (string.IsNullOrEmpty(value))
+                        value = GetAttribute(element, "value");
 
                     if (value == null)
                         value = string.Empty;

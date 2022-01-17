@@ -105,6 +105,7 @@
     <Compile Include="Widgets\WidgetParameterIndex.cs" />
     <Compile Include="Widgets\WidgetParameterMap.cs" />
     <Compile Include="Utility\ConversionHelper.cs" />
+    <Compile Include="Styles\CSSParser.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

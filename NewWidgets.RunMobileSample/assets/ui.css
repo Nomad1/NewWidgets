@@ -1,0 +1,278 @@
+@font.default {
+	-nw-font-resource: font|font5;
+	-nw-font-spacing: 0;
+	-nw-font-shift: 0;
+	-nw-font-leading: 0;
+	-nw-font-baseline: 30;
+}
+
+@sprite.panel_9 {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 3;
+}
+
+@sprite.panel_white_normal_9 {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 3;
+}
+
+@sprite.panel_white_hovered_9 {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 3;
+}
+
+@sprite.window_9 {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 3;
+}
+
+@sprite.window_dialog_9 {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 3;
+}
+
+@sprite.scroll_horizontal {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 3;
+}
+
+@sprite.scroll_vertical {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 3;
+}
+
+@sprite.scroll_indicator_horizontal {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 3;
+}
+
+@sprite.scroll_indicator_vertical {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 3;
+}
+
+@sprite.button_white_normal_3 {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 1;
+}
+
+@sprite.button_white_hovered_3 {
+	-nw-sprite-tile-x: 3;
+	-nw-sprite-tile-y: 1;
+}
+
+window {
+	background-repeat: nineimage;
+	background-image: window_9;
+	background-size: 0.75;
+	width: 600;
+	height: 400;
+	overflow: true;
+}
+
+panel {
+	background-repeat: nineimage;
+	background-image: window_9;
+	background-size: 0.5;
+	width: 100;
+	height: 100;
+	overflow: true;
+}
+
+label {
+	font-family: default;
+	font-size: 0.6;
+	color: #ffffff;
+	width: 100;
+	height: 35;
+	overflow: false;
+	-nw-text-padding: 4 2 4 2;
+}
+
+text {
+	font-family: default;
+	font-size: 0.6;
+	color: #ffffff;
+}
+
+textedit {
+	background-repeat: nineimage;
+	background-image: panel_white_hovered_9;
+	background-size: 0.25;
+	font-family: default;
+	font-size: 0.5;
+	width: 200;
+	height: 45;
+	color: #aaaaaa;
+	overflow: true;
+	clip: 1 2 3 2;
+	-nw-cursor-color: #ffffff;
+	-nw-text-padding: 6 2 6 0;
+}
+
+textedit:selected {
+	background-image: panel_white_normal_9;
+	color: #ffffff;
+}
+
+textedit:hover:selected {
+	background-color: #ffee88;
+}
+
+textedit:hover {
+	background-color: #ffee88;
+}
+
+#scrollview_hscroll {
+	background-repeat: nineimage;
+	background-image: scroll_horizontal;
+	background-size: 1;
+}
+
+#scrollview_htrack {
+	background-repeat: nineimage;
+	background-image: scroll_indicator_horizontal;
+	background-size: 1;
+}
+
+#scrollview_vscroll {
+	background-repeat: nineimage;
+	background-image: scroll_vertical;
+	background-size: 1;
+}
+
+#scrollview_vtrack {
+	background-repeat: nineimage;
+	background-image: scroll_indicator_vertical;
+	background-size: 1;
+}
+
+context_menu {
+	background-repeat: nineimage;
+	background-image: panel_9;
+	background-size: 1;
+	padding: 4 4 4 4;
+}
+
+context_menu_item {
+	background-repeat: none;
+	font-family: default;
+	font-size: 0.5;
+	color: #cceeff;
+	padding: 4 2 4 2;
+}
+
+context_menu_item:hover {
+	background-repeat: none;
+	background-size: 0.5;
+	color: #ffffff;
+}
+
+tooltip {
+	background-repeat: nineimage;
+	background-image: panel_9;
+	background-size: 0.5;
+	padding: 14 14 16 14;
+	overflow: true;
+}
+
+button {
+	background-repeat: threeimage;
+	background-image: button_white_normal_3;
+	background-size: 1;
+	-nw-text-padding: 0 0 0 6;
+	width: 120;
+	height: 40;
+	font-family: default;
+	font-size: 0.6;
+	color: #ffffff;
+}
+
+button:hover {
+	background-image: button_white_hovered_3;
+	color: #ffffff;
+}
+
+button:disabled {
+	background-image: button_white_normal_3;
+	background-color-opacity: 0.5;
+	background-color: #aaaaaa;
+	color: #808080;
+}
+
+button:hover:disabled {
+	background-image: button_white_hovered_3;
+	color: #aaaaaa;
+	background-color-opacity: 0.5;
+	background-color: #aaaaaa;
+}
+
+checkbox {
+	background-repeat: imagefit;
+	background-image: checkbox_back_normal;
+	width: 40;
+	height: 40;
+	color: #cceeff;
+}
+
+checkbox:selected {
+	background-image: checkbox_back_normal;
+	color: #ffffff;
+}
+
+checkbox:hover {
+	background-image: checkbox_back_hovered;
+	color: #ffffff;
+}
+
+checkbox:hover:selected {
+	background-image: checkbox_back_hovered;
+	color: #cceeff;
+}
+
+checkbox:disabled {
+	background-image: checkbox_back_hovered;
+	-nw-image-color: #888888;
+	color: #888888;
+}
+
+checkbox image {
+	image: check_icon;
+	-nw-image-color: #ffffff;
+}
+
+.back_pattern {
+	background-repeat: imagetiled;
+	-nw-back-depth: backclipped;
+	background-image: back_pattern;
+	background-size: 1;
+	background-color-opacity: 0.04;
+	overflow: true;
+	clip: 2 2 2 2;
+}
+
+.text_button {
+	background-repeat: none;
+}
+
+.image_button {
+	background-repeat: none;
+	-nw-image-padding: 6 6 6 6;
+	width: 64;
+	height: 64;
+}
+
+.image_button:hover {
+	background-repeat: nineimage;
+	background-image: panel_white_hovered_9;
+	background-size: 0.5;
+}
+
+.dialog_window {
+	background-repeat: nineimage;
+	background-image: window_dialog_9;
+	background-size: 1;
+	width: 600;
+	height: 300;
+}
+

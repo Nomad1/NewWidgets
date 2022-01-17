@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using NewWidgets.UI.Styles;
 
-namespace StyleTree
+namespace NewWidgets.UI.Styles
 {
     /// <summary>
     /// This class takes .css file text and splits it to styles, parameters and comments
@@ -18,9 +17,11 @@ namespace StyleTree
             Comment = 0x2, // we're inside the comment /* ... */
             ParameterBlock = 0x4, // we're inside the parameters block { ... }
             Parameter = 0x08, // we're inside the parameter definition
+            Rule = 0x10, // that's a name of the rule, i.e. @import
+            RuleParameter = 0x20
         }
 
-        public static void ParseCSS(string cssText, StyleCollection targetCollection)
+        public static void ParseCSS(string cssText, StyleCollection targetCollection, Func<string, Dictionary<string, string>, IStyleData> paramConstructor)
         {
             CSSParserState state = CSSParserState.None;
             StringBuilder text = new StringBuilder();
@@ -44,29 +45,30 @@ namespace StyleTree
                 switch (cssText[i])
                 {
                     case '{':
-                        if ((state & CSSParserState.Style) != 0) // we're entering new param block, ending the style
+                        if ((state & (CSSParserState.Style | CSSParserState.RuleParameter)) != 0) // we're entering new param block, ending the style
                         {
-                            state &= ~CSSParserState.Style;
-                            state |= CSSParserState.ParameterBlock;
-
                             if (!string.IsNullOrEmpty(currentStyle))
                             {
-                                Console.WriteLine("WARNING: New style block started while {0} is in process", currentStyle);
-                            }
+                                if ((state & CSSParserState.RuleParameter) == 0)
+                                    Console.WriteLine("WARNING: New style block started while {0} is in process", currentStyle);
+                            } else
+                                currentStyle = text.ToString();
 
                             if (parameters.Count != 0)
                             {
                                 Console.WriteLine("WARNING: New style block started while parameters collection has {0} entries", parameters.Count);
                             }
 
-                            currentStyle = text.ToString();
+                            state &= ~(CSSParserState.Style | CSSParserState.RuleParameter);
+                            state |= CSSParserState.ParameterBlock;
+
                             parameters = new Dictionary<string, string>();
 
                             text.Clear();
                             continue;
                         }
-                        else
-                            Console.WriteLine("ERROR: Starting parameter block without style name");
+
+                        Console.WriteLine("ERROR: Starting parameter block without style name");
                         break;
                     case '}': // TODO: ignore inside of the parameter text string
                         if ((state & CSSParserState.Parameter) != 0) // parameter is ending without trailing ;. Not an issue
@@ -88,13 +90,19 @@ namespace StyleTree
                             }
 
                             //LogTrace("{0}: {1} params", currentStyle.Trim(), parameters.Count);
+                            currentStyle = currentStyle.Trim();
 
-                            targetCollection.AddStyle(currentStyle.Trim(), new SimpleStyleData(parameters));
+                            targetCollection.AddStyle(currentStyle, paramConstructor(currentStyle, parameters));
 
                             currentStyle = null;
                             parameters = new Dictionary<string, string>();
 
                             continue;
+                        }
+
+                        if ((state & CSSParserState.Rule) != 0)
+                        {
+                            goto case ';';
                         }
                         break;
                     case '/': // possible start of the comment
@@ -120,10 +128,35 @@ namespace StyleTree
                             text.Clear();
                             continue;
                         }
+                        if ((state & CSSParserState.RuleParameter) != 0)
+                        {
+                            state &= ~CSSParserState.RuleParameter;
+                            ParseParameter(text.ToString(), parameters, true);
+
+                            text.Clear();
+
+                            currentStyle = currentStyle.Trim();
+
+                            targetCollection.AddStyle(currentStyle, paramConstructor(currentStyle, parameters));
+
+                            currentStyle = null;
+                            parameters = new Dictionary<string, string>();
+                            continue;
+                        }
                         break;
                     case ' ':
                     case '\t':
                         // whitespace
+                        if ((state & CSSParserState.Rule) != 0)
+                        {
+                            state &= ~CSSParserState.Rule;
+                            state |= CSSParserState.RuleParameter;
+
+                            currentStyle = text.ToString();
+                            text.Clear();
+                            continue;
+                        }
+                        else
                         if ((state & (CSSParserState.Style | CSSParserState.Parameter)) == 0)
                             continue; // ignore it if we're not inside the meaningful block
                         // otherwise do nothing
@@ -132,13 +165,17 @@ namespace StyleTree
                     case '\r':
                         // line feed, ignoring it
                         continue;
+                    case '@':
+                        if (state == CSSParserState.None)
+                            state = CSSParserState.Rule;
+                        break;
                 }
 
                 if ((state & (CSSParserState.ParameterBlock | CSSParserState.Parameter)) == CSSParserState.ParameterBlock) // we're inside parameter block but parameter hasn't started yet
                 {
                     state |= CSSParserState.Parameter;
                 }
-                else if ((state & (CSSParserState.Style | CSSParserState.ParameterBlock)) == 0) // we're outside of parameter block but style name hasn't started yet
+                else if ((state & (CSSParserState.Style | CSSParserState.ParameterBlock | CSSParserState.RuleParameter)) == 0) // we're outside of parameter block but style name hasn't started yet
                 {
                     state |= CSSParserState.Style;
                 }
@@ -147,7 +184,7 @@ namespace StyleTree
             }
         }
 
-        private static bool ParseParameter(string text, Dictionary<string, string> parameters)
+        private static bool ParseParameter(string text, Dictionary<string, string> parameters, bool rule = false)
         {
             if (string.IsNullOrEmpty(text))
             {
@@ -156,6 +193,9 @@ namespace StyleTree
             }
 
             string[] split = text.Split(new[] { ':' }, 2);
+
+            if (rule && split.Length == 1) // some rules could be like @import "something.css" so we'll use empty key name for this
+                split = new[] { split[0], split[0] };
 
             if (split.Length != 2)
             {

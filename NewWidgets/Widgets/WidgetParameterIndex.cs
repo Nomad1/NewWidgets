@@ -137,7 +137,25 @@ namespace NewWidgets.Widgets
         [WidgetParameter("button_animate_time", "-nw-button-animate-time", typeof(int))]
         ButtonAnimateTime,
 
-        Max = ButtonAnimateTime + 1
+        // Font
+        [WidgetParameter("font_resource", "-nw-font-resource", typeof(string))]
+        FontResource,
+        [WidgetParameter("font_spacing", "-nw-font-spacing", typeof(float))]
+        FontSpacing,
+        [WidgetParameter("font_shift", "-nw-font-shift", typeof(int))]
+        FontShift,
+        [WidgetParameter("font_leading", "-nw-font-leading", typeof(int))]
+        FontLeading,
+        [WidgetParameter("font_baseline", "-nw-font-baseline", typeof(int))]
+        FontBaseline,
+
+        // Sprite
+        [WidgetParameter("sprite_tile_x", "-nw-sprite-tile-x", typeof(int))]
+        SpriteTileX,
+        [WidgetParameter("sprite_tile_y", "-nw-sprite-tile-y", typeof(int))]
+        SpriteTileY,
+
+        Max
     }
 
 
