@@ -72,7 +72,7 @@ namespace NewWidgets.Widgets
             WindowController.Instance.OnTouch += HandleTouch;
 
             // We need to register conversion from string to Font type
-            Utility.ConversionHelper.RegisterParser(typeof(Font), (type, str) => GetFont(str));
+            Utility.ConversionHelper.RegisterParser(typeof(Font), (str, unitType) => GetFont(str));
         }
 
         private static bool HandleTouch(float x, float y, bool press, bool unpress, int pointer)

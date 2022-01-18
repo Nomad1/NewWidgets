@@ -90,7 +90,11 @@ namespace NewWidgets.Widgets
             StringBuilder builder = new StringBuilder();
 
             foreach (var pair in m_parameters)
-                builder.AppendFormat("\t{0}: {1};\n", WidgetParameterMap.GetNameByIndex(pair.Key), ConversionHelper.FormatValue(pair.Value.GetType(), pair.Value));
+            {
+                var attr = WidgetParameterMap.GetAttributeByIndex(pair.Key);
+
+                builder.AppendFormat("    {0}: {1};\n", attr.Name, ConversionHelper.FormatValue(pair.Value.GetType(), attr.UnitType, pair.Value));
+            }
 
             return builder.ToString();
         }

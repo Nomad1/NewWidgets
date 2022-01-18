@@ -10,6 +10,7 @@ namespace NewWidgets.Widgets
         private readonly string m_name;
         private readonly string m_xmlName;
         private readonly Type m_type;
+        private readonly UnitType m_unitType;
         private readonly WidgetParameterInheritance m_inheritance;
         private readonly Type m_processorType;
         private readonly string [] m_processorParams;
@@ -29,6 +30,11 @@ namespace NewWidgets.Widgets
             get { return m_type; }
         }
 
+        public UnitType UnitType
+        {
+            get { return m_unitType; }
+        }
+
         public WidgetParameterInheritance Inheritance
         {
             get { return m_inheritance; }
@@ -44,15 +50,16 @@ namespace NewWidgets.Widgets
             get { return m_processorParams; }
         }
 
-        public WidgetParameterAttribute(string name, Type type = null, WidgetParameterInheritance inheritance = WidgetParameterInheritance.Initial)
-            : this (name, name, type, inheritance)
+        public WidgetParameterAttribute(string name, Type type = null, UnitType unitType = UnitType.None, WidgetParameterInheritance inheritance = WidgetParameterInheritance.Initial)
+            : this (name, name, type, unitType, inheritance)
         {
         }
 
-        public WidgetParameterAttribute(string xmlName, string name, Type type = null, WidgetParameterInheritance inheritance = WidgetParameterInheritance.Initial,
+        public WidgetParameterAttribute(string xmlName, string name, Type type = null, UnitType unitType = UnitType.None, WidgetParameterInheritance inheritance = WidgetParameterInheritance.Initial,
             Type processorType = null,
             params string [] parameters)
         {
+            m_unitType = unitType;
             m_name = name;
             m_xmlName = xmlName;
             m_type = type ?? typeof(string);

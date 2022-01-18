@@ -101,7 +101,7 @@ namespace NewWidgets.Widgets
             m_progressLine = new WidgetBackground(new WidgetStyle(LineId));
             m_progressLine.Size = Size;
             m_progressLine.Position = Position;
-            m_progressLine.ClipContents = true;
+            m_progressLine.ClipContent = true;
             m_progressLine.BackgroundDepth = WidgetBackgroundDepth.BackClipped;
             AddChild(m_progressLine);
 
@@ -111,7 +111,7 @@ namespace NewWidgets.Widgets
             m_frontText.Position = m_backText.Position;
             m_frontText.FontSize = m_backText.FontSize;
             m_frontText.Color = 0x666666;
-            m_frontText.ClipContents = true;
+            m_frontText.ClipContent = true;
             AddChild(m_frontText);
 
             m_progress = 0;

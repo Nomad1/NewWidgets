@@ -228,14 +228,14 @@ namespace NewWidgets.Widgets
         {
             m_needAnimate = false;
 
-            bool oldClip = this.ClipContents;
+            WidgetOverflow oldClip = this.Overflow;
             
-            this.ClipContents = true;
+            this.Overflow = WidgetOverflow.Hidden;
             
             Vector2 targetPosition = m_label.Position;
             m_label.Position = targetPosition + new Vector2(0, 10);
             m_label.Move(targetPosition, 100, delegate {
-                this.ClipContents = oldClip;
+                this.Overflow = oldClip;
                 m_label.Position = targetPosition;
             });
 

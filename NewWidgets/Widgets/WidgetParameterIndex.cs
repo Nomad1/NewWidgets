@@ -15,144 +15,147 @@ namespace NewWidgets.Widgets
 
         // Size and position
 
-        [WidgetParameter("width", typeof(float))]
+        [WidgetParameter("width", typeof(float), UnitType.Length)]
         Width, // part of size, width and height are not inherited
 
-        [WidgetParameter("height", typeof(float))]
+        [WidgetParameter("height", typeof(float), UnitType.Length)]
         Height, // part of size,width and height are not inherited
 
         [Obsolete] // no longer used, only for compatibility
-        [WidgetParameter("size", "size", typeof(Vector2), WidgetParameterInheritance.Initial,
+        [WidgetParameter("size", "size", typeof(Vector2), UnitType.Length, WidgetParameterInheritance.Initial,
                                          typeof(Vector2SplitProcessor), "width", "height")] // non CSS
         Size,
 
-        [WidgetParameter("x", "x", typeof(float), WidgetParameterInheritance.Initial, typeof(DefaultProcessor), "left")] // Panorama UI, writes to left instead
-        [WidgetParameter("left", typeof(float))] // CSS
+        [WidgetParameter("x", "x", typeof(float), UnitType.Length, WidgetParameterInheritance.Initial, typeof(DefaultProcessor), "left")] // Panorama UI, writes to left instead
+        [WidgetParameter("left", typeof(float), UnitType.Length)] // CSS
         Left, // part of position
 
-        [WidgetParameter("y", "y", typeof(float), WidgetParameterInheritance.Initial, typeof(DefaultProcessor), "top")] // Panorama UI, writes to top instead
-        [WidgetParameter("top", typeof(float))] // CSS
+        [WidgetParameter("y", "y", typeof(float), UnitType.Length, WidgetParameterInheritance.Initial, typeof(DefaultProcessor), "top")] // Panorama UI, writes to top instead
+        [WidgetParameter("top", typeof(float), UnitType.Length)] // CSS
         Top, // part of position
-        [WidgetParameter("z", "z", typeof(float), WidgetParameterInheritance.Initial, typeof(DefaultProcessor), "z-index")] // Panorama UI, writes to z-index instead
-        [WidgetParameter("z-index", typeof(float))] // CSS. TODO: change to int
+        [WidgetParameter("z", "z", typeof(int), UnitType.Length, WidgetParameterInheritance.Initial, typeof(DefaultProcessor), "z-index")] // Panorama UI, writes to z-index instead
+        [WidgetParameter("z-index", typeof(int), UnitType.Length)] // CSS. TODO: change to int
         ZIndex,
 
-        [Obsolete]
-        [WidgetParameter("position", "position", typeof(Vector3), WidgetParameterInheritance.Initial,
-                                                 typeof(Vector3SplitProcessor), "left", "top", "z-index")] // split
-        Position,
+        //[Obsolete]
+        //[WidgetParameter("position", "position", typeof(Vector3), WidgetParameterInheritance.Initial,
+        //                                         typeof(Vector3SplitProcessor), "left", "top", "z-index")] // split
+        //Position,
 
         // Common
-        [WidgetParameter("opacity", typeof(float))]
+        [WidgetParameter("opacity", typeof(float), UnitType.Percent)]
         Opacity, // opacity is a special value that should not be inherited but multiplied with parent
 
 
-        [WidgetParameter("clip", "overflow", typeof(bool))] // instead of `visible` and `hidden` we use `true` and `false`. It doesn't cover `scroll` option although
+        [WidgetParameter("clip", "--clip", typeof(bool), UnitType.None, WidgetParameterInheritance.Initial, typeof(OverflowProcessor), "overflow")] // instead of `visible` and `hidden` we use `true` and `false`. It doesn't cover `scroll` option although
+        [Obsolete]
         Clip,
-        [WidgetParameter("clip_margin", "clip", typeof(Margin))] // clip margin is a Margin type, not a rect. TODO:
+        [WidgetParameter("overflow", "overflow", typeof(WidgetOverflow))] // instead of `visible` and `hidden` we use `true` and `false`. It doesn't cover `scroll` option although
+        Overflow,
+        [WidgetParameter("clip_margin", "clip", typeof(Margin), UnitType.Length)] // clip margin is a Margin type, not a rect. TODO:
         ClipMargin,
-        [WidgetParameter("padding", typeof(Margin))] // padding is of type Margin
+        [WidgetParameter("padding", typeof(Margin), UnitType.Length)] // padding is of type Margin
         Padding,
 
         // Background
 
-        [WidgetParameter("back_color", "background-color", typeof(uint))] // unlike HTML it doesn't supports transparency yet. TODO: wrapper type for Color
+        [WidgetParameter("back_color", "background-color", typeof(uint), UnitType.Color)] // unlike HTML it doesn't supports transparency yet. TODO: wrapper type for Color
         BackColor,
-        [WidgetParameter("back_image", "background-image", typeof(string))]
+        [WidgetParameter("back_image", "background-image", typeof(string), UnitType.Url)]
         BackImage,
         [WidgetParameter("back_style", "background-repeat", typeof(WidgetBackgroundStyle))] // we have own repeat modes so this needs to be worked out
                                                                                             // TODO: another parameter that converts to one of our styles
         BackStyle,
 
 
-        [WidgetParameter("back_depth", "-nw-back-depth", typeof(WidgetBackgroundDepth))] // nothing like that in HTML
+        [WidgetParameter("back_depth", "--back-depth", typeof(WidgetBackgroundDepth))] // nothing like that in HTML
         BackDepth,
-        [WidgetParameter("back_scale", "background-size", typeof(float))] // right now its a single percentage value. TODO: another property to support two values and exact length
+        [WidgetParameter("back_scale", "background-size", typeof(float), UnitType.Percent)] // right now its a single percentage value. TODO: another property to support two values and exact length
         BackScale,
-        [WidgetParameter("back_angle", "-nw-back-angle", typeof(float))]
+        [WidgetParameter("back_angle", "--back-angle", typeof(float))]
         BackAngle,
-        [WidgetParameter("back_pivot", "-nw-back-pivot", typeof(Vector2))] // pivot + padding are powerful but in CSS there is only background-origin, TODO: implement it
+        [WidgetParameter("back_pivot", "--back-pivot", typeof(Vector2), UnitType.Percent)] // pivot + padding are powerful but in CSS there is only background-origin, TODO: implement it
         BackPivot,
-        [WidgetParameter("back_padding", "-nw-back-padding", typeof(Margin))]
+        [WidgetParameter("back_padding", "--back-padding", typeof(Margin), UnitType.Length)]
         BackPadding,
-        [WidgetParameter("back_opacity", "background-color-opacity",  typeof(float))] // Panorama UI compat
+        [WidgetParameter("back_opacity", "background-color-opacity",  typeof(float), UnitType.Percent)] // Panorama UI compat
         BackOpacity,
 
         // Text
 
-        [WidgetParameter("font", "font-family", typeof(Font), WidgetParameterInheritance.Inherit)]
+        [WidgetParameter("font", "font-family", typeof(Font), UnitType.None, WidgetParameterInheritance.Inherit)]
         Font,
-        [WidgetParameter("font_size", "font-size", typeof(float), WidgetParameterInheritance.Inherit)]
+        [WidgetParameter("font_size", "font-size", typeof(float), UnitType.FontUnits, WidgetParameterInheritance.Inherit)]
         FontSize,
-        [WidgetParameter("text_color", "color", typeof(uint), WidgetParameterInheritance.Inherit)]
+        [WidgetParameter("text_color", "color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Inherit)]
         TextColor,
-        [WidgetParameter("line_spacing", "line-height", typeof(float), WidgetParameterInheritance.Inherit)]
+        [WidgetParameter("line_spacing", "line-height", typeof(float), UnitType.Length, WidgetParameterInheritance.Inherit)]
         LineSpacing,
-        [WidgetParameter("text_align", "text-align", typeof(WidgetAlign), WidgetParameterInheritance.Inherit)]
+        [WidgetParameter("text_align", "text-align", typeof(WidgetAlign), UnitType.None, WidgetParameterInheritance.Inherit)]
         TextAlign,
-        [WidgetParameter("text_padding", "-nw-text-padding", typeof(Margin))]
+        [WidgetParameter("text_padding", "--text-padding", typeof(Margin), UnitType.Length)]
         TextPadding,
-        [WidgetParameter("richtext", "-nw-richtext", typeof(bool))]
+        [WidgetParameter("richtext", "--richtext", typeof(bool))]
         RichText,
 
         // Image
 
-        [WidgetParameter("image")] // image name
+        [WidgetParameter("image", typeof(string), UnitType.Url)] // image name
         Image,
-        [WidgetParameter("image_style", "-nw-image_style", typeof(WidgetBackgroundStyle))]
+        [WidgetParameter("image_style", "--image_style", typeof(WidgetBackgroundStyle))]
         ImageStyle,
-        [WidgetParameter("image_angle", "-nw-image_angle", typeof(float))]
+        [WidgetParameter("image_angle", "--image_angle", typeof(float))]
         ImageAngle,
-        [WidgetParameter("image_pivot", "-nw-image_pivot", typeof(Vector2))]
+        [WidgetParameter("image_pivot", "--image_pivot", typeof(Vector2), UnitType.Percent)]
         ImagePivot,
-        [WidgetParameter("image_padding", "-nw-image-padding", typeof(Margin))] // change to "padding"?
+        [WidgetParameter("image_padding", "--image-padding", typeof(Margin), UnitType.Length)] // change to "padding"?
         ImagePadding,
-        [WidgetParameter("image_color", "-nw-image-color", typeof(uint))]
+        [WidgetParameter("image_color", "--image-color", typeof(uint), UnitType.Color)]
         ImageColor,
-        [WidgetParameter("image_opacity", "-nw-image-opacity", typeof(float))]
+        [WidgetParameter("image_opacity", "--image-opacity", typeof(float), UnitType.Percent)]
         ImageOpacity,
 
         // Text edit
 
-        [WidgetParameter("cursor_color", "-nw-cursor-color", typeof(uint))]
+        [WidgetParameter("cursor_color", "--cursor-color", typeof(uint), UnitType.Color)]
         CursorColor,
-        [WidgetParameter("cursor_char", "-nw-cursor_char")]
+        [WidgetParameter("cursor_char", "--cursor_char")]
         CursorChar,
-        [WidgetParameter("mask_char", "-nw-mask_char")]
+        [WidgetParameter("mask_char", "--mask_char")]
         MaskChar,
 
 
         // Button
 
-        [WidgetParameter("button_layout", "-nw-button-layout",  typeof(WidgetButtonLayout))]
+        [WidgetParameter("button_layout", "--button-layout", typeof(WidgetButtonLayout))]
         ButtonLayout,
-        [WidgetParameter("button_image_padding", "-nw-button-image-padding", typeof(Margin))]
+        [WidgetParameter("button_image_padding", "--button-image-padding", typeof(Margin), UnitType.Length)]
         ButtonImagePadding,
-        [WidgetParameter("button_text_padding", "-nw-button-text-padding",  typeof(Margin))]
+        [WidgetParameter("button_text_padding", "--button-text-padding",  typeof(Margin), UnitType.Length)]
         ButtonTextPadding,
-        [WidgetParameter("button_animate_scale", "-nw-button-animate-scale", typeof(float))]
+        [WidgetParameter("button_animate_scale", "--button-animate-scale", typeof(float), UnitType.Percent)]
         ButtonAnimateScale,
-        [WidgetParameter("button_animate_pivot", "-nw-button-animate-pivot", typeof(Vector2))]
+        [WidgetParameter("button_animate_pivot", "--button-animate-pivot", typeof(Vector2), UnitType.Percent)]
         ButtonAnimatePivot,
-        [WidgetParameter("button_animate_time", "-nw-button-animate-time", typeof(int))]
+        [WidgetParameter("button_animate_time", "--button-animate-time", typeof(int))]
         ButtonAnimateTime,
 
         // Font
-        [WidgetParameter("font_resource", "-nw-font-resource", typeof(string))]
+        [WidgetParameter("font_resource", "--font-resource", typeof(string), UnitType.Url)]
         FontResource,
-        [WidgetParameter("font_spacing", "-nw-font-spacing", typeof(float))]
+        [WidgetParameter("font_spacing", "--font-spacing", typeof(float))]
         FontSpacing,
-        [WidgetParameter("font_shift", "-nw-font-shift", typeof(int))]
+        [WidgetParameter("font_shift", "--font-shift", typeof(int))]
         FontShift,
-        [WidgetParameter("font_leading", "-nw-font-leading", typeof(int))]
+        [WidgetParameter("font_leading", "--font-leading", typeof(int))]
         FontLeading,
-        [WidgetParameter("font_baseline", "-nw-font-baseline", typeof(int))]
+        [WidgetParameter("font_baseline", "--font-baseline", typeof(int))]
         FontBaseline,
 
         // Sprite
-        [WidgetParameter("sprite_tile_x", "-nw-sprite-tile-x", typeof(int))]
+        [WidgetParameter("sprite_tile_x", "--sprite-tile-x", typeof(int))]
         SpriteTileX,
-        [WidgetParameter("sprite_tile_y", "-nw-sprite-tile-y", typeof(int))]
+        [WidgetParameter("sprite_tile_y", "--sprite-tile-y", typeof(int))]
         SpriteTileY,
 
         Max
@@ -165,11 +168,13 @@ namespace NewWidgets.Widgets
 
         private Type m_type;
         private string m_targetName;
+        private UnitType m_unitType;
 
-        public void Init(string target, Type type, string [] parameters)
+        public void Init(string target, Type type, UnitType unitType, string[] parameters)
         {
             m_targetName = (parameters != null && parameters.Length >= 1) ? parameters[0] : target;
             m_type = type;
+            m_unitType = unitType;
         }
 
         public void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
@@ -180,7 +185,7 @@ namespace NewWidgets.Widgets
                 Debug.Assert(m_target != 0);
             }
 
-            object value = ConversionHelper.ParseValue(m_type, stringValue);
+            object value = ConversionHelper.ParseValue(m_type, m_unitType, stringValue);
 
             data[m_target] = value;
         }
@@ -192,10 +197,13 @@ namespace NewWidgets.Widgets
         private string m_targetNameY;
         private WidgetParameterIndex m_targetX;
         private WidgetParameterIndex m_targetY;
+        private UnitType m_unitType;
 
-        public void Init(string target, Type type, string[] parameters)
+        public void Init(string target, Type type, UnitType unitType, string[] parameters)
         {
             Debug.Assert(parameters != null && parameters.Length == 2);
+
+            m_unitType = unitType;
 
             m_targetNameX = parameters[0];
             m_targetNameY = parameters[1];
@@ -212,7 +220,7 @@ namespace NewWidgets.Widgets
                 Debug.Assert(m_targetY != 0);
             }
 
-            Vector2 value = (Vector2)ConversionHelper.ParseValue(typeof(Vector2), stringValue);
+            Vector2 value = (Vector2)ConversionHelper.ParseValue(typeof(Vector2), m_unitType, stringValue);
 
             data[m_targetX] = value.X;
             data[m_targetY] = value.Y;
@@ -227,10 +235,13 @@ namespace NewWidgets.Widgets
         private WidgetParameterIndex m_targetX;
         private WidgetParameterIndex m_targetY;
         private WidgetParameterIndex m_targetZ;
+        private UnitType m_unitType;
 
-        public void Init(string target, Type type, string[] parameters)
+        public void Init(string target, Type type, UnitType unitType, string[] parameters)
         {
             Debug.Assert(parameters != null && parameters.Length == 3);
+
+            m_unitType = unitType;
 
             m_targetNameX = parameters[0];
             m_targetNameY = parameters[1];
@@ -251,13 +262,38 @@ namespace NewWidgets.Widgets
                 Debug.Assert(m_targetZ != 0);
             }
 
-            Vector3 value = (Vector3)ConversionHelper.ParseValue(typeof(Vector3), stringValue);
+            Vector3 value = (Vector3)ConversionHelper.ParseValue(typeof(Vector3), m_unitType, stringValue);
 
             data[m_targetX] = value.X;
             data[m_targetY] = value.Y;
             data[m_targetZ] = value.Z;
         }
     }
+
+    internal class OverflowProcessor : IParameterProcessor
+    {
+        private WidgetParameterIndex m_target;
+        private string m_targetName;
+
+        public void Init(string target, Type type, UnitType unitType, string[] parameters)
+        {
+            m_targetName = (parameters != null && parameters.Length >= 1) ? parameters[0] : target;
+        }
+
+        public void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            if (m_target == 0)
+            {
+                m_target = WidgetParameterMap.GetIndexByName(m_targetName);
+                Debug.Assert(m_target != 0);
+            }
+
+            bool value = (bool)ConversionHelper.ParseValue(typeof(bool), UnitType.None, stringValue);
+
+            data[m_target] = value ? WidgetOverflow.Hidden : WidgetOverflow.Visible;
+        }
+    }
+
 
 }
 

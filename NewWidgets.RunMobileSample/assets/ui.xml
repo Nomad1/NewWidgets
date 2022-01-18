@@ -67,12 +67,12 @@
     <text_padding>6;2;6;0</text_padding>
   </style>
     
-  <style name="default_textedit:selected" _parent="default_textedit">
+  <style name="default_textedit:focus" _parent="default_textedit">
     <back_image>panel_white_normal_9</back_image>
     <text_color>#ffffff</text_color>
   </style>
 
-  <style name="default_textedit:hover:selected" _parent="default_textedit:selected">
+  <style name="default_textedit:hover:focus" _parent="default_textedit:focus">
     <back_color>#ffee88</back_color>
   </style>
     
@@ -184,7 +184,7 @@
     <text_color>#cceeff</text_color>
   </style>
     
-  <style name="default_checkbox:selected" _parent="default_checkbox">
+  <style name="default_checkbox:focus" _parent="default_checkbox">
     <back_image>checkbox_back_normal</back_image>
     <text_color>#ffffff</text_color>
   </style>
@@ -194,7 +194,7 @@
     <text_color>#ffffff</text_color>
   </style>
     
- <style name="default_checkbox:hover:selected" _parent="default_checkbox">
+ <style name="default_checkbox:hover:focus" _parent="default_checkbox">
     <back_image>checkbox_back_hovered</back_image>
     <text_color>#cceeff</text_color>
   </style>

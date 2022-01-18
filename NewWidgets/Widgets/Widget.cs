@@ -123,7 +123,7 @@ namespace NewWidgets.Widgets
                 if ((m_currentState & WidgetState.Hovered) != 0)
                     pseudoClasses.Add(":hover");
                 if ((m_currentState & WidgetState.Selected) != 0)
-                    pseudoClasses.Add(":selected");
+                    pseudoClasses.Add(":focus");
                 if ((m_currentState & WidgetState.Disabled) != 0)
                     pseudoClasses.Add(":disabled");
 
@@ -187,10 +187,16 @@ namespace NewWidgets.Widgets
         /// <summary>
         /// Indicates if the contents should be clipped. Almost the same as overflow:hidden and overflow:visible in HTML
         /// </summary>
-        public bool ClipContents
+        public WidgetOverflow Overflow
         {
-            get { return GetProperty(WidgetParameterIndex.Clip, false); }
-            set { SetProperty(WidgetParameterIndex.Clip, value); } // clipping is applied on each redraw so we don't need to call Invalidate of any kind
+            get { return GetProperty(WidgetParameterIndex.Overflow, WidgetOverflow.Visible); }
+            set { SetProperty(WidgetParameterIndex.Overflow, value); } // clipping is applied on each redraw so we don't need to call Invalidate of any kind
+        }
+
+        public bool ClipContent
+        {
+            get { return Overflow == WidgetOverflow.Hidden; }
+            set { Overflow = value ? WidgetOverflow.Hidden : WidgetOverflow.Visible; } // clipping is applied on each redraw so we don't need to call Invalidate of any kind
         }
 
         /// <summary>
@@ -419,7 +425,7 @@ namespace NewWidgets.Widgets
             if (!Visible)
                 return;
 
-            if (ClipContents)
+            if (Overflow == WidgetOverflow.Hidden)
             {
                 Vector2 clipTopLeft = this.Transform.GetScreenPoint(new Vector2(ClipMargin.Left, ClipMargin.Top));
                 Vector2 clipBottomRight = this.Transform.GetScreenPoint(new Vector2(this.Size.X - ClipMargin.Right, this.Size.Y - ClipMargin.Bottom));
@@ -433,7 +439,7 @@ namespace NewWidgets.Widgets
 
             DrawContents();
             
-            if (ClipContents)
+            if (Overflow == WidgetOverflow.Hidden)
                 WindowController.Instance.CancelClipRect();
         }
 

@@ -406,9 +406,9 @@ namespace NewWidgets.Widgets
             if (BackgroundDepth == WidgetBackgroundDepth.Back)
                 m_background.Draw();
 
-            bool clip = ClipContents; // I'm caching this variable to make sure we apply clipping and then cancel it accordingly
+            WidgetOverflow clip = Overflow; // I'm caching this variable to make sure we apply clipping and then cancel it accordingly
 
-            if (clip)
+            if (clip == WidgetOverflow.Hidden)
             {
                 Vector2 clipTopLeft = this.Transform.GetScreenPoint(new Vector2(ClipMargin.Left, ClipMargin.Top));
                 Vector2 clipBottomRight = this.Transform.GetScreenPoint(new Vector2(this.Size.X - ClipMargin.Right, this.Size.Y - ClipMargin.Bottom));
@@ -428,7 +428,7 @@ namespace NewWidgets.Widgets
             if (BackgroundDepth == WidgetBackgroundDepth.TopClipped)
                 m_background.Draw();
 
-            if (clip)
+            if (clip == WidgetOverflow.Hidden)
             {
                 WindowController.Instance.CancelClipRect();
             }

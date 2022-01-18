@@ -1,278 +1,278 @@
 @font.default {
-	-nw-font-resource: font|font5;
-	-nw-font-spacing: 0;
-	-nw-font-shift: 0;
-	-nw-font-leading: 0;
-	-nw-font-baseline: 30;
+    --font-resource: url("font|font5");
+    --font-spacing: 0;
+    --font-shift: 0;
+    --font-leading: 0;
+    --font-baseline: 30;
 }
 
 @sprite.panel_9 {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 3;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
 }
 
 @sprite.panel_white_normal_9 {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 3;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
 }
 
 @sprite.panel_white_hovered_9 {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 3;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
 }
 
 @sprite.window_9 {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 3;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
 }
 
 @sprite.window_dialog_9 {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 3;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
 }
 
 @sprite.scroll_horizontal {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 3;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
 }
 
 @sprite.scroll_vertical {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 3;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
 }
 
 @sprite.scroll_indicator_horizontal {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 3;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
 }
 
 @sprite.scroll_indicator_vertical {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 3;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
 }
 
 @sprite.button_white_normal_3 {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 1;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
 }
 
 @sprite.button_white_hovered_3 {
-	-nw-sprite-tile-x: 3;
-	-nw-sprite-tile-y: 1;
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
 }
 
 window {
-	background-repeat: nineimage;
-	background-image: window_9;
-	background-size: 0.75;
-	width: 600;
-	height: 400;
-	overflow: true;
+    background-repeat: nineimage;
+    background-image: url("window_9");
+    background-size: 75%;
+    width: 600px;
+    height: 400px;
+    overflow: hidden;
 }
 
 panel {
-	background-repeat: nineimage;
-	background-image: window_9;
-	background-size: 0.5;
-	width: 100;
-	height: 100;
-	overflow: true;
+    background-repeat: nineimage;
+    background-image: url("window_9");
+    background-size: 50%;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
 }
 
 label {
-	font-family: default;
-	font-size: 0.6;
-	color: #ffffff;
-	width: 100;
-	height: 35;
-	overflow: false;
-	-nw-text-padding: 4 2 4 2;
+    font-family: default;
+    font-size: 0.6em;
+    color: #ffffff;
+    width: 100px;
+    height: 35px;
+    overflow: visible;
+    --text-padding: 4px 2px 4px 2px;
 }
 
 text {
-	font-family: default;
-	font-size: 0.6;
-	color: #ffffff;
+    font-family: default;
+    font-size: 0.6em;
+    color: #ffffff;
 }
 
 textedit {
-	background-repeat: nineimage;
-	background-image: panel_white_hovered_9;
-	background-size: 0.25;
-	font-family: default;
-	font-size: 0.5;
-	width: 200;
-	height: 45;
-	color: #aaaaaa;
-	overflow: true;
-	clip: 1 2 3 2;
-	-nw-cursor-color: #ffffff;
-	-nw-text-padding: 6 2 6 0;
+    background-repeat: nineimage;
+    background-image: url("panel_white_hovered_9");
+    background-size: 25%;
+    font-family: default;
+    font-size: 0.5em;
+    width: 200px;
+    height: 45px;
+    color: #aaaaaa;
+    overflow: hidden;
+    clip: 1px 2px 3px 2px;
+    --cursor-color: #ffffff;
+    --text-padding: 6px 2px 6px 0px;
 }
 
-textedit:selected {
-	background-image: panel_white_normal_9;
-	color: #ffffff;
+textedit:focus {
+    background-image: url("panel_white_normal_9");
+    color: #ffffff;
 }
 
-textedit:hover:selected {
-	background-color: #ffee88;
+textedit:hover:focus {
+    background-color: #ffee88;
 }
 
 textedit:hover {
-	background-color: #ffee88;
+    background-color: #ffee88;
 }
 
 #scrollview_hscroll {
-	background-repeat: nineimage;
-	background-image: scroll_horizontal;
-	background-size: 1;
+    background-repeat: nineimage;
+    background-image: url("scroll_horizontal");
+    background-size: 100%;
 }
 
 #scrollview_htrack {
-	background-repeat: nineimage;
-	background-image: scroll_indicator_horizontal;
-	background-size: 1;
+    background-repeat: nineimage;
+    background-image: url("scroll_indicator_horizontal");
+    background-size: 100%;
 }
 
 #scrollview_vscroll {
-	background-repeat: nineimage;
-	background-image: scroll_vertical;
-	background-size: 1;
+    background-repeat: nineimage;
+    background-image: url("scroll_vertical");
+    background-size: 100%;
 }
 
 #scrollview_vtrack {
-	background-repeat: nineimage;
-	background-image: scroll_indicator_vertical;
-	background-size: 1;
+    background-repeat: nineimage;
+    background-image: url("scroll_indicator_vertical");
+    background-size: 100%;
 }
 
 context_menu {
-	background-repeat: nineimage;
-	background-image: panel_9;
-	background-size: 1;
-	padding: 4 4 4 4;
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-size: 100%;
+    padding: 4px 4px 4px 4px;
 }
 
 context_menu_item {
-	background-repeat: none;
-	font-family: default;
-	font-size: 0.5;
-	color: #cceeff;
-	padding: 4 2 4 2;
+    background-repeat: none;
+    font-family: default;
+    font-size: 0.5em;
+    color: #cceeff;
+    padding: 4px 2px 4px 2px;
 }
 
 context_menu_item:hover {
-	background-repeat: none;
-	background-size: 0.5;
-	color: #ffffff;
+    background-repeat: none;
+    background-size: 50%;
+    color: #ffffff;
 }
 
 tooltip {
-	background-repeat: nineimage;
-	background-image: panel_9;
-	background-size: 0.5;
-	padding: 14 14 16 14;
-	overflow: true;
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-size: 50%;
+    padding: 14px 14px 16px 14px;
+    overflow: hidden;
 }
 
 button {
-	background-repeat: threeimage;
-	background-image: button_white_normal_3;
-	background-size: 1;
-	-nw-text-padding: 0 0 0 6;
-	width: 120;
-	height: 40;
-	font-family: default;
-	font-size: 0.6;
-	color: #ffffff;
+    background-repeat: threeimage;
+    background-image: url("button_white_normal_3");
+    background-size: 100%;
+    --text-padding: 0px 0px 0px 6px;
+    width: 120px;
+    height: 40px;
+    font-family: default;
+    font-size: 0.6em;
+    color: #ffffff;
 }
 
 button:hover {
-	background-image: button_white_hovered_3;
-	color: #ffffff;
+    background-image: url("button_white_hovered_3");
+    color: #ffffff;
 }
 
 button:disabled {
-	background-image: button_white_normal_3;
-	background-color-opacity: 0.5;
-	background-color: #aaaaaa;
-	color: #808080;
+    background-image: url("button_white_normal_3");
+    background-color-opacity: 50%;
+    background-color: #aaaaaa;
+    color: #808080;
 }
 
 button:hover:disabled {
-	background-image: button_white_hovered_3;
-	color: #aaaaaa;
-	background-color-opacity: 0.5;
-	background-color: #aaaaaa;
+    background-image: url("button_white_hovered_3");
+    color: #aaaaaa;
+    background-color-opacity: 50%;
+    background-color: #aaaaaa;
 }
 
 checkbox {
-	background-repeat: imagefit;
-	background-image: checkbox_back_normal;
-	width: 40;
-	height: 40;
-	color: #cceeff;
+    background-repeat: imagefit;
+    background-image: url("checkbox_back_normal");
+    width: 40px;
+    height: 40px;
+    color: #cceeff;
 }
 
-checkbox:selected {
-	background-image: checkbox_back_normal;
-	color: #ffffff;
+checkbox:focus {
+    background-image: url("checkbox_back_normal");
+    color: #ffffff;
 }
 
 checkbox:hover {
-	background-image: checkbox_back_hovered;
-	color: #ffffff;
+    background-image: url("checkbox_back_hovered");
+    color: #ffffff;
 }
 
-checkbox:hover:selected {
-	background-image: checkbox_back_hovered;
-	color: #cceeff;
+checkbox:hover:focus {
+    background-image: url("checkbox_back_hovered");
+    color: #cceeff;
 }
 
 checkbox:disabled {
-	background-image: checkbox_back_hovered;
-	-nw-image-color: #888888;
-	color: #888888;
+    background-image: url("checkbox_back_hovered");
+    --image-color: #888888;
+    color: #888888;
 }
 
 checkbox image {
-	image: check_icon;
-	-nw-image-color: #ffffff;
+    image: url("check_icon");
+    --image-color: #ffffff;
 }
 
 .back_pattern {
-	background-repeat: imagetiled;
-	-nw-back-depth: backclipped;
-	background-image: back_pattern;
-	background-size: 1;
-	background-color-opacity: 0.04;
-	overflow: true;
-	clip: 2 2 2 2;
+    background-repeat: imagetiled;
+    --back-depth: backclipped;
+    background-image: url("back_pattern");
+    background-size: 100%;
+    background-color-opacity: 4%;
+    overflow: hidden;
+    clip: 2px 2px 2px 2px;
 }
 
 .text_button {
-	background-repeat: none;
+    background-repeat: none;
 }
 
 .image_button {
-	background-repeat: none;
-	-nw-image-padding: 6 6 6 6;
-	width: 64;
-	height: 64;
+    background-repeat: none;
+    --image-padding: 6px 6px 6px 6px;
+    width: 64px;
+    height: 64px;
 }
 
 .image_button:hover {
-	background-repeat: nineimage;
-	background-image: panel_white_hovered_9;
-	background-size: 0.5;
+    background-repeat: nineimage;
+    background-image: url("panel_white_hovered_9");
+    background-size: 50%;
 }
 
 .dialog_window {
-	background-repeat: nineimage;
-	background-image: window_dialog_9;
-	background-size: 1;
-	width: 600;
-	height: 300;
+    background-repeat: nineimage;
+    background-image: url("window_dialog_9");
+    background-size: 100%;
+    width: 600px;
+    height: 300px;
 }
 

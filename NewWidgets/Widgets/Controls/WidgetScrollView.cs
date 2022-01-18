@@ -152,7 +152,7 @@ namespace NewWidgets.Widgets
             m_verticalScrollBarIndicator = new WidgetBackground(new WidgetStyle(VerticalScrollTrackerId));
             m_verticalScrollBarIndicator.Parent = this;
 
-            ClipContents = true;
+            Overflow = WidgetOverflow.Hidden;
         }
 
         protected override void Resize(Vector2 size)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
@@ -149,15 +150,6 @@ namespace NewWidgets.Widgets
         Revert // NYI
     }
 
-    [Flags]
-    internal enum WidgetParameterUnits
-    {
-        None, // default for the data type
-        Pixels, // px
-        Percentage, // %
-        Auto,
-    }
-
     public enum WidgetStyleClassIndex
     {
         None = 0,
@@ -193,6 +185,15 @@ namespace NewWidgets.Widgets
         Toolbar,
         [Name("tooltip")]
         Tooltip,
+    }
+
+    /// <summary>
+    /// Type of visibility for overflown content: overflow:hidden and overflow:visible
+    /// </summary>
+    public enum WidgetOverflow
+    {
+        Hidden = 1, // Clip = true means overflow:hidden
+        Visible = 2, // Clip = false means overflow:visible
     }
 
     // Nomad: one day we'll migrate to these

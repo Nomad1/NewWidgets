@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
     internal interface IParameterProcessor
     {
-        void Init(string target, Type type, string[] parameters);
+        void Init(string target, Type type, UnitType unitType, string[] parameters);
         void Process(IDictionary<WidgetParameterIndex, object> data, string value);
     }
 
@@ -36,7 +37,7 @@ namespace NewWidgets.Widgets
                         ? (IParameterProcessor)Activator.CreateInstance(attribute.ProcessorType)
                         : new DefaultProcessor();
 
-                    processor.Init(attribute.Name, attribute.Type, attribute.ProcessorParams);
+                    processor.Init(attribute.Name, attribute.Type, attribute.UnitType, attribute.ProcessorParams);
 
                     s_cssParserCache[attribute.Name] = processor;
                     s_xmlParserCache[attribute.XmlName] = processor;

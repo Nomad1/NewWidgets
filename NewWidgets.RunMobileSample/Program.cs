@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using NewWidgets.Sample;
 using NewWidgets.Widgets;
 using RunMobile;
@@ -70,8 +69,8 @@ namespace NewWidgets.RunMobileSample
             //WidgetManager.LoadUI(AssetManager.GetAssetTextFile("ui.xml"));
             WidgetManager.LoadCSS(AssetManager.GetAssetTextFile("ui.css"));
 
-            //using (var cssSave = File.CreateText("ui.css"))
-            //    WidgetManager.SaveUI(cssSave);
+            using (var cssSave = File.CreateText("ui.css"))
+                WidgetManager.SaveUI(cssSave);
 
             // Here we're creating main window and it's added to the Game Controller
             m_window = new TestWindow();
