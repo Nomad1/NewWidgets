@@ -33,33 +33,33 @@ namespace NewWidgets.Widgets
         [WidgetParameter("y", "y", typeof(float), UnitType.Length, WidgetParameterInheritance.Initial, typeof(DefaultProcessor), "top")] // Panorama UI, writes to top instead
         [WidgetParameter("top", typeof(float), UnitType.Length)] // CSS
         Top, // part of position
-        [WidgetParameter("z", "z", typeof(int), UnitType.Length, WidgetParameterInheritance.Initial, typeof(DefaultProcessor), "z-index")] // Panorama UI, writes to z-index instead
-        [WidgetParameter("z-index", typeof(int), UnitType.Length)] // CSS. TODO: change to int
+        [WidgetParameter("z", "z", typeof(int), UnitType.None, WidgetParameterInheritance.Initial, typeof(DefaultProcessor), "z-index")] // Panorama UI, writes to z-index instead
+        [WidgetParameter("z-index", typeof(int), UnitType.None)] // CSS
         ZIndex,
 
-        //[Obsolete]
-        //[WidgetParameter("position", "position", typeof(Vector3), WidgetParameterInheritance.Initial,
-        //                                         typeof(Vector3SplitProcessor), "left", "top", "z-index")] // split
-        //Position,
+        [Obsolete]
+        [WidgetParameter("position", "position", typeof(Vector2), UnitType.Length, WidgetParameterInheritance.Initial,
+                                                 typeof(Vector2SplitProcessor), "left", "top")] // split. No longer used
+        Position,
 
         // Common
         [WidgetParameter("opacity", typeof(float), UnitType.Percent)]
         Opacity, // opacity is a special value that should not be inherited but multiplied with parent
 
 
-        [WidgetParameter("clip", "--clip", typeof(bool), UnitType.None, WidgetParameterInheritance.Initial, typeof(OverflowProcessor), "overflow")] // instead of `visible` and `hidden` we use `true` and `false`. It doesn't cover `scroll` option although
         [Obsolete]
+        [WidgetParameter("clip", "--clip", typeof(bool), UnitType.None, WidgetParameterInheritance.Initial, typeof(OverflowProcessor), "overflow")] // instead of `visible` and `hidden` we use `true` and `false`. It doesn't cover `scroll` option although
         Clip,
         [WidgetParameter("overflow", "overflow", typeof(WidgetOverflow))] // instead of `visible` and `hidden` we use `true` and `false`. It doesn't cover `scroll` option although
         Overflow,
-        [WidgetParameter("clip_margin", "clip", typeof(Margin), UnitType.Length)] // clip margin is a Margin type, not a rect. TODO:
+        [WidgetParameter("clip_margin", "--clip-margin", typeof(Margin), UnitType.Length)] // clip margin is a Margin type, while CSS clip is a rect. We can't convert one to another
         ClipMargin,
         [WidgetParameter("padding", typeof(Margin), UnitType.Length)] // padding is of type Margin
         Padding,
 
         // Background
 
-        [WidgetParameter("back_color", "background-color", typeof(uint), UnitType.Color)] // unlike HTML it doesn't supports transparency yet. TODO: wrapper type for Color
+        [WidgetParameter("back_color", "background-color", typeof(uint), UnitType.Color)] // unlike HTML it doesn't supports transparency yet
         BackColor,
         [WidgetParameter("back_image", "background-image", typeof(string), UnitType.Url)]
         BackImage,
@@ -68,17 +68,17 @@ namespace NewWidgets.Widgets
         BackStyle,
 
 
-        [WidgetParameter("back_depth", "--back-depth", typeof(WidgetBackgroundDepth))] // nothing like that in HTML
+        [WidgetParameter("back_depth", "--background-depth", typeof(WidgetBackgroundDepth))] // nothing like that in HTML
         BackDepth,
         [WidgetParameter("back_scale", "background-size", typeof(float), UnitType.Percent)] // right now its a single percentage value. TODO: another property to support two values and exact length
         BackScale,
-        [WidgetParameter("back_angle", "--back-angle", typeof(float))]
+        [WidgetParameter("back_angle", "--background-rotation", typeof(float))]
         BackAngle,
-        [WidgetParameter("back_pivot", "--back-pivot", typeof(Vector2), UnitType.Percent)] // pivot + padding are powerful but in CSS there is only background-origin, TODO: implement it
+        [WidgetParameter("back_pivot", "background-position", typeof(Vector2), UnitType.Percent)] // pivot point. in CSS there are different constants and possibility to set xpos and ypos, it's only percents in our implementation
         BackPivot,
-        [WidgetParameter("back_padding", "--back-padding", typeof(Margin), UnitType.Length)]
+        [WidgetParameter("back_padding", "--background-padding", typeof(Margin), UnitType.Length)]
         BackPadding,
-        [WidgetParameter("back_opacity", "background-color-opacity",  typeof(float), UnitType.Percent)] // Panorama UI compat
+        [WidgetParameter("back_opacity", "background-color-opacity",  typeof(float), UnitType.Percent)] // Panorama UI compat, invalid in CSS
         BackOpacity,
 
         // Text
@@ -89,9 +89,9 @@ namespace NewWidgets.Widgets
         FontSize,
         [WidgetParameter("text_color", "color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Inherit)]
         TextColor,
-        [WidgetParameter("line_spacing", "line-height", typeof(float), UnitType.Length, WidgetParameterInheritance.Inherit)]
+        [WidgetParameter("line_spacing", "line-height", typeof(float), UnitType.Percent, WidgetParameterInheritance.Inherit)]
         LineSpacing,
-        [WidgetParameter("text_align", "text-align", typeof(WidgetAlign), UnitType.None, WidgetParameterInheritance.Inherit)]
+        [WidgetParameter("text_align", "text-align", typeof(WidgetAlign), UnitType.None, WidgetParameterInheritance.Inherit)] // TODO: more alignment options
         TextAlign,
         [WidgetParameter("text_padding", "--text-padding", typeof(Margin), UnitType.Length)]
         TextPadding,
@@ -102,11 +102,11 @@ namespace NewWidgets.Widgets
 
         [WidgetParameter("image", typeof(string), UnitType.Url)] // image name
         Image,
-        [WidgetParameter("image_style", "--image_style", typeof(WidgetBackgroundStyle))]
+        [WidgetParameter("image_style", "--image-style", typeof(WidgetBackgroundStyle))]
         ImageStyle,
-        [WidgetParameter("image_angle", "--image_angle", typeof(float))]
+        [WidgetParameter("image_angle", "--image-rotation", typeof(float))]
         ImageAngle,
-        [WidgetParameter("image_pivot", "--image_pivot", typeof(Vector2), UnitType.Percent)]
+        [WidgetParameter("image_pivot", "--image-position", typeof(Vector2), UnitType.Percent)]
         ImagePivot,
         [WidgetParameter("image_padding", "--image-padding", typeof(Margin), UnitType.Length)] // change to "padding"?
         ImagePadding,

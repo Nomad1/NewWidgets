@@ -66,8 +66,8 @@ namespace NewWidgets.RunMobileSample
             SpriteManager.Instance.LoadSpriteAtlas("ui"); // loads ui.bin with defulat ui atlas
             SpriteManager.Instance.LoadSpriteAtlas("font5"); // loads font5.bin with font MSDF atlas
             WidgetManager.Init(0.5f); // 0.5 is font scale
-            //WidgetManager.LoadUI(AssetManager.GetAssetTextFile("ui.xml"));
-            WidgetManager.LoadCSS(AssetManager.GetAssetTextFile("ui.css"));
+            WidgetManager.LoadUI(AssetManager.GetAssetTextFile("ui.xml"));
+            //WidgetManager.LoadCSS(AssetManager.GetAssetTextFile("ui.css"));
 
             using (var cssSave = File.CreateText("ui.css"))
                 WidgetManager.SaveUI(cssSave);

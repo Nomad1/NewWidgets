@@ -105,7 +105,7 @@ textedit {
     height: 45px;
     color: #aaaaaa;
     overflow: hidden;
-    clip: 1px 2px 3px 2px;
+    --clip-margin: 1px 2px 3px 2px;
     --cursor-color: #ffffff;
     --text-padding: 6px 2px 6px 0px;
 }
@@ -243,12 +243,12 @@ checkbox image {
 
 .back_pattern {
     background-repeat: imagetiled;
-    --back-depth: backclipped;
+    --background-depth: backclipped;
     background-image: url("back_pattern");
     background-size: 100%;
     background-color-opacity: 4%;
     overflow: hidden;
-    clip: 2px 2px 2px 2px;
+    --clip-margin: 2px 2px 2px 2px;
 }
 
 .text_button {
