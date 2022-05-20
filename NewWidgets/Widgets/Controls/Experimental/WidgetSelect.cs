@@ -12,7 +12,7 @@ namespace NewWidgets.Widgets
     {
         public new const string ElementType = "select";
         public const string LeftButtonId = "select_left";
-        public const string RightButtonId = "select_left";
+        public const string RightButtonId = "select_right";
         public const string LabelId = "select_label";
         //
 

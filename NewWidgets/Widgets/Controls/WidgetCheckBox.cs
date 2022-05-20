@@ -153,6 +153,8 @@ namespace NewWidgets.Widgets
                 else if (!Hovered)
                 {
                     Hovered = true;
+                    if (m_image != null)
+                        m_image.Hovered = true;
                     WindowController.Instance.OnTouch += UnHoverTouch;
                 }
             }
@@ -165,6 +167,8 @@ namespace NewWidgets.Widgets
             if (Hovered && !HitTest(x, y))
             {
                 Hovered = false;
+                if (m_image != null)
+                    m_image.Hovered = false;
                 WindowController.Instance.OnTouch -= UnHoverTouch;
             }
             return false;

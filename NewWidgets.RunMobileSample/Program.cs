@@ -1,5 +1,7 @@
 ﻿using System.IO;
+using System.Numerics;
 using NewWidgets.Sample;
+using NewWidgets.Utility;
 using NewWidgets.Widgets;
 using RunMobile;
 using RunMobile.Graphics;
@@ -66,16 +68,65 @@ namespace NewWidgets.RunMobileSample
             SpriteManager.Instance.LoadSpriteAtlas("ui"); // loads ui.bin with defulat ui atlas
             SpriteManager.Instance.LoadSpriteAtlas("font5"); // loads font5.bin with font MSDF atlas
             WidgetManager.Init(0.5f); // 0.5 is font scale
-            WidgetManager.LoadUI(AssetManager.GetAssetTextFile("ui.xml"));
-            //WidgetManager.LoadCSS(AssetManager.GetAssetTextFile("ui.css"));
+            WidgetManager.OnTooltip += TextTooltip;
+
+#if! CONVERT_XML
+            WidgetManager.LoadXML(AssetManager.GetAssetTextFile("ui.xml"));
 
             using (var cssSave = File.CreateText("ui.css"))
-                WidgetManager.SaveUI(cssSave);
-
+                WidgetManager.SaveCSS(cssSave);
+#else
+            WidgetManager.LoadCSS(AssetManager.GetAssetTextFile("ui.css"));
+#endif
             // Here we're creating main window and it's added to the Game Controller
             m_window = new TestWindow();
             GameController.AddWindow(m_window);
         }
+
+        public static bool TextTooltip(Widget sender, string text, Vector2 position)
+        {
+            if ((sender != null && (!sender.Visible || sender.Opacity <= 0)) || string.IsNullOrWhiteSpace(text))
+            {
+                WidgetTooltip.Hide();
+                return false;
+            }
+
+            RectangleF region;
+
+            if (sender == null)
+                region = new RectangleF(position.X, position.Y, 32, 32);
+            else
+                region = sender.ScreenRect;
+
+
+            if (WidgetTooltip.CurrentTooltip != null && text != null && WidgetTooltip.CurrentTooltip.Tag == (object)text)
+            {
+                WidgetTooltip.CurrentTooltip.UpdatePosition(position);
+                WidgetTooltip.CurrentTooltip.Region = region;
+                return true;
+            }
+
+            WidgetTooltip.Hide();
+
+            WidgetTooltip tooltip = new WidgetTooltip();
+            tooltip.Tag = text;
+
+            Margin padding = tooltip.GetProperty("padding", new Margin(0));
+            WidgetLabel body = new WidgetLabel(text);
+            body.UpdateLayout();
+            tooltip.AddChild(body);
+
+            body.Position = padding.TopLeft;
+            body.Update();
+
+            tooltip.Size = body.Size + new Vector2(padding.Width, padding.Height);
+            tooltip.Shift = new Vector2(20, 20); // cursor size?
+
+            WidgetTooltip.Show(tooltip, position, region);
+
+            return true;
+        }
+
 
         protected override void OnUpdateFrame(OpenTK.FrameEventArgs e)
         {

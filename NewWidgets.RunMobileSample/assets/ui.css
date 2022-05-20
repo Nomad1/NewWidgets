@@ -86,7 +86,6 @@ label {
     width: 100px;
     height: 35px;
     overflow: visible;
-    --text-padding: 4px 2px 4px 2px;
 }
 
 text {
@@ -115,7 +114,7 @@ textedit:focus {
     color: #ffffff;
 }
 
-textedit:hover:focus {
+textedit:focus:hover {
     background-color: #ffee88;
 }
 
@@ -168,7 +167,7 @@ context_menu_item:hover {
     color: #ffffff;
 }
 
-tooltip {
+.tooltip {
     background-repeat: nineimage;
     background-image: url("panel_9");
     background-size: 50%;
@@ -200,7 +199,7 @@ button:disabled {
     color: #808080;
 }
 
-button:hover:disabled {
+button:disabled:hover {
     background-image: url("button_white_hovered_3");
     color: #aaaaaa;
     background-color-opacity: 50%;
@@ -225,7 +224,7 @@ checkbox:hover {
     color: #ffffff;
 }
 
-checkbox:hover:focus {
+checkbox:focus:hover {
     background-image: url("checkbox_back_hovered");
     color: #cceeff;
 }
@@ -236,7 +235,12 @@ checkbox:disabled {
     color: #888888;
 }
 
-checkbox image {
+checkbox #checkbox_image {
+    image: url("check_icon");
+    --image-color: #000032;
+}
+
+checkbox #checkbox_image:hover {
     image: url("check_icon");
     --image-color: #ffffff;
 }
@@ -253,6 +257,17 @@ checkbox image {
 
 .text_button {
     background-repeat: none;
+    font-family: default;
+    width: 300px;
+    height: 20px;
+    font-size: 0.6em;
+    color: #cceeff;
+    --text-padding: 4px 2px 4px 2px;
+}
+
+.text_button:hover {
+    background-repeat: none;
+    color: #ffffff;
 }
 
 .image_button {

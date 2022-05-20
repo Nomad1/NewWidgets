@@ -146,7 +146,7 @@ namespace NewWidgets.Sample
             panel.AddChild(logoImage);
 
 
-            WidgetTextField textTextField = new WidgetTextField(WidgetManager.GetStyle("default_textedit"));
+            WidgetTextField textTextField = new WidgetTextField();// WidgetManager.GetStyle("default_textedit"));
             textTextField.Size = new Vector2(500, 225);
             textTextField.Position = new Vector2(50, 520);
             textTextField.FontSize = WidgetManager.FontScale * 1.25f;

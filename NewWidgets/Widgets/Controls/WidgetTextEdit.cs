@@ -498,6 +498,8 @@ namespace NewWidgets.Widgets
             if (!press && !unpress && !Hovered)
             {
                 Hovered = true;
+                if (m_label != null)
+                    m_label.Hovered = true;
                 WindowController.Instance.OnTouch += UnHoverTouch;
             }
             return true;
@@ -508,6 +510,8 @@ namespace NewWidgets.Widgets
             if (Hovered && !HitTest(x, y))
             {
                 Hovered = false;
+                if (m_label != null)
+                    m_label.Hovered = false;
                 WindowController.Instance.OnTouch -= UnHoverTouch;
             }
             return false;

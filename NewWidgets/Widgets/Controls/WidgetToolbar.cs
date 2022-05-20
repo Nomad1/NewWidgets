@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Numerics;
 using NewWidgets.UI;
-using NewWidgets.UI.Styles;
 
 namespace NewWidgets.Widgets
 {

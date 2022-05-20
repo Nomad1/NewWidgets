@@ -11,9 +11,9 @@ namespace NewWidgets.Widgets
     {
         public new const string ElementType = "slider";
 
-        private const string TrackerId = "slider_track";
-        private const string LabelId = "slider_label";
-        private const string LineId = "slider_line";
+        public const string TrackerId = "slider_track";
+        public const string LabelId = "slider_label";
+        public const string LineId = "slider_line";
 
         // TODO: make configurable
         private static readonly float s_height = 10f;

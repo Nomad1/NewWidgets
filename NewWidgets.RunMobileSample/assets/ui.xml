@@ -65,42 +65,45 @@
     <clip_margin>1;2;3;2</clip_margin>
     <cursor_color>0xffffff</cursor_color>
     <text_padding>6;2;6;0</text_padding>
+    <selected_style>default_textedit_selected</selected_style>
+    <hovered_style>default_textedit_hovered</hovered_style>
   </style>
     
-  <style name="default_textedit:focus" _parent="default_textedit">
+  <style name="default_textedit_selected" parent="default_textedit">
     <back_image>panel_white_normal_9</back_image>
     <text_color>#ffffff</text_color>
+    <hovered_style>default_textedit_selected_hovered</hovered_style>
   </style>
 
-  <style name="default_textedit:hover:focus" _parent="default_textedit:focus">
+  <style name="default_textedit_selected_hovered" parent="default_textedit_selected">
     <back_color>#ffee88</back_color>
   </style>
     
-  <style name="default_textedit:hover" _parent="default_textedit">
+  <style name="default_textedit_hovered" parent="default_textedit">
     <back_color>#ffee88</back_color>
   </style>
 
   <!-- ScrollView -->
 
-  <style name="#scrollview_hscroll">
+  <style name="scroll_horizontal">
     <back_style>NineImage</back_style>
     <back_image>scroll_horizontal</back_image>
     <back_scale>1.0</back_scale>
   </style>
 
-  <style name="#scrollview_htrack">
+  <style name="scroll_indicator_horizontal">
     <back_style>NineImage</back_style>
     <back_image>scroll_indicator_horizontal</back_image>
     <back_scale>1.0</back_scale>
   </style>
 
-  <style name="#scrollview_vscroll">
+  <style name="scroll_vertical">
     <back_style>NineImage</back_style>
     <back_image>scroll_vertical</back_image>
     <back_scale>1.0</back_scale>
   </style>
 
-  <style name="#scrollview_vtrack">
+  <style name="scroll_indicator_vertical">
     <back_style>NineImage</back_style>
     <back_image>scroll_indicator_vertical</back_image>
     <back_scale>1.0</back_scale>
@@ -113,6 +116,7 @@
     <back_image>panel_9</back_image>
     <back_scale>1.0</back_scale>
     <padding>4;4;4;4</padding>
+    <item_style>default_context_menu_item</item_style>
   </style>
 
   <style name="default_context_menu_item" class="panel">
@@ -121,15 +125,16 @@
     <font_size>0.5</font_size>
     <text_color>0xcceeff</text_color>
     <padding>4;2;4;2</padding>
+    <hovered_style>default_context_menu_item_hovered</hovered_style>
   </style>
 
-  <style name="default_context_menu_item:hover" _parent="default_context_menu_item">
+  <style name="default_context_menu_item_hovered" parent="default_context_menu_item">
     <back_style>None</back_style>
     <back_scale>0.5</back_scale>
     <text_color>#ffffff</text_color>
   </style>
 
-  <style name="default_tooltip" class="panel">
+  <style name="default_tooltip">
     <back_style>NineImage</back_style>
     <back_image>panel_9</back_image>
     <back_scale>0.5</back_scale>
@@ -143,6 +148,8 @@
     <back_style>ThreeImage</back_style>
     <back_image>button_white_normal_3</back_image>
     <back_scale>1.0</back_scale>
+    <hovered_style>default_button_hovered</hovered_style>
+    <disabled_style>default_button_disabled</disabled_style>
     <text_padding>0;0;0;6</text_padding>
     <size>120;40</size>
         
@@ -151,26 +158,20 @@
     <text_color>0xffffff</text_color>
   </style>
 
-  <style name="default_button label">
-    <font>default</font>
-    <font_size>0.6</font_size>
-    <text_color>0xcceeff</text_color>
-  </style>
-
-
-  <style name="default_button:hover" _parent="default_button">
+  <style name="default_button_hovered" parent="default_button">
     <back_image>button_white_hovered_3</back_image>
     <text_color>0xffffff</text_color>
   </style>
 
-  <style name="default_button:disabled" _parent="default_button">
+  <style name="default_button_disabled" parent="default_button">
     <back_image>button_white_normal_3</back_image>
     <back_opacity>0.5</back_opacity>
     <back_color>0xaaaaaa</back_color>
     <text_color>0x808080</text_color>
+    <hovered_style>default_button_disabled_hovered</hovered_style>
   </style>
   
- <style name="default_button:hover:disabled" _parent="default_button">
+ <style name="default_button_disabled_hovered" parent="default_button">
     <back_image>button_white_hovered_3</back_image>
     <text_color>0xaaaaaa</text_color>
     <back_opacity>0.5</back_opacity>
@@ -181,36 +182,44 @@
     <back_style>ImageFit</back_style>
     <back_image>checkbox_back_normal</back_image>
     <size>40;40</size>
+    <selected_style>default_checkbox_selected</selected_style>
+    <hovered_style>default_checkbox_hovered</hovered_style>
+    <disabled_style>default_checkbox_disabled</disabled_style>
     <text_color>#cceeff</text_color>
+    <button_image_style>default_checkbox_image</button_image_style>
   </style>
     
-  <style name="default_checkbox:focus" _parent="default_checkbox">
+  <style name="default_checkbox_selected" parent="default_checkbox">
     <back_image>checkbox_back_normal</back_image>
     <text_color>#ffffff</text_color>
+    <hovered_style>default_checkbox_selected_hovered</hovered_style>
   </style>
     
-  <style name="default_checkbox:hover" _parent="default_checkbox">
+  <style name="default_checkbox_hovered" parent="default_checkbox">
     <back_image>checkbox_back_hovered</back_image>
     <text_color>#ffffff</text_color>
   </style>
     
- <style name="default_checkbox:hover:focus" _parent="default_checkbox">
+ <style name="default_checkbox_selected_hovered" parent="default_checkbox">
     <back_image>checkbox_back_hovered</back_image>
     <text_color>#cceeff</text_color>
   </style>
 
-  <style name="default_checkbox:disabled" _parent="default_checkbox">
+  <style name="default_checkbox_disabled" parent="default_checkbox">
     <back_image>checkbox_back_hovered</back_image>
     <image_color>#888888</image_color>
     <text_color>#888888</text_color>
   </style>
     
-  <style name="default_checkbox image">
+  <style name="default_checkbox_image">
     <image>check_icon</image>
     <image_color>#000032</image_color>
+    <hovered_style>default_checkbox_image_hovered</hovered_style>
+    <selected_style>default_checkbox_image</selected_style>
+    <selected_hovered_style>default_checkbox_image_hovered</selected_hovered_style>
   </style>
     
-  <style name="default_checkbox:hover image">
+  <style name="default_checkbox_image_hovered">
     <image>check_icon</image>
     <image_color>#ffffff</image_color>
   </style>
@@ -230,32 +239,33 @@
 
   <style name="text_button" class="button">
     <back_style>None</back_style>
-  </style>
-
-   <style name="text_button label">
     <font>default</font>
+    <size>300;20</size>
     <font_size>0.6</font_size>
     <text_color>0xcceeff</text_color>
     <text_padding>4;2;4;2</text_padding>
+    <hovered_style>text_button_hovered</hovered_style>
   </style>
 
-  <style name="text_button:hover label" _parent="default_button_hovered">
+  <style name="text_button_hovered" parent="default_button_hovered">
+    <back_style>None</back_style>
     <text_color>#ffffff</text_color>
   </style>
 
-  <style name="image_button" _parent="default_button">
+  <style name="image_button" parent="default_button">
     <back_style>None</back_style>
     <image_padding>6</image_padding>
     <size>64;64</size>
+    <hovered_style>image_button_hovered</hovered_style>
   </style>
 
-  <style name="image_button:hover" _parent="image_button">
+  <style name="image_button_hovered" parent="image_button">
     <back_style>NineImage</back_style>
     <back_image>panel_white_hovered_9</back_image>
     <back_scale>0.5</back_scale>
   </style>
 
-  <style name="dialog_window">
+  <style name="dialog_window" class="window">
     <back_style>NineImage</back_style>
     <back_image>window_dialog_9</back_image>
     <back_scale>1.0</back_scale>

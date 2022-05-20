@@ -170,15 +170,23 @@ namespace NewWidgets.Widgets
             return style;
         }
 
+        public static void SaveCSS(System.IO.TextWriter outputStream)
+        {
+            s_styleCollection.Dump(outputStream);
+        }
 
-        #region XML style loading
+
+        #region XML style for backwards compatibility
+
+        private static readonly IDictionary<string, string> s_lookForwardStyles = new Dictionary<string, string>();
+        private static readonly IDictionary<string, string> s_defaultStyles = new Dictionary<string, string>();
 
         /// <summary>
         /// Loads ui data from a XML string
         /// </summary>
         /// <param name="uiData"></param>
         /// <exception cref="WidgetException"></exception>
-        public static void LoadUI(string uiData)
+        public static void LoadXML(string uiData)
         {
             try
             {
@@ -194,16 +202,16 @@ namespace NewWidgets.Widgets
                             switch (node.Name)
                             {
                                 case "font":
-                                    RegisterFont(node);
+                                    RegisterXmlFont(node);
                                     break;
                                 case "nine":
-                                    RegisterNinePatch(node);
+                                    RegisterXmlNinePatch(node);
                                     break;
                                 case "three":
-                                    RegisterThreePatch(node);
+                                    RegisterXmlThreePatch(node);
                                     break;
                                 case "style":
-                                    RegisterStyle(node);
+                                    RegisterXmlStyle(node);
                                     break;
                             }
                         }
@@ -218,12 +226,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public static void SaveUI(System.IO.TextWriter outputStream)
-        {
-            s_styleCollection.Dump(outputStream);
-        }
-
-        private static void RegisterFont(XmlNode node)
+        private static void RegisterXmlFont(XmlNode node)
         {
             string name = node.Attributes.GetNamedItem("name").Value;
             string resource = node.Attributes.GetNamedItem("resource").Value;
@@ -259,7 +262,7 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered font {0}, resource {1}, spacing {2}", name, resource, spacing);
         }
 
-        private static void RegisterNinePatch(XmlNode node)
+        private static void RegisterXmlNinePatch(XmlNode node)
         {
             string name = node.Attributes.GetNamedItem("name").Value;
 
@@ -274,7 +277,7 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered nine patch {0}", name);
         }
 
-        private static void RegisterThreePatch(XmlNode node)
+        private static void RegisterXmlThreePatch(XmlNode node)
         {
             string name = node.Attributes.GetNamedItem("name").Value;
 
@@ -289,7 +292,7 @@ namespace NewWidgets.Widgets
             WindowController.Instance.LogMessage("Registered three patch {0}", name);
         }
 
-        private static void RegisterStyle(XmlNode node)
+        private static void RegisterXmlStyle(XmlNode node)
         {
             string name = GetAttribute(node, "name");
 
@@ -298,23 +301,105 @@ namespace NewWidgets.Widgets
 
             string parent = GetAttribute(node, "parent");
 
-            IDictionary<WidgetParameterIndex, object> parameters = InitStyle(node);
+            if (s_lookForwardStyles.ContainsKey(name))
+                name = s_lookForwardStyles[name];
+            else
+            {
+                if (name.StartsWith("default_"))
+                {
+                    string subName = name.Substring(8);
+                    s_defaultStyles[name] = subName;
+                    name = subName;
+                }
+                else
+                {
+                    switch (name)
+                    {
+                       /* case "tooltip":
+                        case "checkbox":
+                        case "button":
+                        case "image":
+                        case "label":
+                        //case WidgetText.ElementType:
+                        case WidgetLine.ElementType:
+                        case WidgetPanel.ElementType:
 
-            name = name.StartsWith("default_") ? name.Substring(8) : string.IsNullOrEmpty(parent) ? char.IsLetter(name[0]) ? ("." + name) : name : ("." + parent + "." + name);
+                        case "context_menu":
+                        case "scrollview":
+
+                        case WidgetTextEdit.ElementType:
+                        case WidgetWindow.ElementType:
+                        case WidgetList.ElementType:
+
+                        case WidgetProgressLine.ElementType:
+                        case WidgetProgressLine.LabelId:
+                        case WidgetProgressLine.LineId:
+
+                        case WidgetSelect.ElementType:
+                        case WidgetSelect.LeftButtonId:
+                        case WidgetSelect.RightButtonId:
+                        case WidgetSelect.LabelId:
+
+                        case WidgetTable.ElementType:
+                        //case "tablerow": // tr?
+                        //case "row_header": // th?
+                        //case "row_odd":
+                        //case "row_even":
+
+                        case WidgetSlider.ElementType:
+                        case WidgetSlider.TrackerId:
+                        case WidgetSlider.LabelId:
+                        case WidgetSlider.LineId:
+                            s_defaultStyles[name] = name;
+                            break;*/
+                        case "scroll_horizontal":
+                            name = "#scrollview_hscroll";
+                            break;
+                        case "scroll_indicator_horizontal":
+                            name = "#scrollview_htrack";
+                            break;
+                        case "scroll_vertical":
+                            name = "#scrollview_vscroll";
+                            break;
+                        case "scroll_indicator_vertical":
+                            name = "#scrollview_vtrack";
+                            break;
+                        default: // class name, start with .
+                            name = string.IsNullOrEmpty(parent) || s_defaultStyles.ContainsKey(parent) ? char.IsLetter(name[0]) ? ("." + name) : name : ("." + parent + "." + name);
+                            break;
+                    }
+                }
+            }
+
+            IDictionary<WidgetParameterIndex, object> parameters = InitXmlStyle(node, name);
 
             s_styleCollection.AddStyle(name, new StyleSheetData(parameters));
 
             WindowController.Instance.LogMessage("Registered style {0}", name);
         }
 
-        #endregion
-
-        private static IDictionary<WidgetParameterIndex, object> InitStyle(XmlNode node)
+        private static IDictionary<WidgetParameterIndex, object> InitXmlStyle(XmlNode node, string elementName)
         {
             Dictionary<WidgetParameterIndex, object> style = new Dictionary<WidgetParameterIndex, object>();
 
             foreach (XmlNode element in node.ChildNodes)
             {
+                switch (element.Name)
+                {
+                    case "selected_style":
+                        s_lookForwardStyles[element.InnerText] = elementName + ":focus";
+                        continue;
+                    case "hovered_style":
+                        s_lookForwardStyles[element.InnerText] = elementName + ":hover";
+                        continue;
+                    case "disabled_style":
+                        s_lookForwardStyles[element.InnerText] = elementName + ":disabled";
+                        continue;
+                    case "button_image_style":
+                        s_lookForwardStyles[element.InnerText] = elementName + " #checkbox_image";
+                        continue;
+                }
+
                 try
                 {
                     string value = element.InnerText;
@@ -344,11 +429,13 @@ namespace NewWidgets.Widgets
             return style;
         }
 
-        public static string GetAttribute(XmlNode node, string name)
+        private static string GetAttribute(XmlNode node, string name)
         {
             var attribute = node.Attributes.GetNamedItem(name);
 
             return attribute == null ? null : attribute.Value;
         }
+
+        #endregion
     }
 }
