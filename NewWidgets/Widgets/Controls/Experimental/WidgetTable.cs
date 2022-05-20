@@ -160,7 +160,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style"></param>
         public WidgetTable(WidgetStyle style = default(WidgetStyle))
-            : base(ElementType, style)
+            : this(ElementType, style)
         {
         }
 
@@ -623,9 +623,21 @@ namespace NewWidgets.Widgets
 
         #region Rows
 
+        private class WidgetTableCell : WidgetPanel
+        {
+            public new const string ElementType = "td";
+            public const string HeaderElementType = "th";
+
+            public WidgetTableCell(bool header = false)
+                : base(header ? HeaderElementType : ElementType, default(WidgetStyle))
+            {
+
+            }
+        }
+
         private class WidgetTableRow : WidgetPanel
         {
-            public new const string ElementType = "tablerow";
+            public new const string ElementType = "tr";
             //
             private readonly uint m_id;
             private readonly ITableDataReader m_reader;
@@ -779,7 +791,7 @@ namespace NewWidgets.Widgets
 
                 if (column.Custom && value is Widget)
                 {
-                    WidgetPanel panel = new WidgetPanel();
+                    WidgetPanel panel = new WidgetTableCell();
                     panel.Size = new Vector2(column.Width, height);
                     ((Widget)value).Size = panel.Size;
                     panel.AddChild((Widget)value);

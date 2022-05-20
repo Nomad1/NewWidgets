@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
@@ -136,6 +137,12 @@ namespace NewWidgets.Widgets
            : base(elementType, style)
         {
             Text = text;
+        }
+
+        [Obsolete]
+        public void Relayout()
+        {
+            UpdateLayout();
         }
 
         public override void UpdateLayout()

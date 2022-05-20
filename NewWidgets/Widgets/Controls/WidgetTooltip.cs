@@ -1,7 +1,6 @@
 ﻿using System.Numerics;
 
 using NewWidgets.UI;
-using NewWidgets.UI.Styles;
 
 #if !RUNMOBILE
 using System.Drawing;

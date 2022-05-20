@@ -50,6 +50,12 @@ namespace NewWidgets.Widgets
     public abstract class Widget : WindowObject
     {
         public const string ElementType = "*";
+
+        /// <summary>
+        /// This is pretty much obsolete but was widely used in previous versions to specify a style
+        /// without any decorations. Now we have to drag along .none class to maintain at least a partial compat
+        /// </summary>
+        public static readonly WidgetStyle DefaultStyle = new WidgetStyle(new string[] { "none" }, null);
         //
 
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
@@ -193,7 +199,21 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.Overflow, value); } // clipping is applied on each redraw so we don't need to call Invalidate of any kind
         }
 
+        /// <summary>
+        /// Wrapper for Overflow
+        /// </summary>
+        [Obsolete]
         public bool ClipContent
+        {
+            get { return Overflow == WidgetOverflow.Hidden; }
+            set { Overflow = value ? WidgetOverflow.Hidden : WidgetOverflow.Visible; } // clipping is applied on each redraw so we don't need to call Invalidate of any kind
+        }
+
+        /// <summary>
+        /// Wrapper for Overflow
+        /// </summary>
+        [Obsolete]
+        public bool ClipContents
         {
             get { return Overflow == WidgetOverflow.Hidden; }
             set { Overflow = value ? WidgetOverflow.Hidden : WidgetOverflow.Visible; } // clipping is applied on each redraw so we don't need to call Invalidate of any kind

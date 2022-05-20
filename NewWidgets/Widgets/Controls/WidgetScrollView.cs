@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Numerics;
 
 using NewWidgets.UI;
-using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
 using RunMobile.Utility;
@@ -16,6 +15,18 @@ namespace NewWidgets.Widgets
     public class WidgetScrollView : WidgetBackground, IWindowContainer
     {
         public new const string ElementType = "scrollview";
+
+        private class WidgetScrollContent : WidgetPanel
+        {
+            public new const string ElementType = "scrollviewcontent";
+
+            public WidgetScrollContent(WidgetStyle style = default(WidgetStyle))
+                : base(ElementType, style)
+            {
+            }
+        }
+
+
         //
         public const string HorizontalScrollId = "scrollview_hscroll";
         public const string HorizontalTrackerId = "scrollview_htrack";
@@ -37,7 +48,7 @@ namespace NewWidgets.Widgets
         private WidgetScrollType m_horizontalScroll;
         private WidgetScrollType m_verticalScroll;
 
-        private readonly WidgetPanel m_contentView;
+        private readonly WidgetScrollContent m_contentView;
         private readonly Widget m_horizontalScrollBar;
         private readonly Widget m_verticalScrollBar;
         private readonly Widget m_horizontalScrollBarIndicator;
@@ -124,7 +135,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style"></param>
         public WidgetScrollView(WidgetStyle style = default(WidgetStyle))
-            : base(ElementType, style)
+            : this(ElementType, style)
         {
         }
 
@@ -135,7 +146,7 @@ namespace NewWidgets.Widgets
         protected WidgetScrollView(string elementType, WidgetStyle style)
             : base(elementType, style)
         {
-            m_contentView = new WidgetPanel();
+            m_contentView = new WidgetScrollContent();
             m_contentView.Parent = this;
             m_horizontalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;
             m_verticalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;

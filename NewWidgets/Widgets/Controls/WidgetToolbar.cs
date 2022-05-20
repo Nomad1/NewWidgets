@@ -59,13 +59,13 @@ namespace NewWidgets.Widgets
             m_vertical = vertical;
         }
 
-        public void AddChild(WidgetButton obj)
+        public void AddChild(Widget obj)
         {
             m_buttons.AddChild(obj);
             InvalidateLayout();
         }
 
-        public void RemoveChild(WidgetButton obj)
+        public void RemoveChild(Widget obj)
         {
             if (m_buttons.RemoveChild(obj)) // we're doing RemoveChild instead of Remove to make sure buttons are refreshed
                 InvalidateLayout();
@@ -180,20 +180,24 @@ namespace NewWidgets.Widgets
     /// <summary>
     /// Helper class for toolbar separators
     /// </summary>
-    public class WidgetToolbarSeparator : WidgetButton
+    public class WidgetToolbarSeparator : WidgetBackground
     {
-        public new const string ElementType = "toolbarvseparator";
-        public const string HorizontalElementType = "toolbarhseparator";
+        public new const string ElementType = "toolbarsep";
+        public const string HorizontalElementType = "toolbarhsep";
+
+        public WidgetToolbarSeparator(bool vertical = true)
+            : this(default(WidgetStyle), vertical)
+        {
+        }
 
         /// <summary>
         /// Creates a toolbar separator with element type set not to button but to specific string
         /// </summary>
         /// <param name="style"></param>
         /// <param name="vertical"></param>
-        public WidgetToolbarSeparator(WidgetStyle style = default(WidgetStyle), bool vertical = true)
-            : base(vertical ? ElementType : HorizontalElementType, style, string.Empty)
+        public WidgetToolbarSeparator(WidgetStyle style, bool vertical = true)
+            : base(vertical ? ElementType : HorizontalElementType, style)
         {
-            Enabled = false;
         }
     }
 }
