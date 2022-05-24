@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
@@ -15,7 +14,8 @@ namespace NewWidgets.Widgets
 
         HorizontalCenter = Left | Right,
         VerticalCenter = Top | Bottom,
-        NotTopLeft = Right | Bottom
+        NotTopLeft = Right | Bottom,
+        Center = Left | Right | Top | Bottom
     }
 
     public enum WidgetBackgroundStyle

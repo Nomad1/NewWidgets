@@ -160,7 +160,7 @@ namespace NewWidgets.Widgets
         {
             m_items = items;
 
-            m_leftButton = new WidgetButton(new WidgetStyle(LeftButtonId));
+            m_leftButton = new WidgetButton(new WidgetStyle(LeftButtonId), "<");
             AddChild(m_leftButton);
             m_leftButton.OnPress += (obj) => HandleChange(-1);
 
@@ -169,7 +169,7 @@ namespace NewWidgets.Widgets
             AddChild(m_label);
             m_label.UpdateLayout();
 
-            m_rightButton = new WidgetButton(new WidgetStyle(RightButtonId));
+            m_rightButton = new WidgetButton(new WidgetStyle(RightButtonId), ">");
             AddChild(m_rightButton);
             m_rightButton.OnPress += (obj) => HandleChange(+1);
 
