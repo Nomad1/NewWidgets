@@ -101,7 +101,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetBackgroundStyle imageStyle, string image)
+        public WidgetImage(WidgetBackgroundStyle imageStyle, string image = "")
             : this(ElementType, default(WidgetStyle), string.IsNullOrEmpty(image)? 0 : imageStyle, image)
         {
            

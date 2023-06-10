@@ -181,6 +181,12 @@ namespace NewWidgets.Widgets
         private static readonly IDictionary<string, string> s_lookForwardStyles = new Dictionary<string, string>();
         private static readonly IDictionary<string, string> s_defaultStyles = new Dictionary<string, string>();
 
+        [Obsolete]
+        public static void LoadUI(string uiData)
+        {
+            LoadXML(uiData);
+        }
+
         /// <summary>
         /// Loads ui data from a XML string
         /// </summary>
