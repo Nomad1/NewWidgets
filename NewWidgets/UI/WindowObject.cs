@@ -13,7 +13,7 @@ namespace NewWidgets.UI
     /// <summary>
     /// Basic class for UI elements
     /// </summary>
-    public abstract class WindowObject
+    public /*abstract*/ class WindowObject
     {
         private readonly Transform m_transform;
 
@@ -269,7 +269,7 @@ namespace NewWidgets.UI
             }
         }
 
-        protected WindowObject(WindowObject parent, Transform transform = null)
+        public WindowObject(WindowObject parent, Transform transform = null)
         {
             m_parent = parent;
             m_transform = transform ?? new Transform();

@@ -220,7 +220,7 @@ namespace NewWidgets.UI
             return false;
         }
 
-        public void AddChild(WindowObject child)
+        public virtual void AddChild(WindowObject child)
         {
             var parentContainer = child.Parent as IWindowContainer;
             if (parentContainer != null && parentContainer != this)

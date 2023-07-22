@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Numerics;
+using System.Collections.Generic;
 
 namespace NewWidgets.UI
 {
@@ -88,7 +88,13 @@ namespace NewWidgets.UI
         /// List of currently displayed windows
         /// </summary>
         /// <value>The windows.</value>
-        public abstract IList<Window> Windows { get; }
+        public abstract
+#if MODERN || USE_NUMERICS
+            IReadOnlyList<Window>
+#else
+            IList<Window>
+#endif
+            Windows { get; }
 
         /// <summary>
         /// Adds new window to Windows collection
@@ -116,8 +122,21 @@ namespace NewWidgets.UI
         /// </summary>
         /// <returns>The sprite.</returns>
         /// <param name="id">Identifier.</param>
-        /// <param name="position">Position.</param>
         public abstract ISprite CreateSprite(string id);
+
+
+        /// <summary>
+        /// Construct sprite by hashed id string and with default UI material and specified position
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="position"></param>
+        /// <returns></returns>
+        public ISprite CreateSprite(string id, Vector2 position)
+        {
+            ISprite result = CreateSprite(id);
+            result.Transform.FlatPosition = position;
+            return result;
+        }
 
         /// <summary>
         /// Sets the screen clip rectangle.
@@ -165,6 +184,12 @@ namespace NewWidgets.UI
         /// </summary>
         /// <param name="id">Sound id</param>
         public abstract void PlaySound(string id);
+
+        /// <summary>
+        /// Stops the sound by it's name
+        /// </summary>
+        /// <param name="id">Sound id</param>
+        public abstract void StopSound(string id);
     }
 }
 

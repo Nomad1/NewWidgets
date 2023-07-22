@@ -3,18 +3,18 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B9E44890-DC40-4C45-A457-035B20581E54}</ProjectGuid>
+    <ProjectGuid>{B9E55890-DC40-4C45-A457-035B20581E54}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>NewWidgets</RootNamespace>
     <AssemblyName>NewWidgets</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;RUNMOBILE</DefineConstants>
+    <DefineConstants>DEBUG;RUNMOBILE;MINI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -27,13 +27,13 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug.Numerics</OutputPath>
-    <DefineConstants>DEBUG;RUNMOBILE;USE_NUMERICS</DefineConstants>
+    <DefineConstants>DEBUG;RUNMOBILE;MINI</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <Prefer32Bit>false</Prefer32Bit>
     <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -56,7 +56,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Debug.Numerics' or '$(Configuration)' == 'Release.Numerics'">
     <Reference Include="System.Numerics" />
@@ -122,15 +122,15 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\..\RunMobile\RunMobile.Utility\RunMobile.Utility.csproj">
-      <Project>{029EA736-BCAA-40B3-B44B-52936740C349}</Project>
-      <Name>RunMobile.Utility</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Folder Include="Widgets\Controls\" />
     <Folder Include="Widgets\Controls\Experimental\" />
     <Folder Include="Styles\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RunMobile\RunMobile.Mini\RunMobile.Mini.csproj">
+      <Project>{B6B1316F-CF08-42A1-A970-69B63EF21F75}</Project>
+      <Name>RunMobile.Mini</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

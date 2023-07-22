@@ -131,6 +131,7 @@ namespace NewWidgets.RunMobileSample
         protected override void OnUpdateFrame(OpenTK.FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
+            TextureManager.Instance.Update();
 
             // Pass FPS values to text label in the TestWindow class
             if (m_window != null)
