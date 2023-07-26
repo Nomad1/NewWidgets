@@ -247,7 +247,7 @@ namespace NewWidgets.Widgets
 
         public static Window GetTopmostWindow()
         {
-            return s_topLevelWindow ?? WindowController.Instance.Windows[WindowController.Instance.Windows.Count - 1];
+            return s_topLevelWindow ?? WindowController.Instance.Windows[WindowController.Instance.Windows.Length - 1];
         }
         
         public static void SetExclusive(Widget widget)

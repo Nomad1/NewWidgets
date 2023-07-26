@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using System.Collections.Generic;
 
 namespace NewWidgets.UI
 {
@@ -88,13 +87,7 @@ namespace NewWidgets.UI
         /// List of currently displayed windows
         /// </summary>
         /// <value>The windows.</value>
-        public abstract
-#if MODERN || USE_NUMERICS
-            IReadOnlyList<Window>
-#else
-            IList<Window>
-#endif
-            Windows { get; }
+        public abstract Window [] Windows { get; }
 
         /// <summary>
         /// Adds new window to Windows collection
