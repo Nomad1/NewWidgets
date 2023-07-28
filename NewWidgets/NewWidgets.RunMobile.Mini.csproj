@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -7,7 +7,8 @@
     <OutputType>Library</OutputType>
     <RootNamespace>NewWidgets</RootNamespace>
     <AssemblyName>NewWidgets</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TargetFrameworks>net471;netstandard2.1</TargetFrameworks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -20,20 +21,18 @@
     <ConsolePause>false</ConsolePause>
     <Prefer32Bit>false</Prefer32Bit>
     <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.Numerics|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug.Numerics</OutputPath>
-    <DefineConstants>DEBUG;RUNMOBILE;MINI</DefineConstants>
+    <DefineConstants>DEBUG;RUNMOBILE;MINI;USE_NUMERICS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <Prefer32Bit>false</Prefer32Bit>
     <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -42,21 +41,19 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <Prefer32Bit>false</Prefer32Bit>
-    <DefineConstants>RUNMOBILE</DefineConstants>
+    <DefineConstants>RUNMOBILE;MINI</DefineConstants>
     <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release.Numerics|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\Release.Numerics\</OutputPath>
-    <DefineConstants>RUNMOBILE</DefineConstants>
+    <DefineConstants>RUNMOBILE;MINI;USE_NUMERICS</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <ItemGroup Condition="'$(Configuration)' == 'Debug.Numerics' or '$(Configuration)' == 'Release.Numerics'">
     <Reference Include="System.Numerics" />
@@ -132,5 +129,4 @@
       <Name>RunMobile.Mini</Name>
     </ProjectReference>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
