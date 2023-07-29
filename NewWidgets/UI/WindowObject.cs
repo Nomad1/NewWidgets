@@ -22,7 +22,7 @@ namespace NewWidgets.UI
         private int m_zIndex;
         private int m_tempZIndex;
 
-        private int m_transformVersion;
+        private int m_transformVersion = -1;
         private RectangleF m_screenRect;
 
         private WindowObject m_parent;
@@ -319,8 +319,7 @@ namespace NewWidgets.UI
 
         public virtual void Draw()
         {
-            if (Removing || !Visible || !Enabled)
-                return;
+            
         }
 
         public virtual bool Touch(float x, float y, bool press, bool unpress, int pointer)
