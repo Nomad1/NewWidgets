@@ -247,9 +247,37 @@ namespace NewWidgets.Widgets
 
         public static Window GetTopmostWindow()
         {
-            return s_topLevelWindow ?? WindowController.Instance.Windows[WindowController.Instance.Windows.Length - 1];
+            if (s_topLevelWindow != null)
+                return s_topLevelWindow;
+
+            var windows = WindowController.Instance.Windows;
+            if (windows == null || windows.Length == 0)
+                return null;
+
+            return windows[windows.Length - 1];
         }
-        
+
+        /// <summary>
+        /// Looks for the window of type T starting from the top-most window and going further down the Z axis
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static T GetWindow<T>() where T:Window
+        {
+            if (s_topLevelWindow != null && s_topLevelWindow is T)
+                return (T)s_topLevelWindow;
+
+            var windows = WindowController.Instance.Windows;
+            if (windows == null || windows.Length == 0)
+                return null;
+
+            for (int i = windows.Length - 1; i >= 0; i--)
+                if (windows[i] is T)
+                    return (T)windows[i];
+
+            return null;
+        }
+
         public static void SetExclusive(Widget widget)
         {
             s_exclusiveWidgets.AddLast(widget);

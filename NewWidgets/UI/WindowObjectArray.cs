@@ -122,7 +122,7 @@ namespace NewWidgets.UI
                     }
                     else
                     {
-                        if (obj.HasChanges)
+                        if (obj.HasChanges) 
                             hasChanges = true;
 
                         if (obj.ZIndex != node.Value.Key)
