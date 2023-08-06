@@ -148,6 +148,27 @@ namespace NewWidgets.Widgets
             }
         }
 
+        [Obsolete("This does nothing at the moment. Migrate to CSS stylesheet instead of using this proprerty!")]
+        public WidgetStyle RowStyle
+        {
+            get { return default(WidgetStyle); }
+            set { }
+        }
+
+        [Obsolete("This does nothing at the moment. Migrate to CSS stylesheet instead of using this proprerty!")]
+        public WidgetStyle AlternateRowStyle
+        {
+            get { return default(WidgetStyle); }
+            set { }
+        }
+
+        [Obsolete("This does nothing at the moment. Migrate to CSS stylesheet instead of using this proprerty!")]
+        public WidgetStyle HeaderRowStyle
+        {
+            get { return default(WidgetStyle); }
+            set { }
+        }
+
         protected bool Inited
         {
             get { return m_layout.Columns.Count > 0; }
@@ -194,6 +215,11 @@ namespace NewWidgets.Widgets
             InvalidateLayout();
 
             return column;
+        }
+
+        [Obsolete("Not used anymore!")]
+        public void UpdateColumn(TColumnIdentifier columnId, string header, string tooltip, int width)
+        {
         }
 
         public ColumnLayout GetColumn(TColumnIdentifier columnId)

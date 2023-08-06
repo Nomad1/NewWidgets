@@ -78,7 +78,7 @@ namespace NewWidgets.Widgets
         {
         }
 
-        protected WidgetCheckBox(WidgetStyle style, bool isChecked = false)
+        public WidgetCheckBox(WidgetStyle style, bool isChecked = false)
             :this(ElementType, style, isChecked)
         {
         }
