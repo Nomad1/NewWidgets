@@ -168,7 +168,7 @@ namespace NewWidgets.Widgets
                 // if next style is the same as this one less on pseudo-class, we can think of it as a parent and do a one-time exception for data lookup
                 // otherwise we need to check if the property inheritance is Initial and then break
 
-                if (inherited || node == m_data.First || (node.Next != null && node.Next.Value.IsPseudoClassParent(node.Value)))
+                if (inherited || node == m_data.First || (node.Next != null && node.Next.Value.IsPseudoClassParent(node.Value)) || (node.Next != null && node.Next.Value.IsElementParent()))
                 {
                     node = node.Next;
                 }

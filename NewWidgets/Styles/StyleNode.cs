@@ -86,5 +86,14 @@ namespace NewWidgets.UI.Styles
 
             return false;
         }
+
+        /// <summary>
+        /// Checks if the current selector is parent of the element group (button, etc.)
+        /// </summary>
+        /// <returns></returns>
+        public bool IsElementParent()
+        {
+            return SelectorList.IsSimple && !string.IsNullOrEmpty(SelectorList.Selectors[0].Element) && (SelectorList.Selectors[0].Classes == null || SelectorList.Selectors[0].Classes.Length == 0);
+        }
     }
 }
