@@ -263,6 +263,15 @@ namespace NewWidgets.Widgets
             set { base.Parent = value; }
         }
 
+        /// <summary>
+        /// Windows Object that is parent to this control. Nomad: I believe this is kind of shit, but we still need
+        /// window based parents :(
+        /// </summary>
+        public WindowObject ParentObject
+        {
+            get { return base.Parent; }
+        }
+
         public bool NeedsLayout
         {
             get { return m_needsLayout; }

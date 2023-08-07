@@ -435,7 +435,9 @@ namespace NewWidgets.Utility
             string[] strings = value.Split(new[] { '|', ',', '+' });
 
             foreach (string str in strings)
-                result |= (int)Enum.Parse(enumType, str, true);
+            {
+                result |= (int)Enum.Parse(enumType, str.Replace('-', '_'), true);
+            }
 
             return (Enum)Enum.ToObject(enumType, result);
         }

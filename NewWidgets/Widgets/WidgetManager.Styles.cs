@@ -19,7 +19,9 @@ namespace NewWidgets.Widgets
         /// <param name="class">Name.</param>
         public static WidgetStyle GetStyle(string @class, bool notUsed = false)
         {
-            return new WidgetStyle(new string[] { @class }, string.Empty);
+            if (string.IsNullOrEmpty(@class))
+                return default(WidgetStyle);
+            return new WidgetStyle(@class.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries), string.Empty);
         }
 
         /// <summary>
@@ -46,7 +48,7 @@ namespace NewWidgets.Widgets
 
         public static void LoadCSS(string uiData)
         {
-            CSSParser.ParseCSS(uiData, s_styleCollection, (name, parameters) => InitCssData(name, parameters));
+            CSSParser.ParseCSS(uiData, s_styleCollection, InitCssData);
 
             /*ICollection<StyleNode> fonts = s_styleCollection.GetElementNodes(new StyleSelector("@font"));
 

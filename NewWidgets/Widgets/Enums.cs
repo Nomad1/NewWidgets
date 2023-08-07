@@ -24,6 +24,7 @@ namespace NewWidgets.Widgets
         /// No background at all
         /// </summary>
         None = 0,
+        No_Repeat = 0, // synonym
         /// <summary>
         /// Center and no stretch
         /// </summary>
