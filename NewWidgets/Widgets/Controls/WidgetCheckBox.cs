@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Numerics;
 using NewWidgets.UI;
-using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
+    /// <summary>
+    /// Checkbox class. Note, that it contains a WidgetImage with id #checkbox_image for the check mark
+    /// All the styles related to the image should be put to it's style. Check image is always zoomed to take the whole checkbox.
+    /// Nomad: there is remaints of ancient checkbox animation: check image is appearing from the below (Size.Y/4) and fading in.
+    /// Same goes for disappearing, whick movement to the bottom. It's not very customizable and could be changed in the future
+    /// </summary>
     public class WidgetCheckBox : WidgetBackground
     {
         public new const string ElementType = "checkbox";
@@ -36,7 +41,7 @@ namespace NewWidgets.Widgets
 
                 if (m_image != null)
                 {
-                    m_image.Position = value ? ImagePadding.TopLeft : (ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f));
+                    m_image.Position = value ? Vector2.Zero : new Vector2(0, Size.Y / 4.0f); // Size.Y/4 is needed for animation
                     m_image.Opacity = value ? 1.0f : 0.0f;
                 }
 
@@ -63,10 +68,12 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public Margin ImagePadding
+        /// <summary>
+        /// Direct access to the underlying WidgetImage
+        /// </summary>
+        protected WidgetImage InternalImage
         {
-            get { return GetProperty(WidgetParameterIndex.ButtonImagePadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); }
+            get { return m_image; }
         }
 
         /// <summary>
@@ -101,10 +108,7 @@ namespace NewWidgets.Widgets
         public override void UpdateLayout()
         {
             if (m_image != null)
-            {
-                m_image.Size = Size - ImagePadding.Size;
-                m_image.Position = ImagePadding.TopLeft;
-            }
+                m_image.Size = Size;
 
             base.UpdateLayout();
         }
@@ -197,14 +201,14 @@ namespace NewWidgets.Widgets
             if (Checked)
             {
                 m_image.Opacity = 0.0f;
-                m_image.Position = ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f);
-                m_image.Move(ImagePadding.TopLeft, animateTime, AnimateFinished);
+                m_image.Position = new Vector2(0, Size.Y / 4.0f);
+                m_image.Move(Vector2.Zero, animateTime, AnimateFinished);
                 m_image.FadeTo(1.0f, animateTime, null);
             } else
             {
                 m_image.Opacity = 1.0f;
-                m_image.Position = ImagePadding.TopLeft;
-                m_image.Move(ImagePadding.TopLeft + new Vector2(0, Size.Y / 4.0f), animateTime, AnimateFinished);
+                m_image.Position = Vector2.Zero;
+                m_image.Move(new Vector2(0, Size.Y / 4.0f), animateTime, AnimateFinished);
                 m_image.FadeTo(0.0f, animateTime, null);
             }
         }

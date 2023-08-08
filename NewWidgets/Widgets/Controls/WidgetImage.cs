@@ -38,8 +38,8 @@ namespace NewWidgets.Widgets
 
         public Margin ImagePadding
         {
-            get { return GetProperty(WidgetParameterIndex.ImagePadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.ImagePadding, value); InvalidateLayout(); }
+            get { return GetProperty(WidgetParameterIndex.Padding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.Padding, value); InvalidateLayout(); }
         }
 
         public WidgetBackgroundStyle ImageStyle
@@ -165,8 +165,8 @@ namespace NewWidgets.Widgets
                 m_imageObject = new ImageObject(this, textureSprite);
             }
 
-            Vector2 size = Size - ImagePadding.Size;
             Vector2 spriteSize = m_imageObject.Sprite.Size;
+            Vector2 size = Size.X <= 0 || Size.Y <= 0 ? spriteSize : (Size - ImagePadding.Size);
             Vector2 start = ImagePadding.TopLeft;
             Vector2 center = start + size / 2;
 

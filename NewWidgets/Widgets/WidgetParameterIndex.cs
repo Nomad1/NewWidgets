@@ -108,8 +108,8 @@ namespace NewWidgets.Widgets
         ImageAngle,
         [WidgetParameter("image_pivot", "--image-position", typeof(Vector2), UnitType.Percent)]
         ImagePivot,
-        [WidgetParameter("image_padding", "--image-padding", typeof(Margin), UnitType.Length)] // change to "padding"?
-        ImagePadding,
+        //[WidgetParameter("image_padding", "--image-padding", typeof(Margin), UnitType.Length)] // change to "padding"?
+        //ImagePadding,
         [WidgetParameter("image_color", "--image-color", typeof(uint), UnitType.Color)]
         ImageColor,
         [WidgetParameter("image_opacity", "--image-opacity", typeof(float), UnitType.Percent)]
@@ -129,10 +129,10 @@ namespace NewWidgets.Widgets
 
         [WidgetParameter("button_layout", "--button-layout", typeof(WidgetButtonLayout))]
         ButtonLayout,
-        [WidgetParameter("button_image_padding", "--button-image-padding", typeof(Margin), UnitType.Length)]
-        ButtonImagePadding,
-        [WidgetParameter("button_text_padding", "--button-text-padding",  typeof(Margin), UnitType.Length)]
-        ButtonTextPadding,
+        //[WidgetParameter("button_image_padding", "--button-image-padding", typeof(Margin), UnitType.Length)]
+        //ButtonImagePadding,
+        //[WidgetParameter("button_text_padding", "--button-text-padding",  typeof(Margin), UnitType.Length)]
+        //ButtonTextPadding,
         [WidgetParameter("button_animate_scale", "--button-animate-scale", typeof(float), UnitType.Percent)]
         ButtonAnimateScale,
         [WidgetParameter("button_animate_pivot", "--button-animate-pivot", typeof(Vector2), UnitType.Percent)]

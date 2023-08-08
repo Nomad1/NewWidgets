@@ -21,7 +21,12 @@ namespace NewWidgets.Widgets
         {
             if (string.IsNullOrEmpty(@class))
                 return default(WidgetStyle);
-            return new WidgetStyle(@class.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries), string.Empty);
+
+            string[] classes = @class.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries);
+            if (classes.Length == 0)
+                return default(WidgetStyle);
+
+            return new WidgetStyle(classes, string.Empty);
         }
 
         /// <summary>

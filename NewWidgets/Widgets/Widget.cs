@@ -358,7 +358,7 @@ namespace NewWidgets.Widgets
         /// <summary>
         /// This method should be called if the hierarchy or parent state are changed
         /// </summary>
-        public void InvalidateStyle()
+        protected void InvalidateStyle()
         {
             m_needUpdateStyle = true;
         }
@@ -369,6 +369,51 @@ namespace NewWidgets.Widgets
         public void InvalidateLayout()
         {
             m_needsLayout = true;
+        }
+
+        /// <summary>
+        /// Adds one class name to a style
+        /// </summary>
+        /// <param name="className"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public void AddStyleClass(string className)
+        {
+            if (string.IsNullOrEmpty(className))
+                throw new ArgumentNullException("@className should not be empty!");
+
+            string[] array = new string[m_styleClasses.Length + 1];
+            m_styleClasses.CopyTo(array, 0);
+            array[m_styleClasses.Length] = className;
+            m_styleClasses = array;
+            InvalidateLayout();
+        }
+
+        /// <summary>
+        /// Removes one class from the style
+        /// </summary>
+        /// <param name="className"></param>
+        /// <returns>true if the class was removed</returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public bool RemoveStyleClass(string className)
+        {
+            if (string.IsNullOrEmpty(className))
+                throw new ArgumentNullException("@className should not be empty!");
+
+            bool changed = false;
+
+            for (int i = 0; i < m_styleClasses.Length; i++)
+            {
+                if (m_styleClasses[i] == className)
+                {
+                    m_styleClasses[i] = string.Empty;
+                    changed = true;
+                }
+            }
+
+            if (changed)
+                InvalidateLayout();
+
+            return changed;
         }
 
         /// <summary>

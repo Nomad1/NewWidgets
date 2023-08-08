@@ -12,7 +12,11 @@ namespace NewWidgets.Widgets
         ImageLeft = 0x01,
         ImageRight = 0x02,
         TextLeft = 0x04,
-        TextRight = 0x08
+        TextRight = 0x08,
+        /// <summary>
+        /// Layout with alignmets specified for each component instead
+        /// </summary>
+        Custom = 0x10
     }
 
     public class WidgetButton : WidgetBackground
@@ -50,25 +54,28 @@ namespace NewWidgets.Widgets
         }
 
         // Forwarded style properties
-
+        [Obsolete("Use styles instead")]
         public uint ImageTint
         {
             get { return m_image.Color; }
             set { m_image.Color = value; }
         }
 
+        [Obsolete("Use styles instead")]
         public uint TextColor
         {
             get { return m_label.Color; }
             set { m_label.Color = value; }
         }
 
+        [Obsolete("Use styles instead")]
         public Font Font
         {
             get { return m_label.Font; }
             set { m_label.Font = value; InvalidateLayout(); }
         }
 
+        [Obsolete("Use styles instead")]
         public float FontSize
         {
             get { return m_label.FontSize; }
@@ -81,18 +88,6 @@ namespace NewWidgets.Widgets
         {
             get { return GetProperty(WidgetParameterIndex.ButtonLayout, WidgetButtonLayout.Center); }
             set { SetProperty(WidgetParameterIndex.ButtonLayout, value); InvalidateLayout(); }
-        }
-
-        public Margin ImagePadding
-        {
-            get { return GetProperty(WidgetParameterIndex.ButtonImagePadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.ButtonImagePadding, value); InvalidateLayout(); }
-        }
-
-        public Margin TextPadding
-        {
-            get { return GetProperty(WidgetParameterIndex.ButtonTextPadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.ButtonTextPadding, value); InvalidateLayout(); }
         }
 
         public Vector2 AnimatePivot
@@ -120,7 +115,7 @@ namespace NewWidgets.Widgets
             get { return m_clickSound; }
             set { m_clickSound = value; }
         }
-        
+
         public bool OverridePress
         {
             get { return m_overridePress; }
@@ -137,11 +132,17 @@ namespace NewWidgets.Widgets
             get { return !string.IsNullOrEmpty(m_label.Text); }
         }
 
+        /// <summary>
+        /// Direct access to the underlying WidgetImage
+        /// </summary>
         protected WidgetImage InternalImage
         {
             get { return m_image; }
         }
 
+        /// <summary>
+        /// Direct access to the underlying WidgetLabel
+        /// </summary>
         protected WidgetLabel InternalLabel
         {
             get { return m_label; }
@@ -164,7 +165,7 @@ namespace NewWidgets.Widgets
         public WidgetButton(WidgetStyle style, string text = "")
            : this(ElementType, style, text)
         {
-           
+
         }
 
         /// <summary>
@@ -201,18 +202,17 @@ namespace NewWidgets.Widgets
 
         public override void UpdateLayout()
         {
+            Margin textPadding = m_label.GetProperty(WidgetParameterIndex.Padding, new Margin(0));
+
             if (IsImageVisible)
             {
-                m_image.Size = Size - ImagePadding.Size;
                 m_image.UpdateLayout();
             }
 
-
             if (IsLabelVisible)
             {
-                m_label.Size = Size - TextPadding.Size;
+                m_label.Size = Size - textPadding.Size;
                 m_label.UpdateLayout();
-
             }
 
             // now we're ready for automatic resize if needed
@@ -220,19 +220,19 @@ namespace NewWidgets.Widgets
             // auto-resize attempt. Little bit clumsy and ignores image size and button layout. TODO: re-implement this part
             if (Size.X <= 0 || Size.Y <= 0)
             {
-                Size = new Vector2(Math.Max(TextPadding.Width + m_label.Size.X, ImagePadding.Width + m_image.Size.X), Math.Max(TextPadding.Height + m_label.Size.Y, ImagePadding.Height + m_image.Size.Y));
+                Size = new Vector2(Math.Max(textPadding.Width + m_label.Size.X, /*ImagePadding.Width + */m_image.Size.X), Math.Max(textPadding.Height + m_label.Size.Y, /*ImagePadding.Height + */m_image.Size.Y));
             }
-
 
             if (IsLabelVisible)
             {
-                m_label.Position = TextPadding.TopLeft;
+                m_label.Position = textPadding.TopLeft;
 
                 if ((Layout & WidgetButtonLayout.TextLeft) != 0)
                 {
                     m_label.TextAlign = WidgetAlign.Left | WidgetAlign.Top;
                 }
                 else
+                if ((Layout & WidgetButtonLayout.Custom) == 0)
                 {
                     m_label.TextAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
                 }
@@ -240,7 +240,7 @@ namespace NewWidgets.Widgets
 
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
             {
-                m_image.Position = ImagePadding.TopLeft;
+                m_image.Position = Vector2.Zero;
 
                 if ((Layout & WidgetButtonLayout.ImageLeft) != 0)
                 {
@@ -248,6 +248,7 @@ namespace NewWidgets.Widgets
                     m_image.ImagePivot = new Vector2(0, 0);
                 }
                 else
+                if ((Layout & WidgetButtonLayout.Custom) == 0)
                 {
                     m_image.ImageStyle = WidgetBackgroundStyle.ImageFit;
                     // ImagePivot?
@@ -268,7 +269,7 @@ namespace NewWidgets.Widgets
         {
             if (!base.Update())
                 return false;
-            
+
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
                 m_image.Update();
 
@@ -289,7 +290,7 @@ namespace NewWidgets.Widgets
                 m_label.Draw();
         }
 
-        
+
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
             if (m_animating)
@@ -302,7 +303,8 @@ namespace NewWidgets.Widgets
                     {
                         return true;
                     }
-                } else
+                }
+                else
                 if (Enabled && unpress)
                 {
                     if (!m_overridePress)
@@ -401,6 +403,45 @@ namespace NewWidgets.Widgets
 
             if (onPress != null)
                 WindowController.Instance.ScheduleAction(delegate { onPress(this); }, 1);
+        }
+    }
+
+    /// <summary>
+    /// This is the same class as WidgetButton but with the separate element type
+    /// </summary>
+    public class WidgetImageButton : WidgetButton
+    {
+        public new const string ElementType = "image_button";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetImageButton"/> class.
+        /// </summary>
+        /// <param name="text">Text.</param>
+        public WidgetImageButton(string text = "")
+            : this(ElementType, default(WidgetStyle), text)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetImageButton"/> class.
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="text">Text.</param>
+        public WidgetImageButton(WidgetStyle style, string text = "")
+           : this(ElementType, style, text)
+        {
+
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetImageButton"/> class.
+        /// </summary>
+        /// <param name="elementType"></param>
+        /// <param name="style"></param>
+        /// <param name="text"></param>
+        protected WidgetImageButton(string elementType, WidgetStyle style, string text)
+           : base(elementType, style, text)
+        {
         }
     }
 }

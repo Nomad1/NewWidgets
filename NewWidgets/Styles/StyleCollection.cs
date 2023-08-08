@@ -102,11 +102,14 @@ namespace NewWidgets.UI.Styles
 
             // To use fast search in the collections we have to extract last selector from the list
 
-            StyleSelector selector = selectorList.Selectors[selectorList.Count - 1];
-
             StyleNode result;
 
+            /*StyleSelector selector = selectorList.Selectors[selectorList.Count - 1];
+
             if (m_allNodes.TryGetValue(selector.ToString(), out result))
+                return result;*/
+
+            if (m_allNodes.TryGetValue(selectorList.ToString(), out result))
                 return result;
 
 #if OLD
@@ -196,7 +199,11 @@ namespace NewWidgets.UI.Styles
                             }
 
                 if (selector.Classes != null)
-                    foreach (string @class in selector.Classes) // if it has a class, check class collection
+                {
+                    // Classes should be processed in reverse order meaning that the last class has more priority
+                    for (int c = selector.Classes.Length - 1; c >= 0; c--) // if it has a class, check class collection
+                    {
+                        string @class = selector.Classes[c];
                         if (m_classCollection.TryGetValue(@class, out collection))
                             foreach (StyleNode node in collection)
                                 if (!partStyles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
@@ -205,6 +212,8 @@ namespace NewWidgets.UI.Styles
 
                                     //Console.WriteLine("Found match for class {0} to style {1}", @class, node);
                                 }
+                    }
+                }
 
                 styles.AddRange(partStyles);
             }
