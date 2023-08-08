@@ -136,7 +136,7 @@ namespace NewWidgets.Widgets
                 Image = image;
         }
 
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             if (m_imageObject != null && m_lastTexture != Image) // TODO: check if image was not changed meaning no need to remove it
             {

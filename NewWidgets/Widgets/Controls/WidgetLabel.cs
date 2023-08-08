@@ -139,13 +139,7 @@ namespace NewWidgets.Widgets
             Text = text;
         }
 
-        [Obsolete]
-        public void Relayout()
-        {
-            UpdateLayout();
-        }
-
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             // If label is not yet created - create it. Otherwise all the changes are already it
             if (m_label == null)

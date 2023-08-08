@@ -98,7 +98,7 @@ namespace NewWidgets.Widgets
             m_background = new WindowObjectArray<WindowObject>();
         }
 
-        public override void UpdateStyle()
+        protected override void UpdateStyle()
         {
             base.UpdateStyle();
 

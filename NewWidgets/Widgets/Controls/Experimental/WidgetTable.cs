@@ -400,7 +400,7 @@ namespace NewWidgets.Widgets
             return row;
         }
 
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             int index = -1;
 
@@ -785,7 +785,7 @@ namespace NewWidgets.Widgets
 
                     ((WidgetText)cell).Text = value == null ? "" : value.ToString();
                     ((WidgetText)cell).TextAlign = column.TextAlign;
-                    ((WidgetText)cell).UpdateLayout();
+                    ((WidgetText)cell).InternalUpdateLayout();
                     return;
                 }
 

@@ -191,28 +191,28 @@ namespace NewWidgets.Widgets
         /// <summary>
         /// Updates 
         /// </summary>
-        public override void UpdateStyle()
+        protected override void UpdateStyle()
         {
             base.UpdateStyle();
 
-            m_label.UpdateStyle();
+            m_label.InternalUpdateStyle();
 
-            m_image.UpdateStyle();
+            m_image.InternalUpdateStyle();
         }
 
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             Margin textPadding = m_label.GetProperty(WidgetParameterIndex.Padding, new Margin(0));
 
             if (IsImageVisible)
             {
-                m_image.UpdateLayout();
+                m_image.InternalUpdateLayout();
             }
 
             if (IsLabelVisible)
             {
                 m_label.Size = Size - textPadding.Size;
-                m_label.UpdateLayout();
+                m_label.InternalUpdateLayout();
             }
 
             // now we're ready for automatic resize if needed

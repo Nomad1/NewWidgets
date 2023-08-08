@@ -170,7 +170,7 @@ namespace NewWidgets.Widgets
             ClipMargin = TextPadding;
         }
 
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             m_lines = m_text.Split(new string[] { "\r", "\n" }, StringSplitOptions.None);
 

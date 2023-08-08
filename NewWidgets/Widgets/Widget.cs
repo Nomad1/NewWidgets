@@ -60,9 +60,6 @@ namespace NewWidgets.Widgets
 
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
-        private bool m_needUpdateStyle;
-        private bool m_needsLayout; // flag to indicate that inner label size/opacity/formatting has changed
-
         private WidgetStyleSheet m_style;
         private readonly StyleSheetData m_ownStyle;
 
@@ -74,6 +71,11 @@ namespace NewWidgets.Widgets
         private string m_tooltip;
 
         #region Style-related stuff
+
+        private bool m_needUpdateStyle;
+        private bool m_needsLayout; // flag to indicate that inner label size/opacity/formatting has changed
+        private bool m_styleReady; // indicates that style was loaded
+
 
         /// <summary>
         /// Pseudo-class flag
@@ -361,12 +363,13 @@ namespace NewWidgets.Widgets
         protected void InvalidateStyle()
         {
             m_needUpdateStyle = true;
+            m_styleReady = false;
         }
 
         /// <summary>
         /// This method should be called when widget layout is changed (size, padding, etc.)
         /// </summary>
-        public void InvalidateLayout()
+        protected void InvalidateLayout()
         {
             m_needsLayout = true;
         }
@@ -416,16 +419,40 @@ namespace NewWidgets.Widgets
             return changed;
         }
 
+
+        /// <summary>
+        /// This method should be called whenever you need to update widget
+        /// size, style and layout immediatelly
+        /// </summary>
+        public void Relayout()
+        {
+            if (m_styleReady && !m_needsLayout && !m_needUpdateStyle) // style was already loaded, no need to reload it
+                return;
+
+            UpdateStyle();
+            UpdateLayout();
+        }
+
         /// <summary>
         /// This method is to be called when:
         /// 1. Widget size has changed (Resize was called)
         /// 2. Widget style has changed
         /// 3. Widget content has changed and widget should be resized
         /// </summary>
-        public virtual void UpdateLayout()
+        protected virtual void UpdateLayout()
         {
             m_needsLayout = false;
             // nothing to do in base
+        }
+
+        internal void InternalUpdateLayout()
+        {
+            UpdateLayout();
+        }
+
+        internal void InternalUpdateStyle()
+        {
+            UpdateStyle();
         }
 
         protected override void Resize(Vector2 size)
@@ -438,10 +465,11 @@ namespace NewWidgets.Widgets
             InvalidateLayout();
         }
 
-        public virtual void UpdateStyle()
+        protected virtual void UpdateStyle()
         {
             m_needUpdateStyle = false;
             m_needsLayout = true; // make sure that any style changes result in layout updates as well
+            m_styleReady = true; // style was loaded at least once
 
             List<StyleSelector> styles = new List<StyleSelector>();
             List<StyleSelectorCombinator> combinators = new List<StyleSelectorCombinator>();

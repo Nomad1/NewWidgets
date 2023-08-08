@@ -122,16 +122,7 @@ namespace NewWidgets.Widgets
             Text = text;
         }
 
-        /// <summary>
-        /// Synonym to UpdateLoayout
-        /// </summary>
-        [Obsolete]
-        public void Relayout()
-        {
-            UpdateLayout();
-        }
-
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             string[] lines = string.IsNullOrEmpty(m_text) ? new string[0]: m_text.Split(new string[] { Environment.NewLine, "\r", "\n", "|n", "\\n" }, StringSplitOptions.None);
 

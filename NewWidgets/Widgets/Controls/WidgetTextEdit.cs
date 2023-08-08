@@ -205,7 +205,7 @@ namespace NewWidgets.Widgets
             ClipMargin = TextPadding;
         }
 
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             if (m_label == null)
             {

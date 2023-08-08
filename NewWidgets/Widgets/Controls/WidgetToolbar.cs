@@ -77,7 +77,7 @@ namespace NewWidgets.Widgets
             InvalidateLayout();
         }
 
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             if (m_buttons.Children.Count > 0)
             {

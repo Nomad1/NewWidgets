@@ -100,14 +100,9 @@ namespace NewWidgets.UI.Styles
             if (selectorList == null || selectorList.IsEmpty || !selectorList.IsSingleChain)
                 throw new ArgumentException("Invalid StyleNode for FindExactStyle call");
 
-            // To use fast search in the collections we have to extract last selector from the list
+            // Nomad: fast search was a mistake, excat search requires exact results
 
             StyleNode result;
-
-            /*StyleSelector selector = selectorList.Selectors[selectorList.Count - 1];
-
-            if (m_allNodes.TryGetValue(selector.ToString(), out result))
-                return result;*/
 
             if (m_allNodes.TryGetValue(selectorList.ToString(), out result))
                 return result;

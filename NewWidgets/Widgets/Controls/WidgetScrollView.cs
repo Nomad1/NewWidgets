@@ -179,7 +179,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
             m_horizontalBarVisible = (m_horizontalScroll & WidgetScrollType.Visible) != 0;
             m_verticalBarVisible = (m_verticalScroll & WidgetScrollType.Visible) != 0;

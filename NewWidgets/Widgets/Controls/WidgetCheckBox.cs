@@ -105,21 +105,20 @@ namespace NewWidgets.Widgets
             //Resize(Size);
         }
 
-        public override void UpdateLayout()
+        protected override void UpdateLayout()
         {
+            base.UpdateLayout();
+
             if (m_image != null)
                 m_image.Size = Size;
-
-            base.UpdateLayout();
         }
 
-
-        public override void UpdateStyle()
+        protected override void UpdateStyle()
         {
             base.UpdateStyle();
 
             if (m_image != null)
-                m_image.UpdateStyle();
+                m_image.InternalUpdateStyle();
         }
 
         public override bool Update()
