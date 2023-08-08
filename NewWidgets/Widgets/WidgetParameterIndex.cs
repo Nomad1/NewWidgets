@@ -93,8 +93,8 @@ namespace NewWidgets.Widgets
         LineSpacing,
         [WidgetParameter("text_align", "text-align", typeof(WidgetAlign), UnitType.None, WidgetParameterInheritance.Inherit)] // TODO: more alignment options
         TextAlign,
-        [WidgetParameter("text_padding", "--text-padding", typeof(Margin), UnitType.Length)]
-        TextPadding,
+        //[WidgetParameter("text_padding", "--text-padding", typeof(Margin), UnitType.Length)] // changed to "padding"
+        //TextPadding,
         [WidgetParameter("richtext", "--richtext", typeof(bool))]
         RichText,
 
@@ -108,7 +108,7 @@ namespace NewWidgets.Widgets
         ImageAngle,
         [WidgetParameter("image_pivot", "--image-position", typeof(Vector2), UnitType.Percent)]
         ImagePivot,
-        //[WidgetParameter("image_padding", "--image-padding", typeof(Margin), UnitType.Length)] // change to "padding"?
+        //[WidgetParameter("image_padding", "--image-padding", typeof(Margin), UnitType.Length)] // changed to "padding"
         //ImagePadding,
         [WidgetParameter("image_color", "--image-color", typeof(uint), UnitType.Color)]
         ImageColor,

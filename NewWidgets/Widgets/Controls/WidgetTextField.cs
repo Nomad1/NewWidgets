@@ -45,8 +45,8 @@ namespace NewWidgets.Widgets
 
         public Margin TextPadding
         {
-            get { return GetProperty(WidgetParameterIndex.TextPadding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.TextPadding, value); InvalidateLayout(); }
+            get { return GetProperty(WidgetParameterIndex.Padding, new Margin(0)); }
+            set { SetProperty(WidgetParameterIndex.Padding, value); InvalidateLayout(); }
         }
 
         public float LineSpacing
