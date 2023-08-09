@@ -98,22 +98,22 @@ namespace NewWidgets.Widgets
         [WidgetParameter("richtext", "--richtext", typeof(bool))]
         RichText,
 
-        // Image
+        // Image // migrated to background styles
 
-        [WidgetParameter("image", typeof(string), UnitType.Url)] // image name
-        Image,
-        [WidgetParameter("image_style", "--image-style", typeof(WidgetBackgroundStyle))]
-        ImageStyle,
-        [WidgetParameter("image_angle", "--image-rotation", typeof(float))]
-        ImageAngle,
-        [WidgetParameter("image_pivot", "--image-position", typeof(Vector2), UnitType.Percent)]
-        ImagePivot,
+        //[WidgetParameter("image", typeof(string), UnitType.Url)] // image name
+        //Image,
+        //[WidgetParameter("image_style", "--image-style", typeof(WidgetBackgroundStyle))]
+        //ImageStyle,
+        //[WidgetParameter("image_angle", "--image-rotation", typeof(float))]
+        //ImageAngle,
+        //[WidgetParameter("image_pivot", "--image-position", typeof(Vector2), UnitType.Percent)]
+        //ImagePivot,
         //[WidgetParameter("image_padding", "--image-padding", typeof(Margin), UnitType.Length)] // changed to "padding"
         //ImagePadding,
-        [WidgetParameter("image_color", "--image-color", typeof(uint), UnitType.Color)]
-        ImageColor,
-        [WidgetParameter("image_opacity", "--image-opacity", typeof(float), UnitType.Percent)]
-        ImageOpacity,
+        //[WidgetParameter("image_color", "--image-color", typeof(uint), UnitType.Color)]
+        //ImageColor,
+        //[WidgetParameter("image_opacity", "--image-opacity", typeof(float), UnitType.Percent)]
+        //ImageOpacity,
 
         // Text edit
 

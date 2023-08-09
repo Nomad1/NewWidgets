@@ -91,9 +91,12 @@ namespace NewWidgets.UI.Styles
         /// Checks if the current selector is parent of the element group (button, etc.)
         /// </summary>
         /// <returns></returns>
-        public bool IsElementParent()
+        public bool IsElementParent(string elementType)
         {
-            return SelectorList.IsSimple && !string.IsNullOrEmpty(SelectorList.Selectors[0].Element) && (SelectorList.Selectors[0].Classes == null || SelectorList.Selectors[0].Classes.Length == 0);
+            return SelectorList.IsSimple &&
+                (elementType == SelectorList.Selectors[0].Element || SelectorList.Selectors[0].Element == "*")
+                &&
+                (SelectorList.Selectors[0].Classes == null || SelectorList.Selectors[0].Classes.Length == 0);
         }
     }
 }

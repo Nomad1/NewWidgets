@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Numerics;
 using NewWidgets.UI;
+using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
@@ -16,12 +17,10 @@ namespace NewWidgets.Widgets
         public const string LineId = "slider_line";
 
         // TODO: make configurable
-        private static readonly float s_height = 10f;
-        private static readonly float s_width = 250f;
         private static readonly float s_inset = 15f;
 
         private readonly WidgetProgressLine m_progressLine;
-        private readonly TrackingButton m_lowerButton;
+        private readonly TrackingButton m_trackButton;
         private readonly WidgetLabel m_label;
 
         private float m_max;
@@ -111,30 +110,37 @@ namespace NewWidgets.Widgets
             m_text = "{0:0%}";
 
             m_progressLine = new WidgetProgressLine(new WidgetStyle(LineId));
-            m_progressLine.Size = new Vector2(s_width, s_height);
             AddChild(m_progressLine);
 
-            m_lowerButton = new TrackingButton(new WidgetStyle(TrackerId));
-            m_lowerButton.Rotation = 90;
-            m_lowerButton.Scale = 0.75f;
-            m_lowerButton.Position = new Vector2(0, m_progressLine.Size.Y - s_inset);
-            m_lowerButton.OnDrag += HandleDrag;
-            AddChild(m_lowerButton);
+            m_trackButton = new TrackingButton(new WidgetStyle(TrackerId));
+            m_trackButton.Position = new Vector2(0, m_progressLine.Size.Y - s_inset);
+            m_trackButton.OnDrag += HandleDrag;
+            AddChild(m_trackButton);
 
-            m_label = new WidgetLabel(new WidgetStyle(LabelId), "0");
-            m_label.TextAlign = WidgetAlign.Top | WidgetAlign.VerticalCenter;
-            m_label.FontSize = WidgetManager.FontScale * 0.7f;
-            m_label.Color = 0xffffff;
-            m_label.Relayout();
+            m_label = new WidgetLabel(new WidgetStyle(LabelId));
             AddChild(m_label);
 
-            // Shift progress line to get room for the button to stick out a little
-            m_progressLine.Position = new Vector2(m_lowerButton.Size.X * m_lowerButton.Scale / 2, 0);
-
-            Size = new Vector2(m_progressLine.Size.X + m_lowerButton.Size.X * m_lowerButton.Scale,
-                               m_progressLine.Size.Y + m_lowerButton.Size.Y * m_lowerButton.Scale + m_label.Size.Y - s_inset);
-
             SetValue(m_min);
+        }
+
+        protected override void UpdateLayout()
+        {
+            base.UpdateLayout();
+
+            m_progressLine.Relayout();
+
+            if (Size.X <= 0 || Size.Y <= 0)
+                Size = m_progressLine.Size + m_progressLine.GetProperty(WidgetParameterIndex.Padding, Margin.Empty).Size;
+
+            m_progressLine.Position = m_progressLine.GetProperty(WidgetParameterIndex.Padding, Margin.Empty).TopLeft;
+
+            m_trackButton.Relayout();
+
+            m_trackButton.Position = new Vector2(m_progressLine.Size.X * Ratio + m_trackButton.Scale * m_trackButton.Size.X, 0) + m_trackButton.GetProperty(WidgetParameterIndex.Padding, Margin.Empty).TopLeft;
+
+            m_label.Relayout();
+
+            UpdateText();
         }
 
         private void SetValue(float value)
@@ -142,7 +148,7 @@ namespace NewWidgets.Widgets
             m_value = value;
             m_progressLine.SetProgress(Ratio);
 
-            m_lowerButton.Position = new Vector2(m_progressLine.Size.X * Ratio + m_lowerButton.Scale * m_lowerButton.Size.X, m_lowerButton.Position.Y);
+            m_trackButton.Position = new Vector2(m_progressLine.Size.X * Ratio + m_trackButton.Scale * m_trackButton.Size.X, 0) + m_trackButton.GetProperty(WidgetParameterIndex.Padding, Margin.Empty).TopLeft;
 
             // Manually update the text
             UpdateText();
@@ -150,10 +156,12 @@ namespace NewWidgets.Widgets
 
         private void UpdateText()
         {
-            //m_progressLine.Text = string.Format(m_text, m_value);
             m_label.Text = string.Format(m_text, m_value);
-            m_label.InternalUpdateLayout();
-            m_label.Position = m_lowerButton.Position + new Vector2(m_lowerButton.Scale * m_lowerButton.Size.X /2 - m_label.Size.X / 2, m_lowerButton.Scale * m_lowerButton.Size.Y - 10.0f);
+            m_label.Relayout();
+            m_label.Position =
+                m_trackButton.Position +
+                new Vector2(m_trackButton.Scale * m_trackButton.Size.X /2 - m_label.Size.X / 2, m_trackButton.Scale * m_trackButton.Size.Y - 10.0f)
+                + m_label.GetProperty(WidgetParameterIndex.Padding, Margin.Empty).TopLeft;
         }
 
         private float ClickToProgress(float x)
@@ -186,7 +194,7 @@ namespace NewWidgets.Widgets
             return res;
         }
 
-        private class TrackingButton : WidgetButton
+        private class TrackingButton : WidgetImage
         {
             private bool m_dragged;
 

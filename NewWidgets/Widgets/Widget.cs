@@ -226,7 +226,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         public Margin ClipMargin
         {
-            get { return GetProperty(WidgetParameterIndex.ClipMargin, new Margin(0)); }
+            get { return GetProperty(WidgetParameterIndex.ClipMargin, Margin.Empty); }
             set { SetProperty(WidgetParameterIndex.ClipMargin, value); } // clipping is applied on each redraw so we don't need to call Invalidate of any kind
         }
 
@@ -327,7 +327,7 @@ namespace NewWidgets.Widgets
 
         internal T GetProperty<T>(WidgetParameterIndex index, T defaultValue)
         {
-            return m_style.Get(index, defaultValue);
+            return m_style.Get(index, defaultValue, m_elementType);
         }
 
         internal void SetProperty<T>(WidgetParameterIndex index, T value)
@@ -344,7 +344,7 @@ namespace NewWidgets.Widgets
         /// <returns></returns>
         public T GetProperty<T>(string name, T defaultValue)
         {
-            return m_style.Get(name, defaultValue);
+            return m_style.Get(name, defaultValue, m_elementType);
         }
 
         /// <summary>

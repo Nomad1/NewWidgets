@@ -146,7 +146,7 @@ namespace NewWidgets.Widgets
             m_hasOwnStyle = true;
         }
 
-        internal T Get<T>(WidgetParameterIndex index, T defaultValue)
+        internal T Get<T>(WidgetParameterIndex index, T defaultValue, string elementType)
         {
             WidgetParameterAttribute attr = WidgetParameterMap.GetAttributeByIndex(index);
 
@@ -165,16 +165,17 @@ namespace NewWidgets.Widgets
                     break;
                 }
 
+                //// if current style is explicit with id, it's parent 
+                //if (!inherited && data.IsId()) 
+                //    break;
+
                 // if next style is the same as this one less on pseudo-class, we can think of it as a parent and do a one-time exception for data lookup
                 // otherwise we need to check if the property inheritance is Initial and then break
 
-                if (inherited || node == m_data.First || (node.Next != null && node.Next.Value.IsPseudoClassParent(node.Value)) || (node.Next != null && node.Next.Value.IsElementParent()))
-                {
+                if (inherited || node == m_data.First || (node.Next != null && node.Next.Value.IsPseudoClassParent(data)) || (node.Next != null && node.Next.Value.IsElementParent(elementType)))
                     node = node.Next;
-                }
                 else
                     break;
-
             }
 
             if (result == null)
@@ -216,9 +217,9 @@ namespace NewWidgets.Widgets
         /// <param name="name">Name.</param>
         /// <param name="defaultValue">Default value.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public T Get<T>(string name, T defaultValue)
+        public T Get<T>(string name, T defaultValue, string elementType)
         {
-            return Get(WidgetParameterMap.GetIndexByName(name), defaultValue);
+            return Get(WidgetParameterMap.GetIndexByName(name), defaultValue, elementType);
         }
 
         internal void Set(WidgetParameterIndex index, object value)

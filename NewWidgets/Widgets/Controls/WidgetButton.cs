@@ -202,10 +202,12 @@ namespace NewWidgets.Widgets
 
         protected override void UpdateLayout()
         {
-            Margin textPadding = m_label.GetProperty(WidgetParameterIndex.Padding, new Margin(0));
+            Margin textPadding = m_label.GetProperty(WidgetParameterIndex.Padding, Margin.Empty);
+            Margin imagePadding = m_image.GetProperty(WidgetParameterIndex.Padding, Margin.Empty);
 
             if (IsImageVisible)
             {
+                m_image.Size = Size - imagePadding.Size;
                 m_image.InternalUpdateLayout();
             }
 
@@ -220,7 +222,7 @@ namespace NewWidgets.Widgets
             // auto-resize attempt. Little bit clumsy and ignores image size and button layout. TODO: re-implement this part
             if (Size.X <= 0 || Size.Y <= 0)
             {
-                Size = new Vector2(Math.Max(textPadding.Width + m_label.Size.X, /*ImagePadding.Width + */m_image.Size.X), Math.Max(textPadding.Height + m_label.Size.Y, /*ImagePadding.Height + */m_image.Size.Y));
+                Size = new Vector2(Math.Max(textPadding.Width + m_label.Size.X, imagePadding.Width + m_image.Size.X), Math.Max(textPadding.Height + m_label.Size.Y, imagePadding.Height + m_image.Size.Y));
             }
 
             if (IsLabelVisible)
@@ -240,7 +242,7 @@ namespace NewWidgets.Widgets
 
             if (m_image != null && !string.IsNullOrEmpty(m_image.Image))
             {
-                m_image.Position = Vector2.Zero;
+                m_image.Position = imagePadding.TopLeft;
 
                 if ((Layout & WidgetButtonLayout.ImageLeft) != 0)
                 {

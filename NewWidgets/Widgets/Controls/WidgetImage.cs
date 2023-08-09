@@ -20,32 +20,32 @@ namespace NewWidgets.Widgets
 
         public string Image
         {
-            get { return GetProperty(WidgetParameterIndex.Image, ""); }
-            set { SetProperty(WidgetParameterIndex.Image, value); InvalidateLayout(); }
+            get { return GetProperty(WidgetParameterIndex.BackImage, ""); }
+            set { SetProperty(WidgetParameterIndex.BackImage, value); InvalidateLayout(); }
         }
 
         public float ImageRotation
         {
-            get { return GetProperty(WidgetParameterIndex.ImageAngle, 0.0f); }
-            set { SetProperty(WidgetParameterIndex.ImageAngle, value); InvalidateLayout(); }
+            get { return GetProperty(WidgetParameterIndex.BackAngle, 0.0f); }
+            set { SetProperty(WidgetParameterIndex.BackAngle, value); InvalidateLayout(); }
         }
 
         public Vector2 ImagePivot
         {
-            get { return GetProperty(WidgetParameterIndex.ImagePivot, new Vector2(0.5f, 0.5f)); }
-            set { SetProperty(WidgetParameterIndex.ImagePivot, value); InvalidateLayout(); }
+            get { return GetProperty(WidgetParameterIndex.BackPivot, new Vector2(0.5f, 0.5f)); }
+            set { SetProperty(WidgetParameterIndex.BackPivot, value); InvalidateLayout(); }
         }
 
         public Margin ImagePadding
         {
-            get { return GetProperty(WidgetParameterIndex.Padding, new Margin(0)); }
-            set { SetProperty(WidgetParameterIndex.Padding, value); InvalidateLayout(); }
+            get { return GetProperty(WidgetParameterIndex.BackPadding, Margin.Empty); }
+            set { SetProperty(WidgetParameterIndex.BackPadding, value); InvalidateLayout(); }
         }
 
         public WidgetBackgroundStyle ImageStyle
         {
-            get { return GetProperty(WidgetParameterIndex.ImageStyle, WidgetBackgroundStyle.ImageFit); }
-            set { SetProperty(WidgetParameterIndex.ImageStyle, value); InvalidateLayout(); }
+            get { return GetProperty(WidgetParameterIndex.BackStyle, WidgetBackgroundStyle.ImageFit); }
+            set { SetProperty(WidgetParameterIndex.BackStyle, value); InvalidateLayout(); }
         }
 
         //public float ImageAlpha
@@ -63,8 +63,8 @@ namespace NewWidgets.Widgets
 
         public uint Color
         {
-            get { return GetProperty(WidgetParameterIndex.ImageColor, (uint)0xffffff); }
-            set { SetProperty(WidgetParameterIndex.ImageColor, value); }
+            get { return GetProperty(WidgetParameterIndex.BackColor, (uint)0xffffff); }
+            set { SetProperty(WidgetParameterIndex.BackColor, value); }
         }
 
         public Vector2 ImageSize
