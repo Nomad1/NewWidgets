@@ -195,9 +195,11 @@ namespace NewWidgets.Widgets
         {
             base.UpdateStyle();
 
-            m_label.InternalUpdateStyle();
+#pragma warning disable CS0618 // Type or member is obsolete
+            m_label.ForceUpdateStyle();
+            m_image.ForceUpdateStyle();
+#pragma warning restore CS0618 // Type or member is obsolete
 
-            m_image.InternalUpdateStyle();
         }
 
         protected override void UpdateLayout()
@@ -208,19 +210,23 @@ namespace NewWidgets.Widgets
             if (IsImageVisible)
             {
                 m_image.Size = Size - imagePadding.Size;
-                m_image.InternalUpdateLayout();
+#pragma warning disable CS0618 // Type or member is obsolete
+                m_image.ForceUpdateLayout();
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
             if (IsLabelVisible)
             {
                 m_label.Size = Size - textPadding.Size;
-                m_label.InternalUpdateLayout();
+#pragma warning disable CS0618 // Type or member is obsolete
+                m_label.ForceUpdateLayout();
+#pragma warning restore CS0618 // Type or member is obsolete
             }
 
-            // now we're ready for automatic resize if needed
+                // now we're ready for automatic resize if needed
 
-            // auto-resize attempt. Little bit clumsy and ignores image size and button layout. TODO: re-implement this part
-            if (Size.X <= 0 || Size.Y <= 0)
+                // auto-resize attempt. Little bit clumsy and ignores image size and button layout. TODO: re-implement this part
+                if (Size.X <= 0 || Size.Y <= 0)
             {
                 Size = new Vector2(Math.Max(textPadding.Width + m_label.Size.X, imagePadding.Width + m_image.Size.X), Math.Max(textPadding.Height + m_label.Size.Y, imagePadding.Height + m_image.Size.Y));
             }

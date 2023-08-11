@@ -57,7 +57,7 @@ namespace NewWidgets.Widgets
                 m_selectedIndex = m_items.Count == 0 ? -1 : value % m_items.Count;
 
                 m_label.Text = SelectedItem.Key;
-                m_label.InternalUpdateLayout();
+                m_label.Relayout();
                 if (m_animated)
                     m_label.AnimateAppear(false);
             }
@@ -83,7 +83,7 @@ namespace NewWidgets.Widgets
                 }
 
                 m_label.Text = SelectedItem.Key;
-                m_label.InternalUpdateLayout();
+                m_label.Relayout();
                 if (m_animated)
                     m_label.AnimateAppear(false);
             }

@@ -785,7 +785,7 @@ namespace NewWidgets.Widgets
 
                     ((WidgetText)cell).Text = value == null ? "" : value.ToString();
                     ((WidgetText)cell).TextAlign = column.TextAlign;
-                    ((WidgetText)cell).InternalUpdateLayout();
+                    ((WidgetText)cell).Relayout();
                     return;
                 }
 

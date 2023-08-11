@@ -118,7 +118,9 @@ namespace NewWidgets.Widgets
             base.UpdateStyle();
 
             if (m_image != null)
-                m_image.InternalUpdateStyle();
+#pragma warning disable CS0618 // Type or member is obsolete
+                m_image.ForceUpdateStyle();
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         public override bool Update()

@@ -278,7 +278,7 @@ namespace NewWidgets.Widgets
             get { return m_needsLayout; }
         }
 
-#if DEBUG
+#if DEBUG_SIZE
         public new Vector2 Size
         {
             get
@@ -461,12 +461,14 @@ namespace NewWidgets.Widgets
             // nothing to do in base
         }
 
-        internal void InternalUpdateLayout()
+        [Obsolete("Don't use it unless you know what to do!")]
+        public void ForceUpdateLayout()
         {
             UpdateLayout();
         }
 
-        internal void InternalUpdateStyle()
+        [Obsolete("Don't use it unless you know what to do!")]
+        public void ForceUpdateStyle()
         {
             UpdateStyle();
         }
