@@ -15,7 +15,6 @@ namespace NewWidgets.Widgets
         private string m_text;
         private float m_progress;
 
-        //private readonly WidgetBackground m_progressLineBack;
         private readonly WidgetBackground m_progressLine;
         private readonly WidgetLabel m_backText;
         private readonly WidgetLabel m_frontText;
@@ -82,12 +81,6 @@ namespace NewWidgets.Widgets
         protected WidgetProgressLine(string elementType, WidgetStyle style, string text)
             : base(elementType, style)
         {
-            //m_progressLineBack = new WidgetBackground(WidgetManager.GetStyle(barStyle));
-            //m_progressLineBack.Size = Size;
-            //m_progressLineBack.Position = new Vector2(0, 0);
-            //m_progressLineBack.Opacity = 0.5f;
-            //AddChild(m_progressLineBack);
-
             m_backText = new WidgetLabel(new WidgetStyle(BackLabelId));
             AddChild(m_backText);
 
