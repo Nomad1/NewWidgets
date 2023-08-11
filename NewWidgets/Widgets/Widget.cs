@@ -74,7 +74,6 @@ namespace NewWidgets.Widgets
 
         private bool m_needUpdateStyle;
         private bool m_needsLayout; // flag to indicate that inner label size/opacity/formatting has changed
-        private bool m_styleReady; // indicates that style was loaded
 
 
         /// <summary>
@@ -262,7 +261,7 @@ namespace NewWidgets.Widgets
         public new Widget Parent
         {
             get { return base.Parent as Widget; }
-            set { base.Parent = value; }
+            set { base.Parent = value; InvalidateStyle(); }
         }
 
         /// <summary>
@@ -279,7 +278,25 @@ namespace NewWidgets.Widgets
             get { return m_needsLayout; }
         }
 
-    
+#if DEBUG
+        public new Vector2 Size
+        {
+            get
+            {
+                if (ParentObject == null)
+                    LogConsole.WriteLine(LogLevel.WARNING, "Asked for {0}.Size before adding to parent element - style cound be invalid at the moment!", this);
+                if (m_needUpdateStyle)
+                    LogConsole.WriteLine(LogLevel.WARNING, "Asked for {0}.Size before calling UpdateStyle!", this);
+
+                return base.Size;
+            }
+            set
+            {
+                base.Size = value;
+            }
+        }
+#endif
+
         public event TooltipDelegate OnTooltip;
 
         /// <summary>
@@ -302,10 +319,10 @@ namespace NewWidgets.Widgets
             m_style = new WidgetStyleSheet(elementType + "_" + GetHashCode(), null);
             m_style.SetOwnStyle(m_ownStyle);
 
-            //Size = m_style.Get(WidgetParameterIndex.Size, new Vector2(0, 0)); // obsolete, needed in some very rare cases
-
-            m_needUpdateStyle = true;
             m_needsLayout = true;
+            m_needUpdateStyle = true;
+
+            //Size = m_style.Get(WidgetParameterIndex.Size, new Vector2(0, 0)); // obsolete, needed in some very rare cases
         }
 
         ///// <summary>
@@ -363,7 +380,6 @@ namespace NewWidgets.Widgets
         protected void InvalidateStyle()
         {
             m_needUpdateStyle = true;
-            m_styleReady = false;
         }
 
         /// <summary>
@@ -426,7 +442,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         public void Relayout()
         {
-            if (m_styleReady && !m_needsLayout && !m_needUpdateStyle) // style was already loaded, no need to reload it
+            if (!m_needsLayout && !m_needUpdateStyle) // style was already loaded, no need to reload it
                 return;
 
             UpdateStyle();
@@ -469,7 +485,6 @@ namespace NewWidgets.Widgets
         {
             m_needUpdateStyle = false;
             m_needsLayout = true; // make sure that any style changes result in layout updates as well
-            m_styleReady = true; // style was loaded at least once
 
             List<StyleSelector> styles = new List<StyleSelector>();
             List<StyleSelectorCombinator> combinators = new List<StyleSelectorCombinator>();

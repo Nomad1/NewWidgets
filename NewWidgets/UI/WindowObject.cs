@@ -166,12 +166,12 @@ namespace NewWidgets.UI
             }
         }
 
-        public virtual Vector2 Size
+        public /*virtual*/ Vector2 Size
         {
             get { return m_size; }
             set
             {
-                if (Vector2.DistanceSquared(value, Size) > float.Epsilon)
+                if (Vector2.DistanceSquared(value, m_size) > float.Epsilon)
                     Resize(value);
             }
         }
