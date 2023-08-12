@@ -344,7 +344,7 @@ namespace NewWidgets.Widgets
 
         internal T GetProperty<T>(WidgetParameterIndex index, T defaultValue)
         {
-            return m_style.Get(index, defaultValue, m_elementType);
+            return m_style.Get(index, defaultValue);
         }
 
         internal void SetProperty<T>(WidgetParameterIndex index, T value)
@@ -361,7 +361,7 @@ namespace NewWidgets.Widgets
         /// <returns></returns>
         public T GetProperty<T>(string name, T defaultValue)
         {
-            return m_style.Get(name, defaultValue, m_elementType);
+            return m_style.Get(name, defaultValue);
         }
 
         /// <summary>
@@ -489,20 +489,38 @@ namespace NewWidgets.Widgets
             m_needsLayout = true; // make sure that any style changes result in layout updates as well
 
             List<StyleSelector> styles = new List<StyleSelector>();
-            List<StyleSelectorCombinator> combinators = new List<StyleSelectorCombinator>();
+            List<StyleNodeType> types = new List<StyleNodeType>();
 
             Widget current = this;
 
             do
             {
-                styles.Insert(0, new StyleSelector(current.StyleElementType, current.StyleClasses, current.StyleId, current.StyleState));
-                current = current.Parent;
+                styles.Add(new StyleSelector(current.StyleElementType, current.StyleClasses, current.StyleId, current.StyleState));
 
-                combinators.Add(current == null ? StyleSelectorCombinator.None : StyleSelectorCombinator.Descendant);
+                // Reason why this style was added
+
+                if (current == this)
+                {
+                    // for current node it's 
+                    types.Add(
+                        !string.IsNullOrEmpty(StyleId) ? StyleNodeType.Id :
+                        StyleState != null && StyleState.Length > 0 ? StyleNodeType.PseudoClass :
+                        StyleClasses != null && StyleClasses.Length > 0 ? StyleNodeType.Class :
+                        StyleNodeType.Element);
+                }
+                else
+                {
+                    types.Add(this.Parent == current ? StyleNodeType.Parent : StyleNodeType.GrandParent);
+                }
+
+                current = current.Parent;
             }
             while (current != null);
 
-            StyleSelectorList list = new StyleSelectorList(styles, combinators);
+            styles.Reverse();
+            types.Reverse();
+
+            StyleSelectorList list = new StyleSelectorList(styles, types);
 
             m_style = WidgetManager.GetStyle(list);
 
@@ -512,14 +530,8 @@ namespace NewWidgets.Widgets
 
             Vector2 size = Size;
 
-            float width;
-
-            if (m_style.TryGetValue(WidgetParameterIndex.Width, out width))
-                size.X = width;
-
-            float height;
-            if (m_style.TryGetValue(WidgetParameterIndex.Height, out height))
-                size.Y = height;
+            size.X = m_style.Get(WidgetParameterIndex.Width, size.X);
+            size.Y = m_style.Get(WidgetParameterIndex.Height, size.Y);
 
             Size = size;
         }

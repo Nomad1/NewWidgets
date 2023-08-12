@@ -23,8 +23,8 @@ namespace NewWidgets.Widgets
     {
         public new const string ElementType = "button";
         //
-        public const string ImageId = "button_image";
-        public const string LabelId = "button_label";
+        public const string ImageClass = "button_image";
+        public const string LabelClass = "button_label";
         //
 
         private readonly WidgetLabel m_label;
@@ -178,11 +178,11 @@ namespace NewWidgets.Widgets
            : base(elementType, style)
         {
             // This one is for compatibility reasons: nested styles were used in XML stylesheet
-            m_label = new WidgetLabel(new WidgetStyle(LabelId), text);
+            m_label = new WidgetLabel(new WidgetStyle(new[] { LabelClass },""), text);
             m_label.Parent = this;
 
             //m_image = new WidgetImage(GetProperty(WidgetParameterIndex.ButtonImageStyle, style.IsEmpty ? DefaultStyle : style));
-            m_image = new WidgetImage(new WidgetStyle(ImageId));
+            m_image = new WidgetImage(new WidgetStyle(new[] { ImageClass },""));
             m_image.Parent = this;
 
             m_clickSound = "click";

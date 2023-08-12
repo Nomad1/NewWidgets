@@ -18,6 +18,7 @@ namespace NewWidgets.UI.Styles
 
         private readonly IList<StyleSelector> m_selectors;
         private readonly IList<StyleSelectorCombinator> m_combinators;
+        private readonly IList<StyleNodeType> m_types;
         private readonly int m_chainCount;
         private readonly bool m_complex;
         private readonly int m_specificity;
@@ -71,6 +72,16 @@ namespace NewWidgets.UI.Styles
             get { return m_combinators; }
         }
 
+        internal IList<StyleNodeType> Types
+        {
+            get { return m_types; }
+        }
+
+        /// <summary>
+        /// Creates style selectors from CSS string honoring combinators
+        /// </summary>
+        /// <param name="selectorsString"></param>
+        /// <exception cref="ArgumentException"></exception>
         public StyleSelectorList(string selectorsString)
         {
             // remove whitespaces to simplify parsing
@@ -88,7 +99,7 @@ namespace NewWidgets.UI.Styles
 
             foreach (Match match in splitStrings)
             {
-                StyleSelectorCombinator @operator = StyleSelectorCombinator.Descendant; // space by default
+                StyleSelectorCombinator combinator = StyleSelectorCombinator.Descendant; // space by default
 
                 string selector = match.Groups[1].Value;
                 string splitOperator = match.Groups[2].Value.Trim();
@@ -98,27 +109,27 @@ namespace NewWidgets.UI.Styles
                     switch (splitOperator[0])
                     {
                         case ',':
-                            @operator = StyleSelectorCombinator.None;
+                            combinator = StyleSelectorCombinator.None;
                             break;
                         case '+':
-                            @operator = StyleSelectorCombinator.AdjacentSibling;
+                            combinator = StyleSelectorCombinator.AdjacentSibling;
                             break;
                         case '>':
-                            @operator = StyleSelectorCombinator.Child;
+                            combinator = StyleSelectorCombinator.Child;
                             break;
                         case '~':
-                            @operator = StyleSelectorCombinator.Sibling;
+                            combinator = StyleSelectorCombinator.Sibling;
                             break;
                         default: // there was a space symbol but it was removed during Split call so now first character is the name of the class or element
-                            @operator = StyleSelectorCombinator.Descendant;
+                            combinator = StyleSelectorCombinator.Descendant;
                             break;
                     }
                 }
 
                 selectors.Add(new StyleSelector(selector));
-                combinators.Add(@operator);
+                combinators.Add(combinator);
 
-                lastCombinator = @operator;
+                lastCombinator = combinator;
             }
 
             Match last = splitStrings[splitStrings.Count - 1];
@@ -127,6 +138,7 @@ namespace NewWidgets.UI.Styles
 
             m_selectors = selectors.ToArray();
             m_combinators = combinators.ToArray();
+            m_types = new StyleNodeType[m_selectors.Count];
 
             m_specificity = Analyze(out m_chainCount, out m_complex);
         }
@@ -135,10 +147,29 @@ namespace NewWidgets.UI.Styles
         /// Creates style list with single selector
         /// </summary>
         /// <param name="singleSelector"></param>
-        public StyleSelectorList(StyleSelector singleSelector)
+        internal StyleSelectorList(StyleSelector singleSelector, StyleNodeType nodeType = StyleNodeType.None)
         {
             m_selectors = new[] { singleSelector };
             m_combinators = new[] { StyleSelectorCombinator.None };
+            m_types = new[] { nodeType };
+            m_specificity = Analyze(out m_chainCount, out m_complex);
+        }
+
+        /// <summary>
+        /// Creates the list with specified collection of selectors and types
+        /// </summary>
+        /// <param name="selectors"></param>
+        /// <param name="types"></param>
+        internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleNodeType> types)
+        {
+            m_selectors = selectors;
+            m_types = types;
+            m_combinators = new StyleSelectorCombinator[selectors.Count];
+
+            for (int i = 0; i < m_combinators.Count - 1; i++)
+                m_combinators[i] = StyleSelectorCombinator.Descendant;
+            m_combinators[m_combinators.Count - 1] = StyleSelectorCombinator.None;
+
             m_specificity = Analyze(out m_chainCount, out m_complex);
         }
 
@@ -147,16 +178,20 @@ namespace NewWidgets.UI.Styles
         /// </summary>
         /// <param name="selectors"></param>
         /// <param name="combinators"></param>
-        public StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorCombinator> combinators)
+        /// <param name="types"></param>
+        internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorCombinator> combinators, IList<StyleNodeType> types)
         {
             m_selectors = selectors;
+            m_types = types;
             m_combinators = combinators;
+
             m_specificity = Analyze(out m_chainCount, out m_complex);
         }
 
         internal StyleSelectorList(StyleSelectorList other, int start, int count)
             : this(new ListRange<StyleSelector>(other.m_selectors, start, count),
-                  new ListRange<StyleSelectorCombinator>(other.m_combinators, start, count))
+                  new ListRange<StyleSelectorCombinator>(other.m_combinators, start, count),
+                  new ListRange<StyleNodeType>(other.m_types, start, count))
         {
 
         }
@@ -187,6 +222,7 @@ namespace NewWidgets.UI.Styles
                     case StyleSelectorCombinator.None: // separator
                         chainCount++;
                         break;
+                    case StyleSelectorCombinator.Child: // Nomad: temporary tread child as descendands, TODO
                     case StyleSelectorCombinator.Descendant: // non complex, just an inheritance chain
                         break;
                     default: // complex
@@ -254,6 +290,9 @@ namespace NewWidgets.UI.Styles
             for (int i = 0; i < other.Count; i++)
             {
                 if (m_combinators[i] != other.Operators[i])
+                    return false;
+
+                if (m_types[i] != other.Types[i])
                     return false;
 
                 if (!m_selectors[i].Equals(other.Selectors[i]))

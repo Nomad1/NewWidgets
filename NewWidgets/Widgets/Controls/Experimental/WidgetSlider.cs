@@ -12,9 +12,9 @@ namespace NewWidgets.Widgets
     {
         public new const string ElementType = "slider";
 
-        public const string TrackerId = "slider_track";
-        public const string LabelId = "slider_label";
-        public const string LineId = "slider_line";
+        public const string TrackerClass = "slider_track";
+        public const string LabelClass = "slider_label";
+        public const string LineClass = "slider_line";
 
         // TODO: make configurable
         private static readonly float s_inset = 15f;
@@ -109,15 +109,15 @@ namespace NewWidgets.Widgets
             m_min = Math.Min(min, max);
             m_text = "{0:0%}";
 
-            m_progressLine = new WidgetProgressLine(new WidgetStyle(LineId));
+            m_progressLine = new WidgetProgressLine(new WidgetStyle(new[] { LineClass },""));
             AddChild(m_progressLine);
 
-            m_trackButton = new TrackingButton(new WidgetStyle(TrackerId));
+            m_trackButton = new TrackingButton(new WidgetStyle(new[] { TrackerClass }, ""));
             m_trackButton.Position = new Vector2(0, m_progressLine.Size.Y - s_inset);
             m_trackButton.OnDrag += HandleDrag;
             AddChild(m_trackButton);
 
-            m_label = new WidgetLabel(new WidgetStyle(LabelId));
+            m_label = new WidgetLabel(new WidgetStyle(new[] { LabelClass }, ""));
             AddChild(m_label);
 
             SetValue(m_min);

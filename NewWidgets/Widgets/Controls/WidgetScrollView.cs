@@ -28,10 +28,10 @@ namespace NewWidgets.Widgets
 
 
         //
-        public const string HorizontalScrollId = "scrollview_hscroll";
-        public const string HorizontalTrackerId = "scrollview_htrack";
-        public const string VerticalScrollId = "scrollview_vscroll";
-        public const string VerticalScrollTrackerId = "scrollview_vtrack";
+        public const string HorizontalScrollClass = "scrollview_hscroll";
+        public const string HorizontalTrackerClass = "scrollview_htrack";
+        public const string VerticalScrollClass = "scrollview_vscroll";
+        public const string VerticalScrollTrackerClass = "scrollview_vtrack";
         //
 
         private static readonly float s_zoomDeltaScale = 10.0f;
@@ -151,16 +151,16 @@ namespace NewWidgets.Widgets
             m_horizontalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;
             m_verticalScroll = WidgetScrollType.Normal | WidgetScrollType.Visible | WidgetScrollType.AutoHide;
 
-            m_horizontalScrollBar = new WidgetBackground(new WidgetStyle(HorizontalScrollId));
+            m_horizontalScrollBar = new WidgetBackground(new WidgetStyle(new[] { HorizontalScrollClass }, ""));
             m_horizontalScrollBar.Parent = this;
 
-            m_horizontalScrollBarIndicator = new WidgetBackground(new WidgetStyle(HorizontalTrackerId));
+            m_horizontalScrollBarIndicator = new WidgetBackground(new WidgetStyle(new[] { HorizontalTrackerClass }, ""));
             m_horizontalScrollBarIndicator.Parent = this;
 
-            m_verticalScrollBar = new WidgetBackground(new WidgetStyle(VerticalScrollId));
+            m_verticalScrollBar = new WidgetBackground(new WidgetStyle(new[] { VerticalScrollClass },""));
             m_verticalScrollBar.Parent = this;
 
-            m_verticalScrollBarIndicator = new WidgetBackground(new WidgetStyle(VerticalScrollTrackerId));
+            m_verticalScrollBarIndicator = new WidgetBackground(new WidgetStyle(new[] { VerticalScrollTrackerClass },""));
             m_verticalScrollBarIndicator.Parent = this;
 
             Overflow = WidgetOverflow.Hidden;

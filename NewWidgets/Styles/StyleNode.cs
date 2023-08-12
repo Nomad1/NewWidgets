@@ -14,6 +14,20 @@ namespace NewWidgets.UI.Styles
         Sibling = 5, // E ~ F   an F element preceded by an E element
     }
 
+    public enum StyleNodeType
+    {
+        None = 0, // invalid
+        OwnStyle = 1, // local style set in element properties, i.e. <a style="color:red">
+        Id = 2, // style found by precise element id, i.e. <a id="id">
+        Class = 3, // style set in class attribute, i.e. <a class="class">
+        Element = 4, // style by element type, i.e. a { color: red; }
+        PseudoClass = 5, // style by matching element pseudo-class, i.e. a:hover { color: red}
+        Parent = 6, // direct parent of current element:  <div class="s"><a>tmp</a></div>
+        GrandParent = 7, // indirect parent of current element: <div class="s"><p><a>tmp</a></p></div>
+
+        // TODO: Sibling?
+    }
+
     /// <summary>
     /// This is an interface for property storage container
     /// Simplest version of this container is just a Dictionary with all the properties

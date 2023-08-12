@@ -108,7 +108,7 @@ namespace NewWidgets.Widgets
     {
         private bool m_hasOwnStyle; // This flag indicates that personal style has been created for the object
 
-        private readonly LinkedList<StyleNode> m_data;
+        private readonly LinkedList<ValueTuple<StyleNode, StyleNodeType>> m_data;
         private readonly string m_name;
 
         // Internal properties
@@ -123,16 +123,16 @@ namespace NewWidgets.Widgets
             get { return m_name; }
         }
 
-        internal WidgetStyleSheet(string name, ICollection<StyleNode> data)
+        internal WidgetStyleSheet(string name, ICollection<ValueTuple<StyleNode, StyleNodeType>> data)
         {
             m_name = name;
 
             m_hasOwnStyle = false;
 
-            m_data = new LinkedList<StyleNode>();
+            m_data = new LinkedList<ValueTuple<StyleNode, StyleNodeType>>();
 
             if (data != null)
-                foreach (StyleNode sheetData in data)
+                foreach (ValueTuple<StyleNode, StyleNodeType> sheetData in data)
                     m_data.AddFirst(sheetData);
         }
 
@@ -141,29 +141,31 @@ namespace NewWidgets.Widgets
             if (m_hasOwnStyle)
                 throw new WidgetException("Trying to set own style when it is already set!");
 
-            m_data.AddFirst(new StyleNode(new StyleSelectorList(new StyleSelector("", null, "")), ownStyle)); // local style, the same as HTML tag style="..."
+            m_data.AddFirst(new ValueTuple<StyleNode, StyleNodeType>(new StyleNode(new StyleSelectorList(new StyleSelector("", null, "")), ownStyle), StyleNodeType.OwnStyle)); // local style, the same as HTML tag style="..."
 
             m_hasOwnStyle = true;
         }
 
-        internal T Get<T>(WidgetParameterIndex index, T defaultValue, string elementType)
+        internal T Get<T>(WidgetParameterIndex index, T defaultValue)
         {
             WidgetParameterAttribute attr = WidgetParameterMap.GetAttributeByIndex(index);
 
-            bool inherited = attr != null && attr.Inheritance == WidgetParameterInheritance.Inherit;
+            bool inherited = attr != null && attr.Inheritance == WidgetParameterInheritance.Inherit; // should be read fromParent and GrandParent nodes
 
             object result = null;
 
-            LinkedListNode<StyleNode> node = m_data.First;
+            LinkedListNode<ValueTuple<StyleNode, StyleNodeType>> node = m_data.First;
 
             while (node != null)
             {
-                StyleNode data = node.Value;
+                StyleNode data = node.Value.Item1;
 
                 if (((StyleSheetData)data.Data).TryGetParameter(index, out result))
                 {
                     break;
                 }
+
+                StyleNodeType dataNodeType = node.Value.Item2;
 
                 //// if current style is explicit with id, it's parent 
                 //if (!inherited && data.IsId()) 
@@ -172,10 +174,17 @@ namespace NewWidgets.Widgets
                 // if next style is the same as this one less on pseudo-class, we can think of it as a parent and do a one-time exception for data lookup
                 // otherwise we need to check if the property inheritance is Initial and then break
 
-                if (inherited || node == m_data.First || (node.Next != null && node.Next.Value.IsPseudoClassParent(data)) || (node.Next != null && node.Next.Value.IsElementParent(elementType)))
+                StyleNodeType nextNodeType = node.Next != null ? node.Next.Value.Item2 : StyleNodeType.None;
+
+                if (inherited || dataNodeType == StyleNodeType.OwnStyle || nextNodeType == StyleNodeType.Class || nextNodeType == StyleNodeType.Id || nextNodeType == StyleNodeType.Element || nextNodeType == StyleNodeType.PseudoClass)
                     node = node.Next;
-                else
+                else // next node type is Parent or GrandParent. None of them should pass inherited properties to descendants
                     break;
+
+                //if (inherited || node.Value.SelectorList.Types[0] == StyleNodeType.OwnStyle || (node.Next != null && node.Next.Value.IsPseudoClassParent(data)) || (node.Next != null && node.Next.Value.IsElementParent(elementType)))
+                //    node = node.Next;
+                //else
+                //    break;
             }
 
             if (result == null)
@@ -186,7 +195,7 @@ namespace NewWidgets.Widgets
 
             return (T)result;
         }
-
+        /*
         internal bool TryGetValue<T>(WidgetParameterIndex index, out T tresult)
         {
             object result = null;
@@ -209,7 +218,7 @@ namespace NewWidgets.Widgets
             tresult = (T)result;
             return true;
         }
-
+        */
         /// <summary>
         /// Retrieve parameter by name
         /// </summary>
@@ -217,9 +226,9 @@ namespace NewWidgets.Widgets
         /// <param name="name">Name.</param>
         /// <param name="defaultValue">Default value.</param>
         /// <typeparam name="T">The 1st type parameter.</typeparam>
-        public T Get<T>(string name, T defaultValue, string elementType)
+        public T Get<T>(string name, T defaultValue)
         {
-            return Get(WidgetParameterMap.GetIndexByName(name), defaultValue, elementType);
+            return Get(WidgetParameterMap.GetIndexByName(name), defaultValue);
         }
 
         internal void Set(WidgetParameterIndex index, object value)
@@ -233,7 +242,7 @@ namespace NewWidgets.Widgets
                 if (value.GetType() != attribute.Type)
                     throw new WidgetException(string.Format("Setting attribute {0} to value {1} type {2} while expecting type {3}", index, value, value.GetType(), attribute.Type));
 
-            ((StyleSheetData)m_data.First.Value.Data).SetParameter(index, value);
+            ((StyleSheetData)m_data.First.Value.Item1.Data).SetParameter(index, value);
         }
       
         /// <summary>
@@ -251,7 +260,7 @@ namespace NewWidgets.Widgets
             IStyleData temp = new StyleSheetData();
 
             for (var node = m_data.Last; node != null; node = node.Previous)
-                temp.LoadData(node.Value.Data);
+                temp.LoadData(node.Value.Item1.Data);
 
             return temp.ToString();
         }

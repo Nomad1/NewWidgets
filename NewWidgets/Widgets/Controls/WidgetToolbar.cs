@@ -11,7 +11,7 @@ namespace NewWidgets.Widgets
     public class WidgetToolbar : Widget
     {
         public new const string ElementType = "toolbar";
-        private const string PanelId = "toolbar_panel";
+        private const string PanelClass = "toolbar_panel";
         //
 
         private const float s_offsetX = 8f;
@@ -54,7 +54,7 @@ namespace NewWidgets.Widgets
         protected WidgetToolbar(string elementType, WidgetStyle style, bool vertical = false)
             : base(elementType, style)
         {
-            m_buttons = new WidgetPanel(new WidgetStyle(PanelId));
+            m_buttons = new WidgetPanel(new WidgetStyle(new[] { PanelClass }, ""));
             m_buttons.Parent = this;
             m_vertical = vertical;
         }

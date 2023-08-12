@@ -152,23 +152,22 @@ namespace NewWidgets.UI.Styles
         /// </summary>
         /// <param name="selectorList"></param>
         /// <returns></returns>
-        public ICollection<StyleNode> GetStyleData(StyleSelectorList selectorList)
+        internal ICollection<ValueTuple<StyleNode, StyleNodeType>> GetStyleData(StyleSelectorList selectorList)
         {
             if (selectorList == null || selectorList.IsEmpty)
                 throw new ArgumentException("Invalid StyleNode for FindStyle call");
 
-            // Styles are now sorted by specificity
-            //SortedSet<StyleNode> styles = new SortedSet<StyleNode>(StyleNode.Comparer.Instance);
-
-            List<StyleNode> styles = new List<StyleNode>();
+            List<ValueTuple<StyleNode, StyleNodeType>> styles = new List<ValueTuple<StyleNode, StyleNodeType>>();
 
             for (int i = 0; i < selectorList.Count; i++)
             {
-                SortedSet<StyleNode> partStyles = new SortedSet<StyleNode>();
+                // Styles are sorted by specificity
+                SortedDictionary<StyleNode, StyleNodeType> partStyles = new SortedDictionary<StyleNode, StyleNodeType>();
 
                 StyleSelectorList selectorPart = new StyleSelectorList(selectorList, 0, i + 1);
 
                 StyleSelector selector = selectorPart.Selectors[selectorPart.Count - 1];
+                StyleNodeType nodeType = selectorPart.Types[selectorPart.Count - 1];
 
                 // we look in our dictionaries for nodes having some of the target parts
                 ICollection<StyleNode> collection;
@@ -176,9 +175,9 @@ namespace NewWidgets.UI.Styles
                 if (!string.IsNullOrEmpty(selector.Element)) // if it has an element name, check element collection
                     if (m_elementCollection.TryGetValue(selector.Element, out collection))
                         foreach (StyleNode node in collection)
-                            if (!partStyles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
+                            if (!partStyles.ContainsKey(node) && node.SelectorList.AppliesTo(selectorPart))
                             {
-                                partStyles.Add(node);
+                                partStyles[node] = nodeType;
 
                                 //Console.WriteLine("Found match for element {0} to style {1}", selector.Element, node);
                             }
@@ -186,9 +185,9 @@ namespace NewWidgets.UI.Styles
                 if (!string.IsNullOrEmpty(selector.Id)) // if it has an id, check id collection
                     if (m_idCollection.TryGetValue(selector.Id, out collection))
                         foreach (StyleNode node in collection)
-                            if (!partStyles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
+                            if (!partStyles.ContainsKey(node) && node.SelectorList.AppliesTo(selectorPart))
                             {
-                                partStyles.Add(node);
+                                partStyles[node] = nodeType;
 
                                 //Console.WriteLine("Found match for id #{0} to style {1}", selector.Id, node);
                             }
@@ -201,16 +200,17 @@ namespace NewWidgets.UI.Styles
                         string @class = selector.Classes[c];
                         if (m_classCollection.TryGetValue(@class, out collection))
                             foreach (StyleNode node in collection)
-                                if (!partStyles.Contains(node) && node.SelectorList.AppliesTo(selectorPart))
+                                if (!partStyles.ContainsKey(node) && node.SelectorList.AppliesTo(selectorPart))
                                 {
-                                    partStyles.Add(node);
+                                    partStyles[node] = nodeType;
 
                                     //Console.WriteLine("Found match for class {0} to style {1}", @class, node);
                                 }
                     }
                 }
 
-                styles.AddRange(partStyles);
+                foreach(var pair in partStyles)
+                    styles.Add(new ValueTuple<StyleNode, StyleNodeType>(pair.Key, pair.Value));
             }
 
             // rule out some very simple cases
@@ -220,8 +220,8 @@ namespace NewWidgets.UI.Styles
 
 #if !DEBUG
             if (styles.Count == 1)
-                foreach (StyleNode node in styles)
-                    return new[] { node };
+                foreach (var pair in styles)
+                    return new[] { pair };
 #endif
 
             // here we're storing data as an array. The only problem is that we don't store selector hierarchy so we don't know if there is `button:hover` that
@@ -231,11 +231,11 @@ namespace NewWidgets.UI.Styles
 
 #if DEBUG
             string resultString = "";
-            foreach (StyleNode node in styles)
+            foreach (var pair in styles)
             {
                 if (j != 0)
                     resultString += " ";
-                resultString += string.Format("[{0} = {1}]", node.StyleSelector, node.Specificity);
+                resultString += string.Format("[{0} = {1}]", pair.Item1.StyleSelector, pair.Item1.Specificity);
             }
 
             Console.WriteLine("Resolved {0} for {1}", resultString, selectorList);
@@ -247,6 +247,7 @@ namespace NewWidgets.UI.Styles
             return styles;
         }
 
+        /*
         /// <summary>
         /// This method retrieves an ordered list (cascade) of style properties
         /// for given selector string
@@ -256,7 +257,7 @@ namespace NewWidgets.UI.Styles
         public ICollection<StyleNode> GetStyleData(string selectorsString)
         {
             return GetStyleData(new StyleSelectorList(selectorsString));
-        }
+        }*/
 
         /// <summary>
         /// Saves the collection to output stream

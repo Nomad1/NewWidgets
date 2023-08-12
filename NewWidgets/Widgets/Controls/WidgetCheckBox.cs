@@ -14,7 +14,7 @@ namespace NewWidgets.Widgets
     {
         public new const string ElementType = "checkbox";
         //
-        private const string ImageId = "checkbox_image";
+        private const string ImageClass = "checkbox_image";
 
         private readonly WidgetImage m_image;
         private WidgetLabel m_linkedLabel;
@@ -97,7 +97,7 @@ namespace NewWidgets.Widgets
         protected WidgetCheckBox(string elementType, WidgetStyle style, bool isChecked)
             : base(elementType, style)
         {
-            m_image = new WidgetImage(new WidgetStyle(ImageId));
+            m_image = new WidgetImage(new WidgetStyle(new[] { ImageClass }, ""));
             m_image.Parent = this;
 
             Selected = isChecked;
