@@ -18,7 +18,7 @@ namespace NewWidgets.UI.Styles
 
         private readonly IList<StyleSelector> m_selectors;
         private readonly IList<StyleSelectorCombinator> m_combinators;
-        private readonly IList<StyleNodeType> m_types;
+        private readonly IList<StyleNodeMatch> m_types;
         private readonly int m_chainCount;
         private readonly bool m_complex;
         private readonly int m_specificity;
@@ -72,7 +72,7 @@ namespace NewWidgets.UI.Styles
             get { return m_combinators; }
         }
 
-        internal IList<StyleNodeType> Types
+        internal IList<StyleNodeMatch> Types
         {
             get { return m_types; }
         }
@@ -138,7 +138,7 @@ namespace NewWidgets.UI.Styles
 
             m_selectors = selectors.ToArray();
             m_combinators = combinators.ToArray();
-            m_types = new StyleNodeType[m_selectors.Count];
+            m_types = new StyleNodeMatch[m_selectors.Count];
 
             m_specificity = Analyze(out m_chainCount, out m_complex);
         }
@@ -147,7 +147,7 @@ namespace NewWidgets.UI.Styles
         /// Creates style list with single selector
         /// </summary>
         /// <param name="singleSelector"></param>
-        internal StyleSelectorList(StyleSelector singleSelector, StyleNodeType nodeType = StyleNodeType.None)
+        internal StyleSelectorList(StyleSelector singleSelector, StyleNodeMatch nodeType = StyleNodeMatch.None)
         {
             m_selectors = new[] { singleSelector };
             m_combinators = new[] { StyleSelectorCombinator.None };
@@ -160,7 +160,7 @@ namespace NewWidgets.UI.Styles
         /// </summary>
         /// <param name="selectors"></param>
         /// <param name="types"></param>
-        internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleNodeType> types)
+        internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleNodeMatch> types)
         {
             m_selectors = selectors;
             m_types = types;
@@ -179,7 +179,7 @@ namespace NewWidgets.UI.Styles
         /// <param name="selectors"></param>
         /// <param name="combinators"></param>
         /// <param name="types"></param>
-        internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorCombinator> combinators, IList<StyleNodeType> types)
+        internal StyleSelectorList(IList<StyleSelector> selectors, IList<StyleSelectorCombinator> combinators, IList<StyleNodeMatch> types)
         {
             m_selectors = selectors;
             m_types = types;
@@ -191,7 +191,7 @@ namespace NewWidgets.UI.Styles
         internal StyleSelectorList(StyleSelectorList other, int start, int count)
             : this(new ListRange<StyleSelector>(other.m_selectors, start, count),
                   new ListRange<StyleSelectorCombinator>(other.m_combinators, start, count),
-                  new ListRange<StyleNodeType>(other.m_types, start, count))
+                  new ListRange<StyleNodeMatch>(other.m_types, start, count))
         {
 
         }

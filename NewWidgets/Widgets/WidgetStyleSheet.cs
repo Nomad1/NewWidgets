@@ -108,7 +108,7 @@ namespace NewWidgets.Widgets
     {
         private bool m_hasOwnStyle; // This flag indicates that personal style has been created for the object
 
-        private readonly LinkedList<ValueTuple<StyleNode, StyleNodeType>> m_data;
+        private readonly LinkedList<ValueTuple<StyleNode, StyleNodeMatch>> m_data;
         private readonly string m_name;
 
         // Internal properties
@@ -123,16 +123,16 @@ namespace NewWidgets.Widgets
             get { return m_name; }
         }
 
-        internal WidgetStyleSheet(string name, ICollection<ValueTuple<StyleNode, StyleNodeType>> data)
+        internal WidgetStyleSheet(string name, ICollection<ValueTuple<StyleNode, StyleNodeMatch>> data)
         {
             m_name = name;
 
             m_hasOwnStyle = false;
 
-            m_data = new LinkedList<ValueTuple<StyleNode, StyleNodeType>>();
+            m_data = new LinkedList<ValueTuple<StyleNode, StyleNodeMatch>>();
 
             if (data != null)
-                foreach (ValueTuple<StyleNode, StyleNodeType> sheetData in data)
+                foreach (ValueTuple<StyleNode, StyleNodeMatch> sheetData in data)
                     m_data.AddFirst(sheetData);
         }
 
@@ -141,7 +141,7 @@ namespace NewWidgets.Widgets
             if (m_hasOwnStyle)
                 throw new WidgetException("Trying to set own style when it is already set!");
 
-            m_data.AddFirst(new ValueTuple<StyleNode, StyleNodeType>(new StyleNode(new StyleSelectorList(new StyleSelector("", null, "")), ownStyle), StyleNodeType.OwnStyle)); // local style, the same as HTML tag style="..."
+            m_data.AddFirst(new ValueTuple<StyleNode, StyleNodeMatch>(new StyleNode(new StyleSelectorList(new StyleSelector("", null, "")), ownStyle), StyleNodeMatch.OwnStyle)); // local style, the same as HTML tag style="..."
 
             m_hasOwnStyle = true;
         }
@@ -154,7 +154,9 @@ namespace NewWidgets.Widgets
 
             object result = null;
 
-            LinkedListNode<ValueTuple<StyleNode, StyleNodeType>> node = m_data.First;
+            LinkedListNode<ValueTuple<StyleNode, StyleNodeMatch>> node = m_data.First;
+
+            // Let's iterate all the styles and select properties based on inheritance
 
             while (node != null)
             {
@@ -165,18 +167,36 @@ namespace NewWidgets.Widgets
                     break;
                 }
 
-                StyleNodeType dataNodeType = node.Value.Item2;
+                if (node.Next == null)
+                    break;
 
-                //// if current style is explicit with id, it's parent 
-                //if (!inherited && data.IsId()) 
-                //    break;
+                if ((node.Value.Item2 & StyleNodeMatch.OwnStyle) != 0) // owns styles has maximum priority but it not found, they won't stop the cascade
+                {
+                    node = node.Next;
+                    continue;
+                }
 
                 // if next style is the same as this one less on pseudo-class, we can think of it as a parent and do a one-time exception for data lookup
                 // otherwise we need to check if the property inheritance is Initial and then break
 
-                StyleNodeType nextNodeType = node.Next != null ? node.Next.Value.Item2 : StyleNodeType.None;
+                StyleNodeMatch nextNodeType = node.Next.Value.Item2;
 
-                if (inherited || dataNodeType == StyleNodeType.OwnStyle || nextNodeType == StyleNodeType.Class || nextNodeType == StyleNodeType.Id || nextNodeType == StyleNodeType.Element || nextNodeType == StyleNodeType.PseudoClass)
+                if ((nextNodeType & (StyleNodeMatch.Parent | StyleNodeMatch.GrandParent)) != 0 && !inherited)
+                    break;
+
+                node = node.Next;
+                /*
+                if (node.Next.Value.Item1.IsPseudoClassParent(data))
+                {
+                }
+
+
+                if (node.Next != null)
+                {
+                    if (node.Next.Value.Item1.Last.
+                }
+
+                if (inherited || dataNodeType == StyleNodeMatch.OwnStyle || nextNodeType == StyleNodeMatch.Class || nextNodeType == StyleNodeMatch.Id || nextNodeType == StyleNodeMatch.Element || nextNodeType == StyleNodeMatch.PseudoClass)
                     node = node.Next;
                 else // next node type is Parent or GrandParent. None of them should pass inherited properties to descendants
                     break;
@@ -184,7 +204,7 @@ namespace NewWidgets.Widgets
                 //if (inherited || node.Value.SelectorList.Types[0] == StyleNodeType.OwnStyle || (node.Next != null && node.Next.Value.IsPseudoClassParent(data)) || (node.Next != null && node.Next.Value.IsElementParent(elementType)))
                 //    node = node.Next;
                 //else
-                //    break;
+                //    break;*/
             }
 
             if (result == null)

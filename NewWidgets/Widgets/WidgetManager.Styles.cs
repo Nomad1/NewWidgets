@@ -36,7 +36,7 @@ namespace NewWidgets.Widgets
         /// <returns></returns>
         internal static WidgetStyleSheet GetStyle(StyleSelectorList list)
         {
-            ICollection<ValueTuple<StyleNode, StyleNodeType>> result = s_styleCollection.GetStyleData(list);
+            ICollection<ValueTuple<StyleNode, StyleNodeMatch>> result = s_styleCollection.GetStyleData(list);
 
             return new WidgetStyleSheet(list.ToString(), result);
         }
@@ -48,7 +48,7 @@ namespace NewWidgets.Widgets
         /// <returns></returns>
         internal static WidgetStyleSheet GetStyle(StyleSelector singleSelector)
         {
-            return GetStyle(new StyleSelectorList(singleSelector, StyleNodeType.Class));
+            return GetStyle(new StyleSelectorList(singleSelector, StyleNodeMatch.Class));
         }
 
         public static void LoadCSS(string uiData)

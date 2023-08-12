@@ -14,16 +14,17 @@ namespace NewWidgets.UI.Styles
         Sibling = 5, // E ~ F   an F element preceded by an E element
     }
 
-    public enum StyleNodeType
+    [Flags]
+    public enum StyleNodeMatch
     {
         None = 0, // invalid
-        OwnStyle = 1, // local style set in element properties, i.e. <a style="color:red">
-        Id = 2, // style found by precise element id, i.e. <a id="id">
-        Class = 3, // style set in class attribute, i.e. <a class="class">
-        Element = 4, // style by element type, i.e. a { color: red; }
-        PseudoClass = 5, // style by matching element pseudo-class, i.e. a:hover { color: red}
-        Parent = 6, // direct parent of current element:  <div class="s"><a>tmp</a></div>
-        GrandParent = 7, // indirect parent of current element: <div class="s"><p><a>tmp</a></p></div>
+        OwnStyle = 0x01, // local style set in element properties, i.e. <a style="color:red">
+        Id = 0x02, // style found by precise element id, i.e. <a id="id">
+        Class = 0x04, // style set in class attribute, i.e. <a class="class">
+        Element = 0x08, // style by element type, i.e. a { color: red; }
+        PseudoClass = 0x10, // style by matching element pseudo-class, i.e. a:hover { color: red}
+        Parent = 0x20, // direct parent of current element:  <div class="s"><a>tmp</a></div>
+        GrandParent = 0x40, // indirect parent of current element: <div class="s"><p><a>tmp</a></p></div>
 
         // TODO: Sibling?
     }
@@ -71,6 +72,11 @@ namespace NewWidgets.UI.Styles
             get { return m_selectorList.Specificity; }
         }
 
+        public StyleSelector Last
+        {
+            get { return m_selectorList.Selectors[m_selectorList.Count - 1]; }
+        }
+
         internal StyleNode(StyleSelectorList selector, IStyleData data)
         {
             m_selectorList = selector;
@@ -95,7 +101,7 @@ namespace NewWidgets.UI.Styles
             if (child == null)
                 return false;
 
-            if (child.SelectorList.Selectors[child.SelectorList.Selectors.Count - 1].PseudoClasses != null)
+            if (child.Last.PseudoClasses != null)
                 return true;
 
             return false;
@@ -112,5 +118,22 @@ namespace NewWidgets.UI.Styles
                 &&
                 (SelectorList.Selectors[0].Classes == null || SelectorList.Selectors[0].Classes.Length == 0);
         }
+
+        ///// <summary>
+        ///// Tries to guess node type relative to this element type. It could not guess Parent/GrandParent relations
+        ///// </summary>
+        ///// <param name="elementType"></param>
+        ///// <returns></returns>
+        //public StyleNodeType GetNodeType(string elementType, string id, string [] classes, string [] pseudoClasses)
+        //{
+        //    if (!string.IsNullOrEmpty(id) && this.Last.Id == id)
+        //        return StyleNodeType.Id; // this style matches our personal Id
+
+
+        //    return SelectorList.IsSimple &&
+        //        (elementType == SelectorList.Selectors[0].Element || SelectorList.Selectors[0].Element == "*")
+        //        &&
+        //        (SelectorList.Selectors[0].Classes == null || SelectorList.Selectors[0].Classes.Length == 0);
+        //}
     }
 }

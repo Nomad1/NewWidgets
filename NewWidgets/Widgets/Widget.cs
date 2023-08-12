@@ -489,7 +489,7 @@ namespace NewWidgets.Widgets
             m_needsLayout = true; // make sure that any style changes result in layout updates as well
 
             List<StyleSelector> styles = new List<StyleSelector>();
-            List<StyleNodeType> types = new List<StyleNodeType>();
+            List<StyleNodeMatch> types = new List<StyleNodeMatch>();
 
             Widget current = this;
 
@@ -503,14 +503,14 @@ namespace NewWidgets.Widgets
                 {
                     // for current node it's 
                     types.Add(
-                        !string.IsNullOrEmpty(StyleId) ? StyleNodeType.Id :
-                        StyleState != null && StyleState.Length > 0 ? StyleNodeType.PseudoClass :
-                        StyleClasses != null && StyleClasses.Length > 0 ? StyleNodeType.Class :
-                        StyleNodeType.Element);
+                        !string.IsNullOrEmpty(StyleId) ? StyleNodeMatch.Id :
+                        StyleState != null && StyleState.Length > 0 ? StyleNodeMatch.PseudoClass :
+                        StyleClasses != null && StyleClasses.Length > 0 ? StyleNodeMatch.Class :
+                        StyleNodeMatch.Element);
                 }
                 else
                 {
-                    types.Add(this.Parent == current ? StyleNodeType.Parent : StyleNodeType.GrandParent);
+                    types.Add(this.Parent == current ? StyleNodeMatch.Parent : StyleNodeMatch.GrandParent);
                 }
 
                 current = current.Parent;

@@ -152,22 +152,22 @@ namespace NewWidgets.UI.Styles
         /// </summary>
         /// <param name="selectorList"></param>
         /// <returns></returns>
-        internal ICollection<ValueTuple<StyleNode, StyleNodeType>> GetStyleData(StyleSelectorList selectorList)
+        internal ICollection<ValueTuple<StyleNode, StyleNodeMatch>> GetStyleData(StyleSelectorList selectorList)
         {
             if (selectorList == null || selectorList.IsEmpty)
                 throw new ArgumentException("Invalid StyleNode for FindStyle call");
 
-            List<ValueTuple<StyleNode, StyleNodeType>> styles = new List<ValueTuple<StyleNode, StyleNodeType>>();
+            List<ValueTuple<StyleNode, StyleNodeMatch>> styles = new List<ValueTuple<StyleNode, StyleNodeMatch>>();
 
             for (int i = 0; i < selectorList.Count; i++)
             {
                 // Styles are sorted by specificity
-                SortedDictionary<StyleNode, StyleNodeType> partStyles = new SortedDictionary<StyleNode, StyleNodeType>();
+                SortedDictionary<StyleNode, StyleNodeMatch> partStyles = new SortedDictionary<StyleNode, StyleNodeMatch>();
 
                 StyleSelectorList selectorPart = new StyleSelectorList(selectorList, 0, i + 1);
 
                 StyleSelector selector = selectorPart.Selectors[selectorPart.Count - 1];
-                StyleNodeType nodeType = selectorPart.Types[selectorPart.Count - 1];
+                StyleNodeMatch nodeType = selectorPart.Types[selectorPart.Count - 1];
 
                 // we look in our dictionaries for nodes having some of the target parts
                 ICollection<StyleNode> collection;
@@ -177,7 +177,7 @@ namespace NewWidgets.UI.Styles
                         foreach (StyleNode node in collection)
                             if (!partStyles.ContainsKey(node) && node.SelectorList.AppliesTo(selectorPart))
                             {
-                                partStyles[node] = nodeType;
+                                partStyles[node] = nodeType | StyleNodeMatch.Element;
 
                                 //Console.WriteLine("Found match for element {0} to style {1}", selector.Element, node);
                             }
@@ -187,7 +187,7 @@ namespace NewWidgets.UI.Styles
                         foreach (StyleNode node in collection)
                             if (!partStyles.ContainsKey(node) && node.SelectorList.AppliesTo(selectorPart))
                             {
-                                partStyles[node] = nodeType;
+                                partStyles[node] = nodeType | StyleNodeMatch.Id;
 
                                 //Console.WriteLine("Found match for id #{0} to style {1}", selector.Id, node);
                             }
@@ -202,7 +202,7 @@ namespace NewWidgets.UI.Styles
                             foreach (StyleNode node in collection)
                                 if (!partStyles.ContainsKey(node) && node.SelectorList.AppliesTo(selectorPart))
                                 {
-                                    partStyles[node] = nodeType;
+                                    partStyles[node] = nodeType | StyleNodeMatch.Class;
 
                                     //Console.WriteLine("Found match for class {0} to style {1}", @class, node);
                                 }
@@ -210,7 +210,7 @@ namespace NewWidgets.UI.Styles
                 }
 
                 foreach(var pair in partStyles)
-                    styles.Add(new ValueTuple<StyleNode, StyleNodeType>(pair.Key, pair.Value));
+                    styles.Add(new ValueTuple<StyleNode, StyleNodeMatch>(pair.Key, pair.Value));
             }
 
             // rule out some very simple cases
