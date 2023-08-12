@@ -234,11 +234,11 @@ namespace NewWidgets.Widgets
              if (minSize.Y < Size.Y)
                  minSize.Y = Size.Y;
 
-             Size = minSize;*/            
-
-            UpdateCursor(0);
+             Size = minSize;*/
 
             base.UpdateLayout();
+
+            UpdateCursor(0);
         }
 
         public override bool Update()

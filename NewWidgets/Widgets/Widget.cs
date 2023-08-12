@@ -385,7 +385,7 @@ namespace NewWidgets.Widgets
         /// <summary>
         /// This method should be called when widget layout is changed (size, padding, etc.)
         /// </summary>
-        protected void InvalidateLayout()
+        public void InvalidateLayout()
         {
             m_needsLayout = true;
         }

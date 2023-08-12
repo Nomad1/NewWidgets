@@ -163,6 +163,7 @@ namespace NewWidgets.Widgets
             m_leftButton = new WidgetButton(new WidgetStyle(new[] { LeftButtonClass },""), "<");
             AddChild(m_leftButton);
             m_leftButton.OnPress += (obj) => HandleChange(-1);
+            m_leftButton.Relayout();
 
             m_label = new WidgetLabel(new WidgetStyle(new[] { LabelClass },""), items.Count > 0 ? items[0].Key : string.Empty);
             AddChild(m_label);
@@ -171,6 +172,7 @@ namespace NewWidgets.Widgets
             m_rightButton = new WidgetButton(new WidgetStyle(new[] { RightButtonClass },""), ">");
             AddChild(m_rightButton);
             m_rightButton.OnPress += (obj) => HandleChange(+1);
+            m_rightButton.Relayout();
 
             m_animated = true;
 
