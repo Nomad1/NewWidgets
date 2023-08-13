@@ -501,12 +501,19 @@ namespace NewWidgets.Widgets
 
                 if (current == this)
                 {
-                    // for current node it's 
-                    types.Add(
-                        !string.IsNullOrEmpty(StyleId) ? StyleNodeMatch.Id :
-                        StyleState != null && StyleState.Length > 0 ? StyleNodeMatch.PseudoClass :
-                        StyleClasses != null && StyleClasses.Length > 0 ? StyleNodeMatch.Class :
-                        StyleNodeMatch.Element);
+                    StyleNodeMatch type = StyleNodeMatch.Element;
+
+                    if (!string.IsNullOrEmpty(StyleId))
+                        type |= StyleNodeMatch.Id;
+
+                    if (StyleClasses != null && StyleClasses.Length > 0)
+                        type |= StyleNodeMatch.Class;
+
+                    if (StyleState != null && StyleState.Length > 0)
+                        type |= StyleNodeMatch.PseudoClass;
+                    
+                    // type for current node
+                    types.Add(type);
                 }
                 else
                 {

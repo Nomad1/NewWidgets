@@ -101,10 +101,10 @@ namespace NewWidgets.UI.Styles
             if (child == null)
                 return false;
 
-            if (child.Last.PseudoClasses != null)
-                return true;
+            if (child.Last.PseudoClasses == null || child.Last.PseudoClasses.Length == 0)
+                return false;
 
-            return false;
+            return Last.IsChild(child.Last);
         }
 
         /// <summary>

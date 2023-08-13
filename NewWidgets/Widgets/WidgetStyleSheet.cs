@@ -170,41 +170,22 @@ namespace NewWidgets.Widgets
                 if (node.Next == null)
                     break;
 
-                if ((node.Value.Item2 & StyleNodeMatch.OwnStyle) != 0) // owns styles has maximum priority but it not found, they won't stop the cascade
-                {
-                    node = node.Next;
-                    continue;
-                }
+                //if ((node.Value.Item2 & StyleNodeMatch.OwnStyle) != 0) // owns styles has maximum priority but if not found, they won't stop the cascade
+                //{
+                //    node = node.Next;
+                //    continue;
+                //}
 
                 // if next style is the same as this one less on pseudo-class, we can think of it as a parent and do a one-time exception for data lookup
                 // otherwise we need to check if the property inheritance is Initial and then break
 
                 StyleNodeMatch nextNodeType = node.Next.Value.Item2;
 
-                if ((nextNodeType & (StyleNodeMatch.Parent | StyleNodeMatch.GrandParent)) != 0 && !inherited)
+                // Pseudo classes should inherit data from their parent classes
+                if (!inherited && (nextNodeType & (StyleNodeMatch.Parent | StyleNodeMatch.GrandParent)) != 0)
                     break;
 
                 node = node.Next;
-                /*
-                if (node.Next.Value.Item1.IsPseudoClassParent(data))
-                {
-                }
-
-
-                if (node.Next != null)
-                {
-                    if (node.Next.Value.Item1.Last.
-                }
-
-                if (inherited || dataNodeType == StyleNodeMatch.OwnStyle || nextNodeType == StyleNodeMatch.Class || nextNodeType == StyleNodeMatch.Id || nextNodeType == StyleNodeMatch.Element || nextNodeType == StyleNodeMatch.PseudoClass)
-                    node = node.Next;
-                else // next node type is Parent or GrandParent. None of them should pass inherited properties to descendants
-                    break;
-
-                //if (inherited || node.Value.SelectorList.Types[0] == StyleNodeType.OwnStyle || (node.Next != null && node.Next.Value.IsPseudoClassParent(data)) || (node.Next != null && node.Next.Value.IsElementParent(elementType)))
-                //    node = node.Next;
-                //else
-                //    break;*/
             }
 
             if (result == null)

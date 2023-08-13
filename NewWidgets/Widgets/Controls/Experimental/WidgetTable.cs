@@ -856,6 +856,8 @@ namespace NewWidgets.Widgets
                 };
 
                 AddChild(result);
+                result.Relayout();
+
                 return result;
             }
 
