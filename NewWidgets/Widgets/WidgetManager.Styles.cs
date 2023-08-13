@@ -36,7 +36,7 @@ namespace NewWidgets.Widgets
         /// <returns></returns>
         internal static WidgetStyleSheet GetStyle(StyleSelectorList list)
         {
-            ICollection<ValueTuple<StyleNode, StyleNodeMatch>> result = s_styleCollection.GetStyleData(list);
+            ICollection<StyleNodeMatchPair> result = s_styleCollection.GetStyleData(list);
 
             return new WidgetStyleSheet(list.ToString(), result);
         }

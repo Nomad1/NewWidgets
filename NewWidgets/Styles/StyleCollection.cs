@@ -152,12 +152,12 @@ namespace NewWidgets.UI.Styles
         /// </summary>
         /// <param name="selectorList"></param>
         /// <returns></returns>
-        internal ICollection<ValueTuple<StyleNode, StyleNodeMatch>> GetStyleData(StyleSelectorList selectorList)
+        internal ICollection<StyleNodeMatchPair> GetStyleData(StyleSelectorList selectorList)
         {
             if (selectorList == null || selectorList.IsEmpty)
                 throw new ArgumentException("Invalid StyleNode for FindStyle call");
 
-            List<ValueTuple<StyleNode, StyleNodeMatch>> styles = new List<ValueTuple<StyleNode, StyleNodeMatch>>();
+            List<StyleNodeMatchPair> styles = new List<StyleNodeMatchPair>();
 
             for (int i = 0; i < selectorList.Count; i++)
             {
@@ -210,7 +210,7 @@ namespace NewWidgets.UI.Styles
                 }
 
                 foreach(var pair in partStyles)
-                    styles.Add(new ValueTuple<StyleNode, StyleNodeMatch>(pair.Key, pair.Value));
+                    styles.Add(new StyleNodeMatchPair(pair.Key, pair.Value));
             }
 
             // rule out some very simple cases
@@ -235,7 +235,7 @@ namespace NewWidgets.UI.Styles
             {
                 if (j != 0)
                     resultString += " ";
-                resultString += string.Format("[{0} = {1}]", pair.Item1.StyleSelector, pair.Item1.Specificity);
+                resultString += string.Format("[{0} = {1}]", pair.Node.StyleSelector, pair.Node.Specificity);
             }
 
             Console.WriteLine("Resolved {0} for {1}", resultString, selectorList);

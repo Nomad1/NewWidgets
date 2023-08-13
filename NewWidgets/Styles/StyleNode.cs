@@ -15,7 +15,7 @@ namespace NewWidgets.UI.Styles
     }
 
     [Flags]
-    public enum StyleNodeMatch
+    internal enum StyleNodeMatch
     {
         None = 0, // invalid
         OwnStyle = 0x01, // local style set in element properties, i.e. <a style="color:red">
@@ -42,6 +42,17 @@ namespace NewWidgets.UI.Styles
         void LoadData(IStyleData data);
     }
 
+    internal struct StyleNodeMatchPair
+    {
+        public readonly StyleNode Node;
+        public readonly StyleNodeMatch Match;
+
+        public StyleNodeMatchPair(StyleNode node, StyleNodeMatch match)
+        {
+            Node = node;
+            Match = match;
+        }
+    }
     /// <summary>
     /// Style node container
     /// </summary>

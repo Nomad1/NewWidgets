@@ -6,37 +6,7 @@ using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
-    //public class WidgetStyleTable
-    //{
-    //    private readonly string m_elementType;
-    //    private readonly string m_elementId;
-    //    private readonly string m_elementClass;
-    //    private WidgetStyleTable m_parentTable;
-
-    //    //private readonly IDictionary<WidgetState, WidgetStyleSheet> m_styles = new Dictionary<WidgetState, WidgetStyleSheet>();
-
-    //    // in CSS world we could:
-    //    // 1. Get names of all parents and their classes to build a string like this: panel .foo #acc.bar button#wee .l
-    //    // 2. append our own name in form type#id.class
-    //    // 3. append our current state pseudo-class in form :hover
-    //    // 4. run a selector function on all possible styles, keep in mind pseudo-classes of all parents, use + > and || combinators, etc.
-    //    // 5. look for a property value in this cascading style shit.
-
-    //    // in WSS we will cheat:
-    //    // 1. get current style name in form type#id.class:pseudo-class (anything ending with it but with extras in front should be checked somehow)
-    //    // 2. if the style is absent strip pseudo-class (starting from less significant bit), than class, then id then try again
-    //    // 3. try getting the property from it, otherwise goto 2
-    //    // 4. if we have a link to parent style, move to it and goto 1
-
-    //    private WidgetStyleSheet GetStyle(WidgetState state)
-    //    {
-    //        // 
-
-
-
-    //    }
-
-    //}
+   
 
     /// <summary>
     /// This class is a simple wrapper for IDictionary with LoadData working as AddRange
@@ -108,7 +78,7 @@ namespace NewWidgets.Widgets
     {
         private bool m_hasOwnStyle; // This flag indicates that personal style has been created for the object
 
-        private readonly LinkedList<ValueTuple<StyleNode, StyleNodeMatch>> m_data;
+        private readonly LinkedList<StyleNodeMatchPair> m_data;
         private readonly string m_name;
 
         // Internal properties
@@ -123,16 +93,16 @@ namespace NewWidgets.Widgets
             get { return m_name; }
         }
 
-        internal WidgetStyleSheet(string name, ICollection<ValueTuple<StyleNode, StyleNodeMatch>> data)
+        internal WidgetStyleSheet(string name, ICollection<StyleNodeMatchPair> data)
         {
             m_name = name;
 
             m_hasOwnStyle = false;
 
-            m_data = new LinkedList<ValueTuple<StyleNode, StyleNodeMatch>>();
+            m_data = new LinkedList<StyleNodeMatchPair>();
 
             if (data != null)
-                foreach (ValueTuple<StyleNode, StyleNodeMatch> sheetData in data)
+                foreach (StyleNodeMatchPair sheetData in data)
                     m_data.AddFirst(sheetData);
         }
 
@@ -141,7 +111,7 @@ namespace NewWidgets.Widgets
             if (m_hasOwnStyle)
                 throw new WidgetException("Trying to set own style when it is already set!");
 
-            m_data.AddFirst(new ValueTuple<StyleNode, StyleNodeMatch>(new StyleNode(new StyleSelectorList(new StyleSelector("", null, "")), ownStyle), StyleNodeMatch.OwnStyle)); // local style, the same as HTML tag style="..."
+            m_data.AddFirst(new StyleNodeMatchPair(new StyleNode(new StyleSelectorList(new StyleSelector("", null, "")), ownStyle), StyleNodeMatch.OwnStyle)); // local style, the same as HTML tag style="..."
 
             m_hasOwnStyle = true;
         }
@@ -154,13 +124,13 @@ namespace NewWidgets.Widgets
 
             object result = null;
 
-            LinkedListNode<ValueTuple<StyleNode, StyleNodeMatch>> node = m_data.First;
+            LinkedListNode<StyleNodeMatchPair> node = m_data.First;
 
             // Let's iterate all the styles and select properties based on inheritance
 
             while (node != null)
             {
-                StyleNode data = node.Value.Item1;
+                StyleNode data = node.Value.Node;
 
                 if (((StyleSheetData)data.Data).TryGetParameter(index, out result))
                 {
@@ -179,7 +149,7 @@ namespace NewWidgets.Widgets
                 // if next style is the same as this one less on pseudo-class, we can think of it as a parent and do a one-time exception for data lookup
                 // otherwise we need to check if the property inheritance is Initial and then break
 
-                StyleNodeMatch nextNodeType = node.Next.Value.Item2;
+                StyleNodeMatch nextNodeType = node.Next.Value.Match;
 
                 // Pseudo classes should inherit data from their parent classes
                 if (!inherited && (nextNodeType & (StyleNodeMatch.Parent | StyleNodeMatch.GrandParent)) != 0)
@@ -243,7 +213,7 @@ namespace NewWidgets.Widgets
                 if (value.GetType() != attribute.Type)
                     throw new WidgetException(string.Format("Setting attribute {0} to value {1} type {2} while expecting type {3}", index, value, value.GetType(), attribute.Type));
 
-            ((StyleSheetData)m_data.First.Value.Item1.Data).SetParameter(index, value);
+            ((StyleSheetData)m_data.First.Value.Node.Data).SetParameter(index, value);
         }
       
         /// <summary>
@@ -261,7 +231,7 @@ namespace NewWidgets.Widgets
             IStyleData temp = new StyleSheetData();
 
             for (var node = m_data.Last; node != null; node = node.Previous)
-                temp.LoadData(node.Value.Item1.Data);
+                temp.LoadData(node.Value.Node.Data);
 
             return temp.ToString();
         }
