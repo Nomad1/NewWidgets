@@ -227,9 +227,9 @@ namespace NewWidgets.UI.Styles
             // here we're storing data as an array. The only problem is that we don't store selector hierarchy so we don't know if there is `button:hover` that
             // should inherit everything from `button` however `button label` should not.
 
-            int j = 0;
 
-#if DEBUG
+#if DEBUG_STYLES
+            int j = 0;
             string resultString = "";
             foreach (var pair in styles)
             {
