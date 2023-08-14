@@ -1,136 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B9E44890-DC40-4C45-A457-035B20581E54}</ProjectGuid>
-    <OutputType>Library</OutputType>
     <RootNamespace>NewWidgets</RootNamespace>
     <AssemblyName>NewWidgets</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <TargetFrameworks>net40;netstandard2.1;net471</TargetFrameworks>
+    <Configurations>Debug;Release</Configurations>
+    <OutputPath>bin\$(Configuration)\$(Platform)</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
     <DefineConstants>DEBUG;RUNMOBILE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <Prefer32Bit>false</Prefer32Bit>
-    <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug.Numerics|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug.Numerics</OutputPath>
-    <DefineConstants>DEBUG;RUNMOBILE;USE_NUMERICS</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <Prefer32Bit>false</Prefer32Bit>
-    <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <Prefer32Bit>false</Prefer32Bit>
     <DefineConstants>RUNMOBILE</DefineConstants>
-    <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release.Numerics|AnyCPU'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Release.Numerics\</OutputPath>
-    <DefineConstants>RUNMOBILE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>full</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-    <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(Configuration)' == 'Debug.Numerics' or '$(Configuration)' == 'Release.Numerics'">
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Numerics.Vectors" />
+  <ItemGroup>
+    <ProjectReference Include="..\..\RunMobile\RunMobile.Utility\RunMobile.Utility.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Xml" />
+    <Compile Remove="Mac/MacController.cs" />
+    <Compile Remove="Mac/MacSprite.cs" />
+    <Compile Remove="WinForms/WinFormsController.cs" />
+    <Compile Remove="WinForms/WinFormsSprite.cs" />
+    <Compile Remove="Utility/MathHelper.cs" />
+    <Compile Remove="Utility/SortedLinkedList.cs" />
+    <Compile Remove="Utility/Transform.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Widgets\Enums.cs" />
-    <Compile Include="Widgets\Widget.cs" />
-    <Compile Include="Widgets\WidgetManager.cs" />
-    <Compile Include="Utility\Margin.cs" />
-    <Compile Include="UI\Font.cs" />
-    <Compile Include="UI\ImageObject.cs" />
-    <Compile Include="UI\LabelObject.cs" />
-    <Compile Include="UI\Window.cs" />
-    <Compile Include="UI\WindowObject.cs" />
-    <Compile Include="UI\WindowObjectArray.cs" />
-    <Compile Include="UI\ISprite.cs" />
-    <Compile Include="Widgets\WidgetBackground.cs" />
-    <Compile Include="Widgets\WidgetManager.Styles.cs" />
-    <Compile Include="Widgets\WidgetStyleSheet.cs" />
-    <Compile Include="UI\SimpleWindow.cs" />
-    <Compile Include="Utility\ResourceLoader.cs" />
-    <Compile Include="Widgets\WidgetException.cs" />
-    <Compile Include="Widgets\Attributes.cs" />
-    <Compile Include="UI\AnimationManager.cs" />
-    <Compile Include="UI\WindowController.cs" />
-    <Compile Include="UI\Enums.cs" />
-    <Compile Include="UI\IFocusable.cs" />
-    <Compile Include="Widgets\Controls\WidgetButton.cs" />
-    <Compile Include="Widgets\Controls\WidgetCheckBox.cs" />
-    <Compile Include="Widgets\Controls\WidgetContextMenu.cs" />
-    <Compile Include="Widgets\Controls\WidgetImage.cs" />
-    <Compile Include="Widgets\Controls\WidgetLabel.cs" />
-    <Compile Include="Widgets\Controls\WidgetLine.cs" />
-    <Compile Include="Widgets\Controls\WidgetText.cs" />
-    <Compile Include="Widgets\Controls\WidgetTextEdit.cs" />
-    <Compile Include="Widgets\Controls\WidgetTextField.cs" />
-    <Compile Include="Widgets\Controls\WidgetToolbar.cs" />
-    <Compile Include="Widgets\Controls\WidgetTooltip.cs" />
-    <Compile Include="Widgets\Controls\WidgetPanel.cs" />
-    <Compile Include="Widgets\Controls\WidgetScrollView.cs" />
-    <Compile Include="Widgets\Controls\WidgetWindow.cs" />
-    <Compile Include="Widgets\Controls\Experimental\WidgetList.cs" />
-    <Compile Include="Widgets\Controls\Experimental\WidgetProgressLine.cs" />
-    <Compile Include="Widgets\Controls\Experimental\WidgetSelect.cs" />
-    <Compile Include="Widgets\Controls\Experimental\WidgetSlider.cs" />
-    <Compile Include="Widgets\Controls\Experimental\WidgetTable.cs" />
-    <Compile Include="Styles\StyleCollection.cs" />
-    <Compile Include="Styles\StyleNode.cs" />
-    <Compile Include="Styles\StyleSelector.cs" />
-    <Compile Include="Styles\StyleSelectorList.cs" />
-    <Compile Include="Utility\SubList.cs" />
-    <Compile Include="Utility\IndexNameMap.cs" />
-    <Compile Include="Widgets\WidgetParameterIndex.cs" />
-    <Compile Include="Widgets\WidgetParameterMap.cs" />
-    <Compile Include="Utility\ConversionHelper.cs" />
-    <Compile Include="Styles\CSSParser.cs" />
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <ProjectReference Include="..\..\RunMobile\RunMobile.Utility\RunMobile.Utility.csproj">
-      <Project>{029EA736-BCAA-40B3-B44B-52936740C349}</Project>
-      <Name>RunMobile.Utility</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Widgets\Controls\" />
-    <Folder Include="Widgets\Controls\Experimental\" />
-    <Folder Include="Styles\" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
