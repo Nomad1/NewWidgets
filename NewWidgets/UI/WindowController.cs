@@ -20,11 +20,16 @@ namespace NewWidgets.UI
                 System.Diagnostics.Debug.Assert(s_instance != null, "WindowController.Instance requested before WindowController was inited!");
                 return s_instance;
             }
+            private set
+            {
+                System.Diagnostics.Debug.Assert(s_instance == null, "WindowController.Instance set requested more than once!");
+                s_instance = value;
+            }
         }
 
         protected WindowController()
         {
-            s_instance = this;
+            Instance = this;
         }
 
         /// <summary>
@@ -185,4 +190,3 @@ namespace NewWidgets.UI
         public abstract void StopSound(string id);
     }
 }
-

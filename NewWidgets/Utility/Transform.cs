@@ -1,4 +1,6 @@
-﻿using System.Numerics;
+﻿#if !RUNMOBILE
+
+using System.Numerics;
 
 using Matrix = System.Numerics.Matrix4x4;
 
@@ -324,3 +326,4 @@ namespace NewWidgets.Utility
     }
 }
 
+#endif

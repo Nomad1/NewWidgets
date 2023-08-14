@@ -25,5 +25,11 @@
     <Compile Remove="Utility/MathHelper.cs" />
     <Compile Remove="Utility/SortedLinkedList.cs" />
     <Compile Remove="Utility/Transform.cs" />
+    <Compile Remove="WinForms\WinFormsController.cs" />
+    <Compile Remove="WinForms\WinFormsSprite.cs" />
+    <Compile Remove="Mac\MacController.cs" />
+    <Compile Remove="Mac\MacSprite.cs" />
+    <Compile Remove="Utility\SortedLinkedList.cs" />
+    <Compile Remove="Utility\Transform.cs" />
   </ItemGroup>
 </Project>
