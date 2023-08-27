@@ -61,7 +61,8 @@ namespace NewWidgets.UI
                     LinkedListNode<BaseAnimatorTask> next = node.Next;
                     if (node.Value.UpdateAnimator(elapsed))
                     {
-                        m_tasks.Remove(node);
+                        if (node.List == m_tasks)
+                            m_tasks.Remove(node);
                         node.Value.Complete();   
                     }
                     node = next;
@@ -80,7 +81,7 @@ namespace NewWidgets.UI
 
             while (node != null)
             {
-                if (node.Value.Key.Owner == owner && (kind == AnimationKind.None || node.Value.Key.Kind == kind))
+                if (node.Value.Key.Owner == owner && (kind == AnimationKind.None || node.Value.Key.Kind == kind) && node.List == m_tasks)
                     m_tasks.Remove(node);
 
                 node = node.Next;
