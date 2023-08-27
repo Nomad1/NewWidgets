@@ -365,29 +365,26 @@ namespace NewWidgets.UI
             AnimationManager.Instance.StartAnimation(this, AnimationKind.Position, current, point, time, (float x, Vector2 from, Vector2 to) => Position = MathHelper.LinearInterpolation(x, from, to), callback);
         }
 
-        public virtual void Rotate(float angle, int time, Action callback, bool normalize)
+        public virtual void Rotate(float angle, int time, Action callback, bool normalize = false)
         {
             AnimationManager.Instance.RemoveAnimation(this, AnimationKind.Rotation);
 
             float current = Rotation;
 
             // if we need to normalize the angle it could be done like this:
-            /* float delta = (angle - current) % 360;
+            if (normalize)
+            {
+                float delta = (angle - current) % 360;
 
-             if (normalize)
-             {
-                 if (delta > 180)
-                     delta -= 360;
-                 else if (delta < -180)
-                     delta += 360;
-             }*/
+                if (delta > 180)
+                    delta -= 360;
+                else if (delta < -180)
+                    delta += 360;
+
+                angle = current + delta;
+            }
 
             AnimationManager.Instance.StartAnimation(this, AnimationKind.Rotation, current, angle, time, (float x, float from, float to) => Rotation = MathHelper.LinearInterpolation(x, from, to), callback);
-        }
-
-        public virtual void Rotate(float angle, int time, Action callback)
-        {
-            Rotate(angle, time, callback, true);
         }
 
         public virtual void ScaleTo(float target, int time, Action callback)

@@ -31,5 +31,6 @@
     <Compile Remove="Mac\MacSprite.cs" />
     <Compile Remove="Utility\SortedLinkedList.cs" />
     <Compile Remove="Utility\Transform.cs" />
+    <Compile Remove="Utility\MathHelper.cs" />
   </ItemGroup>
 </Project>
