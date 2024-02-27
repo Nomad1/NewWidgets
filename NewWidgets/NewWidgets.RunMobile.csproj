@@ -3,7 +3,7 @@
     <RootNamespace>NewWidgets</RootNamespace>
     <AssemblyName>NewWidgets</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <TargetFrameworks>net40;netstandard2.1;net471</TargetFrameworks>
+    <TargetFrameworks>net40;net5.0;net6.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <OutputPath>bin\$(Configuration)\$(Platform)</OutputPath>
   </PropertyGroup>
@@ -14,9 +14,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DefineConstants>RUNMOBILE</DefineConstants>
   </PropertyGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\RunMobile\RunMobile.Utility\RunMobile.Utility.csproj" />
-  </ItemGroup>
   <ItemGroup>
     <Compile Remove="Mac/MacController.cs" />
     <Compile Remove="Mac/MacSprite.cs" />
@@ -32,5 +29,8 @@
     <Compile Remove="Utility\SortedLinkedList.cs" />
     <Compile Remove="Utility\Transform.cs" />
     <Compile Remove="Utility\MathHelper.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RunMobile\RunMobile.Utility\RunMobile.Utility.csproj" />
   </ItemGroup>
 </Project>
