@@ -8,14 +8,15 @@
     <RootNamespace>NewWidgets</RootNamespace>
     <AssemblyName>NewWidgets</AssemblyName>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <TargetFrameworks>net471;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.1</TargetFrameworks>
+    <Configurations>Debug;Debug.Numerics;Release;Release.Numerics</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;RUNMOBILE;MINI</DefineConstants>
+    <DefineConstants>RUNMOBILE;MINI;DEBUG;NETFRAMEWORK;NET47</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -125,8 +126,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\RunMobile\RunMobile.Mini\RunMobile.Mini.csproj">
-      <Project>{B6B1316F-CF08-42A1-A970-69B63EF21F75}</Project>
-      <Name>RunMobile.Mini</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
