@@ -220,6 +220,12 @@ namespace NewWidgets.Widgets
         /// <c>font-family</c> declaration inside the block, so the name is taken from the raw
         /// declaration text: <see cref="FontFamilyProcessor"/> resolves a family to an already
         /// registered <see cref="Font"/>, and the font being declared here is not one yet.
+        ///
+        /// The family is then put back into the block, after the font exists, for two reasons:
+        /// <c>SaveCSS</c> writes the parameters and nothing else, so a block without it saves
+        /// as a nameless face that no reparse can recover; and it is the only thing that tells
+        /// one <c>@font-face</c> node from another, which is what
+        /// <see cref="StyleSheetData.StyleDataName"/> hands to the collection.
         /// </summary>
         private static IStyleData InitFontFace(IDictionary<string, string> parameters)
         {
@@ -235,7 +241,16 @@ namespace NewWidgets.Widgets
 
             StyleSheetData data = new StyleSheetData(InitCssParameters(parameters));
 
-            RegisterFont(UnquoteFontFamily(family), data);
+            string name = UnquoteFontFamily(family);
+
+            RegisterFont(name, data);
+
+            Font font;
+
+            // set directly rather than through FontFamilyProcessor: the value a font-family
+            // declaration resolves to is the Font object, and this is where it first exists
+            if (TryGetFont(name, out font))
+                data.SetParameter(WidgetParameterIndex.Font, font);
 
             return data;
         }

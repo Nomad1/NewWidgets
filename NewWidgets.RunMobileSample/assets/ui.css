@@ -48,7 +48,7 @@
 
 @font-face {
     font-family: default;
-    src: url("font|font5");
+    src: url("font5");
     --font-spacing: 0;
     --font-shift: 0;
     --font-leading: 0;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Numerics;
 
@@ -34,6 +35,9 @@ namespace NewWidgets.Test
         // the same requirement CorpusTests.EnsureTestFontsRegistered documents.
         private const string LoginFontResource = "font5.png";
 
+        // The three families Test 75 declares, saves and reads back.
+        private static readonly string[] FontFaceFamilies = { "c75alpha", "c75beta", "c75gamma" };
+
         public static void Register()
         {
             TestRunner.Add("Test 52: Conformance/login.css loads clean", Test52_ConformanceLoginStylesheet);
@@ -46,6 +50,7 @@ namespace NewWidgets.Test
             TestRunner.Add("Test 59: deliberately ignored properties, clip-path and display", Test59_IgnoredAndMapped);
             TestRunner.Add("Test 73: an alpha on background-color reaches the renderer", Test73_BackgroundColorAlpha);
             TestRunner.Add("Test 74: @font-face and @font.name register the same font", Test74_FontFaceMatchesFontAtRule);
+            TestRunner.Add("Test 75: several @font-face rules survive a save and a reparse", Test75_FontFacesSurviveSaveAndReparse);
 
             TestRunner.AddKnownFailure("Test 59b: display:none hides the widget",
                 "the display property is parsed and stored (Test 59 covers that) but nothing reads it: Widget.UpdateStyle turns the declared box properties into a position and a size and never touches Visible, so a widget carrying display:none still draws. Applying it belongs in Widget.cs/Widget.UpdateStyle, which D144 puts off limits to a parser change",
@@ -376,6 +381,9 @@ namespace NewWidgets.Test
                     ".c73both { background-color: rgba(0, 0, 0, 0.5); background-color-opacity: 50%; }" +
                     ".c73bothswapped { background-color-opacity: 50%; background-color: rgba(0, 0, 0, 0.5); }" +
                     ".c73plain { background-color: #000000; }" +
+                    ".c73transparent { background-color: transparent; }" +
+                    ".c73zerorgba { background-color: rgba(255, 0, 0, 0); }" +
+                    ".c73zerohex { background-color: #ff000000; }" +
                     ".c73none { --clip: true; }");
             }, "an alpha-bearing background-color should be read, not rejected");
 
@@ -395,6 +403,13 @@ namespace NewWidgets.Test
             // holds, so two declared alphas multiply too, whichever order they are written in
             context.AreEqualFloat(0.25f, StyledPanel(".c73both").BackgroundAlpha, 0.005f, "a colour alpha of 0.5 and an opacity of 50% should compose to a quarter");
             context.AreEqualFloat(0.25f, StyledPanel(".c73bothswapped").BackgroundAlpha, 0.005f, "the same two declarations in the other order should compose to the same quarter");
+
+            // a written zero is transparent, and is not the same as writing no alpha at all.
+            // Without the hasAlpha flag from ColorParse these three paint fully opaque, because a
+            // packed top byte of zero looks exactly like a plain #rrggbb that declared nothing.
+            context.AreEqualFloat(0.0f, StyledPanel(".c73transparent").BackgroundAlpha, 0.005f, "background-color: transparent should paint nothing");
+            context.AreEqualFloat(0.0f, StyledPanel(".c73zerorgba").BackgroundAlpha, 0.005f, "rgba(255, 0, 0, 0) should paint nothing");
+            context.AreEqualFloat(0.0f, StyledPanel(".c73zerohex").BackgroundAlpha, 0.005f, "#ff000000 should paint nothing");
 
             // the two cases the corpus cannot catch, because a top byte of zero is what every
             // colour in both games and the un-declared default alike look like
@@ -469,6 +484,103 @@ namespace NewWidgets.Test
 
         // Resets the process-wide style collection and font registry, and makes sure the
         // resource login.css names is a usable test font sheet.
+        /// <summary>
+        /// The defect this pins: a stylesheet declaring several <c>@font-face</c> rules used to
+        /// round-trip through <c>SaveCSS</c> to nothing recoverable. Every face spells the same
+        /// header, so <c>StyleCollection</c> keyed all of them as one node and kept the last;
+        /// and the family name was removed from the block before it was stored, so even that one
+        /// node saved as a face with no name. Five fonts in, zero fonts out.
+        ///
+        /// So: declare three faces with three different sets of metrics, save, wipe the
+        /// registry, reparse what was saved, and require the same three fonts back. The
+        /// comparison is against the Font objects from before the save rather than against
+        /// literals, so a metric that moves fails here rather than being re-recorded.
+        /// </summary>
+        private static void Test75_FontFacesSurviveSaveAndReparse(TestContext context)
+        {
+            TestController controller = PrepareIsolatedLoad();
+
+            // two sprites of different glyph sizes, so Height and SpaceWidth tell faces apart too
+            controller.RegisterTestFont("c75sprite8", 8, 16);
+            controller.RegisterTestFont("c75sprite11", 11, 21);
+            controller.ClearLog();
+
+            TestEnvironment.LoadCss(
+                "@font-face { font-family: c75alpha; src: url(\"c75sprite8\"); --font-spacing: 2; --font-shift: 1; --font-leading: 3; --font-baseline: 30; }" +
+                "@font-face { font-family: c75beta; src: url(\"c75sprite11\"); --font-spacing: -0.25; --font-shift: -5; --font-leading: -5; --font-baseline: 25; }" +
+                "@font-face { font-family: c75gamma; src: url(\"c75sprite8\"); --font-spacing: 0; --font-shift: 0; --font-leading: 0; --font-baseline: 12; }");
+
+            context.AreEqual(0, controller.Errors.Count, "three @font-face rules should load without an error, got: {0}", Join(controller.Errors));
+
+            Font[] before = new Font[FontFaceFamilies.Length];
+
+            for (int i = 0; i < FontFaceFamilies.Length; i++)
+            {
+                before[i] = WidgetManager.GetFont(FontFaceFamilies[i]);
+                context.IsNotNull(before[i], "@font-face naming {0} should register a font before the save", FontFaceFamilies[i]);
+            }
+
+            if (before[0] == null || before[1] == null || before[2] == null)
+                return;
+
+            // guards the whole test: if the three faces were one merged node the metrics would
+            // agree and every comparison below would pass on a registry holding a single font
+            context.AreEqual(30, before[0].Baseline, "the three faces must start out distinct, or this test proves nothing");
+            context.AreEqual(25, before[1].Baseline, "the three faces must start out distinct, or this test proves nothing");
+            context.AreEqual(12, before[2].Baseline, "the three faces must start out distinct, or this test proves nothing");
+
+            string saved;
+
+            using (StringWriter writer = new StringWriter(CultureInfo.InvariantCulture))
+            {
+                WidgetManager.SaveCSS(writer);
+                saved = writer.ToString();
+            }
+
+            context.AreEqual(3, CountOccurrences(saved, "@font-face"), "the save must write one block per face, not one block for all of them; it wrote: {0}", saved);
+
+            for (int i = 0; i < FontFaceFamilies.Length; i++)
+                context.IsTrue(saved.Contains("font-family: " + FontFaceFamilies[i]), "the saved block for {0} must carry its family name, or nothing can name the face on reload; it wrote: {1}", FontFaceFamilies[i], saved);
+
+            WidgetManager.ResetStyles();
+            controller.ClearLog();
+
+            TestEnvironment.LoadCss(saved);
+
+            context.AreEqual(0, controller.Errors.Count, "reparsing the saved stylesheet should not log an error, got: {0}", Join(controller.Errors));
+
+            for (int i = 0; i < FontFaceFamilies.Length; i++)
+            {
+                Font after = WidgetManager.GetFont(FontFaceFamilies[i]);
+
+                context.IsNotNull(after, "{0} should still be registered after a save and a reparse", FontFaceFamilies[i]);
+
+                if (after == null)
+                    continue;
+
+                context.AreEqualFloat(before[i].Spacing, after.Spacing, 0.001f, "{0} should keep its spacing across the round trip", FontFaceFamilies[i]);
+                context.AreEqual(before[i].Leading, after.Leading, "{0} should keep its leading across the round trip", FontFaceFamilies[i]);
+                context.AreEqual(before[i].Baseline, after.Baseline, "{0} should keep its baseline across the round trip", FontFaceFamilies[i]);
+                context.AreEqual(before[i].Shift, after.Shift, "{0} should keep its shift across the round trip", FontFaceFamilies[i]);
+                context.AreEqual(before[i].Height, after.Height, "{0} should keep the sprite it is cut from, so its glyph height matches", FontFaceFamilies[i]);
+                context.AreEqual(before[i].SpaceWidth, after.SpaceWidth, "{0} should keep the sprite it is cut from, so its space width matches", FontFaceFamilies[i]);
+            }
+        }
+
+        private static int CountOccurrences(string text, string needle)
+        {
+            int count = 0;
+            int index = text.IndexOf(needle, StringComparison.Ordinal);
+
+            while (index >= 0)
+            {
+                count++;
+                index = text.IndexOf(needle, index + needle.Length, StringComparison.Ordinal);
+            }
+
+            return count;
+        }
+
         private static TestController PrepareIsolatedLoad()
         {
             TestController controller = TestEnvironment.Setup();

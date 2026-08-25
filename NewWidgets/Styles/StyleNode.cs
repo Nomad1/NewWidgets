@@ -42,6 +42,21 @@ namespace NewWidgets.UI.Styles
         void LoadData(IStyleData data);
     }
 
+    /// <summary>
+    /// Capability for style data that carries a name of its own. A selector identifies its
+    /// node, but an at-rule is not a selector: every <c>@font-face</c> block spells the same
+    /// header and CSS names the face with a <c>font-family</c> descriptor inside the block.
+    /// Data implementing this lets <see cref="StyleCollection"/> tell two such blocks apart
+    /// instead of merging them into one node and keeping the last one.
+    /// </summary>
+    public interface ISelfNamedStyleData
+    {
+        /// <summary>
+        /// The name the block gives itself, or an empty string when it gives none.
+        /// </summary>
+        string StyleDataName { get; }
+    }
+
     internal struct StyleNodeMatchPair
     {
         public readonly StyleNode Node;

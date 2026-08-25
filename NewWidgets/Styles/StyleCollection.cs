@@ -34,7 +34,7 @@ namespace NewWidgets.UI.Styles
             StyleSelector selector = node.SelectorList.Selectors[node.SelectorList.Count - 1]; // last selector in the list
 
             // All nodes
-            m_allNodes[selector.ToString()] = node;
+            m_allNodes[GetNodeKey(selector.ToString(), node.Data)] = node;
 
             if (!string.IsNullOrEmpty(selector.Id)) // we have an explicit id, i.e. tr#myid
                 AddToCollection(m_idCollection, selector.Id, node);
@@ -44,6 +44,31 @@ namespace NewWidgets.UI.Styles
 
             if (!string.IsNullOrEmpty(selector.Element))
                 AddToCollection(m_elementCollection, selector.Element, node); // there is an element name, i.e. button
+        }
+
+        /// <summary>
+        /// The key a node is stored under, and with it the answer to "is this the same rule
+        /// again?". A selector is its own identity, so a re-declared <c>.button</c> merges
+        /// into the node already there. An at-rule is not a selector: five <c>@font-face</c>
+        /// blocks all spell the header <c>@font-face</c>, so keying on the header alone
+        /// collapses five fonts into one node and the last one wins. CSS names the face
+        /// inside the block, and <see cref="ISelfNamedStyleData"/> is how the data hands that
+        /// name over.
+        ///
+        /// Only at-rules ask. A normal rule that happens to declare <c>font-family</c> must
+        /// keep merging with its own re-declaration, so its key stays the selector alone.
+        /// </summary>
+        private static string GetNodeKey(string selectorString, IStyleData data)
+        {
+            if (string.IsNullOrEmpty(selectorString) || selectorString[0] != '@')
+                return selectorString;
+
+            ISelfNamedStyleData named = data as ISelfNamedStyleData;
+
+            if (named == null || string.IsNullOrEmpty(named.StyleDataName))
+                return selectorString;
+
+            return selectorString + " " + named.StyleDataName;
         }
 
         /// <summary>
@@ -81,7 +106,7 @@ namespace NewWidgets.UI.Styles
         {
             foreach (StyleSelectorList selector in selectorList.Split())
             {
-                StyleNode node = FindExactStyle(selector);
+                StyleNode node = FindExactStyle(selector, data);
 
                 if (node != null) // we have a node that is 100% matching the new one, so we need to append new data to it
                 {
@@ -95,7 +120,7 @@ namespace NewWidgets.UI.Styles
             }
         }
 
-        private StyleNode FindExactStyle(StyleSelectorList selectorList)
+        private StyleNode FindExactStyle(StyleSelectorList selectorList, IStyleData data)
         {
             if (selectorList == null || selectorList.IsEmpty || !selectorList.IsSingleChain)
                 throw new ArgumentException("Invalid StyleNode for FindExactStyle call");
@@ -104,7 +129,7 @@ namespace NewWidgets.UI.Styles
 
             StyleNode result;
 
-            if (m_allNodes.TryGetValue(selectorList.ToString(), out result))
+            if (m_allNodes.TryGetValue(GetNodeKey(selectorList.ToString(), data), out result))
                 return result;
 
 #if OLD
