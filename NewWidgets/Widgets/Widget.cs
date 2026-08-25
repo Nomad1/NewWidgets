@@ -58,17 +58,25 @@ namespace NewWidgets.Widgets
         public static readonly WidgetStyle DefaultStyle = new WidgetStyle(new string[] { "none" }, null);
         //
 
+        // what StyleState answers with for a widget in the default state. Shared, and never
+        // written to: a StyleSelector keeps the array by reference and only reads it
+        private static readonly string[] s_noPseudoClasses = new string[0];
+
         public delegate bool TooltipDelegate(Widget sender, string text, Vector2 position);
 
         private WidgetStyleSheet m_style;
         private readonly StyleSheetData m_ownStyle;
 
-        private readonly string m_elementType;
+        // not readonly: the markup loader replaces it with the tag the document used, so this
+        // is assigned in more than one place. See StyleElementType
+        private string m_elementType;
         private string m_id;
         private string[] m_styleClasses;
         private WidgetState m_currentState;
 
         private string m_tooltip;
+
+        private WidgetMarkup m_markup;
 
         #region Style-related stuff
 
@@ -94,11 +102,32 @@ namespace NewWidgets.Widgets
         }
 
         /// <summary>
-        /// Element type, i.e. button, label, checkbox
+        /// Element type, i.e. button, label, checkbox -- the name a type selector matches.
+        ///
+        /// A widget built in code reports the <c>ElementType</c> const of its own class, which
+        /// is what every stylesheet written against this engine already says. A widget a
+        /// document built reports <b>the tag the document used</b>: <c>div</c>, <c>span</c>,
+        /// <c>h1</c>, <c>input</c>, <c>textarea</c>. The raw tag, not the registration selector
+        /// that matched it, because an author writing <c>input { }</c> means every input and
+        /// <c>checkbox</c> is not an element any editor emits.
+        ///
+        /// That is one name per widget, not two. Nothing in <see cref="StyleCollection"/> or
+        /// <see cref="StyleSelector"/> knows this happened -- the selector chain is built from
+        /// whatever this property answers -- so the cascade gains no second lookup and no extra
+        /// comparison, which is what D144 requires of it.
+        ///
+        /// The consequence is intended: a <c>label { }</c> rule does not reach a widget the
+        /// document wrote as <c>&lt;span&gt;</c>. There are two vocabularies, one per authoring
+        /// mode, and a user interface is designed in HTML or in code, not in both.
+        ///
+        /// The setter is internal because the markup loader is the only thing that has a tag to
+        /// offer today. It is an ordinary instance field either way, so a constructor that takes
+        /// an element name -- <c>new WidgetLabel("h2", style)</c> -- is a public overload away.
         /// </summary>
         public string StyleElementType
         {
             get { return m_elementType; }
+            internal set { m_elementType = value; InvalidateStyle(); }
         }
 
         /// <summary>
@@ -121,17 +150,40 @@ namespace NewWidgets.Widgets
 
         /// <summary>
         /// Pseudo-class name. TODO: get rid of strings
+        ///
+        /// <see cref="WidgetState.Selected"/> reports every name its
+        /// <see cref="WidgetPseudoClass"/> attributes declare, not one of them. That attribute
+        /// table already says the bit means <c>:checked</c>, <c>:selected</c>, <c>:active</c>
+        /// and <c>:focus</c> alike -- this engine has one state bit for all four -- but only
+        /// <c>:focus</c> was ever reported, so a <c>:checked</c> rule written for a checkbox
+        /// parsed, matched nothing and did nothing. Reporting all four makes the declared table
+        /// true. The cost is three more strings in the array while the bit is set, compared
+        /// against a rule list this is matched into once per style resolve.
+        ///
+        /// <c>:enabled</c> is deliberately not reported. It is the default state of every
+        /// widget in this engine, so reporting it would put a pseudo-class on every widget in
+        /// every tree, which changes <see cref="StyleNodeMatch.PseudoClass"/> for all of them.
         /// </summary>
         public string [] StyleState
         {
             get
             {
-                List<string> pseudoClasses = new List<string>(3);
+                // the common case by a wide margin, and it used to allocate a list and an array
+                // per call, twice per style resolve, to say nothing
+                if (m_currentState == WidgetState.Normal)
+                    return s_noPseudoClasses;
+
+                List<string> pseudoClasses = new List<string>(6);
 
                 if ((m_currentState & WidgetState.Hovered) != 0)
                     pseudoClasses.Add(":hover");
                 if ((m_currentState & WidgetState.Selected) != 0)
+                {
                     pseudoClasses.Add(":focus");
+                    pseudoClasses.Add(":checked");
+                    pseudoClasses.Add(":selected");
+                    pseudoClasses.Add(":active");
+                }
                 if ((m_currentState & WidgetState.Disabled) != 0)
                     pseudoClasses.Add(":disabled");
 
@@ -140,6 +192,20 @@ namespace NewWidgets.Widgets
         }
 
         #endregion
+
+        /// <summary>
+        /// What the markup element this widget was built from said that no property here holds:
+        /// the tag it came from, and the attributes and comments the engine does not model.
+        /// Null for a widget built in code, which came from no element.
+        ///
+        /// The saver reads it to write the element back the way the document had it. Nothing
+        /// else in the library reads it, and nothing in a frame does.
+        /// </summary>
+        public WidgetMarkup Markup
+        {
+            get { return m_markup; }
+            set { m_markup = value; }
+        }
 
         public override bool Enabled
         {

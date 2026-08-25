@@ -11,7 +11,7 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetTextField : WidgetBackground, IFocusable
     {
-        public new const string ElementType = "textedit";
+        public new const string ElementType = "textfield";
         //
         private int m_cursorPosition;
         private int m_cursorLine;

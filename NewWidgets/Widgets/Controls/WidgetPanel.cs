@@ -158,6 +158,129 @@ namespace NewWidgets.Widgets
 
             base.Remove();
         }
+
+        /// <summary>
+        /// Finds a widget by the <c>#id</c> it was built with, anywhere below this one. This is
+        /// how a tree loaded from XHTML is bound to code: markup owns the structure and the
+        /// stylesheet owns the appearance, so the id a rule already names a control by is the
+        /// only handle code has on it.
+        ///
+        /// Generic because a caller wants a specific class -- there is nothing to do with a
+        /// <see cref="Widget"/> that has no <c>OnPress</c> -- and throwing rather than returning
+        /// null because both ways of getting the call wrong, a typo in the id and the wrong class
+        /// in the angle brackets, are mistakes in the line just written. Handing back a null
+        /// would move the report to whichever event handler dereferences it first. Use
+        /// <see cref="TryFind{T}(string, out T)"/> where absence is a legitimate answer.
+        /// </summary>
+        /// <typeparam name="T">Class the widget is expected to be</typeparam>
+        /// <param name="id">The id, without the '#'</param>
+        /// <exception cref="ArgumentException">No widget carries the id, or the one that does is
+        /// of another class</exception>
+        public T Find<T>(string id) where T : Widget
+        {
+            T result;
+
+            if (TryFind(id, out result))
+                return result;
+
+            Widget other;
+
+            // second walk, on the failure path only, to tell the two mistakes apart
+            if (TryFind(id, out other))
+                throw new ArgumentException(string.Format("Widget #{0} is a {1} and not a {2}", id, other.GetType().Name, typeof(T).Name));
+
+            throw new ArgumentException(string.Format("No widget with id #{0} below this {1}", id, GetType().Name));
+        }
+
+        /// <summary>
+        /// The <see cref="Find{T}"/> that answers instead of throwing, in the shape of
+        /// <c>TryGetValue</c>
+        /// </summary>
+        public bool TryFind<T>(string id, out T widget) where T : Widget
+        {
+            if (string.IsNullOrEmpty(id))
+                throw new ArgumentNullException("id"); // every unnamed widget has StyleId == string.Empty and would match
+
+            return TryFind(this, id, out widget);
+        }
+
+        /// <summary>
+        /// The walk itself, over <see cref="IWindowContainer"/> so that the markup loader can
+        /// search from whatever it was given as the document body.
+        ///
+        /// Not <see cref="Window.FindChildren"/>, which is otherwise the same walk: it skips a
+        /// child whose <c>Visible</c> is false, and half the controls of a real dialog start
+        /// hidden -- the sample's own <c>#local_edit</c> does -- so binding one would fail.
+        ///
+        /// ponytail: a walk, not an index. An index would have to be invalidated by every
+        /// AddChild, RemoveChild and StyleId assignment, and a static one would collide across
+        /// documents, since WidgetManager's state is process-wide and the same document may be
+        /// loaded more than once. The ceiling is O(n) per lookup over a dialog's worth of widgets
+        /// -- the sample login dialog is 14 -- paid while the dialog is being built and never in
+        /// a frame, so D144 does not reach it. Upgrade path: a Dictionary built by the loader and
+        /// owned by the root panel, once a document is large enough for the walk to profile.
+        ///
+        /// Public rather than internal because <see cref="WidgetManager.LoadXHTML"/> takes an
+        /// <see cref="IWindowContainer"/> as the document body, and that container is often a
+        /// <see cref="Window"/> rather than a panel -- the sample's own dialog loads into one.
+        /// Binding a loaded document to code has to start somewhere, and the panel that would
+        /// answer the instance overload is itself the first thing a caller has to find.
+        /// </summary>
+        public static bool TryFind<T>(IWindowContainer container, string id, out T widget) where T : Widget
+        {
+            foreach (WindowObject child in container.Children)
+            {
+                Widget childWidget = child as Widget;
+
+                if (childWidget == null)
+                    continue; // a plain WindowObject carries no id
+
+                if (childWidget.StyleId == id)
+                {
+                    // an id is unique, so the element carrying it either is the class the caller
+                    // asked for or the lookup has failed -- searching on could only find a
+                    // duplicate the document should not have
+                    widget = childWidget as T;
+                    return widget != null;
+                }
+
+                IWindowContainer childContainer = childWidget as IWindowContainer;
+
+                if (childContainer != null && TryFind(childContainer, id, out widget))
+                    return true;
+            }
+
+            widget = null;
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// The widget an element this library has never heard of becomes. A mainstream HTML editor
+    /// emits <c>&lt;section&gt;</c>, <c>&lt;form&gt;</c>, <c>&lt;fieldset&gt;</c> and
+    /// <c>&lt;select&gt;</c> from its toolbar, and skipping one used to take every control
+    /// nested inside it down as well, so wrapping two controls in a <c>&lt;section&gt;</c> made
+    /// both disappear. This is an ordinary panel that carries the tag as its element type
+    /// instead of <c>panel</c>, so that a <c>section { }</c> rule matches it -- which is what an
+    /// HTML author expects -- and a <c>panel</c> rule written for real panels does not.
+    ///
+    /// It draws nothing of its own and no rule positions it unless the author writes one, so it
+    /// is a zero-sized box at the origin and its children keep the coordinates they would have
+    /// had without the wrapper. That is the whole of its geometry: D134's profile is absolute
+    /// positioning, and nothing here arranges anything.
+    ///
+    /// ponytail: a percentage-sized child resolves against this box, so a child of an unstyled
+    /// wrapper resolves a percentage against zero, where a browser would skip a wrapper that is
+    /// not itself positioned and resolve against the nearest positioned ancestor. The ceiling is
+    /// one nesting level per unstyled wrapper; the upgrade path is for the wrapper to report its
+    /// own containing block as its size, which needs a containing-block rule of its own.
+    /// </summary>
+    public class WidgetMarkupElement : WidgetPanel
+    {
+        public WidgetMarkupElement(string elementType, WidgetStyle style)
+            : base(elementType, style)
+        {
+        }
     }
 }
 

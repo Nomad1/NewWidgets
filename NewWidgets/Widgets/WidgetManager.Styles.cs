@@ -178,7 +178,9 @@ namespace NewWidgets.Widgets
 
             Font font = new Font(
                 fontName,
-                resource,
+                // src is stored as it was authored, so a D186 reference still carries its atlas
+                // file here; the sprite the font is cut from is the name in the fragment
+                ConversionHelper.UrlToSpriteName(resource),
                 data.GetParameter(WidgetParameterIndex.FontSpacing, 0.0f),
                 data.GetParameter(WidgetParameterIndex.FontLeading, 0),
                 data.GetParameter(WidgetParameterIndex.FontBaseline, 10),

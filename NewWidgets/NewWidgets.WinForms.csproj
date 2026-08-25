@@ -41,13 +41,11 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <!-- Wildcards rather than an explicit list: the explicit list silently rotted when the
-         widgets moved into Widgets\Controls in 2023 and this project stopped building.
-         WidgetSelect is excluded because it needs RunMobile.Utility's SimpleListDictionary,
-         which this build does not reference. -->
+         widgets moved into Widgets\Controls in 2023 and this project stopped building. -->
     <Compile Include="UI\**\*.cs" />
     <Compile Include="Utility\**\*.cs" />
     <Compile Include="Styles\**\*.cs" />
-    <Compile Include="Widgets\**\*.cs" Exclude="Widgets\Controls\Experimental\WidgetSelect.cs" />
+    <Compile Include="Widgets\**\*.cs" />
     <Compile Include="WinForms\**\*.cs" />
 </ItemGroup>
   <ItemGroup />

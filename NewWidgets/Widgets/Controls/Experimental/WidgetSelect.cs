@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Numerics;
 using System.Collections.Generic;
-using RunMobile.Utility;
 
 namespace NewWidgets.Widgets
 {
@@ -16,7 +15,9 @@ namespace NewWidgets.Widgets
         public const string LabelClass = "select_label";
         //
 
-        private readonly SimpleListDictionary<string, object> m_items;
+        // key/value pairs in insertion order, indexed by position only -- the control never
+        // looks an item up by its key, so a plain list is the whole of what it needs
+        private readonly List<KeyValuePair<string, object>> m_items;
         private readonly WidgetLabel m_label;
         private readonly WidgetButton m_leftButton;
         private readonly WidgetButton m_rightButton;
@@ -97,7 +98,7 @@ namespace NewWidgets.Widgets
 
         public IList<KeyValuePair<string, object>> Items
         {
-            get { return m_items.List; }
+            get { return m_items; }
         }
 
         /// <summary>
@@ -105,7 +106,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style"></param>
         public WidgetSelect(WidgetStyle style = default(WidgetStyle))
-           : this(ElementType, style, new SimpleListDictionary<string, object>())
+           : this(ElementType, style, null)
         {
         }
 
@@ -115,7 +116,7 @@ namespace NewWidgets.Widgets
         /// <param name="items"></param>
         /// <param name="values"></param>
         public WidgetSelect(string[] items, object[] values)
-           : this(ElementType, default(WidgetStyle), new SimpleListDictionary<string, object>(items, values))
+           : this(default(WidgetStyle), items, values)
         {
         }
 
@@ -126,7 +127,7 @@ namespace NewWidgets.Widgets
         /// <param name="items"></param>
         /// <param name="values"></param>
         public WidgetSelect(WidgetStyle style, string[] items, object[] values)
-            : this(ElementType, style, new SimpleListDictionary<string,object>(items, values))
+            : this(ElementType, style, ToItems(items, values))
         {
         }
 
@@ -135,7 +136,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="items"></param>
         public WidgetSelect(IList<KeyValuePair<string, object>> items)
-            : this(ElementType, default(WidgetStyle), new SimpleListDictionary<string, object>(items))
+            : this(default(WidgetStyle), items)
         {
         }
 
@@ -145,7 +146,7 @@ namespace NewWidgets.Widgets
         /// <param name="style"></param>
         /// <param name="items"></param>
         public WidgetSelect(WidgetStyle style, IList<KeyValuePair<string, object>> items)
-            : this(ElementType, style, new SimpleListDictionary<string, object>(items))
+            : this(ElementType, style, items)
         {
         }
 
@@ -154,18 +155,18 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="elementType"></param>
         /// <param name="style"></param>
-        /// <param name="items"></param>
-        protected WidgetSelect(string elementType, WidgetStyle style, SimpleListDictionary<string, object> items)
+        /// <param name="items">initial items, copied; null for an empty control</param>
+        protected WidgetSelect(string elementType, WidgetStyle style, IList<KeyValuePair<string, object>> items)
             : base(elementType, style)
         {
-            m_items = items;
+            m_items = items == null ? new List<KeyValuePair<string, object>>() : new List<KeyValuePair<string, object>>(items);
 
             m_leftButton = new WidgetButton(new WidgetStyle(new[] { LeftButtonClass },""), "<");
             AddChild(m_leftButton);
             m_leftButton.OnPress += (obj) => HandleChange(-1);
             m_leftButton.Relayout();
 
-            m_label = new WidgetLabel(new WidgetStyle(new[] { LabelClass },""), items.Count > 0 ? items[0].Key : string.Empty);
+            m_label = new WidgetLabel(new WidgetStyle(new[] { LabelClass },""), m_items.Count > 0 ? m_items[0].Key : string.Empty);
             AddChild(m_label);
             m_label.Relayout();
 
@@ -189,9 +190,23 @@ namespace NewWidgets.Widgets
             m_rightButton.Position = new Vector2(size.X - m_rightButton.Size.X, (size.Y - m_rightButton.Size.Y) / 2);
         }
 
+        /// <summary>
+        /// Zips a name array and a value array into the pair list the constructor takes.
+        /// A null value array leaves every value null.
+        /// </summary>
+        private static IList<KeyValuePair<string, object>> ToItems(string[] items, object[] values)
+        {
+            List<KeyValuePair<string, object>> result = new List<KeyValuePair<string, object>>(items.Length);
+
+            for (int i = 0; i < items.Length; i++)
+                result.Add(new KeyValuePair<string, object>(items[i], values == null ? null : values[i]));
+
+            return result;
+        }
+
         public void AddItem(string item, object value = null)
         {
-            m_items.Add(item, value);
+            m_items.Add(new KeyValuePair<string, object>(item, value));
         }
 
         public void ClearItems()

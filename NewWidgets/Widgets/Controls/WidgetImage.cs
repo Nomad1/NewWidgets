@@ -155,7 +155,7 @@ namespace NewWidgets.Widgets
 
             if (m_imageObject == null)
             {
-                ISprite textureSprite = WindowController.Instance.CreateSprite(Image);
+                ISprite textureSprite = WindowController.Instance.CreateSprite(ConversionHelper.UrlToSpriteName(Image));
                 if (textureSprite == null)
                 {
                     WindowController.Instance.LogError("WidgetImage texture not found for sprite {0}", textureSprite);

@@ -419,6 +419,31 @@ namespace NewWidgets.Utility
             throw new FormatException("Invalid unit type " + unitType + " for string type");
         }
 
+        /// <summary>
+        /// Takes the sprite name out of an already parsed url() value. D186 writes a sprite
+        /// reference as url("ui.svg#window_9"): the file names the atlas, which only a browser
+        /// needs, and the fragment names the sprite inside it, which is all this engine wants.
+        /// A value with no fragment -- url("window_9") -- is already a sprite name and is
+        /// returned untouched.
+        ///
+        /// Deliberately not done in <see cref="StringParse"/>: the style store keeps the value
+        /// as authored so <c>SaveCSS</c> writes the SVG reference back out intact. Call this
+        /// where a stored value becomes a sprite lookup, which is a layout-time path, never a
+        /// property read.
+        /// </summary>
+        public static string UrlToSpriteName(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return value;
+
+            int fragment = value.IndexOf('#');
+
+            if (fragment < 0)
+                return value;
+
+            return value.Substring(fragment + 1);
+        }
+
 
         /// <summary>
         /// Parse a string to a 2-component vector

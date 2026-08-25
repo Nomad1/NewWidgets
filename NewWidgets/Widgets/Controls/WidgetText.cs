@@ -11,7 +11,7 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetText : Widget
     {
-        public new const string ElementType = "label";
+        public new const string ElementType = "text";
         //
         private static readonly char[] s_separatorChars = { ' ', '\t' };
 

@@ -23,6 +23,13 @@ namespace NewWidgets.Utility
     {
         private const string Indent = "    "; // 4 spaces for tabs ;)
 
+        /// <summary>
+        /// Element name of a comment node. A comment is kept as an ordinary child so that its
+        /// place among the elements survives; '#comment' is the name the DOM already gives one
+        /// and no real tag can collide with it, because '#' is not a name start character
+        /// </summary>
+        public const string CommentElement = "#comment";
+
         private readonly string m_element;
         private readonly string m_text;
 
@@ -64,6 +71,14 @@ namespace NewWidgets.Utility
         public string Class
         {
             get { return GetAttribute("class"); }
+        }
+
+        /// <summary>
+        /// True for a comment node, whose <see cref="Text"/> is the comment body
+        /// </summary>
+        public bool IsComment
+        {
+            get { return m_element == CommentElement; }
         }
 
         public HtmlNode(HtmlNode parent, string element, string text)
@@ -119,6 +134,16 @@ namespace NewWidgets.Utility
 
             for (int i = 0; i < level; i++)
                 builder.Append(Indent);
+
+            if (IsComment)
+            {
+                // a comment carries no attributes and no children, and its body must not be
+                // escaped: XML forbids '--' inside one, so nothing a parser produced can need it
+                builder.Append("<!--");
+                builder.Append(m_text);
+                builder.Append("-->");
+                return;
+            }
 
             builder.Append('<');
             builder.Append(m_element);
@@ -190,9 +215,13 @@ namespace NewWidgets.Utility
                 foreach (XmlAttribute attribute in node.Attributes)
                     htmlNode.SetAttribute(attribute.Name, attribute.Value);
 
+            // elements and comments in one pass, so a comment keeps its place among the
+            // elements it stands between. Text nodes were taken above, out of order by design
             foreach (XmlNode child in node.ChildNodes)
                 if (child.NodeType == XmlNodeType.Element)
                     RecursiveParse(htmlNode, child);
+                else if (child.NodeType == XmlNodeType.Comment)
+                    new HtmlNode(htmlNode, CommentElement, child.Value);
 
             return htmlNode;
         }

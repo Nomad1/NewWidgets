@@ -197,7 +197,7 @@ namespace NewWidgets.Widgets
         CheckBox,
         [Name("label")]
         Label,
-        [Name("label")]
+        [Name("text")]
         Text,
         [Name("line")]
         Line,
@@ -205,7 +205,7 @@ namespace NewWidgets.Widgets
         ScrollView,
         [Name("textedit")]
         TextEdit,
-        [Name("textedit")]
+        [Name("textfield")]
         TextField,
         [Name("toolbar")]
         Toolbar,
