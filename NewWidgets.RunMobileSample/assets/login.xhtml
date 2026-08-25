@@ -4,17 +4,18 @@
 <!-- The sample login dialog. This file is the dialog: Sample/Sample/TestWindow.cs builds
      none of it and only binds the handlers, by the same #id the stylesheet uses.
 
-     Only login.css is linked. It is pure geometry, so a browser and this engine place the
-     same boxes from it. The skin lives in ui.css, which a browser cannot use at all, since
-     url("window_9") names a sprite inside an atlas rather than a file it could fetch. The
-     host loads that one, and linking it here would only make a browser fetch and discard it.
+     One stylesheet is linked, and it is the whole of the presentation: ui.css now carries
+     the skin and the geometry both. It is standard CSS a browser can read, because every
+     sprite in it is named url("ui.svg#name"), where the file is an atlas a browser fetches
+     and the fragment is the sprite name the engine looks up. Three files make this dialog:
+     this one, ui.css and ui.svg.
 
-     Every element is absolutely positioned by login.css, per D134, so the order below is
+     Every element is absolutely positioned by ui.css, per D134, so the order below is
      the paint order and nothing else depends on it. -->
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Connect to server</title>
-    <link rel="stylesheet" href="login.css" />
+    <link rel="stylesheet" href="ui.css" />
 </head>
 <body>
     <div class="window" id="login_window">
@@ -38,7 +39,7 @@
         <button class="text_button" id="website_button">Register new account</button>
         <button id="login_button" title="@tooltip_connect" disabled="disabled">Connect</button>
 
-        <img id="logo_image" src="settings_icon" alt="" />
+        <img id="logo_image" src="ui.svg#settings_icon" alt="" />
 
         <textarea id="text_field" rows="6" cols="66">#text_field { left: 50px; right: 50px; width: auto; top: 520px; height: 225px; }
 
