@@ -17,7 +17,7 @@
 }
 
 window, .window {
-    border-image-source: url("window_9");
+    border-image-source: url("ui.svg#window_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 75%;
@@ -27,7 +27,7 @@ window, .window {
 }
 
 panel, div {
-    border-image-source: url("window_9");
+    border-image-source: url("ui.svg#window_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 50%;
@@ -52,7 +52,7 @@ text {
 }
 
 textedit, textfield, input, textarea {
-    border-image-source: url("panel_white_hovered_9");
+    border-image-source: url("ui.svg#panel_white_hovered_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 25%;
@@ -68,7 +68,7 @@ textedit, textfield, input, textarea {
 }
 
 textedit:focus, textfield:focus, input:focus, textarea:focus {
-    border-image-source: url("panel_white_normal_9");
+    border-image-source: url("ui.svg#panel_white_normal_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     color: #ffffff;
@@ -83,35 +83,35 @@ textedit:hover, textfield:hover, input:hover, textarea:hover {
 }
 
 #scrollview_hscroll {
-    border-image-source: url("scroll_horizontal");
+    border-image-source: url("ui.svg#scroll_horizontal");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
 }
 
 #scrollview_htrack {
-    border-image-source: url("scroll_indicator_horizontal");
+    border-image-source: url("ui.svg#scroll_indicator_horizontal");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
 }
 
 #scrollview_vscroll {
-    border-image-source: url("scroll_vertical");
+    border-image-source: url("ui.svg#scroll_vertical");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
 }
 
 #scrollview_vtrack {
-    border-image-source: url("scroll_indicator_vertical");
+    border-image-source: url("ui.svg#scroll_indicator_vertical");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
 }
 
 context_menu {
-    border-image-source: url("panel_9");
+    border-image-source: url("ui.svg#panel_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
@@ -133,7 +133,7 @@ context_menu_item:hover {
 }
 
 .tooltip {
-    border-image-source: url("panel_9");
+    border-image-source: url("ui.svg#panel_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 50%;
@@ -142,7 +142,7 @@ context_menu_item:hover {
 }
 
 button {
-    border-image-source: url("button_white_normal_3");
+    border-image-source: url("ui.svg#button_white_normal_3");
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
@@ -155,14 +155,14 @@ button {
 }
 
 button:hover {
-    border-image-source: url("button_white_hovered_3");
+    border-image-source: url("ui.svg#button_white_hovered_3");
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
     color: #ffffff;
 }
 
 button:disabled {
-    border-image-source: url("button_white_normal_3");
+    border-image-source: url("ui.svg#button_white_normal_3");
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
     background-color-opacity: 50%;
@@ -171,7 +171,7 @@ button:disabled {
 }
 
 button:disabled:hover {
-    border-image-source: url("button_white_hovered_3");
+    border-image-source: url("ui.svg#button_white_hovered_3");
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
     color: #aaaaaa;
@@ -190,7 +190,7 @@ button:disabled:hover {
    engine already falls back to when nothing declares it. */
 checkbox, .checkbox {
     background-repeat: imagefit;
-    background-image: url("checkbox_back_normal");
+    background-image: url("ui.svg#checkbox_back_normal");
     background-size: 100%;
     width: 40px;
     height: 40px;
@@ -202,33 +202,33 @@ checkbox, .checkbox {
 }
 
 checkbox:focus, .checkbox:focus {
-    background-image: url("checkbox_back_normal");
+    background-image: url("ui.svg#checkbox_back_normal");
     color: #ffffff;
 }
 
 checkbox:hover, .checkbox:hover {
-    background-image: url("checkbox_back_hovered");
+    background-image: url("ui.svg#checkbox_back_hovered");
     color: #ffffff;
 }
 
 checkbox:focus:hover, .checkbox:focus:hover {
-    background-image: url("checkbox_back_hovered");
+    background-image: url("ui.svg#checkbox_back_hovered");
     color: #cceeff;
 }
 
 checkbox:disabled, .checkbox:disabled {
-    background-image: url("checkbox_back_hovered");
+    background-image: url("ui.svg#checkbox_back_hovered");
     --image-color: #888888;
     color: #888888;
 }
 
 checkbox #checkbox_image, .checkbox #checkbox_image {
-    image: url("check_icon");
+    image: url("ui.svg#check_icon");
     --image-color: #000032;
 }
 
 checkbox #checkbox_image:hover, .checkbox #checkbox_image:hover {
-    image: url("check_icon");
+    image: url("ui.svg#check_icon");
     --image-color: #ffffff;
 }
 
@@ -242,7 +242,7 @@ img {
 .back_pattern {
     background-repeat: imagetiled;
     --background-depth: backclipped;
-    background-image: url("back_pattern");
+    background-image: url("ui.svg#back_pattern");
     background-size: 100%;
     background-color-opacity: 4%;
     overflow: hidden;
@@ -272,14 +272,14 @@ img {
 }
 
 .image_button:hover {
-    border-image-source: url("panel_white_hovered_9");
+    border-image-source: url("ui.svg#panel_white_hovered_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 50%;
 }
 
 .dialog_window {
-    border-image-source: url("window_dialog_9");
+    border-image-source: url("ui.svg#window_dialog_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
