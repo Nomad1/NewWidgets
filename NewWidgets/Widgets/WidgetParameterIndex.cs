@@ -127,7 +127,8 @@ namespace NewWidgets.Widgets
 
         // Background
 
-        [WidgetParameter("back_color", "background-color", typeof(uint), UnitType.Color)] // unlike HTML it doesn't supports transparency yet
+        [WidgetParameter("back_color", "background-color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Initial,
+                                       typeof(BackgroundColorProcessor), "background-color-opacity")] // an authored alpha is unpacked into the opacity property, because the renderer masks it off the colour
         BackColor,
         [WidgetParameter("back_image", "background-image", typeof(string), UnitType.Url)]
         BackImage,
@@ -173,7 +174,8 @@ namespace NewWidgets.Widgets
         BorderImageRepeat,
         [WidgetParameter("back_padding", "--background-padding", typeof(Margin), UnitType.Length)]
         BackPadding,
-        [WidgetParameter("back_opacity", "background-color-opacity",  typeof(float), UnitType.Percent)] // Panorama UI compat, invalid in CSS
+        [WidgetParameter("back_opacity", "background-color-opacity",  typeof(float), UnitType.Percent, WidgetParameterInheritance.Initial,
+                                         typeof(BackgroundOpacityProcessor))] // Panorama UI compat, invalid in CSS. Composes with an alpha authored on background-color
         BackOpacity,
 
         // Text
@@ -584,6 +586,82 @@ namespace NewWidgets.Widgets
             }
 
             data[CompanionIndex] = ConversionHelper.MarginParse(inset, UnitType.Length);
+        }
+    }
+
+    /// <summary>
+    /// CSS <c>background-color</c>, whose colour may carry an alpha -- <c>rgba()</c>,
+    /// <c>#rrggbbaa</c>, the engine's own <c>0xAARRGGBB</c>. That alpha cannot stay in the
+    /// colour: <c>Sprite.Color</c>'s setter masks the value with <c>0x00ffffff</c> and keeps
+    /// the alpha byte it already had, so the top byte of a stored colour never reaches the
+    /// screen. The strength of a background reaches it through <c>background-color-opacity</c>
+    /// alone, which <see cref="WidgetBackground.Update"/> multiplies into <c>Sprite.Alpha</c>.
+    /// So the alpha is unpacked here, at parse time, into that property, and stripped from the
+    /// colour -- leaving it in both would apply it twice after a <c>SaveCSS</c> round trip.
+    ///
+    /// The two <b>compose</b> rather than one overriding the other, because that is what the
+    /// renderer already does with every other pair of alphas it holds: an element's own
+    /// opacity, its background opacity and the sprite's alpha all multiply. So
+    /// <c>rgba(0, 0, 0, 0.5)</c> alone is a half-strength background, <c>50%</c> alone is a
+    /// half-strength background, and the two written together give a quarter. Neither
+    /// declaration has to be read before the other for that to hold: whichever is parsed
+    /// second multiplies itself into what the first left.
+    ///
+    /// ponytail: a zero alpha byte is read as "this colour carries no alpha", which is what
+    /// keeps the default colour 0xffffff, every #rrggbb in both shipped games and the
+    /// `transparent` keyword rendering exactly as they do today -- all four have a top byte of
+    /// zero. The cost is that the three genuinely-transparent spellings, `transparent`,
+    /// `rgba(r, g, b, 0)` and `#rrggbb00`, still paint opaque. The upgrade path is for
+    /// <see cref="ConversionHelper.UintParse"/> to report whether the source carried an alpha
+    /// channel at all, rather than leaving the caller to infer it from the value.
+    ///
+    /// ponytail: the split also means a later rule re-declaring `background-color` without an
+    /// alpha does not clear an opacity an earlier rule's colour contributed, the way it would
+    /// in a browser. Same upgrade path: a colour that carries its own alpha to the renderer.
+    /// </summary>
+    internal class BackgroundColorProcessor : CssPropertyProcessor
+    {
+        public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            uint color = ConversionHelper.UintParse(stringValue, UnitType.Color);
+
+            data[PropertyIndex] = color & 0x00ffffffu;
+
+            uint alpha = color >> 24;
+
+            if (alpha == 0)
+                return;
+
+            float opacity = alpha / 255.0f;
+
+            // a background-color-opacity earlier in the same rule composes with this alpha
+            object declared;
+            if (data.TryGetValue(CompanionIndex, out declared))
+                opacity *= (float)declared;
+
+            data[CompanionIndex] = opacity;
+        }
+    }
+
+    /// <summary>
+    /// This engine's own <c>background-color-opacity</c>, kept because both shipped games are
+    /// written in it. It differs from a plain float only in composing with an alpha a
+    /// <c>background-color</c> in the same rule already contributed -- see
+    /// <see cref="BackgroundColorProcessor"/> for why the two multiply.
+    /// </summary>
+    internal class BackgroundOpacityProcessor : CssPropertyProcessor
+    {
+        public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            float opacity = ConversionHelper.FloatParse(stringValue, UnitType.Percent);
+
+            // nothing else in the library writes this property, so a value already sitting in
+            // this rule's data can only have come from the colour's alpha
+            object declared;
+            if (data.TryGetValue(PropertyIndex, out declared))
+                opacity *= (float)declared;
+
+            data[PropertyIndex] = opacity;
         }
     }
 

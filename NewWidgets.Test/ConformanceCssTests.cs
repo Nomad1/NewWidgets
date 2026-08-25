@@ -44,6 +44,8 @@ namespace NewWidgets.Test
             TestRunner.Add("Test 57: border-image longhands are parsed and stored", Test57_BorderImage);
             TestRunner.Add("Test 58: @font-face registers a font and a font stack resolves", Test58_FontFace);
             TestRunner.Add("Test 59: deliberately ignored properties, clip-path and display", Test59_IgnoredAndMapped);
+            TestRunner.Add("Test 73: an alpha on background-color reaches the renderer", Test73_BackgroundColorAlpha);
+            TestRunner.Add("Test 74: @font-face and @font.name register the same font", Test74_FontFaceMatchesFontAtRule);
 
             TestRunner.AddKnownFailure("Test 59b: display:none hides the widget",
                 "the display property is parsed and stored (Test 59 covers that) but nothing reads it: Widget.UpdateStyle turns the declared box properties into a position and a size and never touches Visible, so a widget carrying display:none still draws. Applying it belongs in Widget.cs/Widget.UpdateStyle, which D144 puts off limits to a parser change",
@@ -345,6 +347,124 @@ namespace NewWidgets.Test
             panel.ForceUpdateStyle();
 
             context.IsFalse(panel.Visible, "a widget carrying display: none should not be visible");
+        }
+
+        /// <summary>
+        /// A colour's alpha and this engine's <c>background-color-opacity</c> are the same
+        /// quantity written two ways, so the standard spelling has to arrive where the private
+        /// one does. The renderer is the referee: <see cref="WidgetBackground"/>'s Update
+        /// hands <c>BackgroundColor</c> to <c>Sprite.Color</c>, whose setter masks the value
+        /// with 0x00ffffff and keeps the alpha byte it already had, and hands
+        /// <c>BackgroundAlpha</c> to <c>Sprite.Alpha</c> separately. So an alpha left in the
+        /// colour is an alpha thrown away, and the byte asserted below is the whole of what a
+        /// background's strength does on screen.
+        ///
+        /// The last two cases are the ones neither shipped game could catch: the default
+        /// colour 0xffffff and every plain #rrggbb have a top byte of zero, so reading that
+        /// byte as an alpha without care would make every widget in both games invisible.
+        /// </summary>
+        private static void Test73_BackgroundColorAlpha(TestContext context)
+        {
+            TestController controller = PrepareIsolatedLoad();
+
+            context.DoesNotThrow(delegate
+            {
+                TestEnvironment.LoadCss(
+                    ".c73pair { background-color: #000000; background-color-opacity: 4%; }" +
+                    ".c73rgba { background-color: rgba(0, 0, 0, 0.04); }" +
+                    ".c73hex8 { background-color: #0000000a; }" +
+                    ".c73both { background-color: rgba(0, 0, 0, 0.5); background-color-opacity: 50%; }" +
+                    ".c73bothswapped { background-color-opacity: 50%; background-color: rgba(0, 0, 0, 0.5); }" +
+                    ".c73plain { background-color: #000000; }" +
+                    ".c73none { --clip: true; }");
+            }, "an alpha-bearing background-color should be read, not rejected");
+
+            context.AreEqual(0, controller.Errors.Count, "none of these rules should log an error, got: {0}", Join(controller.Errors));
+
+            WidgetPanel pair = StyledPanel(".c73pair");
+            WidgetPanel rgba = StyledPanel(".c73rgba");
+
+            // the pair is what both shipped skins write; rgba() is what a browser reads
+            context.AreEqual(pair.BackgroundColor, rgba.BackgroundColor, "rgba() should store the same colour the #rrggbb form does");
+            context.AreEqual(RenderedAlpha(pair), RenderedAlpha(rgba), "rgba(0, 0, 0, 0.04) should paint the same background as #000000 plus background-color-opacity: 4%");
+            context.AreEqual(10, RenderedAlpha(rgba), "4% of 255 is 10");
+
+            context.AreEqual(RenderedAlpha(pair), RenderedAlpha(StyledPanel(".c73hex8")), "the eight digit hex form carries the same alpha as rgba()");
+
+            // composition, not precedence: the renderer already multiplies every alpha it
+            // holds, so two declared alphas multiply too, whichever order they are written in
+            context.AreEqualFloat(0.25f, StyledPanel(".c73both").BackgroundAlpha, 0.005f, "a colour alpha of 0.5 and an opacity of 50% should compose to a quarter");
+            context.AreEqualFloat(0.25f, StyledPanel(".c73bothswapped").BackgroundAlpha, 0.005f, "the same two declarations in the other order should compose to the same quarter");
+
+            // the two cases the corpus cannot catch, because a top byte of zero is what every
+            // colour in both games and the un-declared default alike look like
+            WidgetPanel plain = StyledPanel(".c73plain");
+            context.AreEqualFloat(1.0f, plain.BackgroundAlpha, 0.001f, "a background-color with no alpha must leave the background at full strength");
+            context.AreEqual(255, RenderedAlpha(plain), "a background-color with no alpha must still paint opaque");
+
+            WidgetPanel none = StyledPanel(".c73none");
+            context.AreEqual((uint)0xffffff, none.BackgroundColor, "a widget declaring no background-color keeps the default colour");
+            context.AreEqual(255, RenderedAlpha(none), "a widget declaring no background-color must still paint opaque");
+        }
+
+        /// <summary>
+        /// The standard <c>@font-face</c> and this engine's <c>@font.&lt;name&gt;</c> are two
+        /// spellings of one registration, so they must produce the same font from the same
+        /// metrics -- including the "default" family, which is the one the sample's stylesheet
+        /// needs a browser to be able to read.
+        /// </summary>
+        private static void Test74_FontFaceMatchesFontAtRule(TestContext context)
+        {
+            TestController controller = PrepareIsolatedLoad();
+            controller.RegisterTestFont("c74sprite", 8, 16);
+            controller.ClearLog();
+
+            context.DoesNotThrow(delegate
+            {
+                TestEnvironment.LoadCss(
+                    "@font.c74legacy { --font-resource: url(\"c74sprite\"); --font-spacing: 2; --font-leading: 3; --font-baseline: 30; --font-shift: 1; }" +
+                    "@font-face { font-family: \"c74standard\"; src: url(\"c74sprite\"); letter-spacing: 2; --font-leading: 3; --font-baseline: 30; --font-shift: 1; }" +
+                    "@font-face { font-family: \"default\"; src: url(\"c74sprite\"); --font-baseline: 30; }");
+            }, "both at-rules should register a font rather than throw");
+
+            context.AreEqual(0, controller.Errors.Count, "neither at-rule should log an error, got: {0}", Join(controller.Errors));
+
+            Font legacy = WidgetManager.GetFont("c74legacy");
+            Font standard = WidgetManager.GetFont("c74standard");
+
+            context.IsNotNull(legacy, "@font.c74legacy should register a font");
+            context.IsNotNull(standard, "@font-face naming c74standard should register a font");
+
+            if (legacy == null || standard == null)
+                return;
+
+            context.AreEqualFloat(legacy.Spacing, standard.Spacing, 0.001f, "letter-spacing should reach the same field --font-spacing does");
+            context.AreEqual(legacy.Leading, standard.Leading, "both spellings should carry the same leading");
+            context.AreEqual(legacy.Baseline, standard.Baseline, "both spellings should carry the same baseline");
+            context.AreEqual(legacy.Shift, standard.Shift, "both spellings should carry the same shift");
+            context.AreEqual(legacy.Height, standard.Height, "both spellings should cut the same sprite, so the glyph height matches");
+            context.AreEqual(legacy.SpaceWidth, standard.SpaceWidth, "both spellings should cut the same sprite, so the space width matches");
+
+            // the sample's own case: @font.default is what sets the main font today, and the
+            // standard spelling has to set it too or a stylesheet a browser can read has no text
+            context.IsNotNull(WidgetManager.MainFont, "@font-face for the default family should set the main font");
+            context.AreEqual(WidgetManager.MainFont, WidgetManager.GetFont("default"), "the default family should be reachable by name as well");
+        }
+
+        // The byte WidgetBackground.Update hands to Sprite.Alpha, which is the only route by
+        // which a background's strength reaches the screen. Copied from there deliberately:
+        // if that expression changes, this test should be re-read rather than silently follow.
+        private static int RenderedAlpha(WidgetPanel panel)
+        {
+            return MathHelper.Clamp((int)(panel.OpacityValue * panel.BackgroundAlpha * 255 + float.Epsilon), 0, 255);
+        }
+
+        private static WidgetPanel StyledPanel(string selector)
+        {
+            WidgetPanel panel = new WidgetPanel(WidgetManager.GetStyle(selector));
+            panel.ForceUpdateStyle();
+
+            return panel;
         }
 
         // Resets the process-wide style collection and font registry, and makes sure the
