@@ -117,6 +117,7 @@ namespace NewWidgets.Test
 
         private string m_lastPartSubdivisionTarget;
         private int m_partSubdivisionCount;
+        private int m_subdivisionCount;
 
         private int m_lastClipX;
         private int m_lastClipY;
@@ -208,6 +209,15 @@ namespace NewWidgets.Test
             get { return m_partSubdivisionCount; }
         }
 
+        // How many times the uniform-grid seam has been called. Counted rather than merely
+        // recorded because the record is keyed by sprite id and a second cut of the same
+        // sprite overwrites it in silence -- which is the exact defect the deduplication in
+        // WidgetManager exists to prevent, and it is invisible unless the calls are counted.
+        public int SubdivisionCount
+        {
+            get { return m_subdivisionCount; }
+        }
+
         // Lets a test assert the scheduled-action queue drains rather than growing forever.
         public int PendingActionCount
         {
@@ -251,6 +261,7 @@ namespace NewWidgets.Test
         public override void SetSpriteSubdivision(string id, int subdivideX, int subdivideY)
         {
             m_subdivisions[id] = new Subdivision(subdivideX, subdivideY);
+            m_subdivisionCount++;
         }
 
         // The arbitrary-rectangle seam (WindowController.SetSpriteSubdivision with normalized

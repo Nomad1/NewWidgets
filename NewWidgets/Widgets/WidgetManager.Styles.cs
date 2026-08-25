@@ -9,8 +9,39 @@ namespace NewWidgets.Widgets
 {
     public static partial class WidgetManager
     {
+        /// <summary>
+        /// The uniform grid one sprite has already been cut into, so a second request for the
+        /// same sprite can be told apart from a conflicting one.
+        /// </summary>
+        private struct SpriteSubdivision
+        {
+            public readonly int TileX;
+            public readonly int TileY;
+
+            public SpriteSubdivision(int tileX, int tileY)
+            {
+                TileX = tileX;
+                TileY = tileY;
+            }
+        }
+
         // this is primary CSS style collection for now
         private static readonly StyleCollection s_styleCollection = new StyleCollection();
+
+        // Every sprite already handed to WindowController.SetSpriteSubdivision, by sprite name.
+        // A subdivision reads frame 0 of the sprite and overwrites the sprite with the pieces,
+        // so cutting the same sprite twice cuts the top-left ninth into nine and silently
+        // destroys the nine-patch. Since border-image-slice is declared per rule, and dozens of
+        // rules name the same sprite, the second request has to be recognised rather than
+        // obeyed. Deliberately never cleared -- ResetStyles empties the stylesheet, but the
+        // cuts live on WindowController and it has no way to undo them.
+        private static readonly IDictionary<string, SpriteSubdivision> s_spriteSubdivisions = new Dictionary<string, SpriteSubdivision>();
+
+        /// <summary>
+        /// How far a stored <c>border-image-slice</c> value may sit from one third and still be
+        /// the thirds this engine cuts: 33.3333%, 33.33% and 33.4% are all the same patch.
+        /// </summary>
+        private static readonly float s_thirdSliceTolerance = 0.005f;
 
         /// <summary>
         /// Gets the style by name. This method is here only for compatibility purposes and it would be removed in later versions
@@ -54,59 +85,6 @@ namespace NewWidgets.Widgets
         public static void LoadCSS(string uiData)
         {
             CSSParser.ParseCSS(uiData, s_styleCollection, InitCssData);
-
-            /*ICollection<StyleNode> fonts = s_styleCollection.GetElementNodes(new StyleSelector("@font"));
-
-            
-            foreach (StyleNode node in fonts)
-            {
-                StyleSheetData data = (StyleSheetData)node.Data;
-
-                StyleSelector selector = node.SelectorList.Selectors[node.SelectorList.Count - 1];
-
-                if (data == null || selector == null || selector.Classes == null || selector.Classes.Length != 1)
-                {
-                    WindowController.Instance.LogError("Invalid font loaded from CSS " + node);
-                    continue;
-                }
-
-                string name = node.SelectorList.Selectors[node.SelectorList.Count - 1].Classes[0];
-
-                Font font = new Font(
-                    name,
-                    data.GetParameter(WidgetParameterIndex.FontResource, ""),
-                    data.GetParameter(WidgetParameterIndex.FontSpacing, 0.0f),
-                    data.GetParameter(WidgetParameterIndex.FontLeading, 0),
-                    data.GetParameter(WidgetParameterIndex.FontBaseline, 10),
-                    data.GetParameter(WidgetParameterIndex.FontShift, 0));
-
-                s_fonts[name] = font;
-
-                if (name == "default")
-                    s_mainFont = font;
-            }
-
-            ICollection<StyleNode> sprites = s_styleCollection.GetElementNodes(new StyleSelector("@sprite"));
-
-            foreach (StyleNode node in sprites)
-            {
-                StyleSheetData data = (StyleSheetData)node.Data;
-
-                StyleSelector selector = node.SelectorList.Selectors[node.SelectorList.Count - 1];
-
-                if (data == null || selector == null || selector.Classes == null || selector.Classes.Length != 1)
-                {
-                    WindowController.Instance.LogError("Invalid sprite loaded from CSS " + node);
-                    continue;
-                }
-
-                string name = node.SelectorList.Selectors[node.SelectorList.Count - 1].Classes[0];
-
-                WindowController.Instance.SetSpriteSubdivision(
-                    name,
-                    data.GetParameter(WidgetParameterIndex.SpriteTileX, 1),
-                    data.GetParameter(WidgetParameterIndex.SpriteTileY, 1));
-            }*/
         }
 
         private static IStyleData InitCssData(string name, Dictionary<string, string> parameters)
@@ -120,20 +98,120 @@ namespace NewWidgets.Widgets
             StyleSheetData data = new StyleSheetData(style);
 
             if (name.StartsWith("@font."))
-            {
                 RegisterFont(name.Split('.')[1], data);
-            }
-            else if (name.StartsWith("@sprite"))
-            {
-                string spriteName = name.Split('.')[1];
-
-                WindowController.Instance.SetSpriteSubdivision(
-                    spriteName,
-                    data.GetParameter(WidgetParameterIndex.SpriteTileX, 1),
-                    data.GetParameter(WidgetParameterIndex.SpriteTileY, 1));
-            }
+            else
+                ScanBorderImageSubdivision(style);
 
             return data;
+        }
+
+        /// <summary>
+        /// The subdivision scan, and the reason <c>@sprite</c> is gone: a stylesheet says how a
+        /// sprite is cut in the rule that uses it, with the standard's own
+        /// <c>border-image-slice</c>, and this reads that out of every rule as the stylesheet
+        /// loads. A rule naming a sprite it does not slice contributes nothing, so the rule that
+        /// does slice it is the one that decides -- and every rule in the shipped skins carries
+        /// both, so no rule depends on the cascade to complete it.
+        ///
+        /// Load time, once per rule. Nothing here runs on a read or a draw.
+        /// </summary>
+        private static void ScanBorderImageSubdivision(IDictionary<WidgetParameterIndex, object> style)
+        {
+            object source;
+            object slice;
+
+            if (!style.TryGetValue(WidgetParameterIndex.BorderImageSource, out source))
+                return;
+
+            if (!style.TryGetValue(WidgetParameterIndex.BorderImageSlice, out slice))
+                return;
+
+            // the url is stored as authored so SaveCSS can write it back whole (D188); the cut
+            // is registered against the sprite the fragment names (D187)
+            string sprite = ConversionHelper.UrlToSpriteName((string)source);
+
+            if (string.IsNullOrEmpty(sprite) || string.Equals(sprite, "none", StringComparison.OrdinalIgnoreCase))
+                return;
+
+            int tileX;
+            int tileY;
+
+            if (!TryGetBorderImageGrid((Margin)slice, out tileX, out tileY))
+            {
+                WindowController.Instance.LogError("border-image-slice {0} of sprite {1} is neither the 3x3 nor the horizontal 3x1 cut this engine draws, so {1} is left whole. A vertical three-patch does not exist here", slice, sprite);
+                return;
+            }
+
+            RegisterSpriteSubdivision(sprite, tileX, tileY);
+        }
+
+        /// <summary>
+        /// Reads a CSS <c>border-image-slice</c> as one of the two uniform grids this engine
+        /// cuts. <c>border-image-slice</c> is written top right bottom left, so a slice at
+        /// thirds on both axes is the 3x3 nine-patch and one at thirds on the horizontal axis
+        /// alone -- <c>0 33.3333%</c> -- is the 3x1 three-patch.
+        ///
+        /// <c>33.3333% 0</c>, the vertical form, is not a grid this engine has: the three-patch
+        /// renderer walks three frames along x and scales by height (D193). It returns false
+        /// here along with every other slice, and an arbitrary slice is drawn by
+        /// <c>WidgetBackground.InitBorderImageBackground</c> instead.
+        /// </summary>
+        internal static bool TryGetBorderImageGrid(Margin slice, out int tileX, out int tileY)
+        {
+            tileX = 0;
+            tileY = 0;
+
+            bool cutsHorizontally = IsThirdSlice(slice.Left) && IsThirdSlice(slice.Right);
+            bool cutsVertically = IsThirdSlice(slice.Top) && IsThirdSlice(slice.Bottom);
+
+            if (cutsHorizontally && cutsVertically)
+            {
+                tileX = 3;
+                tileY = 3;
+                return true;
+            }
+
+            if (cutsHorizontally && slice.Top == 0.0f && slice.Bottom == 0.0f)
+            {
+                tileX = 3;
+                tileY = 1;
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsThirdSlice(float value)
+        {
+            return Math.Abs(value - 1.0f / 3.0f) < s_thirdSliceTolerance;
+        }
+
+        /// <summary>
+        /// Cuts one sprite into a uniform grid, at most once. Every request for a subdivision
+        /// goes through here -- the CSS scan above and the two legacy XML patch elements alike
+        /// -- because <c>SetSpriteSubdivision</c> registers the pieces under the source's own
+        /// name, so a second call reads the already-cut sprite and quietly replaces the whole
+        /// nine-patch with nine slivers of its top-left corner.
+        ///
+        /// A repeat of the same grid is the normal case and is silent. A different grid for a
+        /// sprite already cut is a stylesheet defect that cannot be honoured either way round,
+        /// so the first cut stands and the conflict is reported.
+        /// </summary>
+        private static void RegisterSpriteSubdivision(string sprite, int tileX, int tileY)
+        {
+            SpriteSubdivision existing;
+
+            if (s_spriteSubdivisions.TryGetValue(sprite, out existing))
+            {
+                if (existing.TileX != tileX || existing.TileY != tileY)
+                    WindowController.Instance.LogError("Sprite {0} is asked for a {1}x{2} subdivision but is already cut {3}x{4}; the first cut stands, because cutting a sprite twice destroys it. Two rules disagree about the same sprite", sprite, tileX, tileY, existing.TileX, existing.TileY);
+
+                return;
+            }
+
+            s_spriteSubdivisions[sprite] = new SpriteSubdivision(tileX, tileY);
+
+            WindowController.Instance.SetSpriteSubdivision(sprite, tileX, tileY);
         }
 
         /// <summary>
@@ -272,7 +350,8 @@ namespace NewWidgets.Widgets
         /// style loader's lookforward/default-style tables (<c>s_lookForwardStyles</c>,
         /// <c>s_defaultStyles</c>) -- that path is obsolete and unused by CSS-based callers;
         /// or sprite subdivisions registered on <c>WindowController.Instance</c> from
-        /// <c>@sprite</c> rules -- those live on a different class entirely.
+        /// <c>border-image-slice</c> -- those live on a different class entirely, which has no
+        /// way to undo a cut, so the record of what is already cut is not cleared either.
         /// </summary>
         public static void ResetStyles()
         {
@@ -378,13 +457,7 @@ namespace NewWidgets.Widgets
         {
             string name = node.Attributes.GetNamedItem("name").Value;
 
-            WindowController.Instance.SetSpriteSubdivision(name, 3, 3);
-
-            Dictionary<WidgetParameterIndex, object> spriteStyle = new Dictionary<WidgetParameterIndex, object>();
-            spriteStyle[WidgetParameterIndex.SpriteTileX] = 3;
-            spriteStyle[WidgetParameterIndex.SpriteTileY] = 3;
-
-            s_styleCollection.AddStyle("@sprite." + name, new StyleSheetData(spriteStyle));
+            RegisterSpriteSubdivision(name, 3, 3);
 
             WindowController.Instance.LogMessage("Registered nine patch {0}", name);
         }
@@ -393,13 +466,7 @@ namespace NewWidgets.Widgets
         {
             string name = node.Attributes.GetNamedItem("name").Value;
 
-            WindowController.Instance.SetSpriteSubdivision(name, 3, 1);
-
-            Dictionary<WidgetParameterIndex, object> spriteStyle = new Dictionary<WidgetParameterIndex, object>();
-            spriteStyle[WidgetParameterIndex.SpriteTileX] = 3;
-            spriteStyle[WidgetParameterIndex.SpriteTileY] = 1;
-
-            s_styleCollection.AddStyle("@sprite." + name, new StyleSheetData(spriteStyle));
+            RegisterSpriteSubdivision(name, 3, 1);
 
             WindowController.Instance.LogMessage("Registered three patch {0}", name);
         }

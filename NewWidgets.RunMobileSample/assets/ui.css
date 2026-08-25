@@ -16,64 +16,10 @@
     --font-baseline: 30;
 }
 
-@sprite.panel_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_white_normal_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_white_hovered_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.window_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.window_dialog_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.scroll_horizontal {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.scroll_vertical {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.scroll_indicator_horizontal {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.scroll_indicator_vertical {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.button_white_normal_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_white_hovered_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
 window, .window {
-    background-repeat: nineimage;
-    background-image: url("window_9");
+    border-image-source: url("window_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 75%;
     width: 600px;
     height: 400px;
@@ -81,8 +27,9 @@ window, .window {
 }
 
 panel, div {
-    background-repeat: nineimage;
-    background-image: url("window_9");
+    border-image-source: url("window_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 50%;
     width: 100px;
     height: 100px;
@@ -105,8 +52,9 @@ text {
 }
 
 textedit, textfield, input, textarea {
-    background-repeat: nineimage;
-    background-image: url("panel_white_hovered_9");
+    border-image-source: url("panel_white_hovered_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 25%;
     font-family: default;
     font-size: 0.5em;
@@ -120,7 +68,9 @@ textedit, textfield, input, textarea {
 }
 
 textedit:focus, textfield:focus, input:focus, textarea:focus {
-    background-image: url("panel_white_normal_9");
+    border-image-source: url("panel_white_normal_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     color: #ffffff;
 }
 
@@ -133,32 +83,37 @@ textedit:hover, textfield:hover, input:hover, textarea:hover {
 }
 
 #scrollview_hscroll {
-    background-repeat: nineimage;
-    background-image: url("scroll_horizontal");
+    border-image-source: url("scroll_horizontal");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 #scrollview_htrack {
-    background-repeat: nineimage;
-    background-image: url("scroll_indicator_horizontal");
+    border-image-source: url("scroll_indicator_horizontal");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 #scrollview_vscroll {
-    background-repeat: nineimage;
-    background-image: url("scroll_vertical");
+    border-image-source: url("scroll_vertical");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 #scrollview_vtrack {
-    background-repeat: nineimage;
-    background-image: url("scroll_indicator_vertical");
+    border-image-source: url("scroll_indicator_vertical");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 context_menu {
-    background-repeat: nineimage;
-    background-image: url("panel_9");
+    border-image-source: url("panel_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 100%;
     padding: 4px 4px 4px 4px;
 }
@@ -178,16 +133,18 @@ context_menu_item:hover {
 }
 
 .tooltip {
-    background-repeat: nineimage;
-    background-image: url("panel_9");
+    border-image-source: url("panel_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 50%;
     padding: 14px 14px 16px 14px;
     overflow: hidden;
 }
 
 button {
-    background-repeat: threeimage;
-    background-image: url("button_white_normal_3");
+    border-image-source: url("button_white_normal_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 100%;
     --text-padding: 0px 0px 0px 6px;
     width: 120px;
@@ -198,19 +155,25 @@ button {
 }
 
 button:hover {
-    background-image: url("button_white_hovered_3");
+    border-image-source: url("button_white_hovered_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
     color: #ffffff;
 }
 
 button:disabled {
-    background-image: url("button_white_normal_3");
+    border-image-source: url("button_white_normal_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
     background-color-opacity: 50%;
     background-color: #aaaaaa;
     color: #808080;
 }
 
 button:disabled:hover {
-    background-image: url("button_white_hovered_3");
+    border-image-source: url("button_white_hovered_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
     color: #aaaaaa;
     background-color-opacity: 50%;
     background-color: #aaaaaa;
@@ -309,14 +272,16 @@ img {
 }
 
 .image_button:hover {
-    background-repeat: nineimage;
-    background-image: url("panel_white_hovered_9");
+    border-image-source: url("panel_white_hovered_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 50%;
 }
 
 .dialog_window {
-    background-repeat: nineimage;
-    background-image: url("window_dialog_9");
+    border-image-source: url("window_dialog_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 100%;
     width: 600px;
     height: 300px;

@@ -95,9 +95,9 @@ namespace NewWidgets.Test
             SpriteUrlTests.Register();
 
             // Registered dead last. Test 71 loads the sample's whole ui.css -- bare element
-            // rules for window, panel, label, button, textedit and checkbox, plus eleven
-            // @sprite blocks that subdivide sprites through the WindowController seam -- into
-            // the shared, process-wide style collection. It resets that collection first, so
+            // rules for window, panel, label, button, textedit and checkbox, whose
+            // border-image-slice declarations also subdivide eleven sprites through the
+            // WindowController seam -- into the shared, process-wide style collection. It resets that collection first, so
             // anything registered after it would read a collection holding a real skin instead
             // of its own scratch styles; BorderImageTests in particular builds plain panels and
             // would pick up ui.css's nine-patch background.

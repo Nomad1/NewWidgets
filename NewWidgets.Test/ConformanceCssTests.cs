@@ -80,7 +80,7 @@ namespace NewWidgets.Test
             WidgetStyleSheet window = GetClassStyle("window");
             context.AreEqual(StyleLength.Pixels(600), window.Get<StyleLength>(WidgetParameterIndex.Width, StyleLength.Unset), "the window rule's width should have applied");
             context.AreEqual(new StyleLength(StyleUnit.Percent, 0.5f), window.Get<StyleLength>(WidgetParameterIndex.Left, StyleLength.Unset), "left: 50% should stay a percentage");
-            context.AreEqual("ui.png", window.Get<string>(WidgetParameterIndex.BorderImageSource, null), "border-image-source should have applied");
+            context.AreEqual("ui.png#window_9", window.Get<string>(WidgetParameterIndex.BorderImageSource, null), "border-image-source should have applied, and be stored as authored so SaveCSS keeps the fragment");
             context.AreEqualFloat(0.3333f, window.Get<Margin>(WidgetParameterIndex.BorderImageSlice, Margin.Empty).Left, 0.001f, "border-image-slice: 33.33% should have applied");
             context.IsTrue(window.Get<bool>(WidgetParameterIndex.BorderImageFill, false), "the fill keyword on border-image-slice should have been recorded");
             context.AreEqualFloat(0.75f, window.Get<Margin>(WidgetParameterIndex.BorderImageWidth, Margin.Empty).Left, 0.001f, "border-image-width: 75% should have applied");

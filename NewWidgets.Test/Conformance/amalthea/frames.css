@@ -1,22 +1,25 @@
 /* Windows */
 
 .dialog_back {
-    background-repeat: nineimage;
-    background-image: url("panel_white_normal_9");
+    border-image-source: url("panel_white_normal_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 50%;
 }
 
 .dialog_window {
-    background-repeat: nineimage;
-    background-image: url("window_dialog_9");
+    border-image-source: url("window_dialog_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 100%;
     width: 600px;
     height: 300px;
 }
 
 .small_dialog_window {
-    background-repeat: nineimage;
-    background-image: url("window_dialog_9");
+    border-image-source: url("window_dialog_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 75%;
     width: 300px;
     height: 100px;
@@ -25,66 +28,75 @@
 /* Frames */
 
 .light_frame {
-    background-repeat: nineimage;
-    background-image: url("panel_9");
+    border-image-source: url("panel_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     --clip-margin: 2px 2px 2px 2px;
     background-size: 75%;
 }
 
 .black_frame {
-    background-repeat: nineimage;
-    background-image: url("panel_black_9");
+    border-image-source: url("panel_black_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     --clip-margin: 2px 2px 2px 2px;
     background-size: 75%;
 }
 
 .blue_frame {
-    background-repeat: nineimage;
-    background-image: url("window_dialog_9");
+    border-image-source: url("window_dialog_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 40%;
 }
 
 .simple_panel {
-    background-repeat: nineimage;
-    background-image: url("select");
+    border-image-source: url("select");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 50%;
 }
 
 .white_panel {
-    background-repeat: nineimage;
-    background-image: url("panel_white_normal_9");
+    border-image-source: url("panel_white_normal_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 50%;
     width: 100px;
     height: 100px;
 }
 
 .blue_panel {
-    background-repeat: nineimage;
-    background-image: url("frame_9");
+    border-image-source: url("frame_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 50%;
     width: 100px;
     height: 100px;
 }
 
 .dark_panel {
-    background-repeat: nineimage;
-    background-image: url("panel_9");
+    border-image-source: url("panel_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-color: #000000;
     background-color-opacity: 40%;
     background-size: 25%;
 }
 
 .darker_panel {
-    background-repeat: nineimage;
-    background-image: url("panel_9");
+    border-image-source: url("panel_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-color: #000000;
     background-color-opacity: 80%;
     background-size: 25%;
 }
 
 .light_panel {
-    background-repeat: nineimage;
-    background-image: url("frame_white_9");
+    border-image-source: url("frame_white_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     background-color-opacity: 5%;
     background-size: 50%;
@@ -93,27 +105,31 @@
 /* Individual panel controls */
 
 .paperdoll_panel {
-    background-repeat: nineimage;
-    background-image: url("panel_doll_9");
+    border-image-source: url("panel_doll_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 70%;
     width: 100px;
     height: 100px;
 }
 
 .map_background_frame {
-    background-repeat: nineimage;
-    background-image: url("panel_9");
+    border-image-source: url("panel_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 .top_panel {
-    background-repeat: threeimage;
-    background-image: url("top_panel_3");
+    border-image-source: url("top_panel_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
 }
 
 .tab_panel {
-    background-repeat: nineimage;
-    background-image: url("tab_panel_9");
+    border-image-source: url("tab_panel_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 75%;
 }
 
@@ -138,6 +154,7 @@
 }
 
 .hex_field {
-    background-repeat: threeimage;
-    background-image: url("hex_field_3");
+    border-image-source: url("hex_field_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
 }

@@ -413,7 +413,9 @@ item_button {
 }
 
 .next_button {
-    background-image: url("button_next_normal_3");
+    border-image-source: url("button_next_normal_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
 }
 
     .next_button > .button_label {
@@ -421,23 +423,33 @@ item_button {
     }
 
     .next_button:hover {
-        background-image: url("button_next_hovered_3");
+        border-image-source: url("button_next_hovered_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
     .next_button:focus {
-        background-image: url("button_prev_selected_3");
+        border-image-source: url("button_prev_selected_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
     .next_button:disabled {
-        background-image: url("button_next_selected_3");
+        border-image-source: url("button_next_selected_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
 .next_button_selected {
-    background-image: url("button_next_selected_3");
+    border-image-source: url("button_next_selected_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
 }
 
 .prev_button {
-    background-image: url("button_prev_normal_3");
+    border-image-source: url("button_prev_normal_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
 }
 
     .prev_button > .button_label {
@@ -445,15 +457,21 @@ item_button {
     }
 
     .prev_button:hover {
-        background-image: url("button_prev_hovered_3");
+        border-image-source: url("button_prev_hovered_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
     .prev_button:focus {
-        background-image: url("button_prev_selected_3");
+        border-image-source: url("button_prev_selected_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
     .prev_button:disabled {
-        background-image: url("button_prev_selected_3");
+        border-image-source: url("button_prev_selected_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
 .prevnext_button_paperdoll {
@@ -466,9 +484,10 @@ item_button {
         padding: 0px 0px 4px 0px;
     }
 
-
 .big_button {
-    background-image: url("button_big_normal_3");
+    border-image-source: url("button_big_normal_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
 }
 
     .big_button > .button_label {
@@ -476,51 +495,75 @@ item_button {
     }
 
     .big_button:hover {
-        background-image: url("button_big_hovered_3");
+        border-image-source: url("button_big_hovered_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
     .big_button:focus {
-        background-image: url("button_big_selected_3");
+        border-image-source: url("button_big_selected_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
     .big_button:disabled {
-        background-image: url("button_big_selected_3");
+        border-image-source: url("button_big_selected_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
 .blue_button {
-    background-image: url("button_blue_normal_3");
+    border-image-source: url("button_blue_normal_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
 }
 
     .blue_button:hover {
-        background-image: url("button_blue_hovered_3");
+        border-image-source: url("button_blue_hovered_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
     .blue_button:focus {
-        background-image: url("button_blue_selected_3");
+        border-image-source: url("button_blue_selected_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
     .blue_button:disabled {
-        background-image: url("button_blue_normal_3");
+        border-image-source: url("button_blue_normal_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
 .shortcut_button {
-    background-image: url("button_blue_normal_3");
+    border-image-source: url("button_blue_normal_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
 }
 
     .shortcut_button:hover {
-        background-image: url("button_blue_hovered_3");
+        border-image-source: url("button_blue_hovered_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
     .shortcut_button:focus {
-        background-image: url("button_blue_hovered_3");
+        border-image-source: url("button_blue_hovered_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
         .shortcut_button:focus:hover {
-            background-image: url("button_big_hovered_3");
+            border-image-source: url("button_big_hovered_3");
+            border-image-slice: 0 33.3333% fill;
+            border-image-repeat: stretch;
         }
 
     .shortcut_button:disabled {
-        background-image: url("button_blue_normal_3");
+        border-image-source: url("button_blue_normal_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
     }
 
 .left_button {
@@ -581,15 +624,17 @@ item_button {
 }
 
     .nimage_button:hover {
-        background-repeat: nineimage;
-        background-image: url("panel_white_hovered_9");
+        border-image-source: url("panel_white_hovered_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-size: 25%;
         background-color-opacity: 80%;
     }
 
     .nimage_button:focus {
-        background-repeat: nineimage;
-        background-image: url("panel_white_selected_9");
+        border-image-source: url("panel_white_selected_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-size: 25%;
         background-color-opacity: 30%;
     }
@@ -618,15 +663,17 @@ item_button {
 
     .close_image_button:hover {
         background-color: #ffaa00;
-        background-repeat: nineimage;
-        background-image: url("panel_white_hovered_9");
+        border-image-source: url("panel_white_hovered_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-size: 25%;
         background-color-opacity: 80%;
     }
 
     .close_image_button:focus {
-        background-repeat: nineimage;
-        background-image: url("panel_white_selected_9");
+        border-image-source: url("panel_white_selected_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-size: 25%;
         background-color-opacity: 30%;
     }
@@ -640,7 +687,6 @@ item_button {
     .buy_coins_button > .button_image {
         padding: 0px 2px 0px 0px;
     }
-
 
 .circle_button {
     background-image: url("circle_button_normal");
@@ -704,7 +750,6 @@ item_button {
         padding: 1px 1px 1px 1px;
     }
 
-
     .square_button:hover {
         background-color: #ffaa00;
         background-image: url("button_square_trans_frame");
@@ -729,8 +774,9 @@ item_button {
     }
 
 .bookmark_button {
-    background-repeat: nineimage;
-    background-image: url("panel_white_normal_9");
+    border-image-source: url("panel_white_normal_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 50%;
     font-family: default;
     font-size: 0.75em;
@@ -740,27 +786,31 @@ item_button {
 }
 
     .bookmark_button:focus {
-        background-image: url("panel_white_selected_9");
-        background-repeat: nineimage;
+        border-image-source: url("panel_white_selected_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ffffff;
     }
 
     .bookmark_button:hover {
-        background-image: url("panel_white_hovered_9");
-        background-repeat: nineimage;
+        border-image-source: url("panel_white_hovered_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ffdd77;
     }
 
     .bookmark_button:disabled {
-        background-image: url("panel_white_normal_9");
-        background-repeat: nineimage;
+        border-image-source: url("panel_white_normal_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ff0000;
         color: #999999;
     }
 
 .bookmark_root_button {
-    background-repeat: nineimage;
-    background-image: url("panel_blue_normal_9");
+    border-image-source: url("panel_blue_normal_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 50%;
     font-family: default;
     font-size: 0.75em;
@@ -770,56 +820,71 @@ item_button {
 }
 
     .bookmark_root_button:focus {
-        background-image: url("panel_blue_selected_9");
-        background-repeat: nineimage;
+        border-image-source: url("panel_blue_selected_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ffffff;
     }
 
     .bookmark_root_button:hover {
-        background-image: url("panel_blue_hovered_9");
-        background-repeat: nineimage;
+        border-image-source: url("panel_blue_hovered_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ffdd77;
     }
 
     .bookmark_root_button:disabled {
-        background-image: url("panel_blue_normal_9");
-        background-repeat: nineimage;
+        border-image-source: url("panel_blue_normal_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ff0000;
         color: #999999;
     }
 
 .paperdoll_left_button {
-    background-image: url("button_ldoll_normal_3");
+    border-image-source: url("button_ldoll_normal_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     color: #ffffff;
 }
 
     .paperdoll_left_button:hover {
-        background-image: url("button_ldoll_hovered_3");
+        border-image-source: url("button_ldoll_hovered_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ffffff;
         color: #ffffff;
     }
 
     .paperdoll_left_button:disabled {
-        background-image: url("button_ldoll_normal_3");
+        border-image-source: url("button_ldoll_normal_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ffffff;
         color: #ffffff;
     }
 
 .paperdoll_right_button {
-    background-image: url("button_doll_normal_3");
+    border-image-source: url("button_doll_normal_3");
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     color: #ffffff;
 }
 
     .paperdoll_right_button:hover {
-        background-image: url("button_doll_hovered_3");
+        border-image-source: url("button_doll_hovered_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ffffff;
         color: #ffffff;
     }
 
     .paperdoll_right_button:disabled {
-        background-image: url("button_doll_normal_3");
+        border-image-source: url("button_doll_normal_3");
+        border-image-slice: 0 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ffffff;
         color: #ffffff;
     }
@@ -863,8 +928,9 @@ item_button {
     }
 
 .tab_button {
-    background-repeat: nineimage;
-    background-image: url("tab_button_normal_9");
+    border-image-source: url("tab_button_normal_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 75%;
     font-family: default;
     font-size: 0.75em;
@@ -874,31 +940,36 @@ item_button {
 }
 
     .tab_button:hover {
-        background-image: url("tab_button_hovered_9");
-        background-repeat: nineimage;
+        border-image-source: url("tab_button_hovered_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         color: #ffffff;
     }
 
     .tab_button.tab_button_selected {
-        background-image: url("tab_button_selected_9");
-        background-repeat: nineimage;
+        border-image-source: url("tab_button_selected_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #ffffff;
     }
 
     .tab_button:disabled {
-        background-image: url("tab_button_selected_9");
-        background-repeat: nineimage;
+        border-image-source: url("tab_button_selected_9");
+        border-image-slice: 33.3333% fill;
+        border-image-repeat: stretch;
         background-color: #888888;
     }
 
         .tab_button:disabled:hover {
-            background-image: url("tab_button_selected_9");
-            background-repeat: nineimage;
+            border-image-source: url("tab_button_selected_9");
+            border-image-slice: 33.3333% fill;
+            border-image-repeat: stretch;
             background-color: #ffaa33;
         }
 
 .invisible_button {
-    background-repeat: threeimage;
+    border-image-slice: 0 33.3333% fill;
+    border-image-repeat: stretch;
     background-image: url("");
     background-size: 100%;
     padding: 0px 0px 6px 0px;

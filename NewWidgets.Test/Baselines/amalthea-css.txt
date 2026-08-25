@@ -36,61 +36,117 @@
 }
 
 .big_button {
+    border-image-source: url("button_big_normal_3");
     background-image: url("button_big_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .big_button:disabled {
+    border-image-source: url("button_big_selected_3");
     background-image: url("button_big_selected_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .big_button:focus {
+    border-image-source: url("button_big_selected_3");
     background-image: url("button_big_selected_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .big_button:hover {
+    border-image-source: url("button_big_hovered_3");
     background-image: url("button_big_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .black_frame {
-    background-repeat: nineimage;
+    border-image-source: url("panel_black_9");
     background-image: url("panel_black_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     --clip-margin: 2px 2px 2px 2px;
     background-size: 75%;
 }
 
 .blue_button {
+    border-image-source: url("button_blue_normal_3");
     background-image: url("button_blue_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .blue_button:disabled {
+    border-image-source: url("button_blue_normal_3");
     background-image: url("button_blue_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .blue_button:focus {
+    border-image-source: url("button_blue_selected_3");
     background-image: url("button_blue_selected_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .blue_button:hover {
+    border-image-source: url("button_blue_hovered_3");
     background-image: url("button_blue_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .blue_frame {
-    background-repeat: nineimage;
+    border-image-source: url("window_dialog_9");
     background-image: url("window_dialog_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 40%;
 }
 
 .blue_panel {
-    background-repeat: nineimage;
+    border-image-source: url("frame_9");
     background-image: url("frame_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     width: 100px;
     height: 100px;
 }
 
 .bookmark_button {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_normal_9");
     background-image: url("panel_white_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     font-family: default;
     font-size: 0.75em;
@@ -100,27 +156,43 @@
 }
 
 .bookmark_button:disabled {
+    border-image-source: url("panel_white_normal_9");
     background-image: url("panel_white_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ff0000;
     color: #999999;
 }
 
 .bookmark_button:focus {
+    border-image-source: url("panel_white_selected_9");
     background-image: url("panel_white_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
 }
 
 .bookmark_button:hover {
+    border-image-source: url("panel_white_hovered_9");
     background-image: url("panel_white_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ffdd77;
 }
 
 .bookmark_root_button {
-    background-repeat: nineimage;
+    border-image-source: url("panel_blue_normal_9");
     background-image: url("panel_blue_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     font-family: default;
     font-size: 0.75em;
@@ -130,21 +202,33 @@
 }
 
 .bookmark_root_button:disabled {
+    border-image-source: url("panel_blue_normal_9");
     background-image: url("panel_blue_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ff0000;
     color: #999999;
 }
 
 .bookmark_root_button:focus {
+    border-image-source: url("panel_blue_selected_9");
     background-image: url("panel_blue_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
 }
 
 .bookmark_root_button:hover {
+    border-image-source: url("panel_blue_hovered_9");
     background-image: url("panel_blue_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ffdd77;
 }
 
@@ -176,8 +260,12 @@
 }
 
 .chat_text {
-    background-repeat: nineimage;
+    border-image-source: url("light_9");
     background-image: url("light_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     font-family: default;
     font-size: 0.528em;
@@ -189,8 +277,12 @@
 }
 
 .chat_text:focus {
-    background-repeat: nineimage;
+    border-image-source: url("light_9");
     background-image: url("light_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     color: #ffffff;
 }
@@ -222,45 +314,69 @@
 }
 
 .close_image_button:focus {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_selected_9");
     background-image: url("panel_white_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     background-color-opacity: 30%;
 }
 
 .close_image_button:hover {
     background-color: #ffaa00;
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_hovered_9");
     background-image: url("panel_white_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     background-color-opacity: 80%;
 }
 
 .dark_panel {
-    background-repeat: nineimage;
+    border-image-source: url("panel_9");
     background-image: url("panel_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #000000;
     background-color-opacity: 40%;
     background-size: 25%;
 }
 
 .darker_panel {
-    background-repeat: nineimage;
+    border-image-source: url("panel_9");
     background-image: url("panel_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #000000;
     background-color-opacity: 80%;
     background-size: 25%;
 }
 
 .dialog_back {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_normal_9");
     background-image: url("panel_white_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
 }
 
 .dialog_window {
-    background-repeat: nineimage;
+    border-image-source: url("window_dialog_9");
     background-image: url("window_dialog_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 100%;
     width: 600px;
     height: 300px;
@@ -310,8 +426,12 @@
 }
 
 .hex_field {
-    background-repeat: threeimage;
+    border-image-source: url("hex_field_3");
     background-image: url("hex_field_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .hex_image_button {
@@ -470,7 +590,10 @@
 }
 
 .invisible_button {
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
     background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-image: url("");
     background-size: 100%;
     padding: 0px 0px 0px 6px;
@@ -523,15 +646,23 @@
 }
 
 .light_frame {
-    background-repeat: nineimage;
+    border-image-source: url("panel_9");
     background-image: url("panel_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     --clip-margin: 2px 2px 2px 2px;
     background-size: 75%;
 }
 
 .light_panel {
-    background-repeat: nineimage;
+    border-image-source: url("frame_white_9");
     background-image: url("frame_white_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     background-color-opacity: 5%;
     background-size: 50%;
@@ -542,29 +673,58 @@
 }
 
 .map_background_frame {
-    background-repeat: nineimage;
+    border-image-source: url("panel_9");
     background-image: url("panel_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 .next_button {
+    border-image-source: url("button_next_normal_3");
     background-image: url("button_next_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .next_button:disabled {
+    border-image-source: url("button_next_selected_3");
     background-image: url("button_next_selected_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .next_button:focus {
+    border-image-source: url("button_prev_selected_3");
     background-image: url("button_prev_selected_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .next_button:hover {
+    border-image-source: url("button_next_hovered_3");
     background-image: url("button_next_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .next_button_selected {
+    border-image-source: url("button_next_selected_3");
     background-image: url("button_next_selected_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .nimage_button {
@@ -575,15 +735,23 @@
 }
 
 .nimage_button:focus {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_selected_9");
     background-image: url("panel_white_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     background-color-opacity: 30%;
 }
 
 .nimage_button:hover {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_hovered_9");
     background-image: url("panel_white_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     background-color-opacity: 80%;
 }
@@ -651,63 +819,117 @@
 }
 
 .paperdoll_left_button {
+    border-image-source: url("button_ldoll_normal_3");
     background-image: url("button_ldoll_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     color: #ffffff;
 }
 
 .paperdoll_left_button:disabled {
+    border-image-source: url("button_ldoll_normal_3");
     background-image: url("button_ldoll_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     color: #ffffff;
 }
 
 .paperdoll_left_button:hover {
+    border-image-source: url("button_ldoll_hovered_3");
     background-image: url("button_ldoll_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     color: #ffffff;
 }
 
 .paperdoll_panel {
-    background-repeat: nineimage;
+    border-image-source: url("panel_doll_9");
     background-image: url("panel_doll_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 70%;
     width: 100px;
     height: 100px;
 }
 
 .paperdoll_right_button {
+    border-image-source: url("button_doll_normal_3");
     background-image: url("button_doll_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     color: #ffffff;
 }
 
 .paperdoll_right_button:disabled {
+    border-image-source: url("button_doll_normal_3");
     background-image: url("button_doll_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     color: #ffffff;
 }
 
 .paperdoll_right_button:hover {
+    border-image-source: url("button_doll_hovered_3");
     background-image: url("button_doll_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     color: #ffffff;
 }
 
 .prev_button {
+    border-image-source: url("button_prev_normal_3");
     background-image: url("button_prev_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .prev_button:disabled {
+    border-image-source: url("button_prev_selected_3");
     background-image: url("button_prev_selected_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .prev_button:focus {
+    border-image-source: url("button_prev_selected_3");
     background-image: url("button_prev_selected_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .prev_button:hover {
+    border-image-source: url("button_prev_hovered_3");
     background-image: url("button_prev_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .prevnext_button_paperdoll {
@@ -717,8 +939,12 @@
 }
 
 .progress_bar {
-    background-repeat: threeimage;
+    border-image-source: url("progress_bar_3");
     background-image: url("progress_bar_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .right_button {
@@ -742,8 +968,12 @@
 }
 
 .selection {
-    background-repeat: nineimage;
+    border-image-source: url("select");
     background-image: url("select");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-position: 0% 0%;
     background-size: 200%;
 }
@@ -754,7 +984,12 @@
 }
 
 .send_mail_edit:focus {
+    border-image-source: url("panel_white_normal_9");
     background-image: url("panel_white_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     color: #ffffff;
 }
 
@@ -819,34 +1054,67 @@
 }
 
 .shortcut_button {
+    border-image-source: url("button_blue_normal_3");
     background-image: url("button_blue_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .shortcut_button:disabled {
+    border-image-source: url("button_blue_normal_3");
     background-image: url("button_blue_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .shortcut_button:focus {
+    border-image-source: url("button_blue_hovered_3");
     background-image: url("button_blue_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .shortcut_button:focus:hover {
+    border-image-source: url("button_big_hovered_3");
     background-image: url("button_big_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .shortcut_button:hover {
+    border-image-source: url("button_blue_hovered_3");
     background-image: url("button_blue_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .simple_panel {
-    background-repeat: nineimage;
+    border-image-source: url("select");
     background-image: url("select");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
 }
 
 .small_dialog_window {
-    background-repeat: nineimage;
+    border-image-source: url("window_dialog_9");
     background-image: url("window_dialog_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 75%;
     width: 300px;
     height: 100px;
@@ -870,57 +1138,89 @@
 }
 
 .special_textedit {
-    background-repeat: threeimage;
+    border-image-source: url("edit_special_inactive_3");
     background-image: url("edit_special_inactive_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     padding: 30px 0px 0px 0px;
     color: #aaaaaa;
     background-color-opacity: 50%;
 }
 
 .special_textedit2 {
-    background-repeat: threeimage;
+    border-image-source: url("edit_ispecial_inactive_3");
     background-image: url("edit_ispecial_inactive_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     padding: 30px 0px 0px 0px;
     color: #aaaaaa;
     background-color-opacity: 50%;
 }
 
 .special_textedit2:focus {
-    background-repeat: threeimage;
+    border-image-source: url("edit_ispecial_inactive_3");
     background-image: url("edit_ispecial_inactive_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     color: #ffffff;
     background-color-opacity: 100%;
 }
 
 .special_textedit2:focus:hover {
-    background-repeat: threeimage;
+    border-image-source: url("edit_ispecial_inactive_3");
     background-image: url("edit_ispecial_inactive_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffdd77;
 }
 
 .special_textedit2:hover {
-    background-repeat: threeimage;
+    border-image-source: url("edit_ispecial_inactive_3");
     background-image: url("edit_ispecial_inactive_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffdd77;
     background-color-opacity: 50%;
 }
 
 .special_textedit:focus {
-    background-repeat: threeimage;
+    border-image-source: url("edit_special_inactive_3");
     background-image: url("edit_special_inactive_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     color: #ffffff;
     background-color-opacity: 100%;
 }
 
 .special_textedit:focus:hover {
-    background-repeat: threeimage;
+    border-image-source: url("edit_special_inactive_3");
     background-image: url("edit_special_inactive_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffdd77;
 }
 
 .special_textedit:hover {
-    background-repeat: threeimage;
+    border-image-source: url("edit_special_inactive_3");
     background-image: url("edit_special_inactive_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffdd77;
     background-color-opacity: 50%;
 }
@@ -977,8 +1277,12 @@
 }
 
 .tab_button {
-    background-repeat: nineimage;
+    border-image-source: url("tab_button_normal_9");
     background-image: url("tab_button_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 75%;
     font-family: default;
     font-size: 0.75em;
@@ -988,32 +1292,52 @@
 }
 
 .tab_button.tab_button_selected {
+    border-image-source: url("tab_button_selected_9");
     background-image: url("tab_button_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
 }
 
 .tab_button:disabled {
+    border-image-source: url("tab_button_selected_9");
     background-image: url("tab_button_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #888888;
 }
 
 .tab_button:disabled:hover {
+    border-image-source: url("tab_button_selected_9");
     background-image: url("tab_button_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ffaa33;
 }
 
 .tab_button:hover {
+    border-image-source: url("tab_button_hovered_9");
     background-image: url("tab_button_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
     background-repeat: nineimage;
+    border-image-repeat: stretch;
     color: #ffffff;
 }
 
 .tab_panel {
-    background-repeat: nineimage;
+    border-image-source: url("tab_panel_9");
     background-image: url("tab_panel_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 75%;
 }
 
@@ -1021,14 +1345,23 @@
     font-family: default;
     font-size: 0.5em;
     color: #ddffff;
-    background-repeat: nineimage;
+    border-image-source: url("table_row_alt");
     background-image: url("table_row_alt");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     background-color-opacity: 50%;
 }
 
 .table_alt_row:focus {
+    border-image-source: url("table_row_alt_selected_9");
     background-image: url("table_row_alt_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ffdd77;
     color: #ffffff;
     background-color-opacity: 50%;
@@ -1038,8 +1371,12 @@
     font-family: title;
     font-size: 0.5em;
     color: #cccccc;
-    background-repeat: nineimage;
+    border-image-source: url("table_row_header_9");
     background-image: url("table_row_header_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     background-color-opacity: 50%;
     background-color: #ffffff;
@@ -1049,14 +1386,23 @@
     font-family: default;
     font-size: 0.5em;
     color: #cceeff;
-    background-repeat: nineimage;
+    border-image-source: url("table_row_alt");
     background-image: url("table_row_alt");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color-opacity: 0%;
     background-size: 25%;
 }
 
 .table_row:focus {
+    border-image-source: url("table_row_selected_9");
     background-image: url("table_row_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-color: #ffdd77;
     color: #ffffff;
     background-color-opacity: 50%;
@@ -1133,8 +1479,12 @@
 }
 
 .talent_name {
-    background-repeat: nineimage;
+    border-image-source: url("panel_dark_9");
     background-image: url("panel_dark_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 10%;
     background-color-opacity: 30%;
     padding: 4px 4px 4px 4px;
@@ -1162,37 +1512,57 @@
 }
 
 .title_line {
-    background-repeat: threeimage;
+    border-image-source: url("title_line_3");
     background-image: url("title_line_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color-opacity: 50%;
 }
 
 .toolbar_button {
     width: 80px;
     height: 80px;
-    background-repeat: nineimage;
+    border-image-source: url("editor_button_normal_9");
     background-image: url("editor_button_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     background-color-opacity: 40%;
 }
 
 .toolbar_button:focus {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_selected_9");
     background-image: url("panel_white_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     background-color-opacity: 30%;
 }
 
 .toolbar_button:focus:hover {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_hovered_9");
     background-image: url("panel_white_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     background-color-opacity: 80%;
 }
 
 .top_panel {
-    background-repeat: threeimage;
+    border-image-source: url("top_panel_3");
     background-image: url("top_panel_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .white_back {
@@ -1201,16 +1571,33 @@
 }
 
 .white_line {
-    background-repeat: threeimage;
+    border-image-source: url("white_line_3");
     background-image: url("white_line_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .white_panel {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_normal_9");
     background-image: url("panel_white_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     width: 100px;
     height: 100px;
+}
+
+.white_title_3 {
+    border-image-source: url("white_title_3");
+    background-image: url("white_title_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 .window_button {
@@ -1256,319 +1643,13 @@
     --font-baseline: 30;
 }
 
-@sprite.button_big_hovered_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_big_normal_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_big_selected_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_blue_hovered_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_blue_normal_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_blue_selected_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_doll_hovered_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_doll_normal_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_hovered_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_ldoll_hovered_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_ldoll_normal_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_next_hovered_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_next_normal_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_next_selected_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_normal_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_prev_hovered_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_prev_normal_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_prev_selected_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.button_selected_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.edit_ispecial_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.edit_ispecial_inactive_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.edit_special_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.edit_special_inactive_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.frame_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.frame_white_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.frame_white_inactive_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.hex_field_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.light_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.line_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.panel_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_black_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_blue_hovered_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_blue_normal_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_blue_selected_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_blue_selected_hovered_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_dark_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_doll_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_white_hovered_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_white_normal_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_white_selected_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.panel_white_selected_hovered_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.progress_bar_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.progress_line_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.scroll_horizontal {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.scroll_indicator_horizontal {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.scroll_indicator_vertical {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.scroll_vertical {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.select {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.tab_button_hovered_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.tab_button_normal_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.tab_button_selected_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.tab_panel_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.table_row_alt {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.table_row_alt_selected_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.table_row_header_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.table_row_selected_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.title_line_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.top_panel_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.white_line_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.white_title_3 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 1;
-}
-
-@sprite.window_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
-@sprite.window_dialog_9 {
-    --sprite-tile-x: 3;
-    --sprite-tile-y: 3;
-}
-
 button {
-    background-repeat: threeimage;
+    border-image-source: url("button_normal_3");
     background-image: url("button_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-size: 100%;
     width: 160px;
     height: 48px;
@@ -1578,17 +1659,32 @@ button {
 }
 
 button:disabled {
+    border-image-source: url("button_normal_3");
     background-image: url("button_normal_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #808080;
     color: #aaaaaa;
 }
 
 button:focus {
+    border-image-source: url("button_selected_3");
     background-image: url("button_selected_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
 }
 
 button:hover {
+    border-image-source: url("button_hovered_3");
     background-image: url("button_hovered_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     color: #ffffff;
 }
 
@@ -1651,8 +1747,12 @@ checkbox_label:hover {
 }
 
 context_menu {
-    background-repeat: nineimage;
+    border-image-source: url("panel_9");
     background-image: url("panel_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 100%;
     padding: 4px 4px 4px 4px;
 }
@@ -1751,16 +1851,24 @@ label {
 }
 
 line {
-    background-repeat: threeimage;
+    border-image-source: url("white_line_3");
     background-image: url("white_line_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-size: 100%;
     background-color-opacity: 80%;
     background-position: 50% 0%;
 }
 
 panel {
-    background-repeat: nineimage;
+    border-image-source: url("window_9");
     background-image: url("window_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     width: 100px;
     height: 100px;
@@ -1786,8 +1894,12 @@ progress > .progress_front_label {
 }
 
 progress > .progress_line {
-    background-repeat: threeimage;
+    border-image-source: url("progress_line_3");
     background-image: url("progress_line_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #ffffff;
     --background-depth: backclipped;
     overflow: hidden;
@@ -1796,38 +1908,62 @@ progress > .progress_line {
 progress {
     width: 290px;
     height: 10px;
-    background-repeat: threeimage;
+    border-image-source: url("progress_line_3");
     background-image: url("progress_line_3");
+    border-image-slice: 33% 0% 33% 0%;
+    --border-image-fill: true;
+    background-repeat: threeimage;
+    border-image-repeat: stretch;
     background-color: #666666;
 }
 
 scrollview > .scrollview_hscroll {
-    background-repeat: nineimage;
+    border-image-source: url("scroll_horizontal");
     background-image: url("scroll_horizontal");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 scrollview > .scrollview_htrack {
-    background-repeat: nineimage;
+    border-image-source: url("scroll_indicator_horizontal");
     background-image: url("scroll_indicator_horizontal");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 scrollview > .scrollview_vscroll {
-    background-repeat: nineimage;
+    border-image-source: url("scroll_vertical");
     background-image: url("scroll_vertical");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 scrollview > .scrollview_vtrack {
-    background-repeat: nineimage;
+    border-image-source: url("scroll_indicator_vertical");
     background-image: url("scroll_indicator_vertical");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 100%;
 }
 
 scrollview {
-    background-repeat: nineimage;
+    border-image-source: url("window_9");
     background-image: url("window_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     overflow: hidden;
     --clip-margin: 2px 2px 2px 2px;
@@ -1883,8 +2019,12 @@ text {
 }
 
 textedit {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_normal_9");
     background-image: url("panel_white_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     font-family: default;
     font-size: 0.5em;
@@ -1900,22 +2040,41 @@ textedit {
 }
 
 textedit:focus {
+    border-image-source: url("panel_white_selected_9");
     background-image: url("panel_white_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     color: #ffffff;
     background-color-opacity: 75%;
 }
 
 textedit:focus:hover {
+    border-image-source: url("panel_white_selected_hovered_9");
     background-image: url("panel_white_selected_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
 }
 
 textedit:hover {
+    border-image-source: url("panel_white_hovered_9");
     background-image: url("panel_white_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
 }
 
 textfield {
-    background-repeat: nineimage;
+    border-image-source: url("panel_white_normal_9");
     background-image: url("panel_white_normal_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 50%;
     font-family: default;
     font-size: 0.5em;
@@ -1931,29 +2090,52 @@ textfield {
 }
 
 textfield:focus {
+    border-image-source: url("panel_white_selected_9");
     background-image: url("panel_white_selected_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     color: #ffffff;
     background-color-opacity: 75%;
 }
 
 textfield:focus:hover {
+    border-image-source: url("panel_white_selected_hovered_9");
     background-image: url("panel_white_selected_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
 }
 
 textfield:hover {
+    border-image-source: url("panel_white_hovered_9");
     background-image: url("panel_white_hovered_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
 }
 
 tooltip {
-    background-repeat: nineimage;
+    border-image-source: url("frame_9");
     background-image: url("frame_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 25%;
     padding: 8px 8px 8px 8px;
 }
 
 window {
-    background-repeat: nineimage;
+    border-image-source: url("window_9");
     background-image: url("window_9");
+    border-image-slice: 33% 33% 33% 33%;
+    --border-image-fill: true;
+    background-repeat: nineimage;
+    border-image-repeat: stretch;
     background-size: 75%;
     width: 400px;
     height: 300px;

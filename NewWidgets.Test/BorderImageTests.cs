@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Numerics;
 
 using NewWidgets.UI;
+using NewWidgets.UI.Styles;
 using NewWidgets.Widgets;
 
 namespace NewWidgets.Test
@@ -10,10 +11,11 @@ namespace NewWidgets.Test
     /// <summary>
     /// Tests 80-84: the nine-patch renderer cut at an arbitrary <c>border-image-slice</c>
     /// instead of always at thirds (D130), with the edges stretching and never repeating
-    /// (D139).
+    /// (D139). Tests 95-96: the stylesheet scan that reads a thirds slice back as the uniform
+    /// cut the two patch renderers draw with, which is what replaced <c>@sprite</c>.
     ///
-    /// Every class, id and sprite name here starts "nine8" so it cannot collide with the
-    /// other groups, which share one process-wide style collection.
+    /// Every class, id and sprite name here starts "nine8" or "nine9" so it cannot collide
+    /// with the other groups, which share one process-wide style collection.
     /// </summary>
     internal static class BorderImageTests
     {
@@ -52,6 +54,8 @@ namespace NewWidgets.Test
             TestRunner.Add("Test 82: the fill keyword controls the centre piece", Test82_FillControlsCentre);
             TestRunner.Add("Test 83: a percentage slice and a number slice differ", Test83_PercentageAndNumberSlices);
             TestRunner.Add("Test 84: nineimage without a slice keeps the thirds it has today", Test84_NoSliceKeepsThirds);
+            TestRunner.Add("Test 95: many rules naming one sprite cut it exactly once", Test95_OneCutPerSprite);
+            TestRunner.Add("Test 96: a conflicting or unsupported slice is reported, not cut", Test96_ConflictIsReported);
         }
 
         // ------------------------------------------------------------------
@@ -138,11 +142,14 @@ namespace NewWidgets.Test
 
             controller.RegisterSprite("nine81sprite", 100, 100);
 
-            // The sprite also carries the old uniform 3x3 registration, which is what a style
-            // being migrated looks like: the slice must win over it. Without the slice path
-            // this group fails on every geometry assertion with the thirds of a 100px source.
+            // The sprite also carries the old uniform 3x3 cut, which is what a style being
+            // migrated looks like: the slice must win over it. Without the slice path this
+            // group fails on every geometry assertion with the thirds of a 100px source.
+            // Registered through the host seam directly, because a stylesheet can no longer
+            // ask for a cut without also asking for the patch that reads it.
+            controller.SetSpriteSubdivision("nine81sprite", 3, 3);
+
             TestEnvironment.LoadCss(
-                "@sprite.nine81sprite { --sprite-tile-x: 3; --sprite-tile-y: 3; }" +
                 ".nine81asym { width: 300px; height: 200px; background-image: url(\"nine81sprite\"); background-repeat: nineimage; border-image-slice: 10 20 30 40 fill; }");
 
             BackgroundProbe probe = new BackgroundProbe(WidgetManager.GetStyle("nine81asym"));
@@ -289,8 +296,12 @@ namespace NewWidgets.Test
 
             controller.RegisterSprite("nine84sprite", 90, 90);
 
+            // The thirds cut this group is about, registered through the host seam directly:
+            // the rule below is the legacy spelling, which names no slice for the stylesheet
+            // scan to read.
+            controller.SetSpriteSubdivision("nine84sprite", 3, 3);
+
             TestEnvironment.LoadCss(
-                "@sprite.nine84sprite { --sprite-tile-x: 3; --sprite-tile-y: 3; }" +
                 ".nine84thirds { width: 300px; height: 200px; background-image: url(\"nine84sprite\"); background-repeat: nineimage; }");
 
             int callsBefore = controller.PartSubdivisionCount;
@@ -327,6 +338,102 @@ namespace NewWidgets.Test
                     context.AreEqualFloat(expectedScaleY[row], piece.Transform.FlatScale.Y, Tolerance, "piece {0} should scale {1} vertically, got {2}", index, expectedScaleY[row], piece.Transform.FlatScale.Y);
                     context.AreEqual(index, piece.Sprite.Frame, "piece {0} should draw frame {0} of the uniformly subdivided sprite, got {1}", index, piece.Sprite.Frame);
                 }
+        }
+
+        // ------------------------------------------------------------------
+        // Test 95: the stylesheet scan cuts each sprite once
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// border-image-slice is declared per rule, and a skin names the same sprite from a
+        /// handful of rules -- a control and its hover, focus and disabled states. The host
+        /// seam registers the pieces under the source sprite's own name, so a second cut reads
+        /// the already-cut sprite, takes frame 0 (the top-left ninth) and cuts that into nine.
+        /// One warning line, and the nine-patch is gone. So the scan must recognise the repeat
+        /// rather than obey it.
+        ///
+        /// The three rules also spell the third three different ways, and one of them names
+        /// the sprite through an SVG fragment, because all four are the same cut.
+        /// </summary>
+        private static void Test95_OneCutPerSprite(TestContext context)
+        {
+            TestController controller = TestEnvironment.Setup();
+            controller.ClearLog();
+
+            controller.RegisterSprite("nine95sprite", 90, 90);
+
+            int callsBefore = controller.SubdivisionCount;
+
+            TestEnvironment.LoadCss(
+                ".nine95a { border-image-source: url(\"nine95sprite\"); border-image-slice: 33.3333% fill; }" +
+                ".nine95a:hover { border-image-source: url(\"nine95sprite\"); border-image-slice: 33.33% fill; }" +
+                ".nine95b { border-image-source: url(\"ui.svg#nine95sprite\"); border-image-slice: 33.4% fill; }");
+
+            context.AreEqual(callsBefore + 1, controller.SubdivisionCount,
+                "three rules naming one sprite should cut it exactly once, got {0} call(s)", controller.SubdivisionCount - callsBefore);
+
+            context.AreEqual(0, controller.Errors.Count, "three rules asking for the same 3x3 cut is the normal case and must be silent, got: {0}", Join(controller.Errors));
+
+            ISprite sprite = WindowController.Instance.CreateSprite("nine95sprite");
+
+            context.AreEqual(9, sprite.FrameCount, "the sprite should be cut 3x3 into nine frames, got {0}", sprite.FrameCount);
+            context.AreEqualFloat(30.0f, sprite.FrameSize.X, Tolerance, "a 90px sprite cut in thirds has 30px frames, got {0}", sprite.FrameSize.X);
+
+            // and the cut a rule asked for is the one the renderer draws with
+            WidgetStyleSheet style = WidgetManager.GetStyle(new StyleSelector(null, new string[] { "nine95a" }, null));
+
+            context.AreEqual(WidgetBackgroundStyle.NineImage, style.Get<WidgetBackgroundStyle>(WidgetParameterIndex.BackStyle, WidgetBackgroundStyle.None),
+                "border-image-slice: 33.3333% fill should select the nine-patch renderer");
+            context.AreEqual("nine95sprite", style.Get<string>(WidgetParameterIndex.BackImage, ""),
+                "border-image-source should name the background sprite, with no background-image declared anywhere");
+        }
+
+        // ------------------------------------------------------------------
+        // Test 96: what the scan refuses to do
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// Two grids for one sprite cannot both be honoured, and picking one in silence is how
+        /// a nine-patch turns into nine slivers of its own corner. The first cut stands and the
+        /// disagreement is reported.
+        ///
+        /// A vertical slice -- <c>33.3333% 0</c> -- is the other refusal: <c>ThreeImage</c>
+        /// walks three frames along x and there is no vertical variant (D193), so the sprite is
+        /// left whole rather than cut into a grid nothing can draw.
+        /// </summary>
+        private static void Test96_ConflictIsReported(TestContext context)
+        {
+            TestController controller = TestEnvironment.Setup();
+            controller.ClearLog();
+
+            controller.RegisterSprite("nine96sprite", 90, 90);
+            controller.RegisterSprite("nine96vertical", 90, 90);
+
+            int callsBefore = controller.SubdivisionCount;
+
+            TestEnvironment.LoadCss(
+                ".nine96a { border-image-source: url(\"nine96sprite\"); border-image-slice: 33.3333% fill; }" +
+                ".nine96b { border-image-source: url(\"nine96sprite\"); border-image-slice: 0 33.3333% fill; }" +
+                ".nine96v { border-image-source: url(\"nine96vertical\"); border-image-slice: 33.3333% 0 fill; }");
+
+            context.AreEqual(callsBefore + 1, controller.SubdivisionCount,
+                "the conflicting second grid and the vertical slice must not reach the host, so exactly one cut, got {0}", controller.SubdivisionCount - callsBefore);
+
+            ISprite conflicted = WindowController.Instance.CreateSprite("nine96sprite");
+            context.AreEqual(9, conflicted.FrameCount, "the first cut of a disputed sprite stands, so it is still 3x3, got {0} frame(s)", conflicted.FrameCount);
+
+            ISprite vertical = WindowController.Instance.CreateSprite("nine96vertical");
+            context.AreEqual(1, vertical.FrameCount, "a vertical slice is a patch this engine cannot draw, so the sprite is left whole, got {0} frame(s)", vertical.FrameCount);
+
+            context.AreEqual(2, controller.Errors.Count, "both refusals must be reported, got: {0}", Join(controller.Errors));
+
+            context.IsTrue(Join(controller.Errors).Contains("nine96sprite"), "the conflict report must name the sprite, got: {0}", Join(controller.Errors));
+            context.IsTrue(Join(controller.Errors).Contains("nine96vertical"), "the vertical-slice report must name the sprite, got: {0}", Join(controller.Errors));
+        }
+
+        private static string Join(System.Collections.Generic.IList<string> lines)
+        {
+            return string.Join(" | ", lines);
         }
 
         // Overlap by more than a normalized thousandth of the source, i.e. a real overlap

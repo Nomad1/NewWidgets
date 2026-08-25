@@ -21,7 +21,10 @@ body {
     font-size: 30px;                /* --font-baseline: 30 in the original */
 }
 
-/* window: was background-repeat: nineimage + @sprite 3x3 + background-size: 75% */
+/* window: was background-repeat: nineimage + a 3x3 @sprite block + background-size: 75%.
+   The fragment names the sprite: a browser fetches ui.png and ignores it, and the engine
+   reads it as the sprite to cut (D187). Without it all four rules below name one image and
+   ask it to be cut three different ways. */
 .window {
     position: absolute;
     left: 50%;
@@ -32,7 +35,7 @@ body {
     height: 760px;
     overflow: hidden;
 
-    border-image-source: url("ui.png");
+    border-image-source: url("ui.png#window_9");
     border-image-slice: 33.33% fill;
     border-image-width: 75%;
     border-image-repeat: stretch;
@@ -70,7 +73,7 @@ body {
     overflow: hidden;
     box-sizing: border-box;
 
-    border-image-source: url("ui.png");
+    border-image-source: url("ui.png#panel_white_hovered_9");
     border-image-slice: 33.33% fill;
     border-image-width: 25%;
 
@@ -97,7 +100,7 @@ body {
     padding: 0 0 0 6px;
     box-sizing: border-box;
 
-    border-image-source: url("ui.png");
+    border-image-source: url("ui.png#button_white_normal_3");
     border-image-slice: 0 33.33% fill;
     border-image-width: 100%;
 }
@@ -169,7 +172,7 @@ body {
     white-space: pre-wrap;
     padding: 6px 2px 6px 0;
 
-    border-image-source: url("ui.png");
+    border-image-source: url("ui.png#panel_white_hovered_9");
     border-image-slice: 33.33% fill;
     border-image-width: 25%;
 }

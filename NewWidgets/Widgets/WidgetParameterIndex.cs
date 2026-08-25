@@ -154,11 +154,16 @@ namespace NewWidgets.Widgets
         [WidgetParameter("back_offset", "--background-offset", typeof(Vector2), UnitType.Length)]
         BackOffset,
 
-        // Border image (D130): the standard's own nine-patch vocabulary
-        [WidgetParameter("border-image-source", typeof(string), UnitType.Url)]
+        // Border image (D130): the standard's own nine-patch vocabulary. Both longhands write
+        // this engine's own background properties as well as their own, the way
+        // `background-size: contain` above already writes `background-repeat`: there is one
+        // background sprite here, and a rule that names it in standard words must reach the
+        // same renderer that `background-image` plus `background-repeat: nineimage` reaches
+        [WidgetParameter("border-image-source", "border-image-source", typeof(string), UnitType.Url, WidgetParameterInheritance.Initial,
+                                                typeof(BorderImageSourceProcessor), "background-image")]
         BorderImageSource,
         [WidgetParameter("border-image-slice", "border-image-slice", typeof(Margin), UnitType.Percent, WidgetParameterInheritance.Initial,
-                                               typeof(BorderImageSliceProcessor), "--border-image-fill")]
+                                               typeof(BorderImageSliceProcessor), "--border-image-fill", "background-repeat")]
         BorderImageSlice,
         [WidgetParameter("--border-image-fill", typeof(bool))] // the `fill` keyword of border-image-slice, which is a flag rather than a number
         BorderImageFill,
@@ -245,12 +250,6 @@ namespace NewWidgets.Widgets
         FontLeading,
         [WidgetParameter("font_baseline", "--font-baseline", typeof(int))]
         FontBaseline,
-
-        // Sprite
-        [WidgetParameter("sprite_tile_x", "--sprite-tile-x", typeof(int))]
-        SpriteTileX,
-        [WidgetParameter("sprite_tile_y", "--sprite-tile-y", typeof(int))]
-        SpriteTileY,
 
         Max
     }
@@ -797,16 +796,54 @@ namespace NewWidgets.Widgets
     }
 
     /// <summary>
+    /// CSS <c>border-image-source</c>. Stores the url as it was authored, so <c>SaveCSS</c>
+    /// writes a D186 reference back whole (D188), and mirrors it into <c>background-image</c>,
+    /// which is the property the renderer reads. <c>none</c> is the initial value and clears
+    /// the background sprite rather than naming one called "none".
+    /// </summary>
+    internal class BorderImageSourceProcessor : CssPropertyProcessor
+    {
+        public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            string value = ConversionHelper.StringParse(stringValue, UnitType.Url);
+
+            data[PropertyIndex] = value;
+
+            if (string.Equals(value, "none", StringComparison.OrdinalIgnoreCase))
+                data[CompanionIndex] = string.Empty;
+            else
+                data[CompanionIndex] = value;
+        }
+    }
+
+    /// <summary>
     /// CSS <c>border-image-slice</c>: one to four numbers or percentages, plus the optional
     /// <c>fill</c> keyword, which is a flag and is stored on its own.
     ///
+    /// A slice at thirds also picks the background style, because thirds is exactly what this
+    /// engine's two patch renderers cut: <c>33.3333% fill</c> is a nine-patch and
+    /// <c>0 33.3333% fill</c> is the horizontal three-patch (D193). Any other slice leaves the
+    /// style alone and is drawn by the arbitrary-slice path in <c>WidgetBackground</c>.
+    ///
     /// ponytail: the four values are stored as a Margin of bare floats, so a percentage
     /// arrives as a 0..1 fraction and a number as itself -- distinguishable by inspection but
-    /// not by type. The renderer still divides a sprite by three regardless, so nothing can
-    /// yet tell the two apart; give this a StyleLength box when an arbitrary slice is drawn.
+    /// not by type. The arbitrary-slice renderer tells them apart by magnitude; give this a
+    /// StyleLength box to do it by unit.
     /// </summary>
     internal class BorderImageSliceProcessor : CssPropertyProcessor
     {
+        private string m_backgroundStyleName;
+        private WidgetParameterIndex m_backgroundStyle;
+
+        public override void Init(string target, Type type, UnitType unitType, string[] parameters)
+        {
+            base.Init(target, type, unitType, parameters);
+
+            Debug.Assert(parameters != null && parameters.Length >= 2);
+
+            m_backgroundStyleName = parameters[1];
+        }
+
         public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
         {
             string[] values = stringValue.Split(new[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
@@ -835,8 +872,24 @@ namespace NewWidgets.Widgets
                 return;
             }
 
-            data[PropertyIndex] = ConversionHelper.MarginParse(numbers.ToString(), UnitType.Percent);
+            Margin slice = ConversionHelper.MarginParse(numbers.ToString(), UnitType.Percent);
+
+            data[PropertyIndex] = slice;
             data[CompanionIndex] = fill;
+
+            if (m_backgroundStyle == 0)
+            {
+                m_backgroundStyle = WidgetParameterMap.GetIndexByName(m_backgroundStyleName);
+                Debug.Assert(m_backgroundStyle != 0);
+            }
+
+            int tileX;
+            int tileY;
+
+            // the `fill` keyword is not read here: both patch renderers always draw the middle
+            // cell, so a hollow frame is not a style this engine has
+            if (WidgetManager.TryGetBorderImageGrid(slice, out tileX, out tileY))
+                data[m_backgroundStyle] = tileY == 1 ? WidgetBackgroundStyle.ThreeImage : WidgetBackgroundStyle.NineImage;
         }
     }
 

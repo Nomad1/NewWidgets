@@ -9,8 +9,9 @@
     }
 
 .talent_name {
-    background-repeat: nineimage;
-    background-image: url("panel_dark_9");
+    border-image-source: url("panel_dark_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
     background-size: 10%;
     background-color-opacity: 30%;
     padding: 4px 4px 4px 4px;

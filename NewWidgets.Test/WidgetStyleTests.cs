@@ -579,7 +579,7 @@ namespace NewWidgets.Test
 
             TestEnvironment.LoadCss(
                 ".styj1back { width: 100px; height: 50px; background-image: url(\"styj1sprite\"); background-repeat: nineimage; background-size: 50%; background-color: #ff0000; --background-padding: 1px 2px 3px 4px; }" +
-                "@sprite.styj2sprite { --sprite-tile-x: 3; --sprite-tile-y: 3; }");
+                ".styj2back { border-image-source: url(\"styj2sprite\"); border-image-slice: 33.3333% fill; }");
 
             WidgetPanel root = new WidgetPanel();
             root.Size = new Vector2(400.0f, 300.0f);
@@ -601,7 +601,7 @@ namespace NewWidgets.Test
 
             ISprite subdividedSprite = controller.CreateSprite("styj2sprite");
 
-            context.AreEqual(9, subdividedSprite.FrameCount, "an @sprite.styj2sprite rule with --sprite-tile-x: 3 and --sprite-tile-y: 3 should make the controller record a 3x3 == 9 frame subdivision, got {0}", subdividedSprite.FrameCount);
+            context.AreEqual(9, subdividedSprite.FrameCount, "a rule with border-image-source: url(\"styj2sprite\") and border-image-slice: 33.3333% fill should make the controller record a 3x3 == 9 frame subdivision, got {0}", subdividedSprite.FrameCount);
             context.AreEqualFloat(30.0f, subdividedSprite.FrameSize.X, Tolerance, "a 90px sprite subdivided 3x3 should have frames 30px wide, got {0}", subdividedSprite.FrameSize.X);
             context.AreEqualFloat(30.0f, subdividedSprite.FrameSize.Y, Tolerance, "a 90px sprite subdivided 3x3 should have frames 30px tall, got {0}", subdividedSprite.FrameSize.Y);
         }
