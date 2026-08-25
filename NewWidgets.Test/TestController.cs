@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Numerics;
 
 using NewWidgets.UI;
@@ -59,6 +60,23 @@ namespace NewWidgets.Test
             }
         }
 
+        // One SetSpriteSubdivision(sourceId, targetId, parts) call: the rectangles the host
+        // seam was handed, kept so a test can assert them, plus the frames CreateSprite must
+        // hand back for the sprite they registered.
+        private struct PartSubdivision
+        {
+            public readonly string SourceId;
+            public readonly RectangleF[] Parts;
+            public readonly SpriteBuild Build;
+
+            public PartSubdivision(string sourceId, RectangleF[] parts, SpriteBuild build)
+            {
+                SourceId = sourceId;
+                Parts = parts;
+                Build = build;
+            }
+        }
+
         // One ScheduleAction(action, delay) call, queued instead of run inline. Sequence
         // breaks ties between two actions with the same DueTime, so draining stays in
         // scheduling order for same-frame actions instead of whatever order a re-sort left them in.
@@ -85,6 +103,7 @@ namespace NewWidgets.Test
         private readonly Dictionary<string, Subdivision> m_subdivisions = new Dictionary<string, Subdivision>();
         private readonly Dictionary<string, SpriteSize> m_spriteSizes = new Dictionary<string, SpriteSize>();
         private readonly Dictionary<string, SpriteBuild> m_fontSprites = new Dictionary<string, SpriteBuild>();
+        private readonly Dictionary<string, PartSubdivision> m_partSubdivisions = new Dictionary<string, PartSubdivision>();
         private readonly List<string> m_messages = new List<string>();
         private readonly List<string> m_errors = new List<string>();
         private readonly List<ScheduledAction> m_scheduledActions = new List<ScheduledAction>();
@@ -95,6 +114,9 @@ namespace NewWidgets.Test
         private float m_fontScale;
         private long m_time;
         private long m_scheduledActionSequence;
+
+        private string m_lastPartSubdivisionTarget;
+        private int m_partSubdivisionCount;
 
         private int m_lastClipX;
         private int m_lastClipY;
@@ -172,6 +194,20 @@ namespace NewWidgets.Test
             get { return m_clipRectCount; }
         }
 
+        // Target id of the last arbitrary-rectangle subdivision the seam was handed, or null
+        // if it has never been called.
+        public string LastPartSubdivisionTarget
+        {
+            get { return m_lastPartSubdivisionTarget; }
+        }
+
+        // How many times the arbitrary-rectangle seam has been called, so a test can assert
+        // it was not called at all.
+        public int PartSubdivisionCount
+        {
+            get { return m_partSubdivisionCount; }
+        }
+
         // Lets a test assert the scheduled-action queue drains rather than growing forever.
         public int PendingActionCount
         {
@@ -217,6 +253,30 @@ namespace NewWidgets.Test
             m_subdivisions[id] = new Subdivision(subdivideX, subdivideY);
         }
 
+        // The arbitrary-rectangle seam (WindowController.SetSpriteSubdivision with normalized
+        // parts). Records the call for assertions and registers targetId as a sprite of one
+        // frame per part, each frame sized in source pixels.
+        public override bool SetSpriteSubdivision(string sourceId, string targetId, RectangleF[] parts)
+        {
+            SpriteSize source = GetSpriteSize(sourceId);
+
+            TestSprite.FrameInfo[] frames = new TestSprite.FrameInfo[parts.Length];
+
+            // Math.Round rather than the host's Floor/Ceiling pair: a test asserting an exact
+            // pixel size should not have to model float rounding on top of the geometry.
+            for (int i = 0; i < parts.Length; i++)
+                frames[i] = new TestSprite.FrameInfo(
+                    (int)Math.Round(parts[i].Width * source.Width),
+                    (int)Math.Round(parts[i].Height * source.Height),
+                    i);
+
+            m_partSubdivisions[targetId] = new PartSubdivision(sourceId, parts, new SpriteBuild(new Vector2(source.Width, source.Height), frames));
+            m_lastPartSubdivisionTarget = targetId;
+            m_partSubdivisionCount++;
+
+            return true;
+        }
+
         public override ISprite CloneSprite(ISprite sprite)
         {
             TestSprite source = (TestSprite)sprite;
@@ -233,6 +293,10 @@ namespace NewWidgets.Test
             SpriteBuild fontBuild;
             if (m_fontSprites.TryGetValue(id, out fontBuild))
                 return new TestSprite(id, fontBuild.Size, fontBuild.Frames);
+
+            PartSubdivision subdivision;
+            if (m_partSubdivisions.TryGetValue(id, out subdivision))
+                return new TestSprite(id, subdivision.Build.Size, subdivision.Build.Frames);
 
             SpriteSize size = GetSpriteSize(id);
             TestSprite.FrameInfo[] frames = BuildFrames(id, size);
@@ -337,6 +401,27 @@ namespace NewWidgets.Test
         public void RegisterSprite(string id, int width, int height)
         {
             m_spriteSizes[id] = new SpriteSize(width, height);
+        }
+
+        // The normalized rectangles the seam was handed for targetId, or null if that target
+        // was never registered.
+        public RectangleF[] GetSpriteParts(string targetId)
+        {
+            PartSubdivision subdivision;
+            if (m_partSubdivisions.TryGetValue(targetId, out subdivision))
+                return subdivision.Parts;
+
+            return null;
+        }
+
+        // The sprite targetId was cut from, or null if that target was never registered.
+        public string GetSpritePartsSource(string targetId)
+        {
+            PartSubdivision subdivision;
+            if (m_partSubdivisions.TryGetValue(targetId, out subdivision))
+                return subdivision.SourceId;
+
+            return null;
         }
 
         // Registers spriteId as a monospace test font sheet: 96 frames covering ASCII

@@ -8,7 +8,7 @@ depth=1 type=image_button id= classes=close_image_button pos=(766.00,1.00) size=
 depth=0 type=TestDialogWindow id= classes= pos=(0.00,0.00) size=(600.00,262.50)
 depth=1 type=panel id= classes=dialog_window pos=(0.00,0.00) size=(600.00,262.50)
 depth=2 type=button id= classes= pos=(220.00,189.50) size=(160.00,48.00)
-depth=2 type=label id= classes= pos=(0.00,110.00) size=(600.00,42.50)
+depth=2 type=text id= classes= pos=(0.00,110.00) size=(600.00,42.50)
 depth=2 type=image_button id= classes=close_image_button pos=(566.00,0.00) size=(34.00,34.00)
 depth=2 type=label id= classes= pos=(0.00,20.00) size=(600.00,50.00)
 === WidgetItemButton ===

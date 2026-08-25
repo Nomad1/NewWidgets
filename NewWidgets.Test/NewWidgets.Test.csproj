@@ -11,8 +11,15 @@
     <Compile Include="../NewWidgets/UI/**/*.cs" />
     <Compile Include="../NewWidgets/Utility/**/*.cs" />
     <Compile Include="../NewWidgets/Styles/**/*.cs" />
-    <Compile Include="../NewWidgets/Widgets/**/*.cs" Exclude="../NewWidgets/Widgets/Controls/Experimental/**/*.cs;../NewWidgets/Widgets/Controls/WidgetScrollView.cs" />
+    <Compile Include="../NewWidgets/Widgets/**/*.cs" />
     <Compile Include="*.cs" />
+
+    <!-- Test 71/72 assert the geometry of the real sample dialog rather than a replica of
+         it, so the sample's own sources are compiled in, at their real path, the same way
+         the corpus files below are. NewWidgets.Sample.DialogWindow comes along because
+         TestWindow.HandleWebSitePress calls it. -->
+    <Compile Include="../Sample/Sample/TestWindow.cs" />
+    <Compile Include="../Sample/Sample/DialogWindow.cs" />
 
     <!-- Corpus test 44: Amalthea's UI classes that compile against only System*/NewWidgets.
          See CorpusTests.cs for which of the 19 candidates from the brief actually compiled. -->

@@ -83,6 +83,26 @@ namespace NewWidgets.Test
             // rules, so anything running afterwards would see them blended with the corpus.
             ConformanceCssTests.Register();
 
+            // Registered after everything else so its own "nine8"-prefixed styles cannot be
+            // in the shared collection while any other group reads from it. Each of its
+            // groups loads the CSS it needs when it runs, so the Test 52 reset above cannot
+            // strand it either.
+            BorderImageTests.Register();
+
+            // Registered here for the same reason as BorderImageTests above, and before the
+            // group below for the reason given there: it builds plain panels too, so it must
+            // not read a collection holding the sample skin's bare `panel` rule.
+            SpriteUrlTests.Register();
+
+            // Registered dead last. Test 71 loads the sample's whole ui.css -- bare element
+            // rules for window, panel, label, button, textedit and checkbox, plus eleven
+            // @sprite blocks that subdivide sprites through the WindowController seam -- into
+            // the shared, process-wide style collection. It resets that collection first, so
+            // anything registered after it would read a collection holding a real skin instead
+            // of its own scratch styles; BorderImageTests in particular builds plain panels and
+            // would pick up ui.css's nine-patch background.
+            LoginDialogTests.Register();
+
             // Scaffolding only, to prove the KNOWN/FIXED reporting path (and the exit-code
             // exemption for known failures) actually works. Delete this once real
             // known-failure groups exist in the suite.

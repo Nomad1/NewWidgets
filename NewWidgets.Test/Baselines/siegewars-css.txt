@@ -1138,6 +1138,37 @@ textedit:hover {
     background-image: url("editor_button_hovered_9");
 }
 
+textfield {
+    background-repeat: nineimage;
+    background-image: url("editor_button_normal_9");
+    background-size: 50%;
+    font-family: default;
+    font-size: 0.6em;
+    width: 200px;
+    height: 45px;
+    color: #aaaaaa;
+    overflow: hidden;
+    --clip-margin: 1px 2px 3px 2px;
+    --cursor-color: #ffffff;
+    padding: 6px 2px 6px 0px;
+    background-color: #ffffff;
+    background-color-opacity: 50%;
+}
+
+textfield:focus {
+    background-image: url("editor_button_normal_9");
+    color: #ffffff;
+    background-color-opacity: 75%;
+}
+
+textfield:focus:hover {
+    background-image: url("editor_button_hovered_9");
+}
+
+textfield:hover {
+    background-image: url("editor_button_hovered_9");
+}
+
 toolbar #toolbar_panel {
     background-repeat: nineimage;
     background-image: url("editor_button_normal_9");

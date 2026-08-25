@@ -36,7 +36,7 @@ image {
     background-color: #ffffff;
 }
 
-label {
+label, text {
     font-family: default;
     font-size: 0.6em;
     color: #ffffff;
@@ -48,7 +48,7 @@ text {
     color: #ffffff;
 }
 
-textedit {
+textedit, textfield {
     background-repeat: nineimage;
     background-image: url("panel_white_normal_9");
     background-size: 50%;
@@ -63,16 +63,16 @@ textedit {
     padding: 2px 6px 0px 6px;
 }
 
-    textedit:focus {
+    textedit:focus, textfield:focus {
         background-image: url("panel_white_selected_9");
         color: #ffffff;
     }
 
-        textedit:focus:hover {
+        textedit:focus:hover, textfield:focus:hover {
             background-image: url("panel_white_selected_hovered_9");
         }
 
-    textedit:hover {
+    textedit:hover, textfield:hover {
         background-image: url("panel_white_hovered_9");
     }
 

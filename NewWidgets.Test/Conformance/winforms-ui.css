@@ -79,7 +79,7 @@ panel {
     overflow: hidden;
 }
 
-label {
+label, text {
     font-family: default;
     font-size: 0.6em;
     color: #ffffff;
@@ -94,7 +94,7 @@ text {
     color: #ffffff;
 }
 
-textedit {
+textedit, textfield {
     background-repeat: nineimage;
     background-image: url("panel_white_hovered_9");
     background-size: 25%;
@@ -108,16 +108,16 @@ textedit {
     --cursor-color: #ffffff;
 }
 
-textedit:focus {
+textedit:focus, textfield:focus {
     background-image: url("panel_white_normal_9");
     color: #ffffff;
 }
 
-textedit:focus:hover {
+textedit:focus:hover, textfield:focus:hover {
     background-color: #ffee88;
 }
 
-textedit:hover {
+textedit:hover, textfield:hover {
     background-color: #ffee88;
 }
 
