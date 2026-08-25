@@ -34,7 +34,7 @@ namespace NewWidgets.Utility
         private static readonly IDictionary<Type, DataParserDelegate> s_parsers = new Dictionary<Type, DataParserDelegate>()
         {
             { typeof(string), (str, unitType) => StringParse(str, unitType) },
-            { typeof(uint), (str, unitType) => UintParse(str, unitType) },
+            { typeof(uint), ParseColorParameter },
             { typeof(float), (str, unitType) => FloatParse(str, unitType) },
             { typeof(Margin), (str, unitType) => MarginParse(str, unitType) },
             { typeof(Vector2), (str, unitType) => Vector2Parse(str, unitType) },
@@ -313,28 +313,66 @@ namespace NewWidgets.Utility
         /// </summary>
         /// <returns>The parse.</returns>
         /// <param name="value">Value.</param>
-        public static uint UintParse(string value, UnitType unitType = UnitType.None)
+        public static uint UintParse(string value)
+        {
+            return uint.Parse(value.Trim());
+        }
+
+        /// <summary>
+        /// The parser table dispatches on the CLR type, and every uint property in this engine is a
+        /// colour, so this is where a uint declaration lands. The alpha flag is dropped here; a
+        /// caller that needs it calls <see cref="ColorParse(string, out bool)"/> directly.
+        /// </summary>
+        private static object ParseColorParameter(string value, UnitType unitType)
+        {
+            bool hasAlpha;
+            return ColorParse(value, out hasAlpha);
+        }
+
+        /// <summary>
+        /// Parses a CSS colour where the caller does not care whether an alpha was written.
+        /// </summary>
+        public static uint ColorParse(string value)
+        {
+            bool hasAlpha;
+            return ColorParse(value, out hasAlpha);
+        }
+
+        /// <summary>
+        /// Parses a CSS colour into this engine's packed form, alpha in the high byte.
+        /// <paramref name="hasAlpha"/> reports whether the source actually wrote an alpha, which the
+        /// packed value cannot say on its own: <c>transparent</c>, <c>rgba(r,g,b,0)</c> and
+        /// <c>#rrggbb00</c> all pack a zero high byte, and so does a plain <c>#rrggbb</c> that wrote
+        /// no alpha at all. Without the flag those are indistinguishable and a written zero reads as
+        /// "none given", which paints an intentionally invisible colour fully opaque.
+        /// </summary>
+        public static uint ColorParse(string value, out bool hasAlpha)
         {
             value = value.Trim();
 
             if (string.IsNullOrEmpty(value))
                 throw new FormatException("Invalid Color value");
 
-            if (unitType == UnitType.Color)
+            hasAlpha = false;
+
+            uint named;
+            if (s_namedColors.TryGetValue(value.ToLowerInvariant(), out named))
             {
-                uint named;
-                if (s_namedColors.TryGetValue(value.ToLowerInvariant(), out named))
-                    return named;
-
-                if (value[0] == '#')
-                    return HexColorParse(value.Substring(1));
-
-                if (value.Length >= 8 && value[0] == '0' && value[1] == 'x')  // StartsWith("0x")
-                    return uint.Parse(value.Substring(2), NumberStyles.HexNumber);
-
-                if (value.StartsWith("rgb(") || value.StartsWith("rgba("))
-                    return RgbFunctionParse(value);
+                hasAlpha = named == 0x00000000u; // transparent is the only keyword carrying an alpha
+                return named;
             }
+
+            if (value[0] == '#')
+                return HexColorParse(value.Substring(1), out hasAlpha);
+
+            if (value.Length >= 8 && value[0] == '0' && value[1] == 'x')  // StartsWith("0x")
+            {
+                hasAlpha = value.Length - 2 == 8; // this engine's own form writes alpha first
+                return uint.Parse(value.Substring(2), NumberStyles.HexNumber);
+            }
+
+            if (value.StartsWith("rgb(") || value.StartsWith("rgba("))
+                return RgbFunctionParse(value, out hasAlpha);
 
             return uint.Parse(value);
         }
@@ -344,8 +382,10 @@ namespace NewWidgets.Utility
         /// Three and four digit forms repeat each digit, so #f00 is #ff0000.
         /// The four and eight digit forms carry a CSS alpha, written last, which moves to the high byte.
         /// </summary>
-        private static uint HexColorParse(string digits)
+        private static uint HexColorParse(string digits, out bool hasAlpha)
         {
+            hasAlpha = digits.Length == 4 || digits.Length == 8;
+
             if (digits.Length == 3 || digits.Length == 4)
             {
                 StringBuilder expanded = new StringBuilder(8);
@@ -376,7 +416,7 @@ namespace NewWidgets.Utility
         /// <summary>
         /// Parses rgb(r, g, b) and rgba(r, g, b, a). Components are 0 to 255, alpha is 0 to 1.
         /// </summary>
-        private static uint RgbFunctionParse(string value)
+        private static uint RgbFunctionParse(string value, out bool hasAlpha)
         {
             int open = value.IndexOf('(');
             int close = value.IndexOf(')');
@@ -388,6 +428,8 @@ namespace NewWidgets.Utility
 
             if (parts.Length != 3 && parts.Length != 4)
                 throw new FormatException("Invalid Color value " + value);
+
+            hasAlpha = parts.Length == 4;
 
             uint red = (uint)Math.Round(FloatParse(parts[0]));
             uint green = (uint)Math.Round(FloatParse(parts[1]));

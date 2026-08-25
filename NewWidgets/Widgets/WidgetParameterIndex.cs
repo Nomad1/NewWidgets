@@ -612,7 +612,7 @@ namespace NewWidgets.Widgets
     /// `transparent` keyword rendering exactly as they do today -- all four have a top byte of
     /// zero. The cost is that the three genuinely-transparent spellings, `transparent`,
     /// `rgba(r, g, b, 0)` and `#rrggbb00`, still paint opaque. The upgrade path is for
-    /// <see cref="ConversionHelper.UintParse"/> to report whether the source carried an alpha
+    /// <see cref="ConversionHelper.ColorParse"/> to report whether the source carried an alpha
     /// channel at all, rather than leaving the caller to infer it from the value.
     ///
     /// ponytail: the split also means a later rule re-declaring `background-color` without an
@@ -623,16 +623,17 @@ namespace NewWidgets.Widgets
     {
         public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
         {
-            uint color = ConversionHelper.UintParse(stringValue, UnitType.Color);
+            bool hasAlpha;
+            uint color = ConversionHelper.ColorParse(stringValue, out hasAlpha);
 
             data[PropertyIndex] = color & 0x00ffffffu;
 
-            uint alpha = color >> 24;
-
-            if (alpha == 0)
+            // a written zero is transparent; an absent alpha must leave the opacity slot alone, or
+            // every rule declaring a colour would start overriding an opacity set elsewhere
+            if (!hasAlpha)
                 return;
 
-            float opacity = alpha / 255.0f;
+            float opacity = (color >> 24) / 255.0f;
 
             // a background-color-opacity earlier in the same rule composes with this alpha
             object declared;

@@ -380,20 +380,20 @@ namespace NewWidgets.Test
             // is not treated as a known failure here.
             context.AreEqualFloat(0.5f, ConversionHelper.FloatParse("50%"), 0.0001f, "current contract: '50%' parses to the raw fraction 0.5, got {0}", ConversionHelper.FloatParse("50%"));
 
-            // UintParse, UnitType.Color
-            context.AreEqual((uint)0xff0000, ConversionHelper.UintParse("#ff0000", UnitType.Color), "'#ff0000' should parse to 0xff0000");
+            // ColorParse
+            context.AreEqual((uint)0xff0000, ConversionHelper.ColorParse("#ff0000"), "'#ff0000' should parse to 0xff0000");
 
             // the eight digit # form is CSS #rrggbbaa, so alpha is written last and moves to the high byte
-            context.AreEqual((uint)0x80ff0000, ConversionHelper.UintParse("#ff000080", UnitType.Color), "'#ff000080' should parse to 0x80ff0000");
-            context.AreEqual((uint)0xffff0000, ConversionHelper.UintParse("#ff0000ff", UnitType.Color), "'#ff0000ff' (full alpha) should parse to 0xffff0000");
-            context.AreEqual((uint)0x00ff0000, ConversionHelper.UintParse("#ff000000", UnitType.Color), "'#ff000000' (zero alpha) should parse to 0x00ff0000");
+            context.AreEqual((uint)0x80ff0000, ConversionHelper.ColorParse("#ff000080"), "'#ff000080' should parse to 0x80ff0000");
+            context.AreEqual((uint)0xffff0000, ConversionHelper.ColorParse("#ff0000ff"), "'#ff0000ff' (full alpha) should parse to 0xffff0000");
+            context.AreEqual((uint)0x00ff0000, ConversionHelper.ColorParse("#ff000000"), "'#ff000000' (zero alpha) should parse to 0x00ff0000");
 
             // the four digit #rgba short form already reads as CSS, so both forms must agree
-            context.AreEqual(ConversionHelper.UintParse("#ff0000aa", UnitType.Color), ConversionHelper.UintParse("#f00a", UnitType.Color), "'#f00a' and '#ff0000aa' should give the same value");
+            context.AreEqual(ConversionHelper.ColorParse("#ff0000aa"), ConversionHelper.ColorParse("#f00a"), "'#f00a' and '#ff0000aa' should give the same value");
 
             // 0x is this engine's own notation, not CSS, so it keeps its 0xAARRGGBB meaning
-            context.AreEqual((uint)0xff0000, ConversionHelper.UintParse("0xff0000", UnitType.Color), "'0xff0000' should parse to 0xff0000");
-            context.AreEqual((uint)0x80ff0000, ConversionHelper.UintParse("0x80ff0000", UnitType.Color), "'0x80ff0000' should still parse to 0x80ff0000");
+            context.AreEqual((uint)0xff0000, ConversionHelper.ColorParse("0xff0000"), "'0xff0000' should parse to 0xff0000");
+            context.AreEqual((uint)0x80ff0000, ConversionHelper.ColorParse("0x80ff0000"), "'0x80ff0000' should still parse to 0x80ff0000");
 
             // StringParse, UnitType.Url
             context.AreEqual("name", ConversionHelper.StringParse("url(\"name\")", UnitType.Url), "url(\"name\") should yield 'name'");
@@ -440,24 +440,24 @@ namespace NewWidgets.Test
 
             // ToString round-trip for uint as a colour
             context.AreEqual("#ff0000", ConversionHelper.ToString((uint)0xff0000, UnitType.Color), "ToString(0xff0000, Color) should be '#ff0000'");
-            context.AreEqual((uint)0xff0000, ConversionHelper.UintParse(ConversionHelper.ToString((uint)0xff0000, UnitType.Color), UnitType.Color), "Color round trip should return to 0xff0000");
+            context.AreEqual((uint)0xff0000, ConversionHelper.ColorParse(ConversionHelper.ToString((uint)0xff0000, UnitType.Color)), "Color round trip should return to 0xff0000");
 
             // SaveCSS writes through this, so the eight digit output must be CSS order too or a save/load round trip corrupts the alpha
             context.AreEqual("#ff000080", ConversionHelper.ToString((uint)0x80ff0000, UnitType.Color), "ToString(0x80ff0000, Color) should be '#ff000080'");
-            context.AreEqual((uint)0x80ff0000, ConversionHelper.UintParse(ConversionHelper.ToString((uint)0x80ff0000, UnitType.Color), UnitType.Color), "Color-with-alpha round trip should return to 0x80ff0000");
-            context.AreEqual((uint)0xaa336699, ConversionHelper.UintParse(ConversionHelper.ToString((uint)0xaa336699, UnitType.Color), UnitType.Color), "Color-with-alpha round trip should return to 0xaa336699");
+            context.AreEqual((uint)0x80ff0000, ConversionHelper.ColorParse(ConversionHelper.ToString((uint)0x80ff0000, UnitType.Color)), "Color-with-alpha round trip should return to 0x80ff0000");
+            context.AreEqual((uint)0xaa336699, ConversionHelper.ColorParse(ConversionHelper.ToString((uint)0xaa336699, UnitType.Color)), "Color-with-alpha round trip should return to 0xaa336699");
         }
 
         private static void AssertUintParse(TestContext context, string input, uint expected, string label)
         {
             try
             {
-                uint actual = ConversionHelper.UintParse(input, UnitType.Color);
+                uint actual = ConversionHelper.ColorParse(input);
                 context.AreEqual(expected, actual, "{0} should parse to 0x{1:x}, got 0x{2:x}", label, expected, actual);
             }
             catch (Exception ex)
             {
-                context.Fail("{0} should parse to 0x{1:x} but UintParse threw {2}: {3}", label, expected, ex.GetType().Name, ex.Message);
+                context.Fail("{0} should parse to 0x{1:x} but ColorParse threw {2}: {3}", label, expected, ex.GetType().Name, ex.Message);
             }
         }
 
@@ -482,6 +482,34 @@ namespace NewWidgets.Test
             AssertUintParse(context, "white", (uint)0xffffff, "'white'");
             AssertUintParse(context, "black", (uint)0x000000, "'black'");
             AssertUintParse(context, "transparent", (uint)0x00000000, "'transparent'");
+
+            // the flag is the whole point: a packed zero high byte cannot say whether an alpha was
+            // written, and a written zero must not read as "none given"
+            bool hasAlpha;
+
+            ConversionHelper.ColorParse("transparent", out hasAlpha);
+            context.IsTrue(hasAlpha, "'transparent' should report a written alpha");
+
+            ConversionHelper.ColorParse("rgba(255, 0, 0, 0)", out hasAlpha);
+            context.IsTrue(hasAlpha, "'rgba(255, 0, 0, 0)' should report a written alpha");
+
+            ConversionHelper.ColorParse("#ff000000", out hasAlpha);
+            context.IsTrue(hasAlpha, "'#ff000000' should report a written alpha");
+
+            ConversionHelper.ColorParse("#ff0000", out hasAlpha);
+            context.IsFalse(hasAlpha, "'#ff0000' should report no written alpha");
+
+            ConversionHelper.ColorParse("rgb(255, 0, 0)", out hasAlpha);
+            context.IsFalse(hasAlpha, "'rgb(255, 0, 0)' should report no written alpha");
+
+            ConversionHelper.ColorParse("red", out hasAlpha);
+            context.IsFalse(hasAlpha, "a named colour other than transparent should report no written alpha");
+
+            ConversionHelper.ColorParse("0xff0000", out hasAlpha);
+            context.IsFalse(hasAlpha, "the six digit 0x form should report no written alpha");
+
+            ConversionHelper.ColorParse("0x80ff0000", out hasAlpha);
+            context.IsTrue(hasAlpha, "the eight digit 0x form should report a written alpha");
         }
 
         private static void Test6_MarginSingleValueDropsUnit(TestContext context)
