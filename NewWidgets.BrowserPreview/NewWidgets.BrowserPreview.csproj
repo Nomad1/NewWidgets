@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>NewWidgets.BrowserPreview</RootNamespace>
+    <AssemblyName>NewWidgets.BrowserPreview</AssemblyName>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Read-only sources, compiled in place rather than copied. See Program.cs remarks. -->
+    <Compile Include="..\..\RunMobile\RunMobile\Graphics\SpriteData.cs">
+      <Link>ReadOnly\SpriteData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\RunMobile\Tools\SpritePacker\Png.cs">
+      <Link>ReadOnly\Png.cs</Link>
+    </Compile>
+  </ItemGroup>
+
+</Project>

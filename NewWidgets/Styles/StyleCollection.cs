@@ -268,5 +268,17 @@ namespace NewWidgets.UI.Styles
             foreach (StyleNode node in m_allNodes.Values)
                 outputStream.WriteLine(node);
         }
+
+        /// <summary>
+        /// Removes every style previously added with <see cref="AddStyle(string,IStyleData)"/>,
+        /// leaving the collection as empty as a freshly constructed one.
+        /// </summary>
+        public void Clear()
+        {
+            m_allNodes.Clear();
+            m_elementCollection.Clear();
+            m_idCollection.Clear();
+            m_classCollection.Clear();
+        }
     }
 }

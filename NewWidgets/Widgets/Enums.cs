@@ -65,6 +65,31 @@ namespace NewWidgets.Widgets
         ImageTopLeftFill = 9,
     }
 
+    /// <summary>
+    /// How <c>border-image</c> tiles the four edge slices between the corners.
+    /// CSS Backgrounds and Borders 3, section 6.4. The renderer still divides a sprite by
+    /// three and stretches, so only <see cref="Stretch"/> is honoured today; the other three
+    /// are stored so a stylesheet round-trips and a nine-patch generator can declare them.
+    /// </summary>
+    public enum WidgetBorderImageRepeat
+    {
+        Stretch = 0,
+        Repeat = 1,
+        Round = 2,
+        Space = 3,
+    }
+
+    /// <summary>
+    /// The part of CSS <c>display</c> that is inside the D134 profile. That profile is
+    /// absolute positioning only, so every box this engine draws is a block and the single
+    /// distinction left that carries meaning is whether the box is drawn at all.
+    /// </summary>
+    public enum WidgetDisplay
+    {
+        None = 0,
+        Block = 1,
+    }
+
     public enum WidgetBackgroundDepth
     {
         /// <summary>
@@ -186,6 +211,8 @@ namespace NewWidgets.Widgets
         Toolbar,
         [Name("tooltip")]
         Tooltip,
+        [Name("window")]
+        Window,
     }
 
     /// <summary>

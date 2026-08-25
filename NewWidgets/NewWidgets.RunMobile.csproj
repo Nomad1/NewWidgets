@@ -3,7 +3,7 @@
     <RootNamespace>NewWidgets</RootNamespace>
     <AssemblyName>NewWidgets</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <TargetFrameworks>net40;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
     <Configurations>Debug;Release</Configurations>
     <OutputPath>bin\$(Configuration)\$(Platform)</OutputPath>
   </PropertyGroup>

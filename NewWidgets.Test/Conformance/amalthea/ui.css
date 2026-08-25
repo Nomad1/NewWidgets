@@ -1,0 +1,286 @@
+/* Text edits */
+
+.special_textedit {
+    background-repeat: threeimage;
+    background-image: url("edit_special_inactive_3");
+    padding: 0px 0px 0px 30px;
+    color: #aaaaaa;
+    background-color-opacity: 50%;
+}
+
+    .special_textedit:focus {
+        background-repeat: threeimage;
+        background-image: url("edit_special_inactive_3");
+        color: #ffffff;
+        background-color-opacity: 100%;
+    }
+
+        .special_textedit:focus:hover {
+            background-repeat: threeimage;
+            background-image: url("edit_special_inactive_3");
+            background-color: #ffdd77;
+        }
+
+    .special_textedit:hover {
+        background-repeat: threeimage;
+        background-image: url("edit_special_inactive_3");
+        background-color: #ffdd77;
+        background-color-opacity: 50%;
+    }
+
+.special_textedit2 {
+    background-repeat: threeimage;
+    background-image: url("edit_ispecial_inactive_3");
+    padding: 0px 0px 0px 30px;
+    color: #aaaaaa;
+    background-color-opacity: 50%;
+}
+
+    .special_textedit2:focus {
+        background-repeat: threeimage;
+        background-image: url("edit_ispecial_inactive_3");
+        color: #ffffff;
+        background-color-opacity: 100%;
+    }
+
+        .special_textedit2:focus:hover {
+            background-repeat: threeimage;
+            background-image: url("edit_ispecial_inactive_3");
+            background-color: #ffdd77;
+        }
+
+    .special_textedit2:hover {
+        background-repeat: threeimage;
+        background-image: url("edit_ispecial_inactive_3");
+        background-color: #ffdd77;
+        background-color-opacity: 50%;
+    }
+
+.chat_text {
+    background-repeat: nineimage;
+    background-image: url("light_9");
+    background-size: 50%;
+    font-family: default;
+    font-size: 0.528em;
+    --clip-margin: 2px 3px 2px 1px;
+    color: #888888;
+    --cursor-color: #aa9988;
+    padding: 0px 4px 0px 4px;
+    overflow: hidden;
+}
+
+    .chat_text:focus {
+        background-repeat: nineimage;
+        background-image: url("light_9");
+        background-size: 50%;
+        color: #ffffff;
+    }
+
+.send_mail_edit {
+    font-size: 0.6em;
+    padding: 0px 6px 0px 6px;
+}
+
+    .send_mail_edit:focus {
+        background-image: url("panel_white_normal_9");
+        color: #ffffff;
+    }
+
+        .send_mail_edit:focus:hover {
+            background-color: #ffdd77;
+        }
+
+    .send_mail_edit:hover {
+        background-color: #ffdd77;
+    }
+
+/* Misc */
+
+.padding6 > .button_image {
+    padding: 6px;
+}
+
+.padding2 > .button_image {
+    padding: 2px;
+}
+
+.padding24 > .button_image {
+    padding: 24px;
+}
+
+.item_tooltip {
+    padding: 0px 6px 10px 10px;
+}
+
+.selection {
+    background-repeat: nineimage;
+    background-image: url("select");
+    background-position: 0% 0%;
+    background-size: 200%;
+}
+
+.image_topleft {
+    background-repeat: image;
+    background-size: 100%;
+    padding: 0px 0px 0px 0px;
+    overflow: hidden;
+    --clip-margin: 0px 0px 0px 0px;
+    background-position: 0% 0%;
+}
+
+.white_line {
+    background-repeat: threeimage;
+    background-image: url("white_line_3");
+}
+
+.progress_bar {
+    background-repeat: threeimage;
+    background-image: url("progress_bar_3");
+}
+
+.progress_line {
+    background-repeat: threeimage;
+    background-image: url("progress_line_3");
+}
+
+.title_line {
+    background-repeat: threeimage;
+    background-image: url("title_line_3");
+    background-color-opacity: 50%;
+}
+
+/* Settings */
+
+.settings_label {
+    text-align: left;
+    font-size: 0.5em;
+    color: #ffffff;
+}
+
+.settings_key_entry {
+    text-align: center;
+}
+
+.settings_select {
+    color: #eeeeee;
+}
+
+    .settings_select > .select_label {
+        font-family: default;
+        font-size: 0.5em;
+        text-align: horizontalcenter, top;
+    }
+
+    .settings_select > .select_left {
+        width: 20px;
+        height: 40px;
+        background-repeat: no-repeat;
+        background-image: url("");
+    }
+
+        .settings_select > .select_left > .button_image {
+            background-repeat: imagefit;
+            background-image: url("button_left_normal");
+        }
+
+        .settings_select > .select_left > .button_label {
+            visibility: hidden;
+            opacity: 0%;
+        }
+
+    .settings_select > .select_right {
+        width: 20px;
+        height: 40px;
+        background-repeat: no-repeat;
+        background-image: url("");
+    }
+
+        .settings_select > .select_right > .button_image {
+            background-repeat: imagefit;
+            background-image: url("button_right_normal");
+        }
+
+        .settings_select > .select_right > .button_label {
+            visibility: hidden;
+            opacity: 0%;
+        }
+
+.settings_text {
+    color: #eeeeee;
+    padding: 6px 6px 6px 6px;
+}
+
+.settings_header {
+    padding: 20px 20px 20px 20px;
+    color: #26bbd9;
+}
+
+.settings_line {
+    padding: 6px 6px 6px 6px;
+    background-color: #ffffff;
+}
+
+/* Tables */
+
+.table_row {
+    font-family: default;
+    font-size: 0.5em;
+    color: #cceeff;
+    background-repeat: nineimage;
+    background-image: url("table_row_alt");
+    background-color-opacity: 0%;
+    background-size: 25%;
+}
+
+    .table_row:focus {
+        background-image: url("table_row_selected_9");
+        background-color: #ffdd77;
+        color: #ffffff;
+        background-color-opacity: 50%;
+    }
+
+.table_alt_row {
+    font-family: default;
+    font-size: 0.5em;
+    color: #ddffff;
+    background-repeat: nineimage;
+    background-image: url("table_row_alt");
+    background-size: 25%;
+    background-color-opacity: 50%;
+}
+
+    .table_alt_row:focus {
+        background-image: url("table_row_alt_selected_9");
+        background-color: #ffdd77;
+        color: #ffffff;
+        background-color-opacity: 50%;
+    }
+
+.table_header_row {
+    font-family: title;
+    font-size: 0.5em;
+    color: #cccccc;
+    background-repeat: nineimage;
+    background-image: url("table_row_header_9");
+    background-size: 25%;
+    background-color-opacity: 50%;
+}
+
+/* Checkboxes */
+
+.solid_checkbox {
+    background-image: url("checkbox_solid_normal");
+    background-color: #ffffff;
+}
+
+    .solid_checkbox:hover {
+        background-image: url("checkbox_solid_hovered");
+        background-color: #ffffff;
+        color: #ffffff;
+    }
+
+    .solid_checkbox:disabled {
+        background-image: url("checkbox_solid_normal");
+        background-color: #888888;
+        color: #888888;
+    }

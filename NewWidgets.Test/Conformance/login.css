@@ -1,0 +1,176 @@
+/* The NewWidgets sample login form, written in standard CSS only.
+   Source: Sample/Sample/TestWindow.cs, styles from RunMobileSample/assets/ui.css.
+
+   Every position here is absolute, which is what makes the two renderers agree.
+   No flow layout is used, so a browser and NewWidgets place the same boxes.
+
+   The class on each element names its NewWidgets widget, so one stylesheet can
+   serve both. A browser reads `.window`; NewWidgets reads `window`. The tag says
+   the same thing wherever HTML has a word for it -- `<button class="button">`,
+   `<input class="textedit">` -- and is a plain container where it does not. */
+
+@font-face {
+    font-family: "uifont";
+    src: url("font5.png");          /* atlas, not a font file. See note 3 below. */
+}
+
+body {
+    margin: 0;
+    background-color: #202020;
+    font-family: "uifont", monospace;
+    font-size: 30px;                /* --font-baseline: 30 in the original */
+}
+
+/* window: was background-repeat: nineimage + @sprite 3x3 + background-size: 75% */
+.window {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -300px;
+    margin-top: -380px;
+    width: 600px;
+    height: 760px;
+    overflow: hidden;
+
+    border-image-source: url("ui.png");
+    border-image-slice: 33.33% fill;
+    border-image-width: 75%;
+    border-image-repeat: stretch;
+}
+
+/* back_pattern: was imagetiled + background-color-opacity: 4% */
+.back_pattern {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 600px;
+    height: 760px;
+    overflow: hidden;
+
+    background-image: url("ui.png");
+    background-repeat: repeat;
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.label {
+    position: absolute;
+    color: #ffffff;
+    font-size: 0.6em;
+    height: 35px;
+    overflow: visible;
+}
+
+/* textedit: was nineimage + --clip-margin + --cursor-color + --text-padding */
+.textedit {
+    position: absolute;
+    width: 500px;
+    height: 45px;
+    font-size: 0.5em;
+    color: #aaaaaa;
+    overflow: hidden;
+    box-sizing: border-box;
+
+    border-image-source: url("ui.png");
+    border-image-slice: 33.33% fill;
+    border-image-width: 25%;
+
+    caret-color: #ffffff;
+    padding: 6px 2px 6px 0;
+    clip-path: inset(1px 2px 3px 2px);
+}
+
+/* button: was threeimage, which is a 3x1 slice.
+   The element is a real <button>, so the three things a browser dresses a form
+   control in of its own accord are taken back here: it does not inherit the page
+   font, and its buttonface background and outset border would sit in front of the
+   nine-patch below. All three are ordinary properties, which is why <button> is
+   usable where <img> was not -- a broken-image placeholder cannot be overridden. */
+.button {
+    position: absolute;
+    width: 120px;
+    height: 40px;
+    font-family: inherit;
+    font-size: 0.6em;
+    text-align: left;
+    color: #ffffff;
+    background-color: transparent;
+    padding: 0 0 0 6px;
+    box-sizing: border-box;
+
+    border-image-source: url("ui.png");
+    border-image-slice: 0 33.33% fill;
+    border-image-width: 100%;
+}
+
+/* text_button drops the nine-patch, so the UA border a <button> carries has
+   nothing drawn over it any more and has to go explicitly */
+.text_button {
+    width: 300px;
+    height: 20px;
+    color: #cceeff;
+    padding: 4px 2px;
+    border: none;
+    border-image-source: none;
+}
+
+.text_button:hover {
+    color: #ffffff;
+}
+
+/* checkbox: was background-repeat: imagefit */
+.checkbox {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    color: #cceeff;
+
+    background-image: url("ui.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Positions, straight from TestWindow.cs */
+
+#login_title  { left: 0;    top: 50px;  width: 600px; text-align: center; font-size: 0.9em; }
+#login_label  { left: 50px; top: 160px; font-size: 0.75em; }
+#login_edit   { left: 50px; top: 200px; }
+#pass_label   { left: 50px; top: 260px; font-size: 0.75em; }
+#pass_edit    { left: 50px; top: 300px; }
+#local_check  { left: 50px; top: 360px; }
+#local_label  { left: 90px; top: 360px; color: #cceeff; }
+#local_edit   { left: 50px; top: 100px; }
+#website_button { left: 50px; top: 360px; }
+#login_button { left: 220px; top: 460px; width: 160px; height: 48px; }
+#fps_label    { left: 440px; top: 20px;  font-size: 0.45em; }
+
+/* WidgetImage with ImageFit, drawn from the atlas. This is the sprite sheet
+   idiom, and it is the one mapping that works from an atlas. */
+.image {
+    position: absolute;
+    background-image: url("ui.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}
+#logo_image { left: 20px; top: 15px; width: 64px; height: 64px; }
+
+/* WidgetTextField: same nine-patch source as textedit, but multi-line */
+.textfield {
+    position: absolute;
+    font-size: 0.75em;
+    color: #aaaaaa;
+    overflow: hidden;
+    box-sizing: border-box;
+    white-space: pre-wrap;
+    padding: 6px 2px 6px 0;
+
+    border-image-source: url("ui.png");
+    border-image-slice: 33.33% fill;
+    border-image-width: 25%;
+}
+#text_field { left: 50px; top: 520px; width: 500px; height: 225px; }

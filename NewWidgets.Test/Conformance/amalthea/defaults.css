@@ -1,0 +1,338 @@
+/* This is pretty much obsolete but was widely used in previous versions to specify a style
+without any decorations. Now we have to drag along .none class to maintain at least a partial compat */
+.none {
+    background-repeat: no-repeat;
+    background-image: url("");
+    background-size: 100%;
+    background-color-opacity: 100%;
+    overflow: visible;
+    color: #ffffff;
+    font-family: default;
+    font-size: 1.0em;
+    opacity: 100%;
+}
+
+window {
+    background-repeat: nineimage;
+    background-image: url("window_9");
+    background-size: 75%;
+    width: 400px;
+    height: 300px;
+    overflow: hidden;
+}
+
+panel {
+    background-repeat: nineimage;
+    background-image: url("window_9");
+    background-size: 50%;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+}
+
+image {
+    overflow: visible;
+    background-position: 50% 50%;
+    background-color: #ffffff;
+}
+
+label {
+    font-family: default;
+    font-size: 0.6em;
+    color: #ffffff;
+}
+
+text {
+    font-family: default;
+    font-size: 0.6em;
+    color: #ffffff;
+}
+
+textedit {
+    background-repeat: nineimage;
+    background-image: url("panel_white_normal_9");
+    background-size: 50%;
+    font-family: default;
+    font-size: 0.5em;
+    width: 200px;
+    height: 45px;
+    color: #aaaaaa;
+    overflow: hidden;
+    --clip-margin: 2px 3px 2px 1px;
+    --cursor-color: #ffffff;
+    padding: 2px 6px 0px 6px;
+}
+
+    textedit:focus {
+        background-image: url("panel_white_selected_9");
+        color: #ffffff;
+    }
+
+        textedit:focus:hover {
+            background-image: url("panel_white_selected_hovered_9");
+        }
+
+    textedit:hover {
+        background-image: url("panel_white_hovered_9");
+    }
+
+line {
+    background-repeat: threeimage;
+    background-image: url("white_line_3");
+    background-size: 100%;
+    background-color-opacity: 80%;
+    background-position: 50% 0%;
+}
+
+button {
+    background-repeat: threeimage;
+    background-image: url("button_normal_3");
+    background-size: 100%;
+    width: 160px;
+    height: 48px;
+    color: #e0f0ff;
+}
+
+    button > .button_label {
+        font-family: default;
+        font-size: 0.66em;
+        padding: 0px 0px 7px 0px;
+    }
+
+    button > .button_image {
+    }
+
+    button:hover {
+        background-image: url("button_hovered_3");
+        color: #ffffff;
+    }
+
+    button:disabled {
+        background-image: url("button_normal_3");
+        background-color: #808080;
+        color: #aaaaaa;
+    }
+
+    button:focus {
+        background-image: url("button_selected_3");
+    }
+
+image_button {
+    background-repeat: no-repeat;
+    background-image: url("");
+    background-size: 100%;
+    color: #e0f0ff;
+    width: 64px;
+    height: 64px;
+}
+
+    image_button > .button_label {
+        font-family: default;
+        font-size: 0.75em;
+    }
+
+    image_button:hover {
+        color: #ffffff;
+    }
+
+    image_button:disabled {
+        color: #aaaaaa;
+    }
+
+    image_button:focus {
+    }
+
+checkbox {
+    background-repeat: imagefit;
+    background-image: url("checkbox_normal");
+    width: 36px;
+    height: 36px;
+}
+
+    checkbox:focus {
+        background-image: url("checkbox_normal");
+        color: #ffffff;
+    }
+
+    checkbox:hover {
+        background-image: url("checkbox_hovered");
+        color: #ffaa33;
+    }
+
+    checkbox:focus:hover {
+        background-image: url("checkbox_hovered");
+        color: #ffaa33;
+    }
+
+    checkbox:disabled {
+        background-image: url("checkbox_solid_normal");
+        background-color: #888888;
+        color: #888888;
+    }
+
+    checkbox > .checkbox_image {
+        background-image: url("check_icon");
+        background-color: #ffffff;
+    }
+
+        checkbox > .checkbox_image:hover {
+            background-image: url("check_icon");
+            background-color: #ffffff;
+        }
+
+checkbox_label {
+    font-size: 0.5em;
+    color: #cceeff;
+}
+
+    checkbox_label:hover {
+        font-size: 0.5em;
+        color: #ffffff;
+    }
+
+    checkbox_label:focus {
+        font-size: 0.5em;
+        color: #ffffff;
+    }
+
+    checkbox_label:disabled {
+        font-size: 0.5em;
+        color: #888888;
+    }
+
+context_menu {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-size: 100%;
+    padding: 4px 4px 4px 4px;
+}
+
+context_menu_item {
+    background-repeat: no-repeat;
+    font-family: default;
+    font-size: 0.5em;
+    color: #cceeff;
+    padding: 2px 4px 2px 4px;
+}
+
+    context_menu_item:hover {
+        background-repeat: no-repeat;
+        background-size: 50%;
+        color: #ffffff;
+    }
+
+
+scrollview {
+    background-repeat: nineimage;
+    background-image: url("window_9");
+    background-size: 50%;
+    overflow: hidden;
+    --clip-margin: 2px 2px 2px 2px;
+}
+
+    scrollview > .scrollview_hscroll {
+        background-repeat: nineimage;
+        background-image: url("scroll_horizontal");
+        background-size: 100%;
+    }
+
+    scrollview > .scrollview_htrack {
+        background-repeat: nineimage;
+        background-image: url("scroll_indicator_horizontal");
+        background-size: 100%;
+    }
+
+    scrollview > .scrollview_vscroll {
+        background-repeat: nineimage;
+        background-image: url("scroll_vertical");
+        background-size: 100%;
+    }
+
+    scrollview > .scrollview_vtrack {
+        background-repeat: nineimage;
+        background-image: url("scroll_indicator_vertical");
+        background-size: 100%;
+    }
+
+select {
+    width: 250px;
+    height: 40px;
+}
+
+    select > select_label {
+        font-family: default;
+        font-size: 0.6em;
+        color: #eeeeee;
+        width: 250px;
+        height: 40px;
+        text-align: horizontalcenter, top;
+    }
+
+tooltip {
+    background-repeat: nineimage;
+    background-image: url("frame_9");
+    background-size: 25%;
+    padding: 8px 8px 8px 8px;
+}
+
+slider {
+    width: 290px;
+    height: 50px;
+    overflow: visible;
+}
+
+    slider > .slider_track {
+        background-image: url("button_left_normal");
+        background-repeat: imagefit;
+        --background-rotation: 90;
+        width: 20px;
+        height: 20px;
+        padding: 12px 0px 0px -30px;
+    }
+
+    slider > .slider_label {
+        font-family: default;
+        font-size: 0.4em;
+        text-align: horizontalcenter, top;
+        color: #ffffff;
+        width: 20px;
+        padding: 8px 0px 0px 10px;
+    }
+
+    slider > .slider_line {
+    }
+
+
+progress {
+    width: 290px;
+    height: 10px;
+    background-repeat: threeimage;
+    background-image: url("progress_line_3");
+    background-color: #666666;
+}
+
+    progress > .progress_line {
+        background-repeat: threeimage;
+        background-image: url("progress_line_3");
+        background-color: #ffffff;
+        --background-depth: backclipped;
+        overflow: hidden;
+    }
+
+    progress > .progress_back_label {
+        font-family: default;
+        font-size: 0.7em;
+        color: #ffffff;
+        text-align: horizontalcenter, verticalcenter;
+        overflow: visible;
+        padding: -3px 0px 0px 0px;
+    }
+
+    progress > .progress_front_label {
+        font-family: default;
+        font-size: 0.7em;
+        color: #222222;
+        text-align: horizontalcenter, verticalcenter;
+        overflow: hidden;
+        padding: -3px 0px 0px 0px;
+    }

@@ -1,0 +1,143 @@
+/* Windows */
+
+.dialog_back {
+    background-repeat: nineimage;
+    background-image: url("panel_white_normal_9");
+    background-size: 50%;
+}
+
+.dialog_window {
+    background-repeat: nineimage;
+    background-image: url("window_dialog_9");
+    background-size: 100%;
+    width: 600px;
+    height: 300px;
+}
+
+.small_dialog_window {
+    background-repeat: nineimage;
+    background-image: url("window_dialog_9");
+    background-size: 75%;
+    width: 300px;
+    height: 100px;
+}
+
+/* Frames */
+
+.light_frame {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    --clip-margin: 2px 2px 2px 2px;
+    background-size: 75%;
+}
+
+.black_frame {
+    background-repeat: nineimage;
+    background-image: url("panel_black_9");
+    --clip-margin: 2px 2px 2px 2px;
+    background-size: 75%;
+}
+
+.blue_frame {
+    background-repeat: nineimage;
+    background-image: url("window_dialog_9");
+    background-size: 40%;
+}
+
+.simple_panel {
+    background-repeat: nineimage;
+    background-image: url("select");
+    background-size: 50%;
+}
+
+.white_panel {
+    background-repeat: nineimage;
+    background-image: url("panel_white_normal_9");
+    background-size: 50%;
+    width: 100px;
+    height: 100px;
+}
+
+.blue_panel {
+    background-repeat: nineimage;
+    background-image: url("frame_9");
+    background-size: 50%;
+    width: 100px;
+    height: 100px;
+}
+
+.dark_panel {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-color: #000000;
+    background-color-opacity: 40%;
+    background-size: 25%;
+}
+
+.darker_panel {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-color: #000000;
+    background-color-opacity: 80%;
+    background-size: 25%;
+}
+
+.light_panel {
+    background-repeat: nineimage;
+    background-image: url("frame_white_9");
+    background-color: #ffffff;
+    background-color-opacity: 5%;
+    background-size: 50%;
+}
+
+/* Individual panel controls */
+
+.paperdoll_panel {
+    background-repeat: nineimage;
+    background-image: url("panel_doll_9");
+    background-size: 70%;
+    width: 100px;
+    height: 100px;
+}
+
+.map_background_frame {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-size: 100%;
+}
+
+.top_panel {
+    background-repeat: threeimage;
+    background-image: url("top_panel_3");
+}
+
+.tab_panel {
+    background-repeat: nineimage;
+    background-image: url("tab_panel_9");
+    background-size: 75%;
+}
+
+/* Backgrounds */
+
+.white_back {
+    background-repeat: imagestretch;
+    background-image: url("white");
+}
+
+.back_pattern {
+    background-repeat: imagetiled;
+    --background-depth: backclipped;
+    background-image: url("back_pattern");
+    background-size: 100%;
+    background-color-opacity: 4%;
+    overflow: hidden;
+}
+
+.map_background {
+    overflow: hidden;
+}
+
+.hex_field {
+    background-repeat: threeimage;
+    background-image: url("hex_field_3");
+}

@@ -111,25 +111,17 @@ namespace NewWidgets.Widgets
 
         private static IStyleData InitCssData(string name, Dictionary<string, string> parameters)
         {
+            // @font-face names the font it declares with a font-family declaration rather than
+            // with its selector, so it is read before the declarations are parsed
+            if (name == "@font-face")
+                return InitFontFace(parameters);
+
             IDictionary<WidgetParameterIndex, object> style = InitCssParameters(parameters);
             StyleSheetData data = new StyleSheetData(style);
 
             if (name.StartsWith("@font."))
             {
-                string fontName = name.Split('.')[1];
-
-                Font font = new Font(
-                    fontName,
-                    data.GetParameter(WidgetParameterIndex.FontResource, ""),
-                    data.GetParameter(WidgetParameterIndex.FontSpacing, 0.0f),
-                    data.GetParameter(WidgetParameterIndex.FontLeading, 0),
-                    data.GetParameter(WidgetParameterIndex.FontBaseline, 10),
-                    data.GetParameter(WidgetParameterIndex.FontShift, 0));
-
-                s_fonts[fontName] = font;
-
-                if (fontName == "default")
-                    s_mainFont = font;
+                RegisterFont(name.Split('.')[1], data);
             }
             else if (name.StartsWith("@sprite"))
             {
@@ -142,6 +134,89 @@ namespace NewWidgets.Widgets
             }
 
             return data;
+        }
+
+        /// <summary>
+        /// Reads a CSS <c>@font-face</c> rule. This engine's font registry is keyed by the
+        /// selector of an <c>@font.&lt;name&gt;</c> rule, where the standard names the font with a
+        /// <c>font-family</c> declaration inside the block, so the name is taken from the raw
+        /// declaration text: <see cref="FontFamilyProcessor"/> resolves a family to an already
+        /// registered <see cref="Font"/>, and the font being declared here is not one yet.
+        /// </summary>
+        private static IStyleData InitFontFace(IDictionary<string, string> parameters)
+        {
+            string family;
+
+            if (!parameters.TryGetValue("font-family", out family))
+            {
+                WindowController.Instance.LogError("Got a @font-face rule with no font-family name");
+                return new StyleSheetData(InitCssParameters(parameters));
+            }
+
+            parameters.Remove("font-family");
+
+            StyleSheetData data = new StyleSheetData(InitCssParameters(parameters));
+
+            RegisterFont(UnquoteFontFamily(family), data);
+
+            return data;
+        }
+
+        /// <summary>
+        /// Builds a <see cref="Font"/> from the font metrics of a parsed <c>@font-face</c> or
+        /// <c>@font.&lt;name&gt;</c> block and puts it in the registry <see cref="GetFont"/> reads.
+        /// </summary>
+        private static void RegisterFont(string fontName, StyleSheetData data)
+        {
+            string resource = data.GetParameter(WidgetParameterIndex.FontResource, "");
+
+            if (string.IsNullOrEmpty(fontName) || string.IsNullOrEmpty(resource))
+            {
+                WindowController.Instance.LogError("Got a font rule for {0} with no resource to load it from", fontName);
+                return;
+            }
+
+            Font font = new Font(
+                fontName,
+                resource,
+                data.GetParameter(WidgetParameterIndex.FontSpacing, 0.0f),
+                data.GetParameter(WidgetParameterIndex.FontLeading, 0),
+                data.GetParameter(WidgetParameterIndex.FontBaseline, 10),
+                data.GetParameter(WidgetParameterIndex.FontShift, 0));
+
+            s_fonts[fontName] = font;
+
+            if (fontName == DefaultFontName)
+                s_mainFont = font;
+        }
+
+        /// <summary>
+        /// Strips the whitespace and the optional quotes CSS allows around one family name.
+        /// </summary>
+        internal static string UnquoteFontFamily(string family)
+        {
+            return family.Trim().Trim('"', '\'');
+        }
+
+        /// <summary>
+        /// Font lookup that does not complain when the font is absent, which is what walking a
+        /// <c>font-family</c> stack needs -- <see cref="GetFont"/> logs an error and is the
+        /// right call for a name that is already known to be the only candidate.
+        /// </summary>
+        internal static bool TryGetFont(string name, out Font font)
+        {
+            font = null;
+
+            if (string.IsNullOrEmpty(name))
+                return false;
+
+            if (name == DefaultFontName)
+            {
+                font = s_mainFont;
+                return font != null;
+            }
+
+            return s_fonts.TryGetValue(name, out font);
         }
 
         private static IDictionary<WidgetParameterIndex, object> InitCssParameters(IDictionary<string, string> parameters)
@@ -180,6 +255,28 @@ namespace NewWidgets.Widgets
         public static void SaveCSS(System.IO.TextWriter outputStream)
         {
             s_styleCollection.Dump(outputStream);
+        }
+
+        /// <summary>
+        /// Clears everything <see cref="LoadCSS"/> populates: the CSS style collection itself,
+        /// and the font registry (<c>s_fonts</c>/<c>s_mainFont</c> in WidgetManager.cs) that
+        /// <see cref="InitCssData"/> fills in from <c>@font</c> rules -- both are stylesheet
+        /// content, so a caller that resets one but not the other would still see stale fonts
+        /// resolve after the styles referencing them are gone. Intended for tests that need to
+        /// load a stylesheet in isolation from whatever ran before.
+        ///
+        /// Does NOT touch: widget/window runtime state (focus, tooltip, exclusive widgets,
+        /// top-level window, font scale) -- none of it is stylesheet-derived; the legacy XML
+        /// style loader's lookforward/default-style tables (<c>s_lookForwardStyles</c>,
+        /// <c>s_defaultStyles</c>) -- that path is obsolete and unused by CSS-based callers;
+        /// or sprite subdivisions registered on <c>WindowController.Instance</c> from
+        /// <c>@sprite</c> rules -- those live on a different class entirely.
+        /// </summary>
+        public static void ResetStyles()
+        {
+            s_styleCollection.Clear();
+            s_fonts.Clear();
+            s_mainFont = null;
         }
 
 

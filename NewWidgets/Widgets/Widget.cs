@@ -74,6 +74,7 @@ namespace NewWidgets.Widgets
 
         private bool m_needUpdateStyle;
         private bool m_needsLayout; // flag to indicate that inner label size/opacity/formatting has changed
+        private bool m_isResolvingBox; // true only while ResolveBox applies its own result, see Resize
 
 
         /// <summary>
@@ -278,6 +279,34 @@ namespace NewWidgets.Widgets
             get { return m_needsLayout; }
         }
 
+        /// <summary>
+        /// Size of the box that percentages and anchors resolve against: the parent widget, or
+        /// the screen when there is no widget parent. Note that Parent is base.Parent as Widget,
+        /// so a widget sitting directly under a plain Window resolves against the screen.
+        ///
+        /// ponytail: this is the parent's whole box. CSS 2.1 10.1 uses the ancestor's padding
+        /// edge for an absolutely positioned element; the two differ only once a parent that has
+        /// a padding gets a percentage-sized or anchored child. Subtract Padding here and offset
+        /// the resolved position by padding-left/top when that turns up -- nothing else in this
+        /// engine gives children a content box to sit in, so introducing one here alone would
+        /// only be inconsistent.
+        /// </summary>
+        private Vector2 ContainingBlockSize
+        {
+            get
+            {
+                Widget parent = Parent;
+
+                if (parent != null)
+                    return parent.Size;
+
+                if (WindowController.Instance == null)
+                    return Vector2.Zero;
+
+                return new Vector2(WindowController.Instance.ScreenWidth, WindowController.Instance.ScreenHeight);
+            }
+        }
+
 #if DEBUG_SIZE
         public new Vector2 Size
         {
@@ -345,6 +374,24 @@ namespace NewWidgets.Widgets
         internal T GetProperty<T>(WidgetParameterIndex index, T defaultValue)
         {
             return m_style.Get(index, defaultValue);
+        }
+
+        /// <summary>
+        /// Reads a property from the widget's own style alone, ignoring the whole cascade behind
+        /// it. This is the el.style.width read: the missing read half of <see cref="SetProperty"/>,
+        /// which every widget property setter in the library writes through and which lands in the
+        /// own style and nowhere else.
+        ///
+        /// Kept although its only caller today is one assertion in Test 35, because nothing else
+        /// can ask the question that assertion asks. GetProperty walks the cascade, so on a widget
+        /// whose class legitimately declares a width it cannot tell a value frozen into the own
+        /// style from the class rule the widget is supposed to be re-resolving -- which is exactly
+        /// the defect Test 35 guards. It costs one dictionary probe, walks no cascade and is
+        /// strictly cheaper than GetProperty, so it adds nothing to the path D144 protects
+        /// </summary>
+        internal T GetOwnProperty<T>(WidgetParameterIndex index, T defaultValue)
+        {
+            return m_ownStyle.GetParameter(index, defaultValue);
         }
 
         internal void SetProperty<T>(WidgetParameterIndex index, T value)
@@ -477,8 +524,18 @@ namespace NewWidgets.Widgets
         {
             base.Resize(size);
 
-            SetProperty(WidgetParameterIndex.Width, size.X);
-            SetProperty(WidgetParameterIndex.Height, size.Y);
+            // Only a resize that came from outside the box resolver is recorded in the own
+            // style: an explicit widget.Size = ... from game code, or a widget measuring its own
+            // content in UpdateLayout. That is the el.style.width equivalent and it is correct.
+            // The resolver's own result must never go there, because the own style sits at the
+            // head of the cascade and answers every later lookup before the cascade is reached,
+            // so writing it would freeze the widget's size after the first layout pass and no
+            // added class and no :hover rule could ever resize it again.
+            if (!m_isResolvingBox)
+            {
+                SetProperty(WidgetParameterIndex.Width, StyleLength.Pixels(size.X));
+                SetProperty(WidgetParameterIndex.Height, StyleLength.Pixels(size.Y));
+            }
 
             InvalidateLayout();
         }
@@ -535,12 +592,67 @@ namespace NewWidgets.Widgets
 
             //Console.WriteLine("Resolved style: {0} {{\n{1}\n}}", list, m_style);
 
+            ResolveBox();
+        }
+
+        /// <summary>
+        /// Turns the declared box properties into a real position and size, following CSS 2.1
+        /// 10.3.7 for the horizontal axis, 10.6.4 for the vertical one and 10.4 for the min/max
+        /// clamp. Every NewWidgets widget is an absolutely positioned box, so those are the
+        /// rules that apply.
+        ///
+        /// This runs from UpdateStyle, which is where the engine has always applied CSS
+        /// geometry. Keeping it there means a widget that measures its own content in
+        /// UpdateLayout still has the last word, exactly as before, and WidgetPanel.Update
+        /// resolves the panel through base.Update() before it updates m_children, so a parent is
+        /// always settled by the time a child asks for its containing block.
+        ///
+        /// Allocation free: every lookup unboxes into a struct and both axes live on the stack.
+        /// Note that nothing here invalidates the style, so a resize never costs a cascade
+        /// re-walk -- Resize only raises the layout flag, as it always did.
+        /// </summary>
+        private void ResolveBox()
+        {
+            Vector2 containingBlock = ContainingBlockSize;
+
             Vector2 size = Size;
+            Vector2 position = Position;
 
-            size.X = m_style.Get(WidgetParameterIndex.Width, size.X);
-            size.Y = m_style.Get(WidgetParameterIndex.Height, size.Y);
+            StyleAxis horizontal = new StyleAxis(
+                m_style.Get(WidgetParameterIndex.Left, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.Right, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.Width, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.MarginLeft, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.MarginRight, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.MinWidth, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.MaxWidth, StyleLength.Unset));
 
+            horizontal.Resolve(containingBlock.X, ref position.X, ref size.X);
+
+            StyleAxis vertical = new StyleAxis(
+                m_style.Get(WidgetParameterIndex.Top, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.Bottom, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.Height, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.MarginTop, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.MarginBottom, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.MinHeight, StyleLength.Unset),
+                m_style.Get(WidgetParameterIndex.MaxHeight, StyleLength.Unset));
+
+            vertical.Resolve(containingBlock.Y, ref position.Y, ref size.Y);
+
+            m_isResolvingBox = true;
             Size = size;
+            m_isResolvingBox = false;
+
+            if (Vector2.DistanceSquared(position, Position) > float.Epsilon)
+                Position = position;
+
+            // a ZIndex of 0 already means "nothing explicit" in this engine, so it doubles as
+            // the not-declared case and no sentinel is needed
+            int zIndex = m_style.Get(WidgetParameterIndex.ZIndex, 0);
+
+            if (zIndex != 0)
+                ZIndex = zIndex;
         }
 
         #endregion

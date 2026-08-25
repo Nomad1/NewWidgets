@@ -1,0 +1,309 @@
+@sprite.tab_button_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.tab_button_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.tab_button_normal_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.tab_panel_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_white_normal_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_white_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_white_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_white_selected_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_blue_normal_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_blue_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_blue_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_blue_selected_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_black_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_dark_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_doll_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.light_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.frame_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.window_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.window_dialog_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.frame_white_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.frame_white_inactive_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.select {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.scroll_horizontal {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.scroll_vertical {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.scroll_indicator_horizontal {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.scroll_indicator_vertical {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.table_row_alt {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.table_row_alt_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.table_row_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.table_row_header_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.button_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_blue_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_blue_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_blue_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_prev_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_prev_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_prev_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_next_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_next_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_next_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_big_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_big_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_big_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_doll_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_doll_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_ldoll_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_ldoll_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.edit_special_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.edit_special_inactive_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.edit_ispecial_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.edit_ispecial_inactive_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.white_line_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.line_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.title_line_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.white_title_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.progress_line_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.progress_bar_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.top_panel_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.hex_field_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}

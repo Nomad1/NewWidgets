@@ -37,7 +37,7 @@ namespace NewWidgets.Sample
             : base(WindowFlags.CustomAnim | WindowFlags.Blackout)
         {
             m_panel = new WidgetWindow(WidgetManager.GetStyle("dialog_window"));
-            m_panel.UpdateStyle();
+            m_panel.Relayout(); // was UpdateStyle(), which is protected now
             Vector2 size = m_panel.Size;
 
             m_text = new WidgetText();
@@ -46,7 +46,7 @@ namespace NewWidgets.Sample
             m_text.MaxWidth = size.X - 40;
             m_text.FontSize *= 1.25f;
             m_text.TextAlign = WidgetAlign.VerticalCenter | WidgetAlign.HorizontalCenter;
-            m_text.UpdateLayout();
+            m_text.Relayout(); // was UpdateLayout(), which is protected now
             size = m_panel.Size = m_panel.Size + new Vector2(0, m_text.Size.Y - 80);
             m_text.Position = new Vector2(0, size.Y / 2 - m_text.Size.Y / 2);
             m_panel.AddChild(m_text);
@@ -72,7 +72,8 @@ namespace NewWidgets.Sample
             m_closeButton = new WidgetButton(WidgetManager.GetStyle("image_button"), "");
             m_closeButton.Size = new Vector2(40, 40);
             m_closeButton.Image = "close_icon";
-            m_closeButton.ImagePadding = new Margin(10, 10, 10, 10);
+            // ImagePadding is gone; --button-image-padding was removed from the style sheet.
+            // The padding now belongs on the button's image sub-element in CSS.
             m_closeButton.Position = new Vector2(size.X - m_closeButton.Size.X, 0);
             m_closeButton.OnPress += delegate { HandleButtonPress(2); };
             m_panel.AddChild(m_closeButton);

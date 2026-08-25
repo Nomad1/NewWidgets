@@ -22,6 +22,12 @@ namespace NewWidgets.Widgets
 
         static WidgetParameterMap()
         {
+            // StyleLength is declared by this library rather than by ConversionHelper, so it has
+            // to announce its own parser before the first declaration is read. This static
+            // constructor is the earliest point that is guaranteed to run: every parse goes
+            // through a processor that came out of the caches built below
+            ConversionHelper.RegisterParser(typeof(StyleLength), StyleLength.ParseData);
+
             FieldInfo[] fields = typeof(WidgetParameterIndex).GetFields(BindingFlags.Public | BindingFlags.Static);
 
             foreach (FieldInfo field in fields)

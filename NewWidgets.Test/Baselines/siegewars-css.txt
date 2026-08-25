@@ -1,0 +1,1170 @@
+.back_pattern {
+    background-repeat: imagetiled;
+    --background-depth: backclipped;
+    background-image: url("back_pattern");
+    background-size: 100%;
+    background-color-opacity: 4%;
+    overflow: hidden;
+}
+
+.black_frame {
+    background-repeat: nineimage;
+    background-image: url("panel_black_9");
+    --clip-margin: 2px 2px 2px 2px;
+    background-size: 75%;
+}
+
+.blue_frame {
+    background-repeat: nineimage;
+    background-image: url("window_dialog_9");
+    background-size: 40%;
+}
+
+.blue_panel {
+    background-repeat: nineimage;
+    background-image: url("frame_9");
+    background-size: 50%;
+    width: 100px;
+    height: 100px;
+}
+
+.chat_text {
+    background-repeat: nineimage;
+    background-image: url("light_9");
+    background-size: 100%;
+    font-family: default;
+    font-size: 0.6em;
+    --clip-margin: 1px 2px 3px 2px;
+    color: #888888;
+    --cursor-color: #aa9988;
+    padding: 4px 0px 4px 0px;
+    overflow: hidden;
+}
+
+.chat_text:focus {
+    background-repeat: nineimage;
+    background-image: url("light_9");
+    background-size: 50%;
+    color: #ffffff;
+}
+
+.dark_panel {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-color: #000000;
+    background-color-opacity: 40%;
+    background-size: 25%;
+}
+
+.darker_panel {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-color: #000000;
+    background-color-opacity: 80%;
+    background-size: 25%;
+}
+
+.dialog_back {
+    background-repeat: nineimage;
+    background-image: url("panel_white_normal_9");
+    background-size: 50%;
+}
+
+.dialog_window {
+    background-repeat: nineimage;
+    background-image: url("window_dialog_9");
+    background-size: 100%;
+    width: 600px;
+    height: 300px;
+}
+
+.editor_black_frame {
+    background-repeat: nineimage;
+    background-image: url("panel_black_9");
+    background-color-opacity: 50%;
+    --clip-margin: 2px 2px 2px 2px;
+    background-size: 75%;
+}
+
+.hex_field {
+    background-repeat: threeimage;
+    background-image: url("hex_field_3");
+}
+
+.image_button {
+    background-repeat: none;
+    width: 64px;
+    height: 64px;
+}
+
+.image_button.close_image_button {
+    width: 34px;
+    height: 34px;
+}
+
+.image_button.close_image_button:hover {
+}
+
+.image_button:focus {
+    background-repeat: nineimage;
+    background-image: url("panel_white_selected_9");
+    background-size: 25%;
+    background-color-opacity: 30%;
+}
+
+.image_button:hover {
+    background-repeat: nineimage;
+    background-image: url("panel_white_hovered_9");
+    background-size: 25%;
+    background-color-opacity: 80%;
+}
+
+.image_button_nohover {
+    background-repeat: none;
+    width: 64px;
+    height: 64px;
+}
+
+.image_topleft {
+    background-repeat: image;
+    background-size: 100%;
+    padding: 0px 0px 0px 0px;
+    overflow: hidden;
+    --clip-margin: 0px 0px 0px 0px;
+    background-position: 0% 0%;
+}
+
+.left_button {
+    background-image: url("button_left_normal");
+    background-repeat: imagefit;
+    width: 40px;
+    height: 40px;
+}
+
+.left_button.settings_left_button {
+    width: 30px;
+    height: 30px;
+}
+
+.left_button:disabled {
+    background-image: url("button_left_selected");
+    background-color-opacity: 50%;
+}
+
+.left_button:focus {
+    background-image: url("button_left_selected");
+}
+
+.left_button:hover {
+    background-color-opacity: 100%;
+    background-image: url("button_left_hovered");
+}
+
+.light_frame {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    --clip-margin: 2px 2px 2px 2px;
+    background-size: 75%;
+}
+
+.light_panel {
+    background-repeat: nineimage;
+    background-image: url("frame_white_9");
+    background-color: #ffffff;
+    background-color-opacity: 5%;
+    background-size: 50%;
+}
+
+.map_background {
+    overflow: hidden;
+}
+
+.map_background_frame {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-size: 100%;
+}
+
+.none {
+    background-repeat: none;
+    background-image: url("");
+    background-size: 100%;
+    background-color-opacity: 100%;
+    overflow: hidden;
+    color: #ffffff;
+    font-family: default;
+    font-size: 1em;
+    opacity: 100%;
+}
+
+.paperdoll_panel {
+    background-repeat: nineimage;
+    background-image: url("panel_doll_9");
+    background-size: 70%;
+    width: 100px;
+    height: 100px;
+}
+
+.progress_bar {
+    background-repeat: threeimage;
+    background-image: url("progress_bar_3");
+}
+
+.right_button {
+    background-image: url("button_right_normal");
+    background-repeat: imagefit;
+    width: 40px;
+    height: 40px;
+}
+
+.right_button.settings_right_button {
+    width: 30px;
+    height: 30px;
+}
+
+.right_button:disabled {
+    background-image: url("button_right_selected");
+    background-color-opacity: 50%;
+}
+
+.right_button:focus {
+    background-image: url("button_right_selected");
+}
+
+.right_button:hover {
+    background-image: url("button_right_hovered");
+}
+
+.selection {
+    background-repeat: nineimage;
+    background-image: url("select");
+    background-position: 0% 0%;
+    background-size: 200%;
+}
+
+.send_mail_edit {
+    font-size: 0.6em;
+    padding: 6px 0px 6px 0px;
+}
+
+.send_mail_edit.send_mail_edit_selected_hovered {
+    background-color: #ffdd77;
+}
+
+.send_mail_edit:focus {
+    background-image: url("panel_white_normal_9");
+    color: #ffffff;
+}
+
+.send_mail_edit:hover {
+    background-color: #ffdd77;
+}
+
+.settings_header {
+    padding: 20px 20px 20px 20px;
+    color: #26bbd9;
+}
+
+.settings_key_entry {
+    text-align: center;
+}
+
+.settings_line {
+    padding: 6px 6px 6px 6px;
+    background-color: #ffffff;
+}
+
+.settings_select {
+    color: #eeeeee;
+    font-family: default;
+    font-size: 0.5em;
+    text-align: horizontalcenter, top;
+}
+
+.settings_text {
+    color: #eeeeee;
+    padding: 6px 6px 6px 6px;
+}
+
+.simple_panel {
+    background-repeat: nineimage;
+    background-image: url("select");
+    background-size: 50%;
+}
+
+.small_dialog_window {
+    background-repeat: nineimage;
+    background-image: url("window_dialog_9");
+    background-size: 75%;
+    width: 300px;
+    height: 100px;
+}
+
+.special_textedit {
+    background-repeat: threeimage;
+    background-image: url("edit_special_inactive_3");
+    padding: 30px 0px 0px 0px;
+    color: #aaaaaa;
+    background-color-opacity: 50%;
+}
+
+.special_textedit2 {
+    background-repeat: threeimage;
+    background-image: url("edit_ispecial_inactive_3");
+    padding: 30px 0px 0px 0px;
+    color: #aaaaaa;
+    background-color-opacity: 50%;
+}
+
+.special_textedit2:focus {
+    background-repeat: threeimage;
+    background-image: url("edit_ispecial_inactive_3");
+    color: #ffffff;
+    background-color-opacity: 100%;
+}
+
+.special_textedit2:focus:hover {
+    background-repeat: threeimage;
+    background-image: url("edit_ispecial_inactive_3");
+    background-color: #ffdd77;
+}
+
+.special_textedit2:hover {
+    background-repeat: threeimage;
+    background-image: url("edit_ispecial_inactive_3");
+    background-color: #ffdd77;
+    background-color-opacity: 50%;
+}
+
+.special_textedit:focus {
+    background-repeat: threeimage;
+    background-image: url("edit_special_inactive_3");
+    color: #ffffff;
+    background-color-opacity: 100%;
+}
+
+.special_textedit:focus:hover {
+    background-repeat: threeimage;
+    background-image: url("edit_special_inactive_3");
+    background-color: #ffdd77;
+}
+
+.special_textedit:hover {
+    background-repeat: threeimage;
+    background-image: url("edit_special_inactive_3");
+    background-color: #ffdd77;
+    background-color-opacity: 50%;
+}
+
+.tab_panel_9 {
+    background-repeat: nineimage;
+    background-image: url("tab_panel_9");
+    background-size: 75%;
+}
+
+.table_alt_row {
+    font-family: default;
+    font-size: 0.5em;
+    color: #ddffff;
+    background-repeat: nineimage;
+    background-image: url("table_row_header_9");
+    background-size: 25%;
+    background-color-opacity: 50%;
+}
+
+.table_alt_row:focus {
+    background-image: url("table_row_alt_selected_9");
+    background-color: #ffdd77;
+    color: #ffffff;
+    background-color-opacity: 50%;
+}
+
+.table_header_row {
+    font-family: bold;
+    font-size: 0.5em;
+    color: #cccccc;
+    background-repeat: imagestretch;
+    background-image: url("white");
+    background-size: 100%;
+    background-color-opacity: 25%;
+    background-color: #ffffff;
+}
+
+.table_row {
+    font-family: default;
+    font-size: 0.5em;
+    color: #cceeff;
+    background-repeat: imagestretch;
+    background-image: url("table_row_alt");
+    background-color-opacity: 0%;
+    background-size: 25%;
+}
+
+.table_row:focus {
+    background-image: url("table_row_selected_9");
+    background-color: #ffdd77;
+    color: #ffffff;
+    background-color-opacity: 50%;
+}
+
+.talent_name {
+    background-repeat: nineimage;
+    background-image: url("panel_dark_9");
+    background-size: 10%;
+    background-color-opacity: 30%;
+    padding: 4px 4px 4px 4px;
+}
+
+.talent_name_text {
+    font-size: 0.25em;
+    color: #ffffff;
+}
+
+.talent_name_text:disabled {
+    font-size: 0.25em;
+    color: #aaaaaa;
+}
+
+.title_line {
+    background-repeat: threeimage;
+    background-image: url("title_line_3");
+    background-color-opacity: 50%;
+}
+
+.toolbar_button {
+    width: 64px;
+    height: 64px;
+    background-repeat: nineimage;
+    background-image: url("editor_button_normal_9");
+    background-size: 25%;
+    background-color-opacity: 40%;
+}
+
+.toolbar_button:disabled {
+    background-repeat: nineimage;
+    background-image: url("editor_button_disabled_9");
+    color: #aaaaaa;
+    background-color-opacity: 30%;
+}
+
+.toolbar_button:disabled:hover {
+    background-repeat: nineimage;
+    background-image: url("editor_button_disabled_9");
+}
+
+.toolbar_button:focus {
+    background-repeat: nineimage;
+    background-image: url("panel_white_selected_9");
+    background-size: 25%;
+    background-color-opacity: 30%;
+}
+
+.toolbar_button:focus:hover {
+    background-repeat: nineimage;
+    background-image: url("panel_white_hovered_9");
+    background-size: 25%;
+    background-color-opacity: 80%;
+}
+
+.toolbar_button:hover {
+    background-repeat: nineimage;
+    background-image: url("panel_white_hovered_9");
+    background-size: 25%;
+    background-color-opacity: 80%;
+}
+
+.tooltip {
+    background-repeat: nineimage;
+    background-image: url("frame_9");
+    background-size: 25%;
+    padding: 8px 8px 8px 8px;
+}
+
+.tooltip.item_tooltip {
+    padding: 10px 0px 6px 10px;
+}
+
+.white_back {
+    background-repeat: imagestretch;
+    background-image: url("white");
+}
+
+.white_line {
+    background-repeat: threeimage;
+    background-image: url("white_line_3");
+}
+
+.white_panel {
+    background-repeat: nineimage;
+    background-image: url("panel_white_normal_9");
+    background-size: 50%;
+    width: 100px;
+    height: 100px;
+}
+
+@font.bold {
+    --font-resource: url("font|font5");
+    --font-spacing: -0.25;
+    --font-shift: 0;
+    --font-leading: 0;
+    --font-baseline: 30;
+}
+
+@font.default {
+    --font-resource: url("font|font5");
+    --font-spacing: -0.25;
+    --font-shift: 0;
+    --font-leading: 0;
+    --font-baseline: 30;
+}
+
+@font.numbers {
+    --font-resource: url("font|font4");
+    --font-spacing: -0.25;
+    --font-shift: -5;
+    --font-leading: -5;
+    --font-baseline: 30;
+}
+
+@font.outline {
+    --font-resource: url("font|font5");
+    --font-spacing: -0.25;
+    --font-shift: 0;
+    --font-leading: 0;
+    --font-baseline: 30;
+}
+
+@font.title {
+    --font-resource: url("font|font6");
+    --font-spacing: -0.25;
+    --font-shift: 0;
+    --font-leading: 0;
+    --font-baseline: 30;
+}
+
+@sprite.button_big_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_big_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_big_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_blue_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_blue_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_blue_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_doll_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_doll_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_frame_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.button_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_ldoll_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_ldoll_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_next_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_next_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_next_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_prev_hovered_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_prev_normal_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_prev_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.button_selected_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.edit_ispecial_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.edit_ispecial_inactive_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.edit_special_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.edit_special_inactive_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.editor_button_disabled_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.editor_button_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.editor_button_normal_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.editor_button_press_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.frame_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.frame_white_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.frame_white_inactive_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.hex_field_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.light_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.line_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.panel_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_black_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_blue_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_blue_normal_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_blue_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_blue_selected_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_dark_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_doll_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_white_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_white_normal_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_white_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.panel_white_selected_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.progress_bar_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.progress_line_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.scroll_horizontal {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.scroll_indicator_horizontal {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.scroll_indicator_vertical {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.scroll_vertical {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.select {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.tab_button_hovered_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.tab_button_normal_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.tab_button_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.tab_panel_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.table_row_alt {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.table_row_alt_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.table_row_header_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.table_row_selected_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.title_line_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.top_panel_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.white_line_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.white_title_3 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 1;
+}
+
+@sprite.window_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+@sprite.window_dialog_9 {
+    --sprite-tile-x: 3;
+    --sprite-tile-y: 3;
+}
+
+button {
+    background-repeat: imagefit;
+    background-image: url("button_square_normal");
+    background-size: 100%;
+    width: 100px;
+    height: 100px;
+    color: #e0f0ff;
+    font-family: default;
+    font-size: 0.75em;
+}
+
+button:disabled {
+    background-image: url("button_square_disabled");
+    background-color: #808080;
+    color: #aaaaaa;
+}
+
+button:disabled:hover {
+    background-image: url("button_square_disabled_hover");
+}
+
+button:focus {
+    background-image: url("button_square_disabled");
+}
+
+button:focus:hover {
+    background-image: url("button_square_disabled_hover");
+}
+
+button:hover {
+    background-image: url("button_square_normal_hover");
+    color: #ffffff;
+}
+
+checkbox #checkbox_image {
+}
+
+checkbox #checkbox_image:hover {
+}
+
+checkbox {
+    background-repeat: imagefit;
+    background-image: url("checkbox_normal");
+    width: 36px;
+    height: 36px;
+}
+
+checkbox:disabled {
+    background-image: url("checkbox_solid_normal");
+    background-color: #888888;
+    color: #888888;
+}
+
+checkbox:focus {
+    background-image: url("checkbox_normal");
+    color: #ffffff;
+}
+
+checkbox:focus:hover {
+    background-image: url("checkbox_hovered");
+    color: #ffaa33;
+}
+
+checkbox:hover {
+    background-image: url("checkbox_hovered");
+    color: #ffaa33;
+}
+
+checkbox_label {
+    font-size: 0.5em;
+    color: #cceeff;
+}
+
+checkbox_label:disabled {
+    font-size: 0.5em;
+    color: #888888;
+}
+
+checkbox_label:focus {
+    font-size: 0.5em;
+    color: #ffffff;
+}
+
+checkbox_label:hover {
+    font-size: 0.5em;
+    color: #ffffff;
+}
+
+context_menu {
+    background-repeat: nineimage;
+    background-image: url("panel_9");
+    background-size: 100%;
+    padding: 4px 4px 4px 4px;
+}
+
+context_menu_item {
+    background-repeat: none;
+    font-family: default;
+    font-size: 0.5em;
+    color: #cceeff;
+    padding: 4px 2px 4px 2px;
+}
+
+context_menu_item:hover {
+    background-repeat: none;
+    background-size: 50%;
+    color: #ffffff;
+}
+
+image {
+    overflow: visible;
+    background-position: 50% 50%;
+    background-color: #ffffff;
+}
+
+label {
+    font-family: default;
+    font-size: 0.6em;
+    color: #ffffff;
+    width: 100px;
+    height: 35px;
+}
+
+line {
+    background-repeat: threeimage;
+    background-image: url("white_line_3");
+    background-size: 100%;
+    background-color-opacity: 80%;
+    background-position: 50% 0%;
+}
+
+panel {
+    background-repeat: nineimage;
+    background-image: url("button_frame_9");
+    background-size: 50%;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+}
+
+scroll_horizontal {
+    background-repeat: nineimage;
+    background-image: url("scroll_horizontal");
+    background-size: 100%;
+}
+
+scroll_indicator_horizontal {
+    background-repeat: nineimage;
+    background-image: url("scroll_indicator_horizontal");
+    background-size: 100%;
+}
+
+scroll_indicator_vertical {
+    background-repeat: nineimage;
+    background-image: url("scroll_indicator_vertical");
+    background-size: 100%;
+}
+
+scroll_vertical {
+    background-repeat: nineimage;
+    background-image: url("scroll_vertical");
+    background-size: 100%;
+}
+
+scrollview {
+    background-repeat: nineimage;
+    background-image: url("window_9");
+    background-size: 50%;
+    overflow: hidden;
+    --clip-margin: 2px 2px 2px 2px;
+}
+
+select #select_label {
+    font-family: default;
+    font-size: 0.6em;
+    color: #eeeeee;
+    text-align: horizontalcenter, top;
+}
+
+select #select_left {
+    background-repeat: none;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+
+select #select_left:disabled {
+    background-repeat: none;
+}
+
+select #select_left:focus {
+    background-repeat: none;
+}
+
+select #select_left:hover {
+    background-repeat: none;
+}
+
+select #select_right {
+    background-repeat: none;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+
+select #select_right:disabled {
+    background-repeat: none;
+}
+
+select #select_right:focus {
+    background-repeat: none;
+}
+
+select #select_right:hover {
+    background-repeat: none;
+}
+
+select {
+    width: 200px;
+    height: 30px;
+}
+
+text {
+    font-family: default;
+    font-size: 0.6em;
+    color: #ffffff;
+    width: 100px;
+    height: 35px;
+}
+
+textedit {
+    background-repeat: nineimage;
+    background-image: url("editor_button_normal_9");
+    background-size: 50%;
+    font-family: default;
+    font-size: 0.6em;
+    width: 200px;
+    height: 45px;
+    color: #aaaaaa;
+    overflow: hidden;
+    --clip-margin: 1px 2px 3px 2px;
+    --cursor-color: #ffffff;
+    padding: 6px 2px 6px 0px;
+    background-color: #ffffff;
+    background-color-opacity: 50%;
+}
+
+textedit:focus {
+    background-image: url("editor_button_normal_9");
+    color: #ffffff;
+    background-color-opacity: 75%;
+}
+
+textedit:focus:hover {
+    background-image: url("editor_button_hovered_9");
+}
+
+textedit:hover {
+    background-image: url("editor_button_hovered_9");
+}
+
+toolbar #toolbar_panel {
+    background-repeat: nineimage;
+    background-image: url("editor_button_normal_9");
+    background-size: 100%;
+}
+
+toolbarhsep {
+    background-repeat: imagefit;
+    background-image: url("icon_separator_horizontal");
+    background-color-opacity: 50%;
+    width: 64px;
+    height: 12px;
+}
+
+toolbarsep {
+    background-repeat: imagefit;
+    background-image: url("icon_separator");
+    background-color-opacity: 50%;
+    width: 12px;
+    height: 64px;
+}
+
+window {
+    background-repeat: nineimage;
+    background-image: url("button_frame_9");
+    background-size: 75%;
+    width: 400px;
+    height: 300px;
+    overflow: hidden;
+}

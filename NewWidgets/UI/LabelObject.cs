@@ -78,7 +78,13 @@ namespace NewWidgets.UI
             Init(text, richText);
         }
 
-        internal void SetColors(TextSpan[] colors)
+        // public, not internal: this file is compiled both directly into NewWidgets.dll
+        // (NewWidgets.WinForms.csproj) and separately into RunMobile.Mini.dll
+        // (RunMobile.Mini.csproj, via a symlinked copy). NewWidgets.RunMobile.Mini.csproj
+        // no longer duplicates this compile -- it references RunMobile.Mini.dll instead --
+        // so Widgets\Controls callers now reach LabelObject across an assembly boundary,
+        // where `internal` is not visible.
+        public void SetColors(TextSpan[] colors)
         {
             if (colors != null && colors.Length < m_sprites.Length)
                 throw new ArgumentException("Too few colors in array!");
@@ -296,7 +302,8 @@ namespace NewWidgets.UI
             return new RectangleF(sprite.Transform.Position.X, sprite.Transform.Position.Y, sprite.FrameSize.X + m_font.Spacing, sprite.FrameSize.Y);
         }
 
-        internal ISprite[] InternalGetSprites()
+        // public, not internal: see the comment on SetColors above.
+        public ISprite[] InternalGetSprites()
         {
             return m_sprites;
         }

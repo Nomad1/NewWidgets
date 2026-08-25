@@ -1,89 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{9F600BDD-C381-43E4-8C5E-9EF300A44587}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>NewWidgets.RunMobileSample</RootNamespace>
     <AssemblyName>NewWidgets.RunMobileSample</AssemblyName>
+    <TargetFramework>net472</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <Deterministic>false</Deterministic>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG;_NETFX20;MINI;NETFRAMEWORK;NET47;RUNMOBILE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ExternalConsole>true</ExternalConsole>
+    <ConsolePause>false</ConsolePause>
+    <Commandlineparameters>1366 768 false</Commandlineparameters>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
     <OutputPath>bin\Release</OutputPath>
+    <DefineConstants>_NETFX20;MINI;NETFRAMEWORK;NET47;RUNMOBILE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <ExternalConsole>true</ExternalConsole>
-    <PlatformTarget>x86</PlatformTarget>
+    <ConsolePause>false</ConsolePause>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="OpenTK">
-      <HintPath>..\..\RunMobile\RunMobile.OpenTK\Lib\OpenTK.dll</HintPath>
+      <HintPath>lib\OpenTK.dll</HintPath>
     </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\RunMobile\RunMobile.Mini\RunMobile.Mini.csproj">
+    </ProjectReference>
+    <ProjectReference Include="..\NewWidgets\NewWidgets.RunMobile.Mini.csproj">
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sample\DialogWindow.cs" />
     <Compile Include="Sample\TestWindow.cs" />
+    <Compile Include="RunMobile\BaseGameController.cs" />
+    <Compile Include="RunMobile\GLHelper.cs" />
+    <Compile Include="RunMobile\GLTexture.cs" />
+    <Compile Include="RunMobile\Sprite.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\RunMobile\RunMobile\RunMobile.csproj">
-      <Project>{B6B7376F-CF08-42A1-A970-69B63EF21F75}</Project>
-      <Name>RunMobile</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\RunMobile\RunMobile.OpenTK\RunMobile.OpenTK.csproj">
-      <Project>{D29EA736-BCAA-40B3-B44B-52936740C349}</Project>
-      <Name>RunMobile.OpenTK</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\RunMobile\RunMobile.Utility\RunMobile.Utility.csproj">
-      <Project>{029EA736-BCAA-40B3-B44B-52936740C349}</Project>
-      <Name>RunMobile.Utility</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NewWidgets\NewWidgets.RunMobile.csproj">
-      <Project>{B9E44890-DC40-4C45-A457-035B20581E54}</Project>
-      <Name>NewWidgets.RunMobile</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="assets\font.frag.shader">
+    <Content Include="lib\OpenTK.dll.config">
+      <Link>OpenTK.dll.config</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="assets\font5.bin">
+    <!-- Native libraries for the macOS/Linux SDL2 backend. Without these the build output
+         cannot start: OpenTK.dll.config maps SDL2.dll to libSDL2.dylib, and nothing else
+         puts it next to the executable. -->
+    <Content Include="Bundle\libSDL2.dylib">
+      <Link>libSDL2.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="assets\font5.rle">
+    <Content Include="Bundle\libopenal32.dylib">
+      <Link>libopenal32.dylib</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="assets\simple_sprite.frag.shader">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\simple_sprite.vert.shader">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\ui.bin">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\ui.rle">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\ui.css">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="assets\ui.xml">
+    <Content Include="assets\**\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

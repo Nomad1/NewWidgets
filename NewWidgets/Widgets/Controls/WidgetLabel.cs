@@ -111,6 +111,16 @@ namespace NewWidgets.Widgets
         }
 
         /// <summary>
+        /// Position of the inner <see cref="LabelObject"/> that text-align/vertical-align
+        /// actually move, as opposed to this widget's own <see cref="WindowObject.Position"/>.
+        /// Internal: exists only so tests can observe layout results without reflection.
+        /// </summary>
+        internal Vector2 InnerLabelPosition
+        {
+            get { return m_label.Position; }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetLabel"/> class.
         /// </summary>
         /// <param name="style">Style.</param>

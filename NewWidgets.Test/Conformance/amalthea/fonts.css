@@ -1,0 +1,39 @@
+@font.default {
+    --font-resource: url("font|font5");
+    --font-spacing: -0.25;
+    --font-shift: 0;
+    --font-leading: 0;
+    --font-baseline: 30;
+}
+
+@font.bold {
+    --font-resource: url("font|font5");
+    --font-spacing: -0.25;
+    --font-shift: 0;
+    --font-leading: 0;
+    --font-baseline: 30;
+}
+
+@font.outline {
+    --font-resource: url("font|font5");
+    --font-spacing: -0.25;
+    --font-shift: 0;
+    --font-leading: 0;
+    --font-baseline: 30;
+}
+
+@font.numbers {
+    --font-resource: url("font|font4");
+    --font-spacing: -0.25;
+    --font-shift: -5;
+    --font-leading: -5;
+    --font-baseline: 30;
+}
+
+@font.title {
+    --font-resource: url("font|font6");
+    --font-spacing: -0.25;
+    --font-shift: 0;
+    --font-leading: 0;
+    --font-baseline: 30;
+}

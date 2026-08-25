@@ -36,46 +36,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Widgets\Enums.cs" />
-    <Compile Include="Widgets\Widget.cs" />
-    <Compile Include="Widgets\WidgetButton.cs" />
-    <Compile Include="Widgets\WidgetCheckBox.cs" />
-    <Compile Include="Widgets\WidgetImage.cs" />
-    <Compile Include="Widgets\WidgetLabel.cs" />
-    <Compile Include="Widgets\WidgetLine.cs" />
-    <Compile Include="Widgets\WidgetManager.cs" />
-    <Compile Include="Widgets\WidgetPanel.cs" />
-    <Compile Include="Widgets\WidgetScrollView.cs" />
-    <Compile Include="Widgets\WidgetText.cs" />
-    <Compile Include="Widgets\WidgetTextEdit.cs" />
-    <Compile Include="Widgets\WidgetTooltip.cs" />
-    <Compile Include="Utility\Margin.cs" />
-    <Compile Include="UI\Font.cs" />
-    <Compile Include="UI\ImageObject.cs" />
-    <Compile Include="UI\LabelObject.cs" />
-    <Compile Include="UI\Window.cs" />
-    <Compile Include="UI\WindowObject.cs" />
-    <Compile Include="UI\WindowObjectArray.cs" />
-    <Compile Include="Utility\Transform.cs" />
-    <Compile Include="Utility\SortedLinkedList.cs" />
-    <Compile Include="UI\ISprite.cs" />
-    <Compile Include="Utility\MathHelper.cs" />
-    <Compile Include="WinForms\WinFormsController.cs" />
-    <Compile Include="WinForms\WinFormsSprite.cs" />
-    <Compile Include="Widgets\WidgetBackground.cs" />
-    <Compile Include="Widgets\WidgetManager.Styles.cs" />
-    <Compile Include="Widgets\WidgetWindow.cs" />
-    <Compile Include="Widgets\WidgetStyleSheet.cs" />
-    <Compile Include="Widgets\WidgetTextField.cs" />
-    <Compile Include="UI\AnimationManager.cs" />
-    <Compile Include="UI\Enums.cs" />
-    <Compile Include="UI\IFocusable.cs" />
-    <Compile Include="UI\SimpleWindow.cs" />
-    <Compile Include="UI\WindowController.cs" />
-    <Compile Include="Utility\ResourceLoader.cs" />
-    <Compile Include="Widgets\WidgetException.cs" />
-    <Compile Include="Widgets\WidgetParameterAttribute.cs" />
-  </ItemGroup>
+    <!-- Wildcards rather than an explicit list: the explicit list silently rotted when the
+         widgets moved into Widgets\Controls in 2023 and this project stopped building.
+         WidgetSelect is excluded because it needs RunMobile.Utility's SimpleListDictionary,
+         which this build does not reference. -->
+    <Compile Include="UI\**\*.cs" />
+    <Compile Include="Utility\**\*.cs" />
+    <Compile Include="Styles\**\*.cs" />
+    <Compile Include="Widgets\**\*.cs" Exclude="Widgets\Controls\Experimental\WidgetSelect.cs" />
+    <Compile Include="WinForms\**\*.cs" />
+</ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

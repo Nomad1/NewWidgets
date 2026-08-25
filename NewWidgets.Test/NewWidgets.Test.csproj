@@ -1,0 +1,37 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <AssemblyName>NewWidgets.Test</AssemblyName>
+    <RootNamespace>NewWidgets.Test</RootNamespace>
+    <NoWarn>0618</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="../NewWidgets/UI/**/*.cs" />
+    <Compile Include="../NewWidgets/Utility/**/*.cs" />
+    <Compile Include="../NewWidgets/Styles/**/*.cs" />
+    <Compile Include="../NewWidgets/Widgets/**/*.cs" Exclude="../NewWidgets/Widgets/Controls/Experimental/**/*.cs;../NewWidgets/Widgets/Controls/WidgetScrollView.cs" />
+    <Compile Include="*.cs" />
+
+    <!-- Corpus test 44: Amalthea's UI classes that compile against only System*/NewWidgets.
+         See CorpusTests.cs for which of the 19 candidates from the brief actually compiled. -->
+    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/DialogPanel.cs" />
+    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/DialogWindow.cs" />
+    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Buttons/WidgetItemButton.cs" />
+
+    <!-- Trial additions: tried one at a time, kept only if they compile clean. See
+         CorpusTests.cs / the task report for which of these were dropped and why. -->
+    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Game/FactionLogo.cs" />
+    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Game/FeatureButtonsPanel.cs" />
+    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Station/StationBookmark.cs" />
+    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Map/JupiterSystemInfo.cs" />
+    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Station/BaseStationPanel.cs" />
+
+    <!-- DialogWindow.cs calls Vector2.Distance(Vector2) instance-style, which System.Numerics
+         does not provide; the game's real build gets it from RunMobile.Utility's extension
+         methods, added to namespace System.Numerics itself. This single file supplies just
+         that (Distance, DistanceSquared, etc. as extensions), with no further dependencies. -->
+    <Compile Include="/Volumes/Projects/Projects/RunMobile/RunMobile.Utility/Math/Vector2.cs" />
+  </ItemGroup>
+</Project>

@@ -5,7 +5,11 @@ using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 
+#if RUNMOBILE
 using RunMobile.Utility;
+#else
+using System.Drawing;
+#endif
 
 namespace NewWidgets.Widgets
 {

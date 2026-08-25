@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
+using System.Text;
 
 namespace NewWidgets.Utility
 {
@@ -172,7 +173,13 @@ namespace NewWidgets.Utility
         public static string ToString(uint value, UnitType unitType = UnitType.None)
         {
             if (unitType == UnitType.Color)
-                return string.Format((value >> 24) != 0 ? "#{0:x8}" : "#{0:x6}", value);
+            {
+                // CSS writes alpha last, this engine stores it first, so the eight digit form is emitted as #rrggbbaa
+                if ((value >> 24) != 0)
+                    return string.Format("#{0:x8}", (value << 8) | (value >> 24));
+
+                return string.Format("#{0:x6}", value);
+            }
 
             return Convert.ToString(value);
         }
@@ -271,6 +278,41 @@ namespace NewWidgets.Utility
         /// </summary>
         /// <returns>The parse.</returns>
         /// <param name="value">Value.</param>
+        /// <summary>
+        /// The sixteen basic HTML colour keywords, plus transparent.
+        /// ponytail: CSS defines 148 named colours. These sixteen cover hand-written UI
+        /// stylesheets; add the rest from the CSS Color specification if a stylesheet needs them.
+        /// </summary>
+        private static readonly IDictionary<string, uint> s_namedColors = new Dictionary<string, uint>()
+        {
+            { "transparent", 0x00000000 },
+            { "black", 0x000000 },
+            { "silver", 0xc0c0c0 },
+            { "gray", 0x808080 },
+            { "grey", 0x808080 },
+            { "white", 0xffffff },
+            { "maroon", 0x800000 },
+            { "red", 0xff0000 },
+            { "purple", 0x800080 },
+            { "fuchsia", 0xff00ff },
+            { "green", 0x008000 },
+            { "lime", 0x00ff00 },
+            { "olive", 0x808000 },
+            { "yellow", 0xffff00 },
+            { "navy", 0x000080 },
+            { "blue", 0x0000ff },
+            { "teal", 0x008080 },
+            { "aqua", 0x00ffff },
+        };
+
+        /// <summary>
+        /// Parse string value to color. Accepts the CSS forms #rgb, #rgba, #rrggbb, #rrggbbaa,
+        /// rgb(), rgba() and the basic colour keywords, plus this engine's own 0xAARRGGBB form.
+        /// Colours are stored as 0xAARRGGBB, so a CSS alpha, which is written last, moves to the
+        /// high byte.
+        /// </summary>
+        /// <returns>The parse.</returns>
+        /// <param name="value">Value.</param>
         public static uint UintParse(string value, UnitType unitType = UnitType.None)
         {
             value = value.Trim();
@@ -280,14 +322,82 @@ namespace NewWidgets.Utility
 
             if (unitType == UnitType.Color)
             {
-                if (value.Length >= 7 && value[0] == '#') // StartsWith("#")
-                    return uint.Parse(value.Substring(1), NumberStyles.HexNumber);
+                uint named;
+                if (s_namedColors.TryGetValue(value.ToLowerInvariant(), out named))
+                    return named;
+
+                if (value[0] == '#')
+                    return HexColorParse(value.Substring(1));
 
                 if (value.Length >= 8 && value[0] == '0' && value[1] == 'x')  // StartsWith("0x")
                     return uint.Parse(value.Substring(2), NumberStyles.HexNumber);
+
+                if (value.StartsWith("rgb(") || value.StartsWith("rgba("))
+                    return RgbFunctionParse(value);
             }
 
             return uint.Parse(value);
+        }
+
+        /// <summary>
+        /// Parses the digits of a # colour, without the leading #.
+        /// Three and four digit forms repeat each digit, so #f00 is #ff0000.
+        /// The four and eight digit forms carry a CSS alpha, written last, which moves to the high byte.
+        /// </summary>
+        private static uint HexColorParse(string digits)
+        {
+            if (digits.Length == 3 || digits.Length == 4)
+            {
+                StringBuilder expanded = new StringBuilder(8);
+
+                // CSS writes alpha last, this engine stores it first
+                if (digits.Length == 4)
+                    expanded.Append(digits[3]).Append(digits[3]);
+
+                for (int i = 0; i < 3; i++)
+                    expanded.Append(digits[i]).Append(digits[i]);
+
+                return uint.Parse(expanded.ToString(), NumberStyles.HexNumber);
+            }
+
+            if (digits.Length == 6)
+                return uint.Parse(digits, NumberStyles.HexNumber);
+
+            if (digits.Length == 8)
+            {
+                // #rrggbbaa: CSS writes alpha last, this engine stores it first
+                uint rgba = uint.Parse(digits, NumberStyles.HexNumber);
+                return (rgba >> 8) | (rgba << 24);
+            }
+
+            throw new FormatException("Invalid Color value #" + digits);
+        }
+
+        /// <summary>
+        /// Parses rgb(r, g, b) and rgba(r, g, b, a). Components are 0 to 255, alpha is 0 to 1.
+        /// </summary>
+        private static uint RgbFunctionParse(string value)
+        {
+            int open = value.IndexOf('(');
+            int close = value.IndexOf(')');
+
+            if (open < 0 || close < open)
+                throw new FormatException("Invalid Color value " + value);
+
+            string[] parts = value.Substring(open + 1, close - open - 1).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length != 3 && parts.Length != 4)
+                throw new FormatException("Invalid Color value " + value);
+
+            uint red = (uint)Math.Round(FloatParse(parts[0]));
+            uint green = (uint)Math.Round(FloatParse(parts[1]));
+            uint blue = (uint)Math.Round(FloatParse(parts[2]));
+            uint alpha = 0;
+
+            if (parts.Length == 4)
+                alpha = (uint)Math.Round(FloatParse(parts[3]) * 255.0f);
+
+            return (alpha << 24) | (red << 16) | (green << 8) | blue;
         }
 
         public static string StringParse(string value, UnitType unitType = UnitType.None)
@@ -387,21 +497,31 @@ namespace NewWidgets.Utility
         {
             string[] values = value.Split(new[] { ';', ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
 
-            if (values.Length != 1 && values.Length != 4)
+            if (values.Length < 1 || values.Length > 4)
                 throw new ArgumentException("Invalid string value for Margin type!");
 
-            if (values.Length == 1) // TODO: cases whith 2 and 3 elements
+            // CSS orders a box shorthand clockwise from the top: top, right, bottom, left.
+            // One value sets every side. Two are vertical then horizontal. Three are top,
+            // horizontal, bottom. Four are the sides in order.
+
+            float top = FloatParse(values[0], unitType);
+            float right = top;
+            float bottom = top;
+            float left = top;
+
+            if (values.Length >= 2)
             {
-                float a = FloatParse(values[0]);
-                return new Margin(a, a, a, a);
+                right = FloatParse(values[1], unitType);
+                left = right;
             }
 
-            float l = FloatParse(values[0], unitType);
-            float t = FloatParse(values[1], unitType);
-            float r = FloatParse(values[2], unitType);
-            float b = FloatParse(values[3], unitType);
+            if (values.Length >= 3)
+                bottom = FloatParse(values[2], unitType);
 
-            return new Margin(l, t, r, b);
+            if (values.Length == 4)
+                left = FloatParse(values[3], unitType);
+
+            return new Margin(left, top, right, bottom);
         }
 
         /// <summary>

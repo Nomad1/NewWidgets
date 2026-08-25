@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>NewWidgets login form</title>
+    <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+    <div class="window" id="login_window">
+        <div class="panel back_pattern" id="login_back"></div>
+
+        <span class="label title" id="login_title">Log in</span>
+
+        <span class="label" id="login_label">Login</span>
+        <input type="text" class="textedit" id="login_edit" value="user" />
+
+        <span class="label" id="pass_label">Password</span>
+        <input type="password" class="textedit" id="pass_edit" value="password" />
+
+        <input type="checkbox" class="checkbox" id="local_check" />
+        <span class="label local" id="local_label">Local server</span>
+
+        <input type="text" class="textedit hidden" id="local_edit" value="127.0.0.1" />
+
+        <button class="button text_button" id="website_button">Register</button>
+
+        <button class="button" id="login_button">Connect</button>
+
+        <div class="image" id="logo_image"></div>
+
+        <div class="textfield" id="text_field">WidgetTextField textTextField = new WidgetTextField(WidgetManager.GetStyle("default_textedit"));
+            textTextField.Size = new Vector2(500, 225);
+            textTextField.Position = new Vector2(50, 520);
+            textTextField.FontSize = WidgetManager.FontScale * 1.25f;
+            textTextField.Visible = true</div>
+
+        <span class="label" id="fps_label">FPS: 55.7/61.1</span>
+    </div>
+</body>
+</html>

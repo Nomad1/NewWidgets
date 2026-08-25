@@ -69,7 +69,7 @@ namespace NewWidgets.WinForms
             get { return m_isSmallScreen; }
         }
 
-        public override IList<Window> Windows
+        public override Window[] Windows
         {
             get { return m_windows.List; }
         }
@@ -281,6 +281,11 @@ namespace NewWidgets.WinForms
             Console.WriteLine("Playing sound {0}", id); // no need to implement real sound playback in WinForms
         }
 
+        public override void StopSound(string id)
+        {
+            Console.WriteLine("Stopping sound {0}", id); // no need to implement real sound playback in WinForms
+        }
+
         public override void ScheduleAction(Action action, int delay)
         {
             m_delayedActions.AddLast(new Tuple<Action, DateTime>(action, DateTime.Now.AddMilliseconds(delay)));
@@ -311,7 +316,7 @@ namespace NewWidgets.WinForms
                 }
             }
 
-            for (int i = Windows.Count - 1; i >= 0; i--)
+            for (int i = Windows.Length - 1; i >= 0; i--)
             {
                 if (Windows[i].Touch(x, y, press, unpress, pointer))
                     return true;
@@ -334,7 +339,7 @@ namespace NewWidgets.WinForms
 
         public bool Key(SpecialKey key, bool up, string keyString)
         {
-            if (Windows.Count > 0 && Windows[Windows.Count - 1].Key(key, up, keyString))
+            if (Windows.Length > 0 && Windows[Windows.Length - 1].Key(key, up, keyString))
                 return true;
 
             return false;
@@ -342,7 +347,7 @@ namespace NewWidgets.WinForms
 
         public bool Zoom(float x, float y, float value)
         {
-            for (int i = Windows.Count - 1; i >= 0; i--)
+            for (int i = Windows.Length - 1; i >= 0; i--)
             {
                 if (Windows[i].Zoom(x, y, value))
                     return true;
@@ -388,7 +393,7 @@ namespace NewWidgets.WinForms
                 node = next;
             }
 
-            if (Windows.Count == 0 && OnInit != null)
+            if (Windows.Length == 0 && OnInit != null)
                 OnInit();
 
             return m_windows.Update();

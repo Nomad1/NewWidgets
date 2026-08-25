@@ -1,63 +1,75 @@
-﻿using System.IO;
+using System;
 using System.Numerics;
+using Vector2 = System.Numerics.Vector2;
 using NewWidgets.Sample;
+using NewWidgets.UI;
 using NewWidgets.Utility;
 using NewWidgets.Widgets;
+using OpenTK;
+using OpenTK.Graphics;
+using OpenTK.Input;
 using RunMobile;
 using RunMobile.Graphics;
+using RunMobile.OpenTK.OpenGL;
 using RunMobile.Utility;
 
 namespace NewWidgets.RunMobileSample
 {
     /// <summary>
-    /// This is a simple class implementing DesktopWindow (system level OpenGL window) in order to load two shaders and display
-    /// a TestWindow class
+    /// Top level OpenTK/SDL2 window. Owns the GL context, drives the BaseGameController
+    /// and forwards mouse/keyboard input to it. Modeled on HIH2.W7's Code/Program.cs,
+    /// the proven-working RunMobile.OpenTK.OpenTKDesktopWindow replacement for this host.
     /// </summary>
-    class SampleWindow : RunMobile.OpenTK.OpenTKDesktopWindow
+    class SampleWindow : GameWindow
     {
+        private BaseGameController m_gameController;
         private TestWindow m_window;
+        private bool m_pressed;
 
-        public SampleWindow()
-            : base(1024, 768, "Sample")
+        public SampleWindow(int width, int height, bool fullScreen)
+            : base(width, height, GraphicsMode.Default, "NewWidgets RunMobile Sample", fullScreen ? GameWindowFlags.Fullscreen : GameWindowFlags.Default)
         {
-        }
+            VSync = VSyncMode.Adaptive;
 
-        /// <summary>
-        /// Engine initialization. We need to set resource path there and load shaders.
-        /// </summary>
-        protected override void Init()
-        {
             AssetManager.Init("assets", ".");
 
-            // we need to load at least default UI sprite shader
-
-            LoadShader("ui",
-                        0,
-                        "simple_sprite.vert.shader",
-                        "simple_sprite.frag.shader",
-                        DefaultSpriteShaderUniforms
-                        );
-
-            // font shader theoretically could be combined with sprite shader
-            // but it's better to have a separate one
-
-            LoadShader("font",
-                        0,
-                        "simple_sprite.vert.shader",
-                        "font.frag.shader",
-                        DefaultSpriteShaderUniforms
-                        );
+            Mouse.ButtonDown += HandleButtonDown;
+            Mouse.ButtonUp += HandleButtonUp;
+            Mouse.Move += HandleMove;
         }
 
-        /// <summary>
-        /// Creation of game controller. We need to override it to hook onto OnInit method
-        /// </summary>
-        protected override BaseGameController CreateGameController()
+        private void HandleMove(object sender, MouseMoveEventArgs e)
         {
-            BaseGameController gameController = new BaseGameController(UserData);
-            gameController.OnInit += HandleGameInit;
+            if (m_pressed)
+                m_gameController.Touch(e.X, e.Y, true, false, (int)MouseButton.Left);
+        }
 
-            return gameController;
+        private void HandleButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Button == MouseButton.Left)
+                m_pressed = false;
+            m_gameController.Touch(e.X, e.Y, false, true, (int)e.Button);
+        }
+
+        private void HandleButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Button == MouseButton.Left)
+                m_pressed = true;
+            m_gameController.Touch(e.X, e.Y, true, false, (int)e.Button);
+        }
+
+        protected override void OnResize(EventArgs e)
+        {
+            MakeCurrent();
+            base.OnResize(e);
+
+            if (m_gameController == null)
+            {
+                GLHelper.Init(Width, Height);
+
+                m_gameController = new BaseGameController(null);
+                m_gameController.OnInit += HandleGameInit;
+            }
         }
 
         /// <summary>
@@ -65,22 +77,16 @@ namespace NewWidgets.RunMobileSample
         /// </summary>
         private void HandleGameInit()
         {
-            SpriteManager.Instance.LoadSpriteAtlas("ui"); // loads ui.bin with defulat ui atlas
+            SpriteManager.Instance.LoadSpriteAtlas("ui"); // loads ui.bin with default ui atlas
             SpriteManager.Instance.LoadSpriteAtlas("font5"); // loads font5.bin with font MSDF atlas
             WidgetManager.Init(0.5f); // 0.5 is font scale
             WidgetManager.OnTooltip += TextTooltip;
 
-#if! CONVERT_XML
-            WidgetManager.LoadXML(AssetManager.GetAssetTextFile("ui.xml"));
-
-            using (var cssSave = File.CreateText("ui.css"))
-                WidgetManager.SaveCSS(cssSave);
-#else
             WidgetManager.LoadCSS(AssetManager.GetAssetTextFile("ui.css"));
-#endif
+
             // Here we're creating main window and it's added to the Game Controller
             m_window = new TestWindow();
-            GameController.AddWindow(m_window);
+            m_gameController.AddWindow(m_window);
         }
 
         public static bool TextTooltip(Widget sender, string text, Vector2 position)
@@ -113,7 +119,7 @@ namespace NewWidgets.RunMobileSample
 
             Margin padding = tooltip.GetProperty("padding", new Margin(0));
             WidgetLabel body = new WidgetLabel(text);
-            body.UpdateLayout();
+            body.Relayout();
             tooltip.AddChild(body);
 
             body.Position = padding.TopLeft;
@@ -127,21 +133,64 @@ namespace NewWidgets.RunMobileSample
             return true;
         }
 
-
-        protected override void OnUpdateFrame(OpenTK.FrameEventArgs e)
+        protected override void OnUpdateFrame(FrameEventArgs e)
         {
             base.OnUpdateFrame(e);
+
+            if (Keyboard[Key.Escape])
+                Close();
+
+            if (m_gameController == null)
+                return;
+
             TextureManager.Instance.Update();
+            m_gameController.Update();
 
             // Pass FPS values to text label in the TestWindow class
             if (m_window != null)
-                m_window.SetFpsValue(UpdateFPS, DrawFPS);
+                m_window.SetFpsValue((float)UpdateFrequency, (float)RenderFrequency);
+        }
+
+        protected override void OnRenderFrame(FrameEventArgs e)
+        {
+            base.OnRenderFrame(e);
+
+            if (m_gameController == null)
+                return;
+
+            GLHelper.Instance.ClearColor();
+            m_gameController.Draw();
+            GLHelper.Instance.Flush();
+
+            SwapBuffers();
         }
 
         public static void Main(string[] args)
         {
-            SampleWindow window = new SampleWindow();
-            window.Run(60, 60); // 60 FPS for update and rendering should be ok
+            int width = 1024;
+            int height = 768;
+            bool fullScreen = false;
+
+            if (args.Length >= 2)
+            {
+                try
+                {
+                    width = int.Parse(args[0]);
+                    height = int.Parse(args[1]);
+
+                    if (args.Length >= 3)
+                        fullScreen = bool.Parse(args[2]);
+                }
+                catch
+                {
+                    width = 1024;
+                    height = 768;
+                    fullScreen = false;
+                }
+            }
+
+            using (SampleWindow window = new SampleWindow(width, height, fullScreen))
+                window.Run(60.0); // 60 FPS for update and rendering should be ok
         }
     }
 }

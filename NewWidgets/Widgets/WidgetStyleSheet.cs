@@ -199,7 +199,33 @@ namespace NewWidgets.Widgets
         /// <typeparam name="T">The 1st type parameter.</typeparam>
         public T Get<T>(string name, T defaultValue)
         {
-            return Get(WidgetParameterMap.GetIndexByName(name), defaultValue);
+            WidgetParameterIndex index = WidgetParameterMap.GetIndexByName(name);
+
+            // The box properties store a StyleLength now, so they can remember whether the
+            // author wrote px, % or auto. Reading one as a float is public API that predates
+            // that, so a length is unwrapped here into exactly the bare number FloatParse used
+            // to return: pixels for a length, a 0..1 fraction for a percentage. `auto` has no
+            // number of its own, so the caller's default stands.
+            //
+            // Deliberately only on this by-name overload, which already pays for a name lookup
+            // and is nobody's hot path. The indexed Get below, which every property getter in
+            // the library runs through, is left exactly as cheap as it was.
+            if (typeof(T) == typeof(float))
+            {
+                WidgetParameterAttribute attribute = WidgetParameterMap.GetAttributeByIndex(index);
+
+                if (attribute != null && attribute.Type == typeof(StyleLength))
+                {
+                    StyleLength length = Get(index, StyleLength.Unset);
+
+                    if (length.IsAuto || length.IsUnset)
+                        return defaultValue;
+
+                    return (T)(object)length.Value;
+                }
+            }
+
+            return Get(index, defaultValue);
         }
 
         internal void Set(WidgetParameterIndex index, object value)
@@ -223,7 +249,31 @@ namespace NewWidgets.Widgets
         /// <param name="value">Value.</param>
         public void Set(string name, object value)
         {
-            Set(WidgetParameterMap.GetIndexByName(name), value);
+            WidgetParameterIndex index = WidgetParameterMap.GetIndexByName(name);
+
+            // Mirror image of the unwrap in the by-name Get above: a caller that reads a box
+            // property as a bare float has to be able to write one back, which is what
+            // Set("width", 100f) meant before these properties started storing a StyleLength.
+            // A bare number carries no unit, so it means pixels -- exactly what FloatParse
+            // handed the layout engine then. Reading a percentage out as a float and writing it
+            // straight back therefore lands as pixels, which is the same information the float
+            // API always lost; a caller that means a percentage sets a StyleLength.
+            //
+            // Deliberately only on this by-name overload, for the same reason as the read: it
+            // already pays for a name lookup and nothing hot goes through it. The indexed Set
+            // is left exactly as it was.
+            if (value is float)
+            {
+                WidgetParameterAttribute attribute = WidgetParameterMap.GetAttributeByIndex(index);
+
+                if (attribute != null && attribute.Type == typeof(StyleLength))
+                {
+                    Set(index, StyleLength.Pixels((float)value));
+                    return;
+                }
+            }
+
+            Set(index, value);
         }
 
         public override string ToString()

@@ -8,7 +8,12 @@
     <RootNamespace>NewWidgets</RootNamespace>
     <AssemblyName>NewWidgets</AssemblyName>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-    <TargetFrameworks>net472;netstandard2.1</TargetFrameworks>
+    <!-- This project and NewWidgets.RunMobile.csproj sit in the same folder and both emit
+         an assembly called NewWidgets, so the default obj\$(Configuration)\$(TargetFramework)
+         path is the same file for both. Whichever built last won, and the other project's
+         consumers then linked against the wrong compile list. Keep the intermediates apart. -->
+    <IntermediateOutputPath>obj\Mini\$(Configuration)\$(TargetFramework)\</IntermediateOutputPath>
+    <TargetFrameworks>net472;net8.0</TargetFrameworks>
     <Configurations>Debug;Debug.Numerics;Release;Release.Numerics</Configurations>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -60,34 +65,31 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <!-- This compile list is explicit (EnableDefaultCompileItems is false above):
+         adding a source file to the repository does NOT add it to this project.
+         Every new .cs file must be listed here by hand or the build breaks. -->
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Widgets\Enums.cs" />
     <Compile Include="Widgets\Widget.cs" />
     <Compile Include="Widgets\WidgetManager.cs" />
     <Compile Include="Utility\Margin.cs" />
-    <Compile Include="UI\Font.cs" />
-    <Compile Include="UI\ImageObject.cs" />
-    <Compile Include="UI\LabelObject.cs" />
-    <Compile Include="UI\Window.cs" />
-    <Compile Include="UI\WindowObject.cs" />
-    <Compile Include="UI\WindowObjectArray.cs" />
-    <Compile Include="UI\ISprite.cs" />
+    <!-- UI\*.cs is NOT compiled here: it is the same symlinked folder RunMobile.Mini.csproj
+         (referenced below) already compiles into Window/WindowController/ISprite/etc.
+         Compiling it a second time into this assembly made those types ambiguous
+         (CS0433) for any consumer, such as NewWidgets.RunMobileSample, that references
+         both this project and RunMobile.Mini.csproj together. -->
     <Compile Include="Widgets\WidgetBackground.cs" />
     <Compile Include="Widgets\WidgetManager.Styles.cs" />
+    <Compile Include="Widgets\WidgetManager.Markup.cs" />
     <Compile Include="Widgets\WidgetStyleSheet.cs" />
-    <Compile Include="UI\SimpleWindow.cs" />
     <Compile Include="Utility\ResourceLoader.cs" />
     <Compile Include="Widgets\WidgetException.cs" />
     <Compile Include="Widgets\Attributes.cs" />
-    <Compile Include="UI\AnimationManager.cs" />
-    <Compile Include="UI\WindowController.cs" />
-    <Compile Include="UI\Enums.cs" />
-    <Compile Include="UI\IFocusable.cs" />
     <Compile Include="Widgets\Controls\WidgetButton.cs" />
     <Compile Include="Widgets\Controls\WidgetCheckBox.cs" />
     <Compile Include="Widgets\Controls\WidgetContextMenu.cs" />
@@ -113,9 +115,11 @@
     <Compile Include="Styles\StyleSelectorList.cs" />
     <Compile Include="Utility\SubList.cs" />
     <Compile Include="Utility\IndexNameMap.cs" />
+    <Compile Include="Widgets\StyleLength.cs" />
     <Compile Include="Widgets\WidgetParameterIndex.cs" />
     <Compile Include="Widgets\WidgetParameterMap.cs" />
     <Compile Include="Utility\ConversionHelper.cs" />
+    <Compile Include="Utility\HtmlNode.cs" />
     <Compile Include="Styles\CSSParser.cs" />
   </ItemGroup>
   <ItemGroup />
