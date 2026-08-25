@@ -11,9 +11,27 @@ namespace NewWidgets.Widgets
     /// <summary>
     /// This class is a simple wrapper for IDictionary with LoadData working as AddRange
     /// </summary>
-    internal class StyleSheetData : IStyleData
+    internal class StyleSheetData : IStyleData, ISelfNamedStyleData
     {
         private readonly IDictionary<WidgetParameterIndex, object> m_parameters;
+
+        /// <summary>
+        /// The font family this block declares. It is what tells one <c>@font-face</c> node
+        /// from another, since every face spells the same header; <c>StyleCollection</c> asks
+        /// only for at-rules, so an ordinary rule declaring <c>font-family</c> is unaffected.
+        /// </summary>
+        public string StyleDataName
+        {
+            get
+            {
+                object font;
+
+                if (!m_parameters.TryGetValue(WidgetParameterIndex.Font, out font))
+                    return string.Empty;
+
+                return font.ToString();
+            }
+        }
 
         public StyleSheetData()
         {

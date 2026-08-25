@@ -75,11 +75,11 @@ namespace NewWidgets.Test
         private static readonly string[] SiegeWarsCssFiles = { "defaults.css", "ui.css", "editor.css" };
 
         // The three font sprite resources fonts.css/defaults.css declare via
-        // "--font-resource: url(...)" for both games. Must be registered as test fonts before
-        // any CSS that declares an @font rule is loaded, or Font's constructor throws
+        // "src: url(...)" for both games. Must be registered as test fonts before any CSS that
+        // declares an @font-face rule is loaded, or Font's constructor throws
         // KeyNotFoundException looking up the space glyph (TestController's default,
         // unregistered sprite has a single frame tagged 0, not one covering ASCII 32).
-        private static readonly string[] FontResourceIds = { "font|font5", "font|font4", "font|font6" };
+        private static readonly string[] FontResourceIds = { "font5", "font4", "font6" };
 
         private const int TestGlyphWidth = 10;
         private const int TestGlyphHeight = 16;

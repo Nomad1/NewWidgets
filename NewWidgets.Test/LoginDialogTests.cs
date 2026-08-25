@@ -35,10 +35,10 @@ namespace NewWidgets.Test
 
         private const string SampleAssetRoot = "../NewWidgets.RunMobileSample/assets";
 
-        // ui.css names its font resource "font|font5"; Font's constructor walks the sprite for
+        // ui.css names its font resource "font5"; Font's constructor walks the sprite for
         // a space glyph and throws if the resource is not registered, so it has to exist before
         // the stylesheet is read. Same requirement CorpusTests.EnsureTestFontsRegistered has.
-        private const string SampleFontResource = "font|font5";
+        private const string SampleFontResource = "font5";
 
         // Pinned so the window's own 2048-unit box, and therefore the panel's centred
         // position, are the same number on every machine.
