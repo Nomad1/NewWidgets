@@ -1,0 +1,124 @@
+/* HTML names for the ui.xml skin.
+
+   ui.xml is this sample's skin and it speaks the pre-CSS vocabulary: `default_panel`
+   registers a rule named `panel`, `default_label` one named `label`, and so on. Those names
+   are what a widget built in code reports. The login dialog is now a document, and a widget
+   a document built reports the tag the document used -- div, span, h2, input, textarea --
+   so none of those rules would reach it and the dialog would draw with no skin at all.
+
+   This file says the same thing again under the HTML names. It is a separate file rather
+   than more <style> elements in ui.xml for two reasons: the XML format has no way to group
+   two names on one rule and no `parent` that actually inherits, so the alias would be a
+   verbatim copy either way; and ui.xml is the legacy format this sample exists to keep
+   working, so it is left exactly as it was.
+
+   Every value below is read straight out of ui.xml. The RunMobile sample does the same job
+   inside its own ui.css, where CSS grouping lets one rule carry both names at once.
+
+   Loaded after ui.xml, so a rule here that repeats one there settles the same way. */
+
+div {
+    background-repeat: nineimage;
+    background-image: url("window_9");
+    background-size: 50%;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+}
+
+.window {
+    background-repeat: nineimage;
+    background-image: url("window_9");
+    background-size: 75%;
+    width: 600px;
+    height: 400px;
+    overflow: hidden;
+}
+
+span, h1, h2, h3, h4, h5, h6 {
+    font-family: default;
+    font-size: 0.6em;
+    color: #ffffff;
+    width: 100px;
+    height: 35px;
+    overflow: visible;
+}
+
+input, textarea {
+    background-repeat: nineimage;
+    background-image: url("panel_white_hovered_9");
+    background-size: 25%;
+    font-family: default;
+    font-size: 0.5em;
+    width: 200px;
+    height: 45px;
+    color: #aaaaaa;
+    overflow: hidden;
+    --clip-margin: 1px 2px 3px 2px;
+    --cursor-color: #ffffff;
+    --text-padding: 6px 2px 6px 0px;
+}
+
+input:focus, textarea:focus {
+    background-image: url("panel_white_normal_9");
+    color: #ffffff;
+}
+
+input:focus:hover, textarea:focus:hover {
+    background-color: #ffee88;
+}
+
+input:hover, textarea:hover {
+    background-color: #ffee88;
+}
+
+/* A checkbox is an <input> too, so the rule above reaches it and has to be undone here.
+   See the same block in the RunMobile sample's ui.css for why there is no way to write
+   input[type=checkbox] instead. */
+.checkbox {
+    background-repeat: imagefit;
+    background-image: url("checkbox_back_normal");
+    background-size: 100%;
+    width: 40px;
+    height: 40px;
+    color: #cceeff;
+    font-size: 1em;
+    overflow: visible;
+    caret-color: #000000;
+    --clip-margin: 0px 0px 0px 0px;
+}
+
+.checkbox:focus {
+    background-image: url("checkbox_back_normal");
+    color: #ffffff;
+}
+
+.checkbox:hover {
+    background-image: url("checkbox_back_hovered");
+    color: #ffffff;
+}
+
+.checkbox:focus:hover {
+    background-image: url("checkbox_back_hovered");
+    color: #cceeff;
+}
+
+.checkbox:disabled {
+    background-image: url("checkbox_back_hovered");
+    --image-color: #888888;
+    color: #888888;
+}
+
+.checkbox #checkbox_image {
+    image: url("check_icon");
+    --image-color: #000032;
+}
+
+.checkbox #checkbox_image:hover {
+    image: url("check_icon");
+    --image-color: #ffffff;
+}
+
+img {
+    background-repeat: imagefit;
+}

@@ -5,7 +5,7 @@ using OpenTK.Graphics.OpenGL;
 using RunMobile.Graphics;
 using RunMobile.Utility;
 
-#if USE_NUMERICS || NETSTANDARD || NET47
+#if USE_NUMERICS || NETSTANDARD || NET47 || NET47_OR_GREATER || NET472 || NETCOREAPP
 using Matrix = System.Numerics.Matrix4x4;
 #else
 using Matrix = System.Numerics.Matrix4x3;
@@ -314,7 +314,7 @@ namespace RunMobile.OpenTK.OpenGL
         public override void DrawTexture(IGraphicsTexture texture, ref SpriteData frame, ref Matrix transform, uint color, TextureFlags flags, Vector2 pivot)
         {
             ((GLTexture)texture).Bind();
-#if USE_NUMERICS || NETSTANDARD || NET47
+#if USE_NUMERICS || NETSTANDARD || NET47 || NET47_OR_GREATER || NET472 || NETCOREAPP
             Vector3 oneVectorX = new Vector3(transform.M11, transform.M12, transform.M13);
             Vector3 oneVectorY = new Vector3(transform.M21, transform.M22, transform.M23);
 #else

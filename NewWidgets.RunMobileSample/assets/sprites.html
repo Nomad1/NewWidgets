@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>ui.svg sprites by name</title>
+<style>
+  body   { margin: 0; padding: 24px; background: #111; color: #ccc;
+           font: 13px/1.5 -apple-system, Helvetica, Arial, sans-serif; }
+  h2     { color: #fff; font-size: 15px; font-weight: 600;
+           margin: 32px 0 12px; border-bottom: 1px solid #333; padding-bottom: 6px; }
+  h2:first-of-type { margin-top: 0; }
+  .grid  { display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end; }
+  figure { margin: 0; text-align: center; }
+  figure img   { display: block; background: #000; }
+  figcaption   { margin-top: 6px; color: #888; max-width: 200px; }
+  small  { color: #666; }
+  em     { display: block; color: #c86; font-style: normal; font-size: 11px; }
+  code   { color: #6ca; }
+
+  /* every rule below names a sprite. No coordinates anywhere. */
+  #atlas       { width: 512px; height: 512px; background: #000; }
+  #tiled       { width: 420px; height: 160px; border: 1px solid #333;
+                 background-image: url("ui.svg#back_pattern");
+                 background-repeat: repeat;
+                 background-size: 135px 117px; }
+  #ninepatch   { width: 420px; height: 160px; color: #fff; padding: 24px; box-sizing: border-box;
+                 border-style: solid; border-width: 40px;
+                 border-image-source: url("ui.svg#window_9");
+                 border-image-slice: 33.3333% fill;
+                 border-image-repeat: stretch; }
+  #button      { width: 240px; height: 134px;
+                 border-style: solid; border-width: 22px;
+                 border-image-source: url("ui.svg#button_white_normal_3");
+                 border-image-slice: 33.3333% fill;
+                 border-image-repeat: stretch; }
+</style>
+</head>
+<body>
+
+<h2>The whole file &mdash; <code>&lt;img src="ui.svg"&gt;</code></h2>
+<img id="atlas" src="ui.svg" alt="atlas" />
+
+<h2>Nine-patch &mdash; <code>border-image-source: url("ui.svg#window_9")</code></h2>
+<div id="ninepatch">Stretched to 420&times;160 from a 238&times;238 sprite.</div>
+<div id="button" style="margin-top:16px"></div>
+
+<h2>Tiled &mdash; <code>background-image: url("ui.svg#back_pattern")</code></h2>
+<div id="tiled"></div>
+
+<h2>Every sprite by name &mdash; <code>&lt;img src="ui.svg#name"&gt;</code></h2>
+<div class="grid">
+  <figure>
+    <img src="ui.svg#back_pattern" width="135" height="117" alt="back_pattern" />
+    <figcaption>back_pattern<br/><small>135&times;117</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#button_white_hovered_3" width="120" height="67" alt="button_white_hovered_3" />
+    <figcaption>button_white_hovered_3<br/><small>120&times;67</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#button_white_normal_3" width="120" height="67" alt="button_white_normal_3" />
+    <figcaption>button_white_normal_3<br/><small>120&times;67</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#check_icon" width="16" height="19" alt="check_icon" />
+    <figcaption>check_icon<br/><small>16&times;19</small><em>trimmed 16&times;19 of 54&times;54, offset 19,17</em></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#checkbox_back_hovered" width="54" height="54" alt="checkbox_back_hovered" />
+    <figcaption>checkbox_back_hovered<br/><small>54&times;54</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#checkbox_back_normal" width="54" height="54" alt="checkbox_back_normal" />
+    <figcaption>checkbox_back_normal<br/><small>54&times;54</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#close_icon" width="20" height="20" alt="close_icon" />
+    <figcaption>close_icon<br/><small>20&times;20</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#health_back" width="417" height="58" alt="health_back" />
+    <figcaption>health_back<br/><small>417&times;58</small><em>trimmed 417&times;58 of 420&times;60, offset 1,1</em></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#health_line" width="361" height="23" alt="health_line" />
+    <figcaption>health_line<br/><small>361&times;23</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#panel_9" width="82" height="84" alt="panel_9" />
+    <figcaption>panel_9<br/><small>82&times;84</small><em>trimmed 82&times;84 of 84&times;84, offset 1,0</em></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#panel_white_hovered_9" width="82" height="84" alt="panel_white_hovered_9" />
+    <figcaption>panel_white_hovered_9<br/><small>82&times;84</small><em>trimmed 82&times;84 of 90&times;90, offset 4,3</em></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#panel_white_normal_9" width="82" height="84" alt="panel_white_normal_9" />
+    <figcaption>panel_white_normal_9<br/><small>82&times;84</small><em>trimmed 82&times;84 of 90&times;90, offset 4,3</em></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#scroll_horizontal" width="90" height="21" alt="scroll_horizontal" />
+    <figcaption>scroll_horizontal<br/><small>90&times;21</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#scroll_indicator_horizontal" width="60" height="15" alt="scroll_indicator_horizontal" />
+    <figcaption>scroll_indicator_horizontal<br/><small>60&times;15</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#scroll_indicator_vertical" width="15" height="60" alt="scroll_indicator_vertical" />
+    <figcaption>scroll_indicator_vertical<br/><small>15&times;60</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#scroll_vertical" width="21" height="90" alt="scroll_vertical" />
+    <figcaption>scroll_vertical<br/><small>21&times;90</small></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#settings_icon" width="84" height="57" alt="settings_icon" />
+    <figcaption>settings_icon<br/><small>84&times;57</small><em>trimmed 84&times;57 of 128&times;128, offset 21,35</em></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#window_9" width="238" height="238" alt="window_9" />
+    <figcaption>window_9<br/><small>238&times;238</small><em>trimmed 238&times;238 of 240&times;240, offset 1,1</em></figcaption>
+  </figure>
+  <figure>
+    <img src="ui.svg#window_dialog_9" width="238" height="238" alt="window_dialog_9" />
+    <figcaption>window_dialog_9<br/><small>238&times;238</small><em>trimmed 238&times;238 of 240&times;240, offset 1,1</em></figcaption>
+  </figure>
+</div>
+
+</body>
+</html>

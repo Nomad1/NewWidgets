@@ -82,6 +82,9 @@ namespace NewWidgets.RunMobileSample
             WidgetManager.Init(0.5f); // 0.5 is font scale
             WidgetManager.OnTooltip += TextTooltip;
 
+            // The skin: what a control looks like, and nothing about any particular dialog.
+            // The dialog's own geometry is login.css, which assets/login.xhtml links and
+            // TestWindow loads with the document -- see the header of login.css.
             WidgetManager.LoadCSS(AssetManager.GetAssetTextFile("ui.css"));
 
             // Here we're creating main window and it's added to the Game Controller

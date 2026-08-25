@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+using System.IO;
+using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.Utility;
 using NewWidgets.Widgets;
@@ -6,12 +7,39 @@ using NewWidgets.Widgets;
 namespace NewWidgets.Sample
 {
     /// <summary>
-    /// Test window. Taken from Project Amalthea login dialog
+    /// Test window. Taken from Project Amalthea login dialog.
+    ///
+    /// The dialog itself is <c>assets/login.xhtml</c> and its geometry is
+    /// <c>assets/login.css</c>, which the document links. Nothing here builds a control or
+    /// computes a position: the document is loaded, every control is found by the same
+    /// <c>#id</c> the stylesheet names it by, and what is left is behaviour -- the event
+    /// handlers -- plus the handful of things below that no CSS property can say yet.
+    ///
+    /// What could not leave code, and what each one waits on:
+    ///
+    /// 1. The panel's own centring and <c>Scale</c>. A Window is not a Widget, so this panel's
+    ///    containing block is the screen rather than the 2048-unit box it is really placed in,
+    ///    and Scale sits outside the box model. left/right plus auto margins cannot say this
+    ///    until a Window is a containing block.
+    /// 2. The six font sizes. <c>font-size</c> is a plain scale factor here, and every one of
+    ///    these is a multiple of <see cref="WidgetManager.FontScale"/>, which is a runtime
+    ///    number the host chooses -- 0.5 in the RunMobile sample, 1.0 under the test runner.
+    ///    A literal in the stylesheet would pin the dialog to one host's scale.
+    /// 3. The title's <c>TextAlign</c>. CSS <c>text-align: center</c> carries the Top and Bottom
+    ///    bits of <see cref="WidgetAlign"/> as well, so it would centre the text vertically too
+    ///    and there is no vertical-align property to undo that. See Test 37.
+    /// 4. Focus, and <c>#local_edit</c> starting hidden. Both are runtime state rather than
+    ///    document content, and the <c>visibility</c> property is parsed and dropped today.
+    ///
+    /// Everything else the dialog used to say in code is now in the document, the text content
+    /// included: an HTML editor puts the words in the element, so that is where they live.
     /// </summary>
     public class TestWindow : Window
     {
-        private static readonly string DefaultLogin = "login";
-        private static readonly string DefaultPassword = "password";
+        private const string DocumentName = "login.xhtml";
+        private const string DefaultAssetPath = "assets";
+
+        private readonly string m_assetPath;
 
         private readonly WidgetTextEdit m_loginEdit;
         private readonly WidgetTextEdit m_passEdit;
@@ -25,12 +53,6 @@ namespace NewWidgets.Sample
         static TestWindow()
         {
             ResourceLoader.Instance.Language = "en-en";
-            ResourceLoader.Instance.RegisterString("login_title", "Connect to server");
-            ResourceLoader.Instance.RegisterString("login_login", "Login");
-            ResourceLoader.Instance.RegisterString("login_password", "Password");
-            ResourceLoader.Instance.RegisterString("login_local", "Custom server");
-            ResourceLoader.Instance.RegisterString("login_register", "Register new account");
-            ResourceLoader.Instance.RegisterString("login_connect", "Connect");
             ResourceLoader.Instance.RegisterString("dialog_title", "Dialog");
             ResourceLoader.Instance.RegisterString("dialog_text", "Dialog text that could be very long,\nwith |caaaaaadifferent|r |c336699colors|r, languages ({0}) and may even contain |tsettings_icon:64:64|t images.");
             ResourceLoader.Instance.RegisterString("button_yes", "Yes");
@@ -38,127 +60,89 @@ namespace NewWidgets.Sample
             ResourceLoader.Instance.RegisterString("tooltip_connect", "Start connection");
         }
 
-        public TestWindow()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:NewWidgets.Sample.TestWindow"/> class.
+        /// </summary>
+        /// <param name="assetPath">Folder holding login.xhtml and the stylesheets it links.
+        /// Every sample runs from a folder with an <c>assets</c> beside the executable, which is
+        /// the default; the test runner reaches the same files from its own working directory</param>
+        public TestWindow(string assetPath = null)
             : base(WindowFlags.None)
         {
+            m_assetPath = string.IsNullOrEmpty(assetPath) ? DefaultAssetPath : assetPath;
+
             Size = new Vector2(2048, 2048.0f * WindowController.Instance.ScreenHeight / WindowController.Instance.ScreenWidth);
             Scale = WindowController.Instance.ScreenHeight / Size.Y;
 
-            WidgetPanel panel = new WidgetWindow();
-            panel.Size = new Vector2(600, 760);
+            WidgetManager.LoadXHTML(File.ReadAllText(Path.Combine(m_assetPath, DocumentName)), LoadStyleSheet, this);
+
+            WidgetPanel panel;
+
+            if (!WidgetPanel.TryFind(this, "login_window", out panel))
+                throw new WidgetException(DocumentName + " has no #login_window, so there is no dialog to bind");
+
             panel.Scale = WindowController.Instance.UIScale;
+            panel.Relayout(); // #login_window gives the 600x760 the centring below reads
+
+            // Stays in code, see 1 above
             panel.Position = Size / 2 - panel.Size * panel.Scale / 2;
-            AddChild(panel);
 
-            WidgetPanel back = new WidgetPanel(WidgetManager.GetStyle("back_pattern"));
-            back.Size = panel.Size;
-            panel.AddChild(back);
-
-            WidgetLabel title = new WidgetLabel();
-            title.Text = ResourceLoader.Instance.GetString("login_title");
-            title.Size = new Vector2(panel.Size.X, 60);
-            title.Position = new Vector2(0, 50);
+            WidgetLabel title = panel.Find<WidgetLabel>("login_title");
             title.FontSize = WidgetManager.FontScale * 1.5f;
-            title.TextAlign = WidgetAlign.Top | WidgetAlign.HorizontalCenter;
-            panel.AddChild(title);
+            title.TextAlign = WidgetAlign.Top | WidgetAlign.HorizontalCenter; // stays in code, see 3 above
 
-            WidgetLabel loginLabel = new WidgetLabel();
-            loginLabel.Text = ResourceLoader.Instance.GetString("login_login");
-            loginLabel.Position = new Vector2(50, 160);
-            loginLabel.FontSize = WidgetManager.FontScale * 1.25f;
-            panel.AddChild(loginLabel);
+            panel.Find<WidgetLabel>("login_label").FontSize = WidgetManager.FontScale * 1.25f;
+            panel.Find<WidgetLabel>("pass_label").FontSize = WidgetManager.FontScale * 1.25f;
+            panel.Find<WidgetLabel>("local_label").FontSize = WidgetManager.FontScale * 1.0f;
 
-            m_loginEdit = new WidgetTextEdit();
-            m_loginEdit.Text = DefaultLogin;
-            m_loginEdit.Size = new Vector2(500, 45);
-            m_loginEdit.Position = new Vector2(50, 200);
+            m_loginEdit = panel.Find<WidgetTextEdit>("login_edit");
             m_loginEdit.FontSize = WidgetManager.FontScale * 1.25f;
             m_loginEdit.OnTextEntered += HandleLoginEntered;
-            panel.AddChild(m_loginEdit);
             m_loginEdit.SetFocused(true);
 
-            WidgetLabel passLabel = new WidgetLabel();
-            passLabel.Text = ResourceLoader.Instance.GetString("login_password");
-            passLabel.Position = new Vector2(50, 260);
-            passLabel.FontSize = WidgetManager.FontScale * 1.25f;
-            panel.AddChild(passLabel);
-
-            m_passEdit = new WidgetTextEdit();
-            m_passEdit.Text = DefaultPassword;
-            m_passEdit.Size = new Vector2(500, 45);
-            m_passEdit.Position = new Vector2(50, 300);
+            m_passEdit = panel.Find<WidgetTextEdit>("pass_edit");
             m_passEdit.FontSize = WidgetManager.FontScale * 1.25f;
-            m_passEdit.MaskChar = "*";
             m_passEdit.OnTextEntered += HandlePassEntered;
-            panel.AddChild(m_passEdit);
             m_passEdit.SetFocused(false);
 
-            WidgetLabel localLabel = new WidgetLabel();
-            localLabel.Text = ResourceLoader.Instance.GetString("login_local");
-            localLabel.Position = new Vector2(90, 360);
-            localLabel.Color = 0xcceeff;
-            localLabel.FontSize = WidgetManager.FontScale * 1.0f;
-            panel.AddChild(localLabel);
+            m_localCheckBox = panel.Find<WidgetCheckBox>("local_check");
+            m_localCheckBox.OnChecked += HandleLocalChecked;
 
-            m_localCheckBox = new WidgetCheckBox(true);
-            m_localCheckBox.Position = new Vector2(50, 360);
-            m_localCheckBox.Checked = false;
-            localLabel.Visible = true;
-            m_localCheckBox.OnChecked += delegate (WidgetCheckBox cb)
-            {
-                m_localEdit.Visible = cb.Checked;
-            };
-
-            panel.AddChild(m_localCheckBox);
-
-            m_localCheckBox.LinkedLabel = localLabel;
-
-            m_localEdit = new WidgetTextEdit();
-            m_localEdit.Text = "127.0.0.1";
-            m_localEdit.Size = new Vector2(500, 45);
-            m_localEdit.Position = new Vector2(50, 100);
+            m_localEdit = panel.Find<WidgetTextEdit>("local_edit");
             m_localEdit.FontSize = WidgetManager.FontScale * 1.25f;
-            m_localEdit.Visible = m_localCheckBox.Checked && m_localCheckBox.Visible;
-            m_localEdit.OnTextEntered += delegate { HandleLoginPress(null); };
+            m_localEdit.Visible = m_localCheckBox.Checked && m_localCheckBox.Visible; // stays in code, see 4 above
+            m_localEdit.OnTextEntered += HandleLocalEntered;
             m_localEdit.OnValidateInput += HandleValidateIpInput;
-            panel.AddChild(m_localEdit);
             m_localEdit.SetFocused(false);
 
+            panel.Find<WidgetButton>("website_button").OnPress += HandleWebSitePress;
 
-            WidgetButton webSiteButton = new WidgetButton(WidgetManager.GetStyle("text_button"), ResourceLoader.Instance.GetString("login_register"));
-            webSiteButton.Position = new Vector2(50, 360 + (m_localCheckBox.Visible ? 40 : 0));
-            webSiteButton.FontSize = WidgetManager.FontScale * 1.0f;
-            webSiteButton.OnPress += delegate { HandleWebSitePress(null); };
-            panel.AddChild(webSiteButton);
+            m_loginButton = panel.Find<WidgetButton>("login_button");
+            m_loginButton.OnPress += HandleLoginPress;
 
-            m_loginButton = new WidgetButton(ResourceLoader.Instance.GetString("login_connect"));
-            m_loginButton.Size = new Vector2(160, 48);
-            m_loginButton.FontSize = WidgetManager.FontScale * 1.25f;
-            m_loginButton.Position = new Vector2(panel.Size.X / 2 - m_loginButton.Size.X / 2, 460);
-            m_loginButton.Enabled = false;
-            m_loginButton.OnPress += delegate { HandleLoginPress(null); };
-            m_loginButton.Tooltip = "@tooltip_connect";
-            panel.AddChild(m_loginButton);
+            panel.Find<WidgetTextField>("text_field").FontSize = WidgetManager.FontScale * 1.25f;
 
-            WidgetImage logoImage = new WidgetImage(WidgetBackgroundStyle.ImageFit, "settings_icon");
-            logoImage.Size = new Vector2(64, 64);
-            logoImage.Position = new Vector2(20, 15);
-            panel.AddChild(logoImage);
-
-
-            WidgetTextField textTextField = new WidgetTextField();// WidgetManager.GetStyle("default_textedit"));
-            textTextField.Size = new Vector2(500, 225);
-            textTextField.Position = new Vector2(50, 520);
-            textTextField.FontSize = WidgetManager.FontScale * 1.25f;
-            textTextField.Visible = true;
-            textTextField.Text = "WidgetTextField textTextField = new WidgetTextField(WidgetManager.GetStyle(\"default_textedit\"));\n            textTextField.Size = new Vector2(500, 225);\n            textTextField.Position = new Vector2(50, 520);\n            textTextField.FontSize = WidgetManager.FontScale * 1.25f;\n            textTextField.Visible = true";
-            panel.AddChild(textTextField);
-
-            m_fpsLabel = new WidgetLabel();
-            m_fpsLabel.Text = "1";
-            m_fpsLabel.Position = new Vector2(440, 20);
+            m_fpsLabel = panel.Find<WidgetLabel>("fps_label");
             m_fpsLabel.FontSize = WidgetManager.FontScale * 0.75f;
-            panel.AddChild(m_fpsLabel);
+        }
+
+        /// <summary>
+        /// Resolves a <c>&lt;link rel="stylesheet"&gt;</c> against the folder the document came
+        /// from, which is where an HTML editor looks for it too
+        /// </summary>
+        private string LoadStyleSheet(string href)
+        {
+            string path = Path.Combine(m_assetPath, href);
+
+            if (!File.Exists(path))
+                return null; // logged by the loader rather than thrown, like every other miss
+
+            return File.ReadAllText(path);
+        }
+
+        private void HandleLocalChecked(WidgetCheckBox checkBox)
+        {
+            m_localEdit.Visible = checkBox.Checked;
         }
 
         private bool HandleValidateIpInput(string oldText, string input)
@@ -191,7 +175,12 @@ namespace NewWidgets.Sample
             HandleLoginPress(null);
         }
 
-        private void HandleWebSitePress(object t)
+        private void HandleLocalEntered(WidgetTextEdit edit, string text)
+        {
+            HandleLoginPress(null);
+        }
+
+        private void HandleWebSitePress(WidgetButton sender)
         {
             DialogWindow dialog = DialogWindow.Show("@dialog_title",
                 ResourceLoader.Instance.GetString("dialog_text", "пример текста"), "@button_yes", "@button_no");
@@ -206,7 +195,7 @@ namespace NewWidgets.Sample
             };
         }
 
-        private void HandleLoginPress(object t)
+        private void HandleLoginPress(WidgetButton sender)
         {
             m_loginButton.Enabled = false;
         }

@@ -1,0 +1,50 @@
+/* Geometry of the sample login dialog, lifted out of Sample/Sample/TestWindow.cs.
+
+   Every rule here is an #id rule, and every rule is loaded on top of the skin -- ui.css
+   in the RunMobile sample, the legacy ui.xml in the WinForms one. This file says where a
+   control sits, never what it looks like, so it is purely additive to either of them and
+   can be dropped in front of a skin that has never heard of it.
+
+   The containing block for everything below #login_window is that window's own box,
+   600x760, so a percentage and an anchor both read against 600 wide and 760 tall.
+
+   Everything is absolutely positioned, per D134. No rule here depends on document order
+   or on any content measurement, so a browser given the same ids places the same boxes. */
+
+#login_window   { width: 600px; height: 760px; }
+
+/* was back.Size = panel.Size */
+#login_back     { left: 0; top: 0; width: 100%; height: 100%; }
+
+/* was new Vector2(panel.Size.X, 60) */
+#login_title    { left: 0; top: 50px; width: 100%; height: 60px; }
+
+#login_label    { left: 50px; top: 160px; }
+
+/* the three edits were a fixed 500 inside a 600 panel: two pinned edges say the same
+   thing without naming either number, and survive a change of panel width. width: auto is
+   load-bearing -- the textedit rule declares a width of its own, and a declared width beats
+   a pair of pinned edges (CSS 2.1 10.3.7 calls that over-constrained and drops the right). */
+#login_edit     { left: 50px; right: 50px; width: auto; top: 200px; height: 45px; }
+
+#pass_label     { left: 50px; top: 260px; }
+#pass_edit      { left: 50px; right: 50px; width: auto; top: 300px; height: 45px; }
+
+#local_check    { left: 50px; top: 360px; }
+#local_label    { left: 90px; top: 360px; color: #cceeff; }
+#local_edit     { left: 50px; right: 50px; width: auto; top: 100px; height: 45px; }
+
+/* was 360 + (checkbox visible ? 40 : 0); the checkbox is never hidden in this dialog */
+#website_button { left: 50px; top: 400px; }
+
+/* was panel.Size.X / 2 - button.Size.X / 2 */
+#login_button   { left: 0; right: 0; margin-left: auto; margin-right: auto;
+                  top: 460px; width: 160px; height: 48px; }
+
+#logo_image     { left: 20px; top: 15px; width: 64px; height: 64px; }
+
+#text_field     { left: 50px; right: 50px; width: auto; top: 520px; height: 225px; }
+
+/* was new Vector2(440, 20): the label is anchored to the top right corner, and the width
+   is repeated from the label rule so the 60 is readable as 600 - 100 - 440 */
+#fps_label      { right: 60px; top: 20px; width: 100px; }

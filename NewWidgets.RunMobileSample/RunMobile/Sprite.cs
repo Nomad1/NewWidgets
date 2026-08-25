@@ -223,7 +223,7 @@ namespace RunMobile.Graphics
             var transform = m_transform.MatrixReference;
 
             Vector3 zero = transform.Translation;
-#if USE_NUMERICS || NETSTANDARD || NET47
+#if USE_NUMERICS || NETSTANDARD || NET47 || NET47_OR_GREATER || NET472 || NETCOREAPP
             Vector3 oneVectorX = new Vector3(transform.M11, transform.M12, transform.M13);
             Vector3 oneVectorY = new Vector3(transform.M21, transform.M22, transform.M23);
 #else

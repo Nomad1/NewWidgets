@@ -20,6 +20,12 @@ namespace NewWidgets.WinFormsSample{    public partial class TestForm : Form 
             ResourceLoader.Instance.RegisterString("login_register", "Register new account");
             ResourceLoader.Instance.RegisterString("login_connect", "Connect");            ResourceLoader.Instance.RegisterString("dialog_title", "Dialog");            ResourceLoader.Instance.RegisterString("dialog_text", "Dialog text that could be very long,\nwith |caaaaaadifferent|r |c336699colors|r, languages ({0}) and may even contain |tsettings_icon:64:64|t images.");            ResourceLoader.Instance.RegisterString("button_yes", "Yes");            ResourceLoader.Instance.RegisterString("button_no", "Yes!");            ResourceLoader.Instance.RegisterString("tooltip_connect", "Start connection");            m_windowController = new WinFormsController(perspectiveViewPictureBox.Width, perspectiveViewPictureBox.Height, 1.5f, 0.6f, false, "assets");
             m_windowController.OnInit += HandleOnInit;            m_windowController.RegisterSpriteAtlas("assets/font5.bin");            WidgetManager.LoadUI(System.IO.File.ReadAllText("assets/ui.xml"));
+            // ui.xml is this sample's skin, in the pre-CSS vocabulary, so its rules are named
+            // panel/label/textedit. The login dialog is assets/login.xhtml now, and a widget a
+            // document built is named by its tag, so html.css says the same skin again under
+            // div/span/input. The dialog's own geometry is login.css, which the document links
+            // and TestWindow loads with it.
+            WidgetManager.LoadCSS(System.IO.File.ReadAllText("assets/html.css"));
 
             this.perspectiveViewPictureBox.Init(m_windowController);
              

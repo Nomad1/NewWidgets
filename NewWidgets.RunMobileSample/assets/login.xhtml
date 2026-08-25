@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+          "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!-- The sample login dialog. This file is the dialog: Sample/Sample/TestWindow.cs builds
+     none of it and only binds the handlers, by the same #id the stylesheet uses.
+
+     Only login.css is linked. It is pure geometry, so a browser and this engine place the
+     same boxes from it. The skin lives in ui.css, which a browser cannot use at all, since
+     url("window_9") names a sprite inside an atlas rather than a file it could fetch. The
+     host loads that one, and linking it here would only make a browser fetch and discard it.
+
+     Every element is absolutely positioned by login.css, per D134, so the order below is
+     the paint order and nothing else depends on it. -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Connect to server</title>
+    <link rel="stylesheet" href="login.css" />
+</head>
+<body>
+    <div class="window" id="login_window">
+        <div class="back_pattern" id="login_back"></div>
+
+        <h2 id="login_title">Connect to server</h2>
+
+        <label id="login_label" for="login_edit">Login</label>
+        <input type="text" id="login_edit" value="login" />
+
+        <label id="pass_label" for="pass_edit">Password</label>
+        <input type="password" id="pass_edit" value="password" />
+
+        <!-- the label stands before the checkbox it names, so the association points
+             forwards; the loader resolves it once the whole tree exists -->
+        <label id="local_label" for="local_check">Custom server</label>
+        <input type="checkbox" class="checkbox" id="local_check" />
+
+        <input type="text" id="local_edit" value="127.0.0.1" />
+
+        <button class="text_button" id="website_button">Register new account</button>
+        <button id="login_button" title="@tooltip_connect" disabled="disabled">Connect</button>
+
+        <img id="logo_image" src="settings_icon" alt="" />
+
+        <textarea id="text_field" rows="6" cols="66">#text_field { left: 50px; right: 50px; width: auto; top: 520px; height: 225px; }
+
+            &lt;textarea id="text_field" rows="6" cols="66"&gt;...&lt;/textarea&gt;
+
+            WidgetTextField field = root.Find&lt;WidgetTextField&gt;("text_field");</textarea>
+
+        <span id="fps_label">1</span>
+    </div>
+</body>
+</html>
