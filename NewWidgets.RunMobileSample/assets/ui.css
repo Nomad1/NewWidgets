@@ -480,6 +480,25 @@ img {
                        text edits and buttons draw with no padding, which the golden master
                        in LoginDialogTests pins. Declaring `padding` above would apply it
                        and change that. The browser gets the value the skin always meant.
+     font-size         a font size is a plain scale factor here -- 1 is the bitmap font at
+                       its own size -- and a length in a browser, where an em is measured
+                       against whatever the parent computed and that is 16px by default.
+                       Naming the root size is the whole of the conversion, and it is the
+                       one place it can be named. See the rule for the number.
+     text-align        this engine centres a label by its own WidgetAlign, which TestWindow
+                       sets on #login_title in code because `text-align: center` here also
+                       carries the vertical bits and there is no property to undo them.
+                       A browser has no such widget state and left-aligns instead.
+     ::before          a checkbox in this engine is a widget with a child WidgetImage for
+                       the tick, which `checkbox #checkbox_image` above styles. A browser
+                       builds no child for an <input>, so that selector matches nothing and
+                       no tick is ever drawn. A pseudo-element is the browser's own spelling
+                       of the same child box, and a mask carries the tint the engine puts in
+                       `--image-color`.
+     :hover reach      hover propagates from a checkbox to that child here, and a linked
+                       label forwards its touches to the checkbox it names (LinkedLabel,
+                       set from `for=`). In a browser `input:hover` reaches neither, so the
+                       tick and the label both need saying with a combinator.
 
    Requirements for the engine, so that three of these four can move back up: read
    `background-color: rgba(...)` as the colour plus the background opacity; read a
@@ -488,9 +507,16 @@ img {
    a gap: the two properties genuinely mean different things and both are implemented.
    ---------------------------------------------------------------------------------- */
 
+/* 30px is the number NewWidgets.BrowserPreview writes on the body of the reference render
+   it builds straight from the atlas: one engine font-size unit is 30 browser pixels, so
+   every `em` above lands where that render puts it. It is a root size and not an inherited
+   one because nothing between here and a control declares a font size, so no em compounds;
+   `rem` would say the same thing here and cost the engine a throw, since its FloatParse
+   strips the last two characters of "0.5rem" and hands "0.5r" to float.Parse. */
 html, html body {
     margin: 0;
     background-color: #000000;
+    font-size: 30px;
 }
 
 html .back_pattern {
@@ -502,8 +528,15 @@ html button:disabled, html button:disabled:hover {
     background-color: rgba(170, 170, 170, 0.5);
 }
 
+/* The skin's own value is ui.xml's `<text_padding>6;2;6;0</text_padding>`, and the parser
+   that read it took four numbers as left, top, right, bottom. CSS takes them clockwise from
+   the top, so the same four numbers written in the same order mean a different box: the 6
+   the skin puts on the LEFT landed on the top and the left became 0. That is the whole of
+   the missing indent -- the text starts at x=0, under a border image whose corner is 7.5px
+   wide, and `clip-path` eats the 2px of it that are left. Test 65 names this exact string
+   as a legacy declaration and rotating it left by one is that test's own migration. */
 html input, html textarea {
-    padding: 6px 2px 6px 0px;
+    padding: 2px 6px 0px 6px;
 }
 
 html button {
@@ -516,4 +549,58 @@ html .text_button {
 
 html .image_button {
     padding: 6px 6px 6px 6px;
+}
+
+/* The one widget in this dialog that resolves WidgetAlign.HorizontalCenter. Both buttons
+   centre their own label whatever their align is, and a browser's UA stylesheet already
+   centres a <button>, so the two agree without being told; every other control here is
+   align=Left in both. That leaves the title, and this is it. */
+html #login_title {
+    text-align: center;
+}
+
+/* The tick. `checkbox #checkbox_image` above cannot match in a browser -- an <input> has no
+   children -- so this is the same child box in the browser's own spelling: the mask carries
+   the sprite's shape and background-color carries the `--image-color` the engine tints it
+   with. Drawn only when checked, as WidgetCheckBox.DrawContents draws it. */
+html .checkbox::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background-color: #000032;
+    mask: url("ui.svg#check_icon") no-repeat center / contain;
+}
+
+html .checkbox:checked::before {
+    opacity: 1;
+}
+
+html .checkbox:hover::before {
+    background-color: #ffffff;
+}
+
+/* `checkbox:hover { color: #ffffff }` above is the checkbox's TEXT colour, and a checkbox
+   has no text of its own: its text is the label bound to it by `for=`, which this engine
+   reaches through WidgetCheckBox.LinkedLabel and lights along with the box. That binding
+   buys a browser one of the two directions for nothing -- HTML puts a labeled control in
+   :hover whenever its label is hovered, so the sprite and the tick above already swap from
+   the text as well as from the box -- and this says the half that is left, the text's own
+   colour. It is named by its id because `#local_label` declares a colour and an id beats
+   any number of classes; every rule that places this dialog is an #id rule too.
+
+   The reverse, lighting the text from the box, is not here: the label stands BEFORE the
+   input it names, `:has` is the only selector that reaches backwards, and this engine's
+   StyleSelector splits a selector on whitespace and throws on the `.checkbox)` that falls
+   out of `:has(+ .checkbox)`. Both hovers still light the box and its tick, which is what
+   WidgetCheckBox itself changes; only the word stays its own colour from that end.
+
+   The nowrap is the same widget in the other place it differs: a WidgetLabel lays one
+   line out and lets it overflow, and only a browser would break the words instead. */
+html #local_label {
+    white-space: nowrap;
+}
+
+html #local_label:hover {
+    color: #ffffff;
 }
