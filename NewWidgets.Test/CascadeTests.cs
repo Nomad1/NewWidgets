@@ -56,9 +56,9 @@ namespace NewWidgets.Test
             // contributes nothing.
             CascadeWidget a1 = CreateWidget("c1elemA1", new string[] { "c1cls1" }, "c1id1");
             TestEnvironment.LoadCss(
-                "#c1id1 { background-color: #ff0000; }" +
-                ".c1cls1 { background-color: #00ff00; color: #0000ff; }" +
-                ".c1nomatch1 { background-color: #ffff00; }");
+                "#c1id1 { --background-color: #ff0000; }" +
+                ".c1cls1 { --background-color: #00ff00; color: #0000ff; }" +
+                ".c1nomatch1 { --background-color: #ffff00; }");
             a1.Relayout();
 
             uint a1Back = a1.GetProperty(WidgetParameterIndex.BackColor, (uint)0);
@@ -75,8 +75,8 @@ namespace NewWidgets.Test
             // A2: a .class rule beats a bare element-type rule.
             CascadeWidget a2 = CreateWidget("c1elemA2", new string[] { "c1cls2" }, null);
             TestEnvironment.LoadCss(
-                "c1elemA2 { background-color: #0000ff; }" +
-                ".c1cls2 { background-color: #00ff00; }");
+                "c1elemA2 { --background-color: #0000ff; }" +
+                ".c1cls2 { --background-color: #00ff00; }");
             a2.Relayout();
 
             uint a2Back = a2.GetProperty(WidgetParameterIndex.BackColor, (uint)0);
@@ -86,8 +86,8 @@ namespace NewWidgets.Test
             // A3: a two-class rule beats a single-class rule.
             CascadeWidget a3 = CreateWidget("c1elemA3", new string[] { "c1cls3a", "c1cls3b" }, null);
             TestEnvironment.LoadCss(
-                ".c1cls3b { background-color: #0000ff; }" +
-                ".c1cls3a.c1cls3b { background-color: #00ff00; }");
+                ".c1cls3b { --background-color: #0000ff; }" +
+                ".c1cls3a.c1cls3b { --background-color: #00ff00; }");
             a3.Relayout();
 
             uint a3Back = a3.GetProperty(WidgetParameterIndex.BackColor, (uint)0);
@@ -101,8 +101,8 @@ namespace NewWidgets.Test
 
             CascadeWidget b1 = CreateWidget("c2elemB1", new string[] { "c2cls1" }, "c2id1");
             TestEnvironment.LoadCss(
-                "#c2id1 { background-color: #ff0000; color: #ff0000; }" +
-                ".c2cls1 { background-color: #00ff00; }");
+                "#c2id1 { --background-color: #ff0000; color: #ff0000; }" +
+                ".c2cls1 { --background-color: #00ff00; }");
             b1.Relayout();
 
             // SetProperty writes straight into the own-style dictionary that is already part of
@@ -174,8 +174,8 @@ namespace NewWidgets.Test
             // be explained by declaration order, never by class-list order.
             CascadeWidget d1 = CreateWidget("c4elemD1", new string[] { "c4b", "c4a" }, null);
             TestEnvironment.LoadCss(
-                ".c4a { background-color: #ff0000; }" +
-                ".c4b { background-color: #00ff00; }");
+                ".c4a { --background-color: #ff0000; }" +
+                ".c4b { --background-color: #00ff00; }");
             d1.Relayout();
 
             uint d1Back = d1.GetProperty(WidgetParameterIndex.BackColor, (uint)0);
@@ -185,8 +185,8 @@ namespace NewWidgets.Test
             // D2: the identical selector declared twice -- the later declaration must win.
             CascadeWidget d2 = CreateWidget("c4elemD2", new string[] { "c4dup" }, null);
             TestEnvironment.LoadCss(
-                ".c4dup { background-color: #ff0000; }" +
-                ".c4dup { background-color: #00ff00; }");
+                ".c4dup { --background-color: #ff0000; }" +
+                ".c4dup { --background-color: #00ff00; }");
             d2.Relayout();
 
             uint d2Back = d2.GetProperty(WidgetParameterIndex.BackColor, (uint)0);
@@ -290,8 +290,8 @@ namespace NewWidgets.Test
             // the non-pseudo rule's other properties while it is active.
             CascadeWidget g1 = CreateWidget("c7elemG1", new string[] { "c7btn1" }, null);
             TestEnvironment.LoadCss(
-                ".c7btn1 { background-color: #ff0000; color: #0000ff; }" +
-                ".c7btn1:hover { background-color: #00ff00; }");
+                ".c7btn1 { --background-color: #ff0000; color: #0000ff; }" +
+                ".c7btn1:hover { --background-color: #00ff00; }");
 
             g1.Relayout();
             uint g1BaseBack = g1.GetProperty(WidgetParameterIndex.BackColor, (uint)0);
@@ -317,8 +317,8 @@ namespace NewWidgets.Test
             // G2: Enabled = false brings in a :disabled rule.
             CascadeWidget g2 = CreateWidget("c7elemG2", new string[] { "c7btn2" }, null);
             TestEnvironment.LoadCss(
-                ".c7btn2 { background-color: #ff0000; }" +
-                ".c7btn2:disabled { background-color: #00ff00; }");
+                ".c7btn2 { --background-color: #ff0000; }" +
+                ".c7btn2:disabled { --background-color: #00ff00; }");
 
             g2.Relayout();
             uint g2BeforeBack = g2.GetProperty(WidgetParameterIndex.BackColor, (uint)0);
@@ -335,8 +335,8 @@ namespace NewWidgets.Test
             // together -- neither state alone is enough.
             CascadeWidget g3 = CreateWidget("c7elemG3", new string[] { "c7btn3" }, null);
             TestEnvironment.LoadCss(
-                ".c7btn3 { background-color: #ff0000; }" +
-                ".c7btn3:hover:focus { background-color: #00ff00; }");
+                ".c7btn3 { --background-color: #ff0000; }" +
+                ".c7btn3:hover:focus { --background-color: #00ff00; }");
 
             g3.Relayout();
             g3.Hovered = true;

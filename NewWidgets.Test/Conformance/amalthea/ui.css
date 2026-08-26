@@ -6,7 +6,7 @@
     border-image-repeat: stretch;
     padding: 0px 0px 0px 30px;
     color: #aaaaaa;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
     .special_textedit:focus {
@@ -14,22 +14,22 @@
         border-image-slice: 0 33.3333% fill;
         border-image-repeat: stretch;
         color: #ffffff;
-        background-color-opacity: 100%;
+        --background-opacity: 100%;
     }
 
         .special_textedit:focus:hover {
             border-image-source: url("edit_special_inactive_3");
             border-image-slice: 0 33.3333% fill;
             border-image-repeat: stretch;
-            background-color: #ffdd77;
+            --background-color: #ffdd77;
         }
 
     .special_textedit:hover {
         border-image-source: url("edit_special_inactive_3");
         border-image-slice: 0 33.3333% fill;
         border-image-repeat: stretch;
-        background-color: #ffdd77;
-        background-color-opacity: 50%;
+        --background-color: #ffdd77;
+        --background-opacity: 50%;
     }
 
 .special_textedit2 {
@@ -38,7 +38,7 @@
     border-image-repeat: stretch;
     padding: 0px 0px 0px 30px;
     color: #aaaaaa;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
     .special_textedit2:focus {
@@ -46,22 +46,22 @@
         border-image-slice: 0 33.3333% fill;
         border-image-repeat: stretch;
         color: #ffffff;
-        background-color-opacity: 100%;
+        --background-opacity: 100%;
     }
 
         .special_textedit2:focus:hover {
             border-image-source: url("edit_ispecial_inactive_3");
             border-image-slice: 0 33.3333% fill;
             border-image-repeat: stretch;
-            background-color: #ffdd77;
+            --background-color: #ffdd77;
         }
 
     .special_textedit2:hover {
         border-image-source: url("edit_ispecial_inactive_3");
         border-image-slice: 0 33.3333% fill;
         border-image-repeat: stretch;
-        background-color: #ffdd77;
-        background-color-opacity: 50%;
+        --background-color: #ffdd77;
+        --background-opacity: 50%;
     }
 
 .chat_text {
@@ -69,7 +69,7 @@
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 50%;
-    font-family: default;
+    font-family: "default";
     font-size: 0.528em;
     --clip-margin: 2px 3px 2px 1px;
     color: #888888;
@@ -99,11 +99,11 @@
     }
 
         .send_mail_edit:focus:hover {
-            background-color: #ffdd77;
+            --background-color: #ffdd77;
         }
 
     .send_mail_edit:hover {
-        background-color: #ffdd77;
+        --background-color: #ffdd77;
     }
 
 /* Misc */
@@ -163,7 +163,7 @@
     border-image-source: url("title_line_3");
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 /* Settings */
@@ -183,7 +183,7 @@
 }
 
     .settings_select > .select_label {
-        font-family: default;
+        font-family: "default";
         font-size: 0.5em;
         text-align: horizontalcenter, top;
     }
@@ -234,19 +234,19 @@
 
 .settings_line {
     padding: 6px 6px 6px 6px;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 /* Tables */
 
 .table_row {
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     color: #cceeff;
     border-image-source: url("table_row_alt");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color-opacity: 0%;
+    --background-opacity: 0%;
     background-size: 25%;
 }
 
@@ -254,57 +254,57 @@
         border-image-source: url("table_row_selected_9");
         border-image-slice: 33.3333% fill;
         border-image-repeat: stretch;
-        background-color: #ffdd77;
+        --background-color: #ffdd77;
         color: #ffffff;
-        background-color-opacity: 50%;
+        --background-opacity: 50%;
     }
 
 .table_alt_row {
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     color: #ddffff;
     border-image-source: url("table_row_alt");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
     .table_alt_row:focus {
         border-image-source: url("table_row_alt_selected_9");
         border-image-slice: 33.3333% fill;
         border-image-repeat: stretch;
-        background-color: #ffdd77;
+        --background-color: #ffdd77;
         color: #ffffff;
-        background-color-opacity: 50%;
+        --background-opacity: 50%;
     }
 
 .table_header_row {
-    font-family: title;
+    font-family: "title";
     font-size: 0.5em;
     color: #cccccc;
     border-image-source: url("table_row_header_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 /* Checkboxes */
 
 .solid_checkbox {
     background-image: url("checkbox_solid_normal");
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
     .solid_checkbox:hover {
         background-image: url("checkbox_solid_hovered");
-        background-color: #ffffff;
+        --background-color: #ffffff;
         color: #ffffff;
     }
 
     .solid_checkbox:disabled {
         background-image: url("checkbox_solid_normal");
-        background-color: #888888;
+        --background-color: #888888;
         color: #888888;
     }

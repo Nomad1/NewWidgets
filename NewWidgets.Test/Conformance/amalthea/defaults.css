@@ -4,10 +4,10 @@ without any decorations. Now we have to drag along .none class to maintain at le
     background-repeat: no-repeat;
     background-image: url("");
     background-size: 100%;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
     overflow: visible;
     color: #ffffff;
-    font-family: default;
+    font-family: "default";
     font-size: 1.0em;
     opacity: 100%;
 }
@@ -35,17 +35,17 @@ panel {
 image {
     overflow: visible;
     background-position: 50% 50%;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 label, text {
-    font-family: default;
+    font-family: "default";
     font-size: 0.6em;
     color: #ffffff;
 }
 
 text {
-    font-family: default;
+    font-family: "default";
     font-size: 0.6em;
     color: #ffffff;
 }
@@ -55,7 +55,7 @@ textedit, textfield {
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 50%;
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     width: 200px;
     height: 45px;
@@ -90,7 +90,7 @@ line {
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
     background-position: 50% 0%;
 }
 
@@ -105,7 +105,7 @@ button {
 }
 
     button > .button_label {
-        font-family: default;
+        font-family: "default";
         font-size: 0.66em;
         padding: 0px 0px 7px 0px;
     }
@@ -124,7 +124,7 @@ button {
         border-image-source: url("button_normal_3");
         border-image-slice: 0 33.3333% fill;
         border-image-repeat: stretch;
-        background-color: #808080;
+        --background-color: #808080;
         color: #aaaaaa;
     }
 
@@ -144,7 +144,7 @@ image_button {
 }
 
     image_button > .button_label {
-        font-family: default;
+        font-family: "default";
         font-size: 0.75em;
     }
 
@@ -183,18 +183,18 @@ checkbox {
 
     checkbox:disabled {
         background-image: url("checkbox_solid_normal");
-        background-color: #888888;
+        --background-color: #888888;
         color: #888888;
     }
 
     checkbox > .checkbox_image {
         background-image: url("check_icon");
-        background-color: #ffffff;
+        --background-color: #ffffff;
     }
 
         checkbox > .checkbox_image:hover {
             background-image: url("check_icon");
-            background-color: #ffffff;
+            --background-color: #ffffff;
         }
 
 checkbox_label {
@@ -227,7 +227,7 @@ context_menu {
 
 context_menu_item {
     background-repeat: no-repeat;
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     color: #cceeff;
     padding: 2px 4px 2px 4px;
@@ -282,7 +282,7 @@ select {
 }
 
     select > select_label {
-        font-family: default;
+        font-family: "default";
         font-size: 0.6em;
         color: #eeeeee;
         width: 250px;
@@ -314,7 +314,7 @@ slider {
     }
 
     slider > .slider_label {
-        font-family: default;
+        font-family: "default";
         font-size: 0.4em;
         text-align: horizontalcenter, top;
         color: #ffffff;
@@ -331,20 +331,20 @@ progress {
     border-image-source: url("progress_line_3");
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #666666;
+    --background-color: #666666;
 }
 
     progress > .progress_line {
         border-image-source: url("progress_line_3");
         border-image-slice: 0 33.3333% fill;
         border-image-repeat: stretch;
-        background-color: #ffffff;
+        --background-color: #ffffff;
         --background-depth: backclipped;
         overflow: hidden;
     }
 
     progress > .progress_back_label {
-        font-family: default;
+        font-family: "default";
         font-size: 0.7em;
         color: #ffffff;
         text-align: horizontalcenter, verticalcenter;
@@ -353,7 +353,7 @@ progress {
     }
 
     progress > .progress_front_label {
-        font-family: default;
+        font-family: "default";
         font-size: 0.7em;
         color: #222222;
         text-align: horizontalcenter, verticalcenter;

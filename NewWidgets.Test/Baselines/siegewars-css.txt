@@ -3,7 +3,7 @@
     --background-depth: backclipped;
     background-image: url("back_pattern");
     background-size: 100%;
-    background-color-opacity: 4%;
+    --background-opacity: 4%;
     overflow: hidden;
 }
 
@@ -75,8 +75,8 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #000000;
-    background-color-opacity: 40%;
+    --background-color: #000000;
+    --background-opacity: 40%;
     background-size: 25%;
 }
 
@@ -87,8 +87,8 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #000000;
-    background-color-opacity: 80%;
+    --background-color: #000000;
+    --background-opacity: 80%;
     background-size: 25%;
 }
 
@@ -121,7 +121,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     --clip-margin: 2px 2px 2px 2px;
     background-size: 75%;
 }
@@ -157,7 +157,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .image_button:hover {
@@ -168,7 +168,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
 }
 
 .image_button_nohover {
@@ -200,7 +200,7 @@
 
 .left_button:disabled {
     background-image: url("button_left_selected");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .left_button:focus {
@@ -208,7 +208,7 @@
 }
 
 .left_button:hover {
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
     background-image: url("button_left_hovered");
 }
 
@@ -230,8 +230,8 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
-    background-color-opacity: 5%;
+    --background-color: #ffffff;
+    --background-opacity: 5%;
     background-size: 50%;
 }
 
@@ -253,7 +253,7 @@
     background-repeat: none;
     background-image: url("");
     background-size: 100%;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
     overflow: hidden;
     color: #ffffff;
     font-family: default;
@@ -296,7 +296,7 @@
 
 .right_button:disabled {
     background-image: url("button_right_selected");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .right_button:focus {
@@ -324,7 +324,7 @@
 }
 
 .send_mail_edit.send_mail_edit_selected_hovered {
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .send_mail_edit:focus {
@@ -338,7 +338,7 @@
 }
 
 .send_mail_edit:hover {
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .settings_header {
@@ -352,7 +352,7 @@
 
 .settings_line {
     padding: 6px 6px 6px 6px;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 .settings_select {
@@ -398,7 +398,7 @@
     border-image-repeat: stretch;
     padding: 30px 0px 0px 0px;
     color: #aaaaaa;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .special_textedit2 {
@@ -410,7 +410,7 @@
     border-image-repeat: stretch;
     padding: 30px 0px 0px 0px;
     color: #aaaaaa;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .special_textedit2:focus {
@@ -421,7 +421,7 @@
     background-repeat: threeimage;
     border-image-repeat: stretch;
     color: #ffffff;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
 }
 
 .special_textedit2:focus:hover {
@@ -431,7 +431,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .special_textedit2:hover {
@@ -441,8 +441,8 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
-    background-color-opacity: 50%;
+    --background-color: #ffdd77;
+    --background-opacity: 50%;
 }
 
 .special_textedit:focus {
@@ -453,7 +453,7 @@
     background-repeat: threeimage;
     border-image-repeat: stretch;
     color: #ffffff;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
 }
 
 .special_textedit:focus:hover {
@@ -463,7 +463,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .special_textedit:hover {
@@ -473,8 +473,8 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
-    background-color-opacity: 50%;
+    --background-color: #ffdd77;
+    --background-opacity: 50%;
 }
 
 .tab_panel_9 {
@@ -498,7 +498,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .table_alt_row:focus {
@@ -508,9 +508,9 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
     color: #ffffff;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .table_header_row {
@@ -524,8 +524,8 @@
     background-repeat: imagestretch;
     border-image-repeat: stretch;
     background-size: 100%;
-    background-color-opacity: 25%;
-    background-color: #ffffff;
+    --background-opacity: 25%;
+    --background-color: #ffffff;
 }
 
 .table_row {
@@ -538,7 +538,7 @@
     --border-image-fill: true;
     background-repeat: imagestretch;
     border-image-repeat: stretch;
-    background-color-opacity: 0%;
+    --background-opacity: 0%;
     background-size: 25%;
 }
 
@@ -549,9 +549,9 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
     color: #ffffff;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .talent_name {
@@ -562,7 +562,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 10%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
     padding: 4px 4px 4px 4px;
 }
 
@@ -583,7 +583,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .toolbar_button {
@@ -596,7 +596,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 40%;
+    --background-opacity: 40%;
 }
 
 .toolbar_button:disabled {
@@ -607,7 +607,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     color: #aaaaaa;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .toolbar_button:disabled:hover {
@@ -627,7 +627,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .toolbar_button:focus:hover {
@@ -638,7 +638,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
 }
 
 .toolbar_button:hover {
@@ -649,7 +649,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
 }
 
 .tooltip {
@@ -760,7 +760,7 @@ button:disabled {
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #808080;
+    --background-color: #808080;
     color: #aaaaaa;
 }
 
@@ -806,7 +806,7 @@ checkbox {
 
 checkbox:disabled {
     background-image: url("checkbox_solid_normal");
-    background-color: #888888;
+    --background-color: #888888;
     color: #888888;
 }
 
@@ -873,7 +873,7 @@ context_menu_item:hover {
 image {
     overflow: visible;
     background-position: 50% 50%;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 label {
@@ -892,7 +892,7 @@ line {
     background-repeat: threeimage;
     border-image-repeat: stretch;
     background-size: 100%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
     background-position: 50% 0%;
 }
 
@@ -1036,8 +1036,8 @@ textedit {
     --clip-margin: 1px 2px 3px 2px;
     --cursor-color: #ffffff;
     padding: 6px 2px 6px 0px;
-    background-color: #ffffff;
-    background-color-opacity: 50%;
+    --background-color: #ffffff;
+    --background-opacity: 50%;
 }
 
 textedit:focus {
@@ -1048,7 +1048,7 @@ textedit:focus {
     background-repeat: nineimage;
     border-image-repeat: stretch;
     color: #ffffff;
-    background-color-opacity: 75%;
+    --background-opacity: 75%;
 }
 
 textedit:focus:hover {
@@ -1086,8 +1086,8 @@ textfield {
     --clip-margin: 1px 2px 3px 2px;
     --cursor-color: #ffffff;
     padding: 6px 2px 6px 0px;
-    background-color: #ffffff;
-    background-color-opacity: 50%;
+    --background-color: #ffffff;
+    --background-opacity: 50%;
 }
 
 textfield:focus {
@@ -1098,7 +1098,7 @@ textfield:focus {
     background-repeat: nineimage;
     border-image-repeat: stretch;
     color: #ffffff;
-    background-color-opacity: 75%;
+    --background-opacity: 75%;
 }
 
 textfield:focus:hover {
@@ -1132,7 +1132,7 @@ toolbar #toolbar_panel {
 toolbarhsep {
     background-repeat: imagefit;
     background-image: url("icon_separator_horizontal");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     width: 64px;
     height: 12px;
 }
@@ -1140,7 +1140,7 @@ toolbarhsep {
 toolbarsep {
     background-repeat: imagefit;
     background-image: url("icon_separator");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     width: 12px;
     height: 64px;
 }

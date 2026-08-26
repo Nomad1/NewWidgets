@@ -79,8 +79,8 @@
     border-image-source: url("panel_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #000000;
-    background-color-opacity: 40%;
+    --background-color: #000000;
+    --background-opacity: 40%;
     background-size: 25%;
 }
 
@@ -88,8 +88,8 @@
     border-image-source: url("panel_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #000000;
-    background-color-opacity: 80%;
+    --background-color: #000000;
+    --background-opacity: 80%;
     background-size: 25%;
 }
 
@@ -97,8 +97,8 @@
     border-image-source: url("frame_white_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #ffffff;
-    background-color-opacity: 5%;
+    --background-color: #ffffff;
+    --background-opacity: 5%;
     background-size: 50%;
 }
 
@@ -145,7 +145,7 @@
     --background-depth: backclipped;
     background-image: url("back_pattern");
     background-size: 100%;
-    background-color-opacity: 4%;
+    --background-opacity: 4%;
     overflow: hidden;
 }
 

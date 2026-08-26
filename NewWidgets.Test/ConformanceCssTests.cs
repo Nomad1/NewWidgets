@@ -48,7 +48,7 @@ namespace NewWidgets.Test
             TestRunner.Add("Test 57: border-image longhands are parsed and stored", Test57_BorderImage);
             TestRunner.Add("Test 58: @font-face registers a font and a font stack resolves", Test58_FontFace);
             TestRunner.Add("Test 59: deliberately ignored properties, clip-path and display", Test59_IgnoredAndMapped);
-            TestRunner.Add("Test 73: an alpha on background-color reaches the renderer", Test73_BackgroundColorAlpha);
+            TestRunner.Add("Test 73: an alpha on --background-color reaches the renderer", Test73_BackgroundColorAlpha);
             TestRunner.Add("Test 74: @font-face and @font.name register the same font", Test74_FontFaceMatchesFontAtRule);
             TestRunner.Add("Test 75: several @font-face rules survive a save and a reparse", Test75_FontFacesSurviveSaveAndReparse);
 
@@ -355,7 +355,7 @@ namespace NewWidgets.Test
         }
 
         /// <summary>
-        /// A colour's alpha and this engine's <c>background-color-opacity</c> are the same
+        /// A colour's alpha and this engine's <c>--background-opacity</c> are the same
         /// quantity written two ways, so the standard spelling has to arrive where the private
         /// one does. The renderer is the referee: <see cref="WidgetBackground"/>'s Update
         /// hands <c>BackgroundColor</c> to <c>Sprite.Color</c>, whose setter masks the value
@@ -375,17 +375,17 @@ namespace NewWidgets.Test
             context.DoesNotThrow(delegate
             {
                 TestEnvironment.LoadCss(
-                    ".c73pair { background-color: #000000; background-color-opacity: 4%; }" +
-                    ".c73rgba { background-color: rgba(0, 0, 0, 0.04); }" +
-                    ".c73hex8 { background-color: #0000000a; }" +
-                    ".c73both { background-color: rgba(0, 0, 0, 0.5); background-color-opacity: 50%; }" +
-                    ".c73bothswapped { background-color-opacity: 50%; background-color: rgba(0, 0, 0, 0.5); }" +
-                    ".c73plain { background-color: #000000; }" +
-                    ".c73transparent { background-color: transparent; }" +
-                    ".c73zerorgba { background-color: rgba(255, 0, 0, 0); }" +
-                    ".c73zerohex { background-color: #ff000000; }" +
+                    ".c73pair { --background-color: #000000; --background-opacity: 4%; }" +
+                    ".c73rgba { --background-color: rgba(0, 0, 0, 0.04); }" +
+                    ".c73hex8 { --background-color: #0000000a; }" +
+                    ".c73both { --background-color: rgba(0, 0, 0, 0.5); --background-opacity: 50%; }" +
+                    ".c73bothswapped { --background-opacity: 50%; --background-color: rgba(0, 0, 0, 0.5); }" +
+                    ".c73plain { --background-color: #000000; }" +
+                    ".c73transparent { --background-color: transparent; }" +
+                    ".c73zerorgba { --background-color: rgba(255, 0, 0, 0); }" +
+                    ".c73zerohex { --background-color: #ff000000; }" +
                     ".c73none { --clip: true; }");
-            }, "an alpha-bearing background-color should be read, not rejected");
+            }, "an alpha-bearing --background-color should be read, not rejected");
 
             context.AreEqual(0, controller.Errors.Count, "none of these rules should log an error, got: {0}", Join(controller.Errors));
 
@@ -394,7 +394,7 @@ namespace NewWidgets.Test
 
             // the pair is what both shipped skins write; rgba() is what a browser reads
             context.AreEqual(pair.BackgroundColor, rgba.BackgroundColor, "rgba() should store the same colour the #rrggbb form does");
-            context.AreEqual(RenderedAlpha(pair), RenderedAlpha(rgba), "rgba(0, 0, 0, 0.04) should paint the same background as #000000 plus background-color-opacity: 4%");
+            context.AreEqual(RenderedAlpha(pair), RenderedAlpha(rgba), "rgba(0, 0, 0, 0.04) should paint the same background as #000000 plus --background-opacity: 4%");
             context.AreEqual(10, RenderedAlpha(rgba), "4% of 255 is 10");
 
             context.AreEqual(RenderedAlpha(pair), RenderedAlpha(StyledPanel(".c73hex8")), "the eight digit hex form carries the same alpha as rgba()");
@@ -407,19 +407,19 @@ namespace NewWidgets.Test
             // a written zero is transparent, and is not the same as writing no alpha at all.
             // Without the hasAlpha flag from ColorParse these three paint fully opaque, because a
             // packed top byte of zero looks exactly like a plain #rrggbb that declared nothing.
-            context.AreEqualFloat(0.0f, StyledPanel(".c73transparent").BackgroundAlpha, 0.005f, "background-color: transparent should paint nothing");
+            context.AreEqualFloat(0.0f, StyledPanel(".c73transparent").BackgroundAlpha, 0.005f, "--background-color: transparent should paint nothing");
             context.AreEqualFloat(0.0f, StyledPanel(".c73zerorgba").BackgroundAlpha, 0.005f, "rgba(255, 0, 0, 0) should paint nothing");
             context.AreEqualFloat(0.0f, StyledPanel(".c73zerohex").BackgroundAlpha, 0.005f, "#ff000000 should paint nothing");
 
             // the two cases the corpus cannot catch, because a top byte of zero is what every
             // colour in both games and the un-declared default alike look like
             WidgetPanel plain = StyledPanel(".c73plain");
-            context.AreEqualFloat(1.0f, plain.BackgroundAlpha, 0.001f, "a background-color with no alpha must leave the background at full strength");
-            context.AreEqual(255, RenderedAlpha(plain), "a background-color with no alpha must still paint opaque");
+            context.AreEqualFloat(1.0f, plain.BackgroundAlpha, 0.001f, "a --background-color with no alpha must leave the background at full strength");
+            context.AreEqual(255, RenderedAlpha(plain), "a --background-color with no alpha must still paint opaque");
 
             WidgetPanel none = StyledPanel(".c73none");
-            context.AreEqual((uint)0xffffff, none.BackgroundColor, "a widget declaring no background-color keeps the default colour");
-            context.AreEqual(255, RenderedAlpha(none), "a widget declaring no background-color must still paint opaque");
+            context.AreEqual((uint)0xffffff, none.BackgroundColor, "a widget declaring no --background-color keeps the default colour");
+            context.AreEqual(255, RenderedAlpha(none), "a widget declaring no --background-color must still paint opaque");
         }
 
         /// <summary>

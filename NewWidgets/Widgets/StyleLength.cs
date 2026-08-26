@@ -43,7 +43,7 @@ namespace NewWidgets.Widgets
     /// applied when the box is resolved rather than when the stylesheet is read.
     ///
     /// This is deliberately per-property. Every other percentage in the library --
-    /// background-size, background-position, background-color-opacity, opacity -- keeps the
+    /// background-size, background-position, --background-opacity, opacity -- keeps the
     /// old bare-fraction behaviour, which is what the shipped stylesheets mean by it.
     /// </summary>
     public struct StyleLength

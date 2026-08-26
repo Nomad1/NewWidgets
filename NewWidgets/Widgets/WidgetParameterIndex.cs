@@ -127,8 +127,8 @@ namespace NewWidgets.Widgets
 
         // Background
 
-        [WidgetParameter("back_color", "background-color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Initial,
-                                       typeof(BackgroundColorProcessor), "background-color-opacity")] // an authored alpha is unpacked into the opacity property, because the renderer masks it off the colour
+        [WidgetParameter("back_color", "--background-color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Initial,
+                                       typeof(BackgroundColorProcessor), "--background-opacity")] // an authored alpha is unpacked into the opacity property, because the renderer masks it off the colour
         BackColor,
         [WidgetParameter("back_image", "background-image", typeof(string), UnitType.Url)]
         BackImage,
@@ -174,8 +174,8 @@ namespace NewWidgets.Widgets
         BorderImageRepeat,
         [WidgetParameter("back_padding", "--background-padding", typeof(Margin), UnitType.Length)]
         BackPadding,
-        [WidgetParameter("back_opacity", "background-color-opacity",  typeof(float), UnitType.Percent, WidgetParameterInheritance.Initial,
-                                         typeof(BackgroundOpacityProcessor))] // Panorama UI compat, invalid in CSS. Composes with an alpha authored on background-color
+        [WidgetParameter("back_opacity", "--background-opacity",  typeof(float), UnitType.Percent, WidgetParameterInheritance.Initial,
+                                         typeof(BackgroundOpacityProcessor))] // Panorama UI compat. Composes with an alpha authored on --background-color
         BackOpacity,
 
         // Text
@@ -590,11 +590,11 @@ namespace NewWidgets.Widgets
     }
 
     /// <summary>
-    /// CSS <c>background-color</c>, whose colour may carry an alpha -- <c>rgba()</c>,
+    /// This engine's tint, <c>--background-color</c>, whose colour may carry an alpha -- <c>rgba()</c>,
     /// <c>#rrggbbaa</c>, the engine's own <c>0xAARRGGBB</c>. That alpha cannot stay in the
     /// colour: <c>Sprite.Color</c>'s setter masks the value with <c>0x00ffffff</c> and keeps
     /// the alpha byte it already had, so the top byte of a stored colour never reaches the
-    /// screen. The strength of a background reaches it through <c>background-color-opacity</c>
+    /// screen. The strength of a background reaches it through <c>--background-opacity</c>
     /// alone, which <see cref="WidgetBackground.Update"/> multiplies into <c>Sprite.Alpha</c>.
     /// So the alpha is unpacked here, at parse time, into that property, and stripped from the
     /// colour -- leaving it in both would apply it twice after a <c>SaveCSS</c> round trip.
@@ -615,7 +615,7 @@ namespace NewWidgets.Widgets
     /// <see cref="ConversionHelper.ColorParse"/> to report whether the source carried an alpha
     /// channel at all, rather than leaving the caller to infer it from the value.
     ///
-    /// ponytail: the split also means a later rule re-declaring `background-color` without an
+    /// ponytail: the split also means a later rule re-declaring `--background-color` without an
     /// alpha does not clear an opacity an earlier rule's colour contributed, the way it would
     /// in a browser. Same upgrade path: a colour that carries its own alpha to the renderer.
     /// </summary>
@@ -635,7 +635,7 @@ namespace NewWidgets.Widgets
 
             float opacity = (color >> 24) / 255.0f;
 
-            // a background-color-opacity earlier in the same rule composes with this alpha
+            // a --background-opacity earlier in the same rule composes with this alpha
             object declared;
             if (data.TryGetValue(CompanionIndex, out declared))
                 opacity *= (float)declared;
@@ -645,9 +645,9 @@ namespace NewWidgets.Widgets
     }
 
     /// <summary>
-    /// This engine's own <c>background-color-opacity</c>, kept because both shipped games are
+    /// This engine's own <c>--background-opacity</c>, kept because both shipped games are
     /// written in it. It differs from a plain float only in composing with an alpha a
-    /// <c>background-color</c> in the same rule already contributed -- see
+    /// <c>--background-color</c> in the same rule already contributed -- see
     /// <see cref="BackgroundColorProcessor"/> for why the two multiply.
     /// </summary>
     internal class BackgroundOpacityProcessor : CssPropertyProcessor

@@ -33,7 +33,7 @@ namespace NewWidgets.BrowserPreview
         public readonly string Repeat;
 
         /// <summary>
-        /// The style's `background-color-opacity`, 0..1. 1 for everything that does not set it.
+        /// The style's `--background-opacity`, 0..1. 1 for everything that does not set it.
         /// </summary>
         public readonly double Opacity;
 
@@ -485,7 +485,7 @@ namespace NewWidgets.BrowserPreview
                 if (box.Outset != "0")
                     text.AppendLine("    clip-path: inset(0);");
 
-                // background-color-opacity is an opacity on the drawn sprite, not an alpha on a
+                // --background-opacity is an opacity on the drawn sprite, not an alpha on a
                 // colour -- WidgetBackground.Update puts it in ImageObject.Sprite.Alpha, which
                 // multiplies every pixel the sprite draws. CSS `opacity` on the element that draws
                 // it is the same operation. `background-color: rgba(...)` would NOT be: that

@@ -1,5 +1,5 @@
 @font-face {
-    font-family: default;
+    font-family: "default";
     src: url("font5");
     --font-spacing: -0.25;
     --font-shift: 0;
@@ -8,7 +8,7 @@
 }
 
 @font-face {
-    font-family: bold;
+    font-family: "bold";
     src: url("font5");
     --font-spacing: -0.25;
     --font-shift: 0;
@@ -17,7 +17,7 @@
 }
 
 @font-face {
-    font-family: outline;
+    font-family: "outline";
     src: url("font5");
     --font-spacing: -0.25;
     --font-shift: 0;
@@ -26,7 +26,7 @@
 }
 
 @font-face {
-    font-family: numbers;
+    font-family: "numbers";
     src: url("font4");
     --font-spacing: -0.25;
     --font-shift: -5;
@@ -35,7 +35,7 @@
 }
 
 @font-face {
-    font-family: title;
+    font-family: "title";
     src: url("font6");
     --font-spacing: -0.25;
     --font-shift: 0;

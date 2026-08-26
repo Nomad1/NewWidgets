@@ -13,7 +13,7 @@
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 10%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
     padding: 4px 4px 4px 4px;
 }
 
@@ -26,7 +26,7 @@
 
     .talent_button > .button_label {
         font-size: 0.3em;
-        font-family: default;
+        font-family: "default";
         padding: 68px 0px 0px 0px;
     }
 
@@ -43,9 +43,9 @@
     }
 
     .talent_button:disabled {
-        background-color-opacity: 50%;
+        --background-opacity: 50%;
         color: #808080;
-        background-color: #808080;
+        --background-color: #808080;
     }
 
     .talent_button.talent_button_empty {
@@ -54,36 +54,36 @@
     }
 
 .talent_mark_empty_button {
-    background-color: #88aaee;
+    --background-color: #88aaee;
     background-image: url("talent_mark_empty");
 }
 
     .talent_mark_empty_button:hover {
         background-image: url("talent_mark_empty");
-        background-color: #ffaa33;
+        --background-color: #ffaa33;
     }
 
     .talent_mark_empty_button:disabled {
-        background-color: #666666;
+        --background-color: #666666;
         background-image: url("talent_mark_empty");
     }
 
     .talent_mark_empty_button:focus {
         background-image: url("talent_mark_full");
-        background-color: #ffffff;
+        --background-color: #ffffff;
     }
 
 .talent_mark_full_button {
     background-image: url("talent_mark_full");
-    background-color: #ffaa00;
+    --background-color: #ffaa00;
 }
 
     .talent_mark_full_button:focus {
         background-image: url("talent_mark_full");
-        background-color: #0ab1e6;
+        --background-color: #0ab1e6;
     }
 
     .talent_mark_full_button:disabled {
         background-image: url("talent_mark_full");
-        background-color: #ffffff;
+        --background-color: #ffffff;
     }

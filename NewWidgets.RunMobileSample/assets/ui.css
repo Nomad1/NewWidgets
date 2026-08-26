@@ -47,7 +47,7 @@
    browser-only block at the foot of the file. See the comment there. */
 
 @font-face {
-    font-family: default;
+    font-family: "default";
     src: url("font5");
     --font-spacing: 0;
     --font-shift: 0;
@@ -89,7 +89,7 @@ label, text, span, h1, h2, h3, h4, h5, h6 {
     position: absolute;
     box-sizing: border-box;
     margin: 0;
-    font-family: default;
+    font-family: "default";
     font-size: 0.6em;
     color: #ffffff;
     width: 100px;
@@ -98,7 +98,7 @@ label, text, span, h1, h2, h3, h4, h5, h6 {
 }
 
 text {
-    font-family: default;
+    font-family: "default";
     font-size: 0.6em;
     color: #ffffff;
 }
@@ -109,14 +109,14 @@ textedit, textfield, input, textarea {
     margin: 0;
     border: none;
     appearance: none;
-    background-color: transparent;
+    --background-color: transparent;
     resize: none;
     border-image-source: url("ui.svg#panel_white_hovered_9");
     border-image-slice: 33.3333% fill;
     border-image-width: 7.5px; /* panel_white_hovered_9 is 90 square: 90 / 3 * 25% */
     border-image-repeat: stretch;
     background-size: 25%;
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     width: 200px;
     height: 45px;
@@ -135,11 +135,11 @@ textedit:focus, textfield:focus, input:focus, textarea:focus {
 }
 
 textedit:focus:hover, textfield:focus:hover, input:focus:hover, textarea:focus:hover {
-    background-color: #ffee88;
+    --background-color: #ffee88;
 }
 
 textedit:hover, textfield:hover, input:hover, textarea:hover {
-    background-color: #ffee88;
+    --background-color: #ffee88;
 }
 
 #scrollview_hscroll {
@@ -192,9 +192,9 @@ context_menu {
 context_menu_item {
     position: absolute;
     border: none;
-    background-color: transparent;
+    --background-color: transparent;
     background-repeat: no-repeat;
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     color: #cceeff;
     padding: 4px 2px 4px 2px;
@@ -226,7 +226,7 @@ button {
     margin: 0;
     border: none;
     appearance: none;
-    background-color: transparent;
+    --background-color: transparent;
     border-image-source: url("ui.svg#button_white_normal_3");
     border-image-slice: 0 33.3333% fill;
     border-image-width: 0 40px; /* button_white_normal_3 is 120x67: 120 / 3 * 100% */
@@ -235,7 +235,7 @@ button {
     --text-padding: 0px 0px 0px 6px;
     width: 120px;
     height: 40px;
-    font-family: default;
+    font-family: "default";
     font-size: 0.6em;
     color: #ffffff;
 }
@@ -251,8 +251,8 @@ button:disabled {
     border-image-source: url("ui.svg#button_white_normal_3");
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
-    background-color-opacity: 50%;
-    background-color: #aaaaaa;
+    --background-opacity: 50%;
+    --background-color: #aaaaaa;
     color: #808080;
 }
 
@@ -261,8 +261,8 @@ button:disabled:hover {
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
     color: #aaaaaa;
-    background-color-opacity: 50%;
-    background-color: #aaaaaa;
+    --background-opacity: 50%;
+    --background-color: #aaaaaa;
 }
 
 /* The one control the two vocabularies cannot share a name for. HTML spells a checkbox
@@ -348,7 +348,7 @@ img {
     --background-depth: backclipped;
     background-image: url("ui.svg#back_pattern");
     background-size: 100%;
-    background-color-opacity: 4%;
+    --background-opacity: 4%;
     overflow: hidden;
     clip-path: inset(2px 2px 2px 2px);
 }
@@ -356,9 +356,9 @@ img {
 .text_button {
     position: absolute;
     border: none;
-    background-color: transparent;
+    --background-color: transparent;
     background-repeat: no-repeat;
-    font-family: default;
+    font-family: "default";
     width: 300px;
     height: 20px;
     font-size: 0.6em;
@@ -374,7 +374,7 @@ img {
 .image_button {
     position: absolute;
     border: none;
-    background-color: transparent;
+    --background-color: transparent;
     background-repeat: no-repeat;
     --image-padding: 6px 6px 6px 6px;
     width: 64px;
@@ -468,12 +468,12 @@ img {
                        fragment brings no intrinsic size with it, and the engine's
                        background-size is a single scale factor where 100% is that same
                        native size. One property, two units, no shared spelling.
-     opacity           `background-color-opacity: 4%` is what this engine dims a background
+     opacity           `--background-opacity: 4%` is what this engine dims a background
                        sprite with and is not a CSS property. `opacity` is the CSS spelling
                        of the same result -- and this engine also reads `opacity`, as the
                        widget's own alpha, so declaring it above would dim the panel twice.
      background-color  a disabled button is 50% grey. This engine spells that #aaaaaa plus
-                       `background-color-opacity: 50%`; CSS spells it rgba(), which this
+                       `--background-opacity: 50%`; CSS spells it rgba(), which this
                        engine's colour parser does not read at all.
      padding           `--text-padding` is dead text in this engine -- the parameter was
                        renamed to `padding` and the old name resolves to nothing -- so the

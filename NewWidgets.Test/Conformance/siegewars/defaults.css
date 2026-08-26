@@ -1,5 +1,5 @@
 @font-face {
-    font-family: default;
+    font-family: "default";
     src: url("font5");
     --font-spacing: -0.25;
     --font-shift: 0;
@@ -8,7 +8,7 @@
 }
 
 @font-face {
-    font-family: bold;
+    font-family: "bold";
     src: url("font5");
     --font-spacing: -0.25;
     --font-shift: 0;
@@ -17,7 +17,7 @@
 }
 
 @font-face {
-    font-family: outline;
+    font-family: "outline";
     src: url("font5");
     --font-spacing: -0.25;
     --font-shift: 0;
@@ -26,7 +26,7 @@
 }
 
 @font-face {
-    font-family: numbers;
+    font-family: "numbers";
     src: url("font4");
     --font-spacing: -0.25;
     --font-shift: -5;
@@ -35,7 +35,7 @@
 }
 
 @font-face {
-    font-family: title;
+    font-family: "title";
     src: url("font6");
     --font-spacing: -0.25;
     --font-shift: 0;
@@ -47,7 +47,7 @@
     background-repeat: none;
     background-image: url("");
     background-size: 100%;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
     overflow: hidden;
     color: #ffffff;
 }
@@ -79,7 +79,7 @@ image {
 }
 
 label, text {
-    font-family: default;
+    font-family: "default";
     font-size: 0.6em;
     color: #ffffff;
     width: 100px;
@@ -87,7 +87,7 @@ label, text {
 }
 
 text {
-    font-family: default;
+    font-family: "default";
     font-size: 0.6em;
     color: #ffffff;
     width: 100px;
@@ -98,10 +98,10 @@ textedit, textfield {
     border-image-source: url("editor_button_normal_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
     background-size: 50%;
-    background-color-opacity: 50%;
-    font-family: default;
+    --background-opacity: 50%;
+    font-family: "default";
     font-size: 0.6em;
     width: 200px;
     height: 45px;
@@ -116,7 +116,7 @@ textedit:focus, textfield:focus {
     border-image-source: url("editor_button_normal_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color-opacity: 75%;
+    --background-opacity: 75%;
     color: #ffffff;
 }
 
@@ -137,7 +137,7 @@ line {
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
     background-position: 50% 0%;
 }
 
@@ -146,7 +146,7 @@ button {
     background-image: url("button_square_normal");
     background-size: 100%;
     --button-text-padding: 0px 0px 7px 0px;
-    font-family: default;
+    font-family: "default";
     font-size: 0.75em;
     width: 100px;
     height: 100px;
@@ -243,7 +243,7 @@ context_menu {
 
 context_menu_item {
     background-repeat: none;
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     color: #cceeff;
     padding: 2px 4px 2px 4px;
@@ -294,7 +294,7 @@ select {
 }
 
 select #select_label {
-    font-family: default;
+    font-family: "default";
     font-size: 0.6em;
     color: #eeeeee;
     text-align: horizontalcenter, top;

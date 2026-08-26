@@ -14,9 +14,11 @@
     src: url("font5.png");          /* atlas, not a font file. See note 3 below. */
 }
 
+/* No background-color: D202 gave the name back to a browser and the engine no longer
+   reads it, and this sheet has to load through the engine without a message. The page
+   colour lives in the renderer, which is where NewWidgets.BrowserPreview writes it. */
 body {
     margin: 0;
-    background-color: #202020;
     font-family: "uifont", monospace;
     font-size: 30px;                /* --font-baseline: 30 in the original */
 }
@@ -41,7 +43,7 @@ body {
     border-image-repeat: stretch;
 }
 
-/* back_pattern: was imagetiled + background-color-opacity: 4% */
+/* back_pattern: was imagetiled + back_opacity: 4% */
 .back_pattern {
     position: absolute;
     left: 0;
@@ -52,7 +54,7 @@ body {
 
     background-image: url("ui.png");
     background-repeat: repeat;
-    background-color: rgba(255, 255, 255, 0.04);
+    --background-color: rgba(255, 255, 255, 0.04);
 }
 
 .label {
@@ -83,11 +85,14 @@ body {
 }
 
 /* button: was threeimage, which is a 3x1 slice.
-   The element is a real <button>, so the three things a browser dresses a form
-   control in of its own accord are taken back here: it does not inherit the page
-   font, and its buttonface background and outset border would sit in front of the
-   nine-patch below. All three are ordinary properties, which is why <button> is
-   usable where <img> was not -- a broken-image placeholder cannot be overridden. */
+   The element is a real <button>, so what a browser dresses a form control in of its
+   own accord is taken back here: it does not inherit the page font, and its buttonface
+   background and outset border would sit in front of the nine-patch below. Those are
+   ordinary properties, which is why <button> is usable where <img> was not -- a
+   broken-image placeholder cannot be overridden.
+   The buttonface reset is the one that cannot be written here any more: D202 gave
+   `background-color` back to a browser and the engine no longer reads it, so a sheet
+   that has to load through the engine without a message cannot declare it. */
 .button {
     position: absolute;
     width: 120px;
@@ -96,7 +101,6 @@ body {
     font-size: 0.6em;
     text-align: left;
     color: #ffffff;
-    background-color: transparent;
     padding: 0 0 0 6px;
     box-sizing: border-box;
 

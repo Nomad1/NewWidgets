@@ -31,7 +31,7 @@
     --background-depth: backclipped;
     background-image: url("back_pattern");
     background-size: 100%;
-    background-color-opacity: 4%;
+    --background-opacity: 4%;
     overflow: hidden;
 }
 
@@ -162,7 +162,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ff0000;
+    --background-color: #ff0000;
     color: #999999;
 }
 
@@ -173,7 +173,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 .bookmark_button:hover {
@@ -183,7 +183,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .bookmark_root_button {
@@ -208,7 +208,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ff0000;
+    --background-color: #ff0000;
     color: #999999;
 }
 
@@ -219,7 +219,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 .bookmark_root_button:hover {
@@ -229,7 +229,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .building_command_button {
@@ -237,15 +237,15 @@
     background-repeat: imagefit;
     width: 72px;
     height: 72px;
-    background-color: #ffffff;
-    background-color-opacity: 100%;
+    --background-color: #ffffff;
+    --background-opacity: 100%;
 }
 
 .building_command_button:disabled {
     background-image: url("button_command_disabled");
     background-repeat: imagefit;
-    background-color: #888888;
-    background-color-opacity: 50%;
+    --background-color: #888888;
+    --background-opacity: 50%;
 }
 
 .building_command_button:hover {
@@ -299,7 +299,7 @@
 
 .circle_button:disabled {
     background-image: url("circle_button_normal");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .circle_button:hover {
@@ -321,11 +321,11 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .close_image_button:hover {
-    background-color: #ffaa00;
+    --background-color: #ffaa00;
     border-image-source: url("panel_white_hovered_9");
     background-image: url("panel_white_hovered_9");
     border-image-slice: 33% 33% 33% 33%;
@@ -333,7 +333,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
 }
 
 .dark_panel {
@@ -343,8 +343,8 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #000000;
-    background-color-opacity: 40%;
+    --background-color: #000000;
+    --background-opacity: 40%;
     background-size: 25%;
 }
 
@@ -355,8 +355,8 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #000000;
-    background-color-opacity: 80%;
+    --background-color: #000000;
+    --background-opacity: 80%;
     background-size: 25%;
 }
 
@@ -392,7 +392,7 @@
 
 .hex_button:disabled {
     background-image: url("hex_button_normal");
-    background-color: #808080;
+    --background-color: #808080;
     color: #aaaaaa;
 }
 
@@ -441,9 +441,9 @@
 }
 
 .hex_image_button:disabled {
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     color: #808080;
-    background-color: #808080;
+    --background-color: #808080;
 }
 
 .hex_image_button:focus {
@@ -458,7 +458,7 @@
     --background-depth: top;
     width: 76px;
     height: 76px;
-    background-color: #ffaa33;
+    --background-color: #ffaa33;
 }
 
 .hhex_button_black {
@@ -473,9 +473,9 @@
 }
 
 .hhex_button_black:disabled {
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     color: #808080;
-    background-color: #808080;
+    --background-color: #808080;
 }
 
 .hhex_button_black:focus {
@@ -498,9 +498,9 @@
 }
 
 .hhex_button_black_big:disabled {
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     color: #808080;
-    background-color: #808080;
+    --background-color: #808080;
 }
 
 .hhex_button_black_big:hover {
@@ -543,7 +543,7 @@
     height: 76px;
     background-image: url("hhex_button_selection");
     background-repeat: imagefit;
-    background-color: #ffaa33;
+    --background-color: #ffaa33;
 }
 
 .hhex_straight_button {
@@ -555,7 +555,7 @@
 
 .hhex_straight_button:disabled {
     color: #aaaaaa;
-    background-color: #aaaaaa;
+    --background-color: #aaaaaa;
     background-image: url("hhex_straight_button_selected");
 }
 
@@ -616,8 +616,8 @@
 
 .item_button_empty {
     background-image: url("button_square_trans_frame");
-    background-color: #444444;
-    background-color-opacity: 100%;
+    --background-color: #444444;
+    --background-opacity: 100%;
 }
 
 .item_tooltip {
@@ -633,7 +633,7 @@
 
 .left_button:disabled {
     background-image: url("button_left_selected");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .left_button:focus {
@@ -641,7 +641,7 @@
 }
 
 .left_button:hover {
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
     background-image: url("button_left_hovered");
 }
 
@@ -663,8 +663,8 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
-    background-color-opacity: 5%;
+    --background-color: #ffffff;
+    --background-opacity: 5%;
     background-size: 50%;
 }
 
@@ -742,7 +742,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .nimage_button:hover {
@@ -753,14 +753,14 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
 }
 
 .none {
     background-repeat: none;
     background-image: url("");
     background-size: 100%;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
     overflow: visible;
     color: #ffffff;
     font-family: default;
@@ -825,7 +825,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
     color: #ffffff;
 }
 
@@ -836,7 +836,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
     color: #ffffff;
 }
 
@@ -847,7 +847,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
     color: #ffffff;
 }
 
@@ -870,7 +870,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
     color: #ffffff;
 }
 
@@ -881,7 +881,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
     color: #ffffff;
 }
 
@@ -892,7 +892,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
     color: #ffffff;
 }
 
@@ -956,7 +956,7 @@
 
 .right_button:disabled {
     background-image: url("button_right_selected");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .right_button:focus {
@@ -994,11 +994,11 @@
 }
 
 .send_mail_edit:focus:hover {
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .send_mail_edit:hover {
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .settings_header {
@@ -1018,7 +1018,7 @@
 
 .settings_line {
     padding: 6px 6px 6px 6px;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 .settings_select > .select_label {
@@ -1122,18 +1122,18 @@
 
 .solid_checkbox {
     background-image: url("checkbox_solid_normal");
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 .solid_checkbox:disabled {
     background-image: url("checkbox_solid_normal");
-    background-color: #888888;
+    --background-color: #888888;
     color: #888888;
 }
 
 .solid_checkbox:hover {
     background-image: url("checkbox_solid_hovered");
-    background-color: #ffffff;
+    --background-color: #ffffff;
     color: #ffffff;
 }
 
@@ -1146,7 +1146,7 @@
     border-image-repeat: stretch;
     padding: 30px 0px 0px 0px;
     color: #aaaaaa;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .special_textedit2 {
@@ -1158,7 +1158,7 @@
     border-image-repeat: stretch;
     padding: 30px 0px 0px 0px;
     color: #aaaaaa;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .special_textedit2:focus {
@@ -1169,7 +1169,7 @@
     background-repeat: threeimage;
     border-image-repeat: stretch;
     color: #ffffff;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
 }
 
 .special_textedit2:focus:hover {
@@ -1179,7 +1179,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .special_textedit2:hover {
@@ -1189,8 +1189,8 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
-    background-color-opacity: 50%;
+    --background-color: #ffdd77;
+    --background-opacity: 50%;
 }
 
 .special_textedit:focus {
@@ -1201,7 +1201,7 @@
     background-repeat: threeimage;
     border-image-repeat: stretch;
     color: #ffffff;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
 }
 
 .special_textedit:focus:hover {
@@ -1211,7 +1211,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .special_textedit:hover {
@@ -1221,8 +1221,8 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
-    background-color-opacity: 50%;
+    --background-color: #ffdd77;
+    --background-opacity: 50%;
 }
 
 .square_button {
@@ -1234,30 +1234,30 @@
     height: 70px;
     color: #ffffff;
     background-image: url("button_square_trans_frame");
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .square_button:disabled {
     background-image: url("button_square_trans_frame");
-    background-color: #888888;
+    --background-color: #888888;
 }
 
 .square_button:focus {
     background-image: url("button_square_trans_bold");
-    background-color: #ffffff;
-    background-color-opacity: 100%;
+    --background-color: #ffffff;
+    --background-opacity: 100%;
 }
 
 .square_button:focus:hover {
-    background-color: #ffaa00;
+    --background-color: #ffaa00;
     background-image: url("button_square_trans_bold");
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
 }
 
 .square_button:hover {
-    background-color: #ffaa00;
+    --background-color: #ffaa00;
     background-image: url("button_square_trans_frame");
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
 }
 
 .station_button {
@@ -1298,7 +1298,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 .tab_button:disabled {
@@ -1308,7 +1308,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #888888;
+    --background-color: #888888;
 }
 
 .tab_button:disabled:hover {
@@ -1318,7 +1318,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffaa33;
+    --background-color: #ffaa33;
 }
 
 .tab_button:hover {
@@ -1352,7 +1352,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .table_alt_row:focus {
@@ -1362,9 +1362,9 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
     color: #ffffff;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .table_header_row {
@@ -1378,8 +1378,8 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 50%;
-    background-color: #ffffff;
+    --background-opacity: 50%;
+    --background-color: #ffffff;
 }
 
 .table_row {
@@ -1392,7 +1392,7 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color-opacity: 0%;
+    --background-opacity: 0%;
     background-size: 25%;
 }
 
@@ -1403,9 +1403,9 @@
     --border-image-fill: true;
     background-repeat: nineimage;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
     color: #ffffff;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .talent_button > .button_image {
@@ -1430,9 +1430,9 @@
 }
 
 .talent_button:disabled {
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     color: #808080;
-    background-color: #808080;
+    --background-color: #808080;
 }
 
 .talent_button:focus {
@@ -1444,38 +1444,38 @@
 }
 
 .talent_mark_empty_button {
-    background-color: #88aaee;
+    --background-color: #88aaee;
     background-image: url("talent_mark_empty");
 }
 
 .talent_mark_empty_button:disabled {
-    background-color: #666666;
+    --background-color: #666666;
     background-image: url("talent_mark_empty");
 }
 
 .talent_mark_empty_button:focus {
     background-image: url("talent_mark_full");
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 .talent_mark_empty_button:hover {
     background-image: url("talent_mark_empty");
-    background-color: #ffaa33;
+    --background-color: #ffaa33;
 }
 
 .talent_mark_full_button {
     background-image: url("talent_mark_full");
-    background-color: #ffaa00;
+    --background-color: #ffaa00;
 }
 
 .talent_mark_full_button:disabled {
     background-image: url("talent_mark_full");
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 .talent_mark_full_button:focus {
     background-image: url("talent_mark_full");
-    background-color: #0ab1e6;
+    --background-color: #0ab1e6;
 }
 
 .talent_name {
@@ -1486,7 +1486,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 10%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
     padding: 4px 4px 4px 4px;
 }
 
@@ -1518,7 +1518,7 @@
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .toolbar_button {
@@ -1531,7 +1531,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 40%;
+    --background-opacity: 40%;
 }
 
 .toolbar_button:focus {
@@ -1542,7 +1542,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .toolbar_button:focus:hover {
@@ -1553,7 +1553,7 @@
     background-repeat: nineimage;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
 }
 
 .top_panel {
@@ -1670,7 +1670,7 @@ button:disabled {
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #808080;
+    --background-color: #808080;
     color: #aaaaaa;
 }
 
@@ -1695,12 +1695,12 @@ button:hover {
 
 checkbox > .checkbox_image {
     background-image: url("check_icon");
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 checkbox > .checkbox_image:hover {
     background-image: url("check_icon");
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 checkbox {
@@ -1712,7 +1712,7 @@ checkbox {
 
 checkbox:disabled {
     background-image: url("checkbox_solid_normal");
-    background-color: #888888;
+    --background-color: #888888;
     color: #888888;
 }
 
@@ -1779,7 +1779,7 @@ context_menu_item:hover {
 image {
     overflow: visible;
     background-position: 50% 50%;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 image_button {
@@ -1803,7 +1803,7 @@ image_button:hover {
 }
 
 item_button > .item_button_type_image {
-    background-color: #00bbee;
+    --background-color: #00bbee;
     padding: 17px -3px -3px 17px;
     --background-padding: 0px 0px 0px 0px;
     background-repeat: imagefit;
@@ -1821,30 +1821,30 @@ item_button {
 }
 
 item_button:disabled {
-    background-color: #8c8ca2;
-    background-color-opacity: 50%;
+    --background-color: #8c8ca2;
+    --background-opacity: 50%;
 }
 
 item_button:disabled:focus {
-    background-color: #ac8ca2;
-    background-color-opacity: 50%;
+    --background-color: #ac8ca2;
+    --background-opacity: 50%;
 }
 
 item_button:disabled:focus:hover {
     background-image: url("button_square_trans_bold");
-    background-color-opacity: 50%;
-    background-color: #ffaa00;
+    --background-opacity: 50%;
+    --background-color: #ffaa00;
 }
 
 item_button:disabled:hover {
     background-image: url("button_square_trans_bold");
-    background-color: #ffaa00;
-    background-color-opacity: 50%;
+    --background-color: #ffaa00;
+    --background-opacity: 50%;
 }
 
 item_button:hover {
     background-image: url("button_square_trans_bold");
-    background-color: #ffaa00;
+    --background-color: #ffaa00;
 }
 
 label {
@@ -1863,7 +1863,7 @@ line {
     background-repeat: threeimage;
     border-image-repeat: stretch;
     background-size: 100%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
     background-position: 50% 0%;
 }
 
@@ -1905,7 +1905,7 @@ progress > .progress_line {
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #ffffff;
+    --background-color: #ffffff;
     --background-depth: backclipped;
     overflow: hidden;
 }
@@ -1919,7 +1919,7 @@ progress {
     --border-image-fill: true;
     background-repeat: threeimage;
     border-image-repeat: stretch;
-    background-color: #666666;
+    --background-color: #666666;
 }
 
 scrollview > .scrollview_hscroll {
@@ -2040,8 +2040,8 @@ textedit {
     --clip-margin: 1px 2px 3px 2px;
     --cursor-color: #ffffff;
     padding: 6px 2px 6px 0px;
-    background-color: #ffffff;
-    background-color-opacity: 50%;
+    --background-color: #ffffff;
+    --background-opacity: 50%;
 }
 
 textedit:focus {
@@ -2052,7 +2052,7 @@ textedit:focus {
     background-repeat: nineimage;
     border-image-repeat: stretch;
     color: #ffffff;
-    background-color-opacity: 75%;
+    --background-opacity: 75%;
 }
 
 textedit:focus:hover {
@@ -2090,8 +2090,8 @@ textfield {
     --clip-margin: 1px 2px 3px 2px;
     --cursor-color: #ffffff;
     padding: 6px 2px 6px 0px;
-    background-color: #ffffff;
-    background-color-opacity: 50%;
+    --background-color: #ffffff;
+    --background-opacity: 50%;
 }
 
 textfield:focus {
@@ -2102,7 +2102,7 @@ textfield:focus {
     background-repeat: nineimage;
     border-image-repeat: stretch;
     color: #ffffff;
-    background-color-opacity: 75%;
+    --background-opacity: 75%;
 }
 
 textfield:focus:hover {

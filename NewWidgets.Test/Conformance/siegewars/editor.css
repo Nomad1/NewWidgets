@@ -2,7 +2,7 @@
     border-image-source: url("panel_black_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     --clip-margin: 2px 2px 2px 2px;
     background-size: 75%;
 }
@@ -12,7 +12,7 @@
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 40%;
+    --background-opacity: 40%;
     --button-image-padding: 8px 8px 8px 8px;
     width: 64px;
     height: 64px;
@@ -23,7 +23,7 @@
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
 }
 
 .toolbar_button:focus {
@@ -31,7 +31,7 @@
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .toolbar_button:disabled {
@@ -40,7 +40,7 @@
     border-image-repeat: stretch;
     color: #aaaaaa;
     --image-color: #aaaaaa;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .toolbar_button:disabled:hover {
@@ -52,7 +52,7 @@
 toolbarsep {
     background-repeat: imagefit;
     background-image: url("icon_separator");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     width: 12px;
     height: 64px;
 }
@@ -60,7 +60,7 @@ toolbarsep {
 toolbarhsep {
     background-repeat: imagefit;
     background-image: url("icon_separator_horizontal");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
     width: 64px;
     height: 12px;
 }

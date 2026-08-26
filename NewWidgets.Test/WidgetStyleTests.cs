@@ -578,7 +578,7 @@ namespace NewWidgets.Test
             controller.RegisterSprite("styj2sprite", 90, 90);
 
             TestEnvironment.LoadCss(
-                ".styj1back { width: 100px; height: 50px; background-image: url(\"styj1sprite\"); background-repeat: nineimage; background-size: 50%; background-color: #ff0000; --background-padding: 1px 2px 3px 4px; }" +
+                ".styj1back { width: 100px; height: 50px; background-image: url(\"styj1sprite\"); background-repeat: nineimage; background-size: 50%; --background-color: #ff0000; --background-padding: 1px 2px 3px 4px; }" +
                 ".styj2back { border-image-source: url(\"styj2sprite\"); border-image-slice: 33.3333% fill; }");
 
             WidgetPanel root = new WidgetPanel();
@@ -591,7 +591,7 @@ namespace NewWidgets.Test
             context.AreEqual("styj1sprite", background.BackgroundTexture, "background-image: url(\"styj1sprite\") should reach BackgroundTexture, got {0}", background.BackgroundTexture);
             context.AreEqual(WidgetBackgroundStyle.NineImage, background.BackgroundStyle, "background-repeat: nineimage should reach BackgroundStyle == NineImage, got {0}", background.BackgroundStyle);
             context.AreEqualFloat(0.5f, background.BackgroundScale, Tolerance, "background-size: 50% should reach BackgroundScale == 0.5, got {0}", background.BackgroundScale);
-            context.AreEqual((uint)0xff0000, background.BackgroundColor, "background-color: #ff0000 should reach BackgroundColor, got {0:x6}", background.BackgroundColor);
+            context.AreEqual((uint)0xff0000, background.BackgroundColor, "--background-color: #ff0000 should reach BackgroundColor, got {0:x6}", background.BackgroundColor);
 
             Margin padding = background.BackgroundPadding;
             context.AreEqualFloat(4.0f, padding.Left, Tolerance, "--background-padding: 1px 2px 3px 4px is top right bottom left, so Left == 4, got {0}", padding.Left);

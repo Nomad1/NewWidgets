@@ -213,7 +213,7 @@ namespace NewWidgets.BrowserPreview
             // "back_pattern": background-image url("back_pattern"), background-repeat: imagetiled,
             // background-size: 100%). Clipped by .window's own overflow: hidden, same as the
             // engine clips it with the widget's Overflow property.
-            // background-color-opacity: 4% -- an opacity on the sprite draw itself, see
+            // --background-opacity: 4% -- an opacity on the sprite draw itself, see
             // NinePatch.FormatCss for why that is CSS `opacity` and not an rgba background-color.
             boxes.Add(NinePatch.BuildTiled("login_back", RequireSprite(sprites, "back_pattern"), 1.0, 0.04,
                 0, 0, 600, 760, atlasWidth, atlasHeight));

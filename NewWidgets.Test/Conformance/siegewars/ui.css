@@ -7,13 +7,13 @@
 }
 
 .left_button:hover {
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
     background-image: url("button_left_hovered");
 }
 
 .left_button:disabled {
     background-image: url("button_left_selected");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .left_button:focus {
@@ -34,7 +34,7 @@
 
 .right_button:disabled {
     background-image: url("button_right_selected");
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .right_button:focus {
@@ -53,7 +53,7 @@
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 80%;
+    --background-opacity: 80%;
 }
 
 .image_button:focus {
@@ -61,7 +61,7 @@
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
 }
 
 .image_button_nohover {
@@ -107,21 +107,21 @@
     border-image-repeat: stretch;
     padding: 0px 0px 0px 30px;
     color: #aaaaaa;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .special_textedit:focus {
     color: #ffffff;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
 }
 
 .special_textedit:focus:hover {
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .special_textedit:hover {
-    background-color: #ffdd77;
-    background-color-opacity: 50%;
+    --background-color: #ffdd77;
+    --background-opacity: 50%;
 }
 
 .special_textedit2 {
@@ -130,21 +130,21 @@
     border-image-repeat: stretch;
     padding: 0px 0px 0px 30px;
     color: #aaaaaa;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .special_textedit2:focus {
     color: #ffffff;
-    background-color-opacity: 100%;
+    --background-opacity: 100%;
 }
 
 .special_textedit2:focus:hover {
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .special_textedit2:hover {
-    background-color: #ffdd77;
-    background-color-opacity: 50%;
+    --background-color: #ffdd77;
+    --background-opacity: 50%;
 }
 
 .settings_key_entry {
@@ -156,7 +156,7 @@
     --background-depth: backclipped;
     background-image: url("back_pattern");
     background-size: 100%;
-    background-color-opacity: 4%;
+    --background-opacity: 4%;
     overflow: hidden;
 }
 
@@ -173,7 +173,7 @@
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 100%;
-    font-family: default;
+    font-family: "default";
     font-size: 0.6em;
     --clip-margin: 2px 3px 2px 1px;
     color: #888888;
@@ -282,8 +282,8 @@
     border-image-source: url("panel_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #000000;
-    background-color-opacity: 40%;
+    --background-color: #000000;
+    --background-opacity: 40%;
     background-size: 25%;
 }
 
@@ -291,8 +291,8 @@
     border-image-source: url("panel_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #000000;
-    background-color-opacity: 80%;
+    --background-color: #000000;
+    --background-opacity: 80%;
     background-size: 25%;
 }
 
@@ -300,8 +300,8 @@
     border-image-source: url("frame_white_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #ffffff;
-    background-color-opacity: 5%;
+    --background-color: #ffffff;
+    --background-opacity: 5%;
     background-size: 50%;
 }
 
@@ -349,11 +349,11 @@
 }
 
 .send_mail_edit.send_mail_edit_selected_hovered {
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 .send_mail_edit:hover {
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
 }
 
 toolbar #toolbar_panel {
@@ -367,7 +367,7 @@ toolbar #toolbar_panel {
     border-image-source: url("title_line_3");
     border-image-slice: 0 33.3333% fill;
     border-image-repeat: stretch;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .talent_name_text {
@@ -385,12 +385,12 @@ toolbar #toolbar_panel {
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 10%;
-    background-color-opacity: 30%;
+    --background-opacity: 30%;
     padding: 4px 4px 4px 4px;
 }
 
 .settings_select {
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     color: #eeeeee;
     text-align: horizontalcenter, top;
@@ -418,7 +418,7 @@ toolbar #toolbar_panel {
 
 .settings_line {
     padding: 6px 6px 6px 6px;
-    background-color: #ffffff;
+    --background-color: #ffffff;
 }
 
 .dialog_back {
@@ -429,12 +429,12 @@ toolbar #toolbar_panel {
 }
 
 .table_row {
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     color: #cceeff;
     background-repeat: imagestretch;
     background-image: url("table_row_alt");
-    background-color-opacity: 0%;
+    --background-opacity: 0%;
     background-size: 25%;
 }
 
@@ -442,38 +442,38 @@ toolbar #toolbar_panel {
     border-image-source: url("table_row_selected_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
     color: #ffffff;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .table_alt_row {
-    font-family: default;
+    font-family: "default";
     font-size: 0.5em;
     color: #ddffff;
     border-image-source: url("table_row_header_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     background-size: 25%;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .table_alt_row:focus {
     border-image-source: url("table_row_alt_selected_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
-    background-color: #ffdd77;
+    --background-color: #ffdd77;
     color: #ffffff;
-    background-color-opacity: 50%;
+    --background-opacity: 50%;
 }
 
 .table_header_row {
-    font-family: bold;
+    font-family: "bold";
     font-size: 0.5em;
     color: #cccccc;
-    background-color: #ffffff;
+    --background-color: #ffffff;
     background-repeat: imagestretch;
     background-image: url("white");
     background-size: 100%;
-    background-color-opacity: 25%;
+    --background-opacity: 25%;
 }
