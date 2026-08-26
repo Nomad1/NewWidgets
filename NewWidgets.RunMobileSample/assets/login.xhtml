@@ -48,6 +48,21 @@
             WidgetTextField field = root.Find&lt;WidgetTextField&gt;("text_field");</textarea>
 
         <span id="fps_label">1</span>
+
+        <!-- Browser-preview only. LoadXHTML's CreateMarkupWidget treats any
+             unknown element as a real widget (a WidgetMarkupElement, a bare
+             WidgetPanel) rather than skipping it, per D157, so wrapping two
+             controls in an unrecognised tag does not delete them. Placed
+             here, after the last real control, it becomes one more child of
+             #login_window: a zero-sized, imageless panel (no CSS rule names
+             "script", so it draws no frame) that a widget tree never asks
+             for by id or class, and layout for everything before it is
+             unaffected because every element here is absolutely positioned.
+             (Tried as a sibling of <body> first, since LoadXHTML's own
+             top-level switch just logs and skips an unknown element there
+             with no widget at all, but Chrome's XHTML parser drops
+             anything after </body> before <script> ever runs.) -->
     </div>
+    <script src="ui-preview.js"></script>
 </body>
 </html>

@@ -44,7 +44,8 @@
    border-image-width and no renderer reads it, so the two spellings sit side by side.
 
    The declarations a browser needs that this engine reads DIFFERENTLY are in the
-   browser-only block at the foot of the file. See the comment there. */
+   ui-preview.js -- root font-size, page background and margin are stated there
+   instead, per its own contract (ui-preview.md). */
 
 @font-face {
     font-family: "default";
@@ -95,6 +96,11 @@ label, text, span, h1, h2, h3, h4, h5, h6 {
     width: 100px;
     height: 35px;
     overflow: visible;
+    white-space: nowrap; /* every one of these is a WidgetLabel under a different tag, and
+        WidgetLabel never wraps -- LabelObject.Init runs the raw string straight through
+        font.GetSprites, with no width-based line breaking anywhere, so this is true of all
+        of them, not of #local_label specifically. Accepted in silence: nowrap was added to
+        IgnoredProcessor's list once this was confirmed general */
 }
 
 text {
@@ -109,7 +115,11 @@ textedit, textfield, input, textarea {
     margin: 0;
     border: none;
     appearance: none;
-    --background-color: transparent;
+    background-color: transparent; /* the engine's own property is --background-color; this
+        is the real CSS one, for a browser's <input>/<textarea> UA stylesheet, which paints
+        an opaque white fill under the nine-patch regardless of --background-color -- IgnoredProcessor
+        now accepts exactly "transparent" here, so this can live in the shared rule instead
+        of an html one */
     resize: none;
     border-image-source: url("ui.svg#panel_white_hovered_9");
     border-image-slice: 33.3333% fill;
@@ -124,7 +134,7 @@ textedit, textfield, input, textarea {
     overflow: hidden;
     clip-path: inset(1px 2px 3px 2px);
     caret-color: #ffffff;
-    --text-padding: 6px 2px 6px 0px;
+    padding: 2px 6px 0px 6px;
 }
 
 textedit:focus, textfield:focus, input:focus, textarea:focus {
@@ -192,12 +202,11 @@ context_menu {
 context_menu_item {
     position: absolute;
     border: none;
-    --background-color: transparent;
     background-repeat: no-repeat;
     font-family: "default";
     font-size: 0.5em;
     color: #cceeff;
-    padding: 4px 2px 4px 2px;
+    padding: 2px 4px 2px 4px;
 }
 
 context_menu_item:hover {
@@ -214,7 +223,7 @@ context_menu_item:hover {
     border-image-width: 14px; /* 84 / 3 * 50% */
     border-image-repeat: stretch;
     background-size: 50%;
-    padding: 14px 14px 16px 14px;
+    padding: 14px 16px 14px 14px;
     overflow: hidden;
 }
 
@@ -226,13 +235,12 @@ button {
     margin: 0;
     border: none;
     appearance: none;
-    --background-color: transparent;
+    background-color: transparent; /* a <button>'s UA fill, same reason as textedit above */
     border-image-source: url("ui.svg#button_white_normal_3");
     border-image-slice: 0 33.3333% fill;
     border-image-width: 0 40px; /* button_white_normal_3 is 120x67: 120 / 3 * 100% */
     border-image-repeat: stretch;
     background-size: 100%;
-    --text-padding: 0px 0px 0px 6px;
     width: 120px;
     height: 40px;
     font-family: "default";
@@ -263,6 +271,18 @@ button:disabled:hover {
     color: #aaaaaa;
     --background-opacity: 50%;
     --background-color: #aaaaaa;
+}
+
+/* `padding` here is the button's TEXT padding, not the button's own. WidgetButton.UpdateLayout
+   reads it off m_label, the child WidgetLabel it builds for its own text, not off the button
+   itself -- Padding is Initial (D132's default, not inherited), and Widget.ContainingBlockSize's
+   own comment is explicit that nothing generic in this engine gives a parent's padding to its
+   children, so a `padding` declared on `button` would sit unread. `button_label` is
+   WidgetButton.LabelClass, the same real child-class idiom `checkbox #checkbox_image` above
+   uses for the tick. A browser's own <button> has no such child -- its text IS its content --
+   so this cannot reach it; the script carries the value for that side instead (ui-preview.md row 6). */
+button .button_label {
+    padding: 0px 0px 6px 0px;
 }
 
 /* The one control the two vocabularies cannot share a name for. HTML spells a checkbox
@@ -318,13 +338,29 @@ checkbox:disabled, .checkbox:disabled {
     color: #888888;
 }
 
+/* `image` is a registered alias of `background-image` in the engine (both spell the same
+   parameter), so only the standard property is written here; a bare `image` is not CSS at
+   all and a browser drops it during parsing rather than storing it (measured: an unparsed
+   property does not appear in a rule's style declaration, unlike a `--custom` one), so
+   keeping both would be two declarations for one sprite, not one truth in two vocabularies.
+
+   `background-color` was tried here too, paired with `mask-image`, the same technique this
+   file used to spell with `html .checkbox::before`. Reverted: `mask-image: url("ui.svg#...")`
+   does not resolve the fragment at all in Chrome (measured -- a broken-image icon, where
+   `background-image`, `border-image-source` and `<img src>` all resolve the same fragment
+   correctly, `<view>` elements included, and `mask-image: url("ui.svg")` with no fragment
+   renders nothing either). ui-preview.js instead reads `--image-color` off the real element
+   with id `checkbox_image` it builds (a browser gives an <input> no children at all to match
+   this selector against otherwise) and tints `background-image` with the same SVG
+   feColorMatrix filter the widget frames use -- `check_icon` is a plain white glyph, so a
+   multiplicative tint reproduces a flat recolour exactly. */
 checkbox #checkbox_image, .checkbox #checkbox_image {
-    image: url("ui.svg#check_icon");
+    background-image: url("ui.svg#check_icon");
     --image-color: #000032;
 }
 
 checkbox #checkbox_image:hover, .checkbox #checkbox_image:hover {
-    image: url("ui.svg#check_icon");
+    background-image: url("ui.svg#check_icon");
     --image-color: #ffffff;
 }
 
@@ -347,7 +383,8 @@ img {
     background-repeat: repeat;
     --background-depth: backclipped;
     background-image: url("ui.svg#back_pattern");
-    background-size: 100%;
+    background-size: auto; /* the sprite's own size to both readers -- ui.svg's <view> gives
+        a browser the right intrinsic size, so the tile no longer needs a browser-only override */
     --background-opacity: 4%;
     overflow: hidden;
     clip-path: inset(2px 2px 2px 2px);
@@ -356,14 +393,13 @@ img {
 .text_button {
     position: absolute;
     border: none;
-    --background-color: transparent;
+    background-color: transparent; /* same UA fill, inherited from <button> */
     background-repeat: no-repeat;
     font-family: "default";
     width: 300px;
     height: 20px;
     font-size: 0.6em;
     color: #cceeff;
-    --text-padding: 4px 2px 4px 2px;
 }
 
 .text_button:hover {
@@ -371,14 +407,27 @@ img {
     color: #ffffff;
 }
 
+/* Overrides the base `button .button_label` above: the child is still called `button_label`
+   regardless of this modifier class, so the higher specificity of two classes over one class
+   plus one element is what makes this win. See the comment on the base rule. */
+.text_button .button_label {
+    padding: 2px 4px 2px 4px;
+}
+
 .image_button {
     position: absolute;
     border: none;
-    --background-color: transparent;
     background-repeat: no-repeat;
-    --image-padding: 6px 6px 6px 6px;
     width: 64px;
     height: 64px;
+}
+
+/* WidgetButton.UpdateLayout reads image padding off m_image, the child WidgetImage it builds
+   for its own image, same as `.button_label` carries the text padding above. `button_image`
+   is WidgetButton.ImageClass. Symmetric, so rotating this value left is a no-op -- migrated
+   anyway, since the property is dead either way. */
+.image_button .button_image {
+    padding: 6px 6px 6px 6px;
 }
 
 .image_button:hover {
@@ -420,7 +469,15 @@ img {
 #login_back     { left: 0; top: 0; width: 100%; height: 100%; }
 
 /* was new Vector2(panel.Size.X, 60) */
-#login_title    { left: 0; top: 50px; width: 100%; height: 60px; }
+#login_title    { left: 0; top: 50px; width: 100%; height: 60px; text-align: center; }
+/* The one widget in this dialog that resolves WidgetAlign.HorizontalCenter. Both buttons
+   centre their own label whatever their align is, and a browser's UA stylesheet already
+   centres a <button>, so the two agree without being told; every other control here is
+   align=Left in both. `text-align: center` used to move text vertically here too --
+   `WidgetAlign.Center` is `Left|Right|Top|Bottom` -- so this needed an html override while
+   that stood, Test 37 pinned it a defect, and now it is fixed: `text-align` sets only the
+   horizontal axis, as CSS defines it, so this is placed with the rest of the dialog's own
+   layout instead. */
 
 #login_label    { left: 50px; top: 160px; }
 
@@ -452,155 +509,12 @@ img {
    is repeated from the label rule so the 60 is readable as 600 - 100 - 440 */
 #fps_label      { right: 60px; top: 20px; width: 100px; }
 
-/* ----------------------------------------------------------------------------------
-   The browser-only block.
-
-   Everything above is read by both. These rules cannot be, because each carries a
-   property this engine reads and reads DIFFERENTLY -- putting them in the rules above
-   would change what the engine draws, not merely add to it. So they are qualified with
-   `html`, which is the one selector that is true of every element in a browser and of
-   nothing here: WidgetManager.LoadXHTML walks <html> and <body> and turns neither into a
-   widget, so no widget in this engine has an <html> ancestor and none of these can match.
-
-   What each one settles, and why it could not go above:
-
-     background-size   a tiled sprite needs its own 135x117 in a browser, because an SVG
-                       fragment brings no intrinsic size with it, and the engine's
-                       background-size is a single scale factor where 100% is that same
-                       native size. One property, two units, no shared spelling.
-     opacity           `--background-opacity: 4%` is what this engine dims a background
-                       sprite with and is not a CSS property. `opacity` is the CSS spelling
-                       of the same result -- and this engine also reads `opacity`, as the
-                       widget's own alpha, so declaring it above would dim the panel twice.
-     background-color  a disabled button is 50% grey. This engine spells that #aaaaaa plus
-                       `--background-opacity: 50%`; CSS spells it rgba(), which this
-                       engine's colour parser does not read at all.
-     padding           `--text-padding` is dead text in this engine -- the parameter was
-                       renamed to `padding` and the old name resolves to nothing -- so the
-                       text edits and buttons draw with no padding, which the golden master
-                       in LoginDialogTests pins. Declaring `padding` above would apply it
-                       and change that. The browser gets the value the skin always meant.
-     font-size         a font size is a plain scale factor here -- 1 is the bitmap font at
-                       its own size -- and a length in a browser, where an em is measured
-                       against whatever the parent computed and that is 16px by default.
-                       Naming the root size is the whole of the conversion, and it is the
-                       one place it can be named. See the rule for the number.
-     text-align        this engine centres a label by its own WidgetAlign, which TestWindow
-                       sets on #login_title in code because `text-align: center` here also
-                       carries the vertical bits and there is no property to undo them.
-                       A browser has no such widget state and left-aligns instead.
-     ::before          a checkbox in this engine is a widget with a child WidgetImage for
-                       the tick, which `checkbox #checkbox_image` above styles. A browser
-                       builds no child for an <input>, so that selector matches nothing and
-                       no tick is ever drawn. A pseudo-element is the browser's own spelling
-                       of the same child box, and a mask carries the tint the engine puts in
-                       `--image-color`.
-     :hover reach      hover propagates from a checkbox to that child here, and a linked
-                       label forwards its touches to the checkbox it names (LinkedLabel,
-                       set from `for=`). In a browser `input:hover` reaches neither, so the
-                       tick and the label both need saying with a combinator.
-
-   Requirements for the engine, so that three of these four can move back up: read
-   `background-color: rgba(...)` as the colour plus the background opacity; read a
-   two-length `background-size` as a tile size; and either honour `--text-padding` or
-   accept that `padding` on a text edit means what the skin says. The `opacity` one is not
-   a gap: the two properties genuinely mean different things and both are implemented.
-   ---------------------------------------------------------------------------------- */
-
-/* 30px is the number NewWidgets.BrowserPreview writes on the body of the reference render
-   it builds straight from the atlas: one engine font-size unit is 30 browser pixels, so
-   every `em` above lands where that render puts it. It is a root size and not an inherited
-   one because nothing between here and a control declares a font size, so no em compounds;
-   `rem` would say the same thing here and cost the engine a throw, since its FloatParse
-   strips the last two characters of "0.5rem" and hands "0.5r" to float.Parse. */
-html, html body {
-    margin: 0;
-    background-color: #000000;
-    font-size: 30px;
-}
-
-html .back_pattern {
-    background-size: 135px 117px; /* back_pattern's own size: a fragment has no intrinsic one */
-    opacity: 0.04;
-}
-
-html button:disabled, html button:disabled:hover {
-    background-color: rgba(170, 170, 170, 0.5);
-}
-
-/* The skin's own value is ui.xml's `<text_padding>6;2;6;0</text_padding>`, and the parser
-   that read it took four numbers as left, top, right, bottom. CSS takes them clockwise from
-   the top, so the same four numbers written in the same order mean a different box: the 6
-   the skin puts on the LEFT landed on the top and the left became 0. That is the whole of
-   the missing indent -- the text starts at x=0, under a border image whose corner is 7.5px
-   wide, and `clip-path` eats the 2px of it that are left. Test 65 names this exact string
-   as a legacy declaration and rotating it left by one is that test's own migration. */
-html input, html textarea {
-    padding: 2px 6px 0px 6px;
-}
-
-html button {
-    padding: 0px 0px 0px 6px;
-}
-
-html .text_button {
-    padding: 4px 2px 4px 2px;
-}
-
-html .image_button {
-    padding: 6px 6px 6px 6px;
-}
-
-/* The one widget in this dialog that resolves WidgetAlign.HorizontalCenter. Both buttons
-   centre their own label whatever their align is, and a browser's UA stylesheet already
-   centres a <button>, so the two agree without being told; every other control here is
-   align=Left in both. That leaves the title, and this is it. */
-html #login_title {
-    text-align: center;
-}
-
-/* The tick. `checkbox #checkbox_image` above cannot match in a browser -- an <input> has no
-   children -- so this is the same child box in the browser's own spelling: the mask carries
-   the sprite's shape and background-color carries the `--image-color` the engine tints it
-   with. Drawn only when checked, as WidgetCheckBox.DrawContents draws it. */
-html .checkbox::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    background-color: #000032;
-    mask: url("ui.svg#check_icon") no-repeat center / contain;
-}
-
-html .checkbox:checked::before {
-    opacity: 1;
-}
-
-html .checkbox:hover::before {
-    background-color: #ffffff;
-}
 
 /* `checkbox:hover { color: #ffffff }` above is the checkbox's TEXT colour, and a checkbox
-   has no text of its own: its text is the label bound to it by `for=`, which this engine
-   reaches through WidgetCheckBox.LinkedLabel and lights along with the box. That binding
-   buys a browser one of the two directions for nothing -- HTML puts a labeled control in
-   :hover whenever its label is hovered, so the sprite and the tick above already swap from
-   the text as well as from the box -- and this says the half that is left, the text's own
-   colour. It is named by its id because `#local_label` declares a colour and an id beats
-   any number of classes; every rule that places this dialog is an #id rule too.
-
-   The reverse, lighting the text from the box, is not here: the label stands BEFORE the
-   input it names, `:has` is the only selector that reaches backwards, and this engine's
-   StyleSelector splits a selector on whitespace and throws on the `.checkbox)` that falls
-   out of `:has(+ .checkbox)`. Both hovers still light the box and its tick, which is what
-   WidgetCheckBox itself changes; only the word stays its own colour from that end.
-
-   The nowrap is the same widget in the other place it differs: a WidgetLabel lays one
-   line out and lets it overflow, and only a browser would break the words instead. */
-html #local_label {
-    white-space: nowrap;
-}
-
-html #local_label:hover {
-    color: #ffffff;
-}
+   has no text of its own: its text is the label WidgetCheckBox.LinkedLabel binds and lights
+   along with the box, for `for=` generally, not for `#local_label` by name -- ui-preview.js
+   mirrors the checkbox's own live `color` onto any label naming a `.checkbox`. Hovering the
+   label already puts the checkbox in :hover for nothing (measured: Chrome matches
+   `#target:hover` with only the label under the pointer, `for=` is enough), so only the
+   reverse -- the box lighting the label -- needed wiring at all. `white-space: nowrap` moved
+   up to the general label rule above; it was never particular to this one. */
