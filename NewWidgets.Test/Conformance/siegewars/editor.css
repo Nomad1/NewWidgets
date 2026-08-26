@@ -1,0 +1,67 @@
+.editor_black_frame {
+    border-image-source: url("panel_black_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
+    background-color-opacity: 50%;
+    --clip-margin: 2px 2px 2px 2px;
+    background-size: 75%;
+}
+
+.toolbar_button {
+    border-image-source: url("editor_button_normal_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
+    background-size: 25%;
+    background-color-opacity: 40%;
+    --button-image-padding: 8px 8px 8px 8px;
+    width: 64px;
+    height: 64px;
+}
+
+.toolbar_button:hover,.toolbar_button:focus:hover {
+    border-image-source: url("panel_white_hovered_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
+    background-size: 25%;
+    background-color-opacity: 80%;
+}
+
+.toolbar_button:focus {
+    border-image-source: url("panel_white_selected_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
+    background-size: 25%;
+    background-color-opacity: 30%;
+}
+
+.toolbar_button:disabled {
+    border-image-source: url("editor_button_disabled_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
+    color: #aaaaaa;
+    --image-color: #aaaaaa;
+    background-color-opacity: 30%;
+}
+
+.toolbar_button:disabled:hover {
+    border-image-source: url("editor_button_disabled_9");
+    border-image-slice: 33.3333% fill;
+    border-image-repeat: stretch;
+}
+
+toolbarsep {
+    background-repeat: imagefit;
+    background-image: url("icon_separator");
+    background-color-opacity: 50%;
+    width: 12px;
+    height: 64px;
+}
+
+toolbarhsep {
+    background-repeat: imagefit;
+    background-image: url("icon_separator_horizontal");
+    background-color-opacity: 50%;
+    width: 64px;
+    height: 12px;
+}
+

@@ -15,30 +15,47 @@
     <Compile Include="*.cs" />
 
     <!-- Test 71/72 assert the geometry of the real sample dialog rather than a replica of
-         it, so the sample's own sources are compiled in, at their real path, the same way
-         the corpus files below are. NewWidgets.Sample.DialogWindow comes along because
+         it, so the sample's own sources are compiled in from their real place in this
+         repository. NewWidgets.Sample.DialogWindow comes along because
          TestWindow.HandleWebSitePress calls it. -->
     <Compile Include="../Sample/Sample/TestWindow.cs" />
     <Compile Include="../Sample/Sample/DialogWindow.cs" />
+  </ItemGroup>
 
-    <!-- Corpus test 44: Amalthea's UI classes that compile against only System*/NewWidgets.
-         See CorpusTests.cs for which of the 19 candidates from the brief actually compiled. -->
-    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/DialogPanel.cs" />
-    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/DialogWindow.cs" />
-    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Buttons/WidgetItemButton.cs" />
+  <!-- Amalthea's own widget classes, needed by corpus test 44 and the DialogWindow portion of
+       seam test 46. This is proprietary game source and is deliberately NOT vendored into this
+       open-source repository, nor named here by any absolute path. Opt in by passing the game
+       checkout on the command line:
+
+           dotnet build -p:AmaltheaRoot=/path/to/SpaceAdventure/SpaceAdventure.Client
+
+       Undefined (or pointing at a directory that is not there) leaves AMALTHEA_SOURCE undefined,
+       and every test that needs these classes reports itself skipped instead of quietly passing.
+       The corpus STYLESHEETS are not conditional: those are cached in Conformance/amalthea and
+       Conformance/siegewars, so tests 40-43 run everywhere. -->
+  <PropertyGroup Condition="Exists('$(AmaltheaRoot)')">
+    <DefineConstants>$(DefineConstants);AMALTHEA_SOURCE</DefineConstants>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(AmaltheaRoot)')">
+    <Compile Include="$(AmaltheaRoot)/SpaceAdventure.Game/BusinessLogic/Controls/DialogPanel.cs" />
+    <Compile Include="$(AmaltheaRoot)/SpaceAdventure.Game/BusinessLogic/Controls/DialogWindow.cs" />
+    <Compile Include="$(AmaltheaRoot)/SpaceAdventure.Game/BusinessLogic/Controls/Buttons/WidgetItemButton.cs" />
 
     <!-- Trial additions: tried one at a time, kept only if they compile clean. See
          CorpusTests.cs / the task report for which of these were dropped and why. -->
-    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Game/FactionLogo.cs" />
-    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Game/FeatureButtonsPanel.cs" />
-    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Station/StationBookmark.cs" />
-    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Map/JupiterSystemInfo.cs" />
-    <Compile Include="/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/SpaceAdventure.Game/BusinessLogic/Controls/Station/BaseStationPanel.cs" />
+    <Compile Include="$(AmaltheaRoot)/SpaceAdventure.Game/BusinessLogic/Controls/Game/FactionLogo.cs" />
+    <Compile Include="$(AmaltheaRoot)/SpaceAdventure.Game/BusinessLogic/Controls/Game/FeatureButtonsPanel.cs" />
+    <Compile Include="$(AmaltheaRoot)/SpaceAdventure.Game/BusinessLogic/Controls/Station/StationBookmark.cs" />
+    <Compile Include="$(AmaltheaRoot)/SpaceAdventure.Game/BusinessLogic/Controls/Map/JupiterSystemInfo.cs" />
+    <Compile Include="$(AmaltheaRoot)/SpaceAdventure.Game/BusinessLogic/Controls/Station/BaseStationPanel.cs" />
 
     <!-- DialogWindow.cs calls Vector2.Distance(Vector2) instance-style, which System.Numerics
          does not provide; the game's real build gets it from RunMobile.Utility's extension
          methods, added to namespace System.Numerics itself. This single file supplies just
-         that (Distance, DistanceSquared, etc. as extensions), with no further dependencies. -->
-    <Compile Include="/Volumes/Projects/Projects/RunMobile/RunMobile.Utility/Math/Vector2.cs" />
+         that (Distance, DistanceSquared, etc. as extensions), with no further dependencies.
+         RunMobile is a sibling checkout every other project here already reaches the same
+         relative way (see NewWidgets.RunMobile.csproj), but it is pulled in HERE only for the
+         game classes above, so it lives inside this conditional and the suite builds without it. -->
+    <Compile Include="..\..\RunMobile\RunMobile.Utility\Math\Vector2.cs" />
   </ItemGroup>
 </Project>

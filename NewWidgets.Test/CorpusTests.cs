@@ -11,8 +11,10 @@ using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 using NewWidgets.Widgets;
 
+#if AMALTHEA_SOURCE
 using SpaceAdventure.BusinessLogic.Controls;
 using SpaceAdventure.BusinessLogic.Controls.Buttons;
+#endif
 
 namespace NewWidgets.Test
 {
@@ -38,6 +40,7 @@ namespace NewWidgets.Test
         // suite and is unrelated to CSS; it is reported separately rather than "fixed" here by
         // reaching into library code. This test-only subclass calls straight through to
         // DialogWindow's protected constructor, skipping Show() (and its animation) entirely.
+#if AMALTHEA_SOURCE
         private sealed class TestDialogWindow : DialogWindow
         {
             public TestDialogWindow(string title, string text, params string[] options)
@@ -45,6 +48,7 @@ namespace NewWidgets.Test
             {
             }
         }
+#endif
 
         // Minimal IStyleData for parsing a game's own CSS into an isolated, throwaway
         // StyleCollection just to learn its selector names (see ComputeOwnSelectorHeaders) --
@@ -56,12 +60,12 @@ namespace NewWidgets.Test
             }
         }
 
-        // The corpus lives in sibling checkouts *outside* this repo, deliberately: these are
-        // absolute paths into the real games' shipped Resources folders, not a copy vendored
-        // into NewWidgets. That means this suite breaks the moment either game's UI changes --
-        // which is the point of a golden-master test: it should notice.
-        private const string AmaltheaUiRoot = "/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/Resources/Shared/ui";
-        private const string SiegeWarsUiRoot = "/Volumes/Projects/Projects/SiegeWars.2/SiegeWars.Client/Resources/Shared/ui";
+        // Byte copies of the two games' shipped stylesheets, cached inside this repository so the
+        // suite is self-contained and names no path on anyone's machine. They were taken from
+        // Resources/Shared/ui in each game's checkout; refresh them from there (and expect the
+        // baselines below to move, which is the finding, not a nuisance) when a game's UI changes.
+        private const string AmaltheaUiRoot = "Conformance/amalthea";
+        private const string SiegeWarsUiRoot = "Conformance/siegewars";
 
         private const string AmaltheaCssBaselinePath = "Baselines/amalthea-css.txt";
         private const string SiegeWarsCssBaselinePath = "Baselines/siegewars-css.txt";
@@ -108,12 +112,6 @@ namespace NewWidgets.Test
 
         private static void Test40_AmaltheaLoadsClean(TestContext context)
         {
-            if (!Directory.Exists(AmaltheaUiRoot))
-            {
-                Console.WriteLine("    Test 40: corpus not present at {0} -- skipped", AmaltheaUiRoot);
-                return;
-            }
-
             TestController controller = PrepareForCssLoad();
 
             LoadCssFiles(context, AmaltheaUiRoot, AmaltheaCssFiles);
@@ -137,12 +135,6 @@ namespace NewWidgets.Test
 
         private static void Test41_SiegeWarsLoadsClean(TestContext context)
         {
-            if (!Directory.Exists(SiegeWarsUiRoot))
-            {
-                Console.WriteLine("    Test 41: corpus not present at {0} -- skipped", SiegeWarsUiRoot);
-                return;
-            }
-
             TestController controller = PrepareForCssLoad();
 
             LoadCssFiles(context, SiegeWarsUiRoot, SiegeWarsCssFiles);
@@ -268,12 +260,6 @@ namespace NewWidgets.Test
 
         private static void Test42_AmaltheaComputedStyleBaseline(TestContext context)
         {
-            if (!Directory.Exists(AmaltheaUiRoot))
-            {
-                Console.WriteLine("    Test 42: corpus not present at {0} -- skipped", AmaltheaUiRoot);
-                return;
-            }
-
             PrepareForCssLoad();
             LoadCssFiles(context, AmaltheaUiRoot, AmaltheaCssFiles);
 
@@ -282,12 +268,6 @@ namespace NewWidgets.Test
 
         private static void Test43_SiegeWarsComputedStyleBaseline(TestContext context)
         {
-            if (!Directory.Exists(SiegeWarsUiRoot))
-            {
-                Console.WriteLine("    Test 43: corpus not present at {0} -- skipped", SiegeWarsUiRoot);
-                return;
-            }
-
             PrepareForCssLoad();
             LoadCssFiles(context, SiegeWarsUiRoot, SiegeWarsCssFiles);
 
@@ -464,14 +444,9 @@ namespace NewWidgets.Test
         // Test 44: widget-tree golden master
         // ------------------------------------------------------------------
 
+#if AMALTHEA_SOURCE
         private static void Test44_AmaltheaWidgetTreeBaseline(TestContext context)
         {
-            if (!Directory.Exists(AmaltheaUiRoot))
-            {
-                Console.WriteLine("    Test 44: corpus not present at {0} -- skipped", AmaltheaUiRoot);
-                return;
-            }
-
             TestController controller = PrepareForCssLoad();
             LoadCssFiles(context, AmaltheaUiRoot, AmaltheaCssFiles);
 
@@ -587,5 +562,15 @@ namespace NewWidgets.Test
 
             CompareLines(context, "Amalthea widgets", expectedLines, actualLines);
         }
+#else
+        // Amalthea's widget classes are proprietary and are compiled in only when the csproj is
+        // given -p:AmaltheaRoot=<checkout> (see NewWidgets.Test.csproj). Without them the tree
+        // cannot be built at all, so the group reports itself skipped rather than asserting
+        // nothing and passing. The cached stylesheets tests 40-43 use are unaffected.
+        private static void Test44_AmaltheaWidgetTreeBaseline(TestContext context)
+        {
+            context.Skip("Amalthea widget classes not compiled in -- build with -p:AmaltheaRoot=<SpaceAdventure.Client checkout> to run this group");
+        }
+#endif
     }
 }

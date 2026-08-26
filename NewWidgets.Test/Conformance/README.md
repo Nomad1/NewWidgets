@@ -1,10 +1,16 @@
 # Conformance copies
 
-These are copies of Project Amalthea's stylesheets, taken on 2026-08-24 from
-`/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/Resources/Shared/ui/`.
+`amalthea/` and `siegewars/` are byte copies of the two games' shipped stylesheets,
+taken from `Resources/Shared/ui/` in each game's own checkout and refreshed on
+2026-08-25. No path outside this repository is named anywhere in the suite, so the
+tests run on a machine that has neither game.
 
-The originals stay untouched. They are the regression baseline, captured by
-`CorpusTests` in `Baselines/amalthea-css.txt`.
+`CorpusTests` (tests 40-43) reads these copies, not the games. They are the input to
+the golden masters in `Baselines/`. Refresh them from a game checkout when its UI
+changes -- and if a baseline then moves, that movement is the finding: report it,
+do not regenerate the baseline to absorb it.
+
+The originals stay untouched.
 
 These copies get converted to standard CSS. The purpose is a test of equality:
 

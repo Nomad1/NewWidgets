@@ -33,8 +33,11 @@ namespace NewWidgets.BrowserPreview
     /// </summary>
     internal static class Program
     {
-        private const string DefaultAssetsDir = "/Volumes/Projects/Projects/NewWidgets/NewWidgets.RunMobileSample/assets";
-        private const string DefaultOutputDir = "/Volumes/Projects/Projects/NewWidgets/NewWidgets.Test/Conformance/preview";
+        // Relative to this project's own directory, which is where the tool is run from -- the
+        // same convention NewWidgets.Test uses for its asset paths. Both can be overridden by
+        // the two command-line arguments. Nothing here may name a path on one machine.
+        private const string DefaultAssetsDir = "../NewWidgets.RunMobileSample/assets";
+        private const string DefaultOutputDir = "../NewWidgets.Test/Conformance/preview";
         private const string AtlasFileName = "ui.png";
 
         private static int Main(string[] args)

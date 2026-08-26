@@ -20,6 +20,7 @@ namespace NewWidgets.Test
 
         private int m_assertionCount;
         private int m_failureCount;
+        private string m_skipReason;
 
         public int AssertionCount
         {
@@ -29,6 +30,14 @@ namespace NewWidgets.Test
         public int FailureCount
         {
             get { return m_failureCount; }
+        }
+
+        /// <summary>
+        /// Why this group could not run, or null if it ran. Set by <see cref="Skip"/>.
+        /// </summary>
+        public string SkipReason
+        {
+            get { return m_skipReason; }
         }
 
         internal TestContext(string groupName)
@@ -112,6 +121,16 @@ namespace NewWidgets.Test
             }
         }
 
+        /// <summary>
+        /// Declares that this group -- or, when the group has already asserted something, the
+        /// remainder of it -- could not run because an optional input is absent. The reason is
+        /// reported by <see cref="TestRunner.Run"/>, so a missing input never reads as a pass.
+        /// </summary>
+        public void Skip(string message, params object[] parameters)
+        {
+            m_skipReason = FormatMessage(message, parameters);
+        }
+
         public void Fail(string message, params object[] parameters)
         {
             m_assertionCount++;
@@ -192,6 +211,7 @@ namespace NewWidgets.Test
             int failedGroups = 0;
             int knownFailingGroups = 0;
             int newlyFixedGroups = 0;
+            int skippedGroups = 0;
 
             foreach (GroupRegistration group in s_groups)
             {
@@ -225,6 +245,22 @@ namespace NewWidgets.Test
 
                 totalAssertions += assertionsForGroup;
 
+                // A group that asserted nothing at all and named a reason did not run: report it
+                // as SKIP rather than letting an empty pass look like a real one. A group that
+                // asserted something first only skipped part of its work, so it keeps its normal
+                // PASS/FAIL verdict and the reason is printed above it.
+                if (context.SkipReason != null)
+                {
+                    if (assertionsForGroup == 0)
+                    {
+                        Console.WriteLine("SKIP   {0}  ({1})", group.Name, context.SkipReason);
+                        skippedGroups++;
+                        continue;
+                    }
+
+                    Console.WriteLine("    partially skipped [{0}]: {1}", group.Name, context.SkipReason);
+                }
+
                 if (group.IsKnownFailure)
                 {
                     if (groupPassed)
@@ -254,8 +290,8 @@ namespace NewWidgets.Test
             }
 
             Console.WriteLine();
-            Console.WriteLine("groups={0} assertions={1} passed={2} failed={3} known-failing={4} newly-fixed={5}",
-                totalGroups, totalAssertions, passedGroups, failedGroups, knownFailingGroups, newlyFixedGroups);
+            Console.WriteLine("groups={0} assertions={1} passed={2} failed={3} known-failing={4} newly-fixed={5} skipped={6}",
+                totalGroups, totalAssertions, passedGroups, failedGroups, knownFailingGroups, newlyFixedGroups, skippedGroups);
 
             int unexpectedResults = failedGroups + newlyFixedGroups;
             return unexpectedResults == 0 ? 0 : 1;

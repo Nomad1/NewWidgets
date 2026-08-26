@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Numerics;
 
 using NewWidgets.UI;
 using NewWidgets.Widgets;
 
+#if AMALTHEA_SOURCE
 using SpaceAdventure.BusinessLogic.Controls;
+#endif
 
 namespace NewWidgets.Test
 {
@@ -20,11 +21,6 @@ namespace NewWidgets.Test
     internal static class SeamTests
     {
         private const float Tolerance = 0.01f;
-
-        // Duplicated from CorpusTests.AmaltheaUiRoot (private there, and CorpusTests.cs is
-        // off-limits to modify) purely to skip the DialogWindow.Show() portion of Test 46 the
-        // same way CorpusTests skips its own groups when the sibling checkout is absent.
-        private const string AmaltheaUiRootForSkipCheck = "/Volumes/Projects/Projects/SpaceAdventure/SpaceAdventure.Client/Resources/Shared/ui";
 
         // Registers Test 45. Must be called BEFORE CorpusTests.Register() in Program.cs:
         // Test 45 calls WidgetManager.ResetStyles(), which wipes the shared, process-wide
@@ -47,7 +43,9 @@ namespace NewWidgets.Test
         // "close_image_button" and the literal font "title" -- names CorpusTests.Test40 loads
         // for real from Amalthea's own CSS. Running before CorpusTests (or via a name filter
         // that skips it) would leave those undefined and fail for a reason unrelated to what
-        // this test checks; see the Directory.Exists guard below for the fallback.
+        // this test checks. CorpusTests reads those stylesheets from Conformance/amalthea inside
+        // this repository, so they are always there; only the DialogWindow class itself is
+        // conditional -- see CheckRealDialogWindow below.
         public static void RegisterSchedulingTest()
         {
             TestRunner.Add("Test 46: scheduled actions and the deterministic clock", Test46_ScheduledActionsAndDeterministicClock);
@@ -148,12 +146,12 @@ namespace NewWidgets.Test
 
             // ---- the original motivating case: a real Amalthea DialogWindow through Show() ----
 
-            if (!Directory.Exists(AmaltheaUiRootForSkipCheck))
-            {
-                Console.WriteLine("    Test 46: Amalthea corpus not present at {0} -- DialogWindow.Show() portion skipped", AmaltheaUiRootForSkipCheck);
-                return;
-            }
+            CheckRealDialogWindow(context, controller);
+        }
 
+#if AMALTHEA_SOURCE
+        private static void CheckRealDialogWindow(TestContext context, TestController controller)
+        {
             int pendingBeforeDialog = controller.PendingActionCount;
 
             DialogWindow dialog = DialogWindow.Show("Test 46 Title", "Test 46 body text for the recursion regression check.", "@button_ok");
@@ -172,5 +170,15 @@ namespace NewWidgets.Test
             context.AreEqual(pendingBeforeDialog, controller.PendingActionCount,
                 "once the appear animation and the deferred AddWindow have both run, the queue should drain back to where it was before Show(), got {0}", controller.PendingActionCount);
         }
+#else
+        // Amalthea's DialogWindow is proprietary game source, compiled in only when the csproj
+        // is given -p:AmaltheaRoot=<checkout> (see NewWidgets.Test.csproj). Everything above
+        // still runs; this last part reports itself skipped so the group's PASS cannot be read
+        // as having exercised the case that motivated the whole fix.
+        private static void CheckRealDialogWindow(TestContext context, TestController controller)
+        {
+            context.Skip("the DialogWindow.Show() portion needs Amalthea's DialogWindow -- build with -p:AmaltheaRoot=<SpaceAdventure.Client checkout> to run it");
+        }
+#endif
     }
 }
