@@ -149,16 +149,23 @@ namespace NewWidgets.Widgets
         }
 
         /// <summary>
+        /// The pseudo-class <see cref="WidgetState.Selected"/> reports in <see cref="StyleState"/>.
+        /// One state bit backs several CSS pseudo-classes in name, but what it means depends on
+        /// the widget: a checked checkbox is not a focused text edit, so the bit cannot honestly
+        /// stand in for all of them at once. <c>:focus</c> is correct for every widget except a
+        /// checkbox, which overrides this to report <c>:checked</c> instead -- see
+        /// <see cref="WidgetCheckBox.SelectedPseudoClass"/>.
+        /// </summary>
+        protected virtual string SelectedPseudoClass { get { return ":focus"; } }
+
+        /// <summary>
         /// Pseudo-class name. TODO: get rid of strings
         ///
-        /// <see cref="WidgetState.Selected"/> reports every name its
-        /// <see cref="WidgetPseudoClass"/> attributes declare, not one of them. That attribute
-        /// table already says the bit means <c>:checked</c>, <c>:selected</c>, <c>:active</c>
-        /// and <c>:focus</c> alike -- this engine has one state bit for all four -- but only
-        /// <c>:focus</c> was ever reported, so a <c>:checked</c> rule written for a checkbox
-        /// parsed, matched nothing and did nothing. Reporting all four makes the declared table
-        /// true. The cost is three more strings in the array while the bit is set, compared
-        /// against a rule list this is matched into once per style resolve.
+        /// <see cref="WidgetState.Selected"/> reports whatever <see cref="SelectedPseudoClass"/>
+        /// says for this widget -- <c>:focus</c> for most widgets, <c>:checked</c> for a
+        /// checkbox. One state bit cannot honestly stand in for every pseudo-class name at once:
+        /// reporting all of them made a <c>:checked</c> rule match a text field that merely has
+        /// focus, and an <c>:active</c> rule match a checked checkbox.
         ///
         /// <c>:enabled</c> is deliberately not reported. It is the default state of every
         /// widget in this engine, so reporting it would put a pseudo-class on every widget in
@@ -178,12 +185,7 @@ namespace NewWidgets.Widgets
                 if ((m_currentState & WidgetState.Hovered) != 0)
                     pseudoClasses.Add(":hover");
                 if ((m_currentState & WidgetState.Selected) != 0)
-                {
-                    pseudoClasses.Add(":focus");
-                    pseudoClasses.Add(":checked");
-                    pseudoClasses.Add(":selected");
-                    pseudoClasses.Add(":active");
-                }
+                    pseudoClasses.Add(SelectedPseudoClass);
                 if ((m_currentState & WidgetState.Disabled) != 0)
                     pseudoClasses.Add(":disabled");
 
@@ -205,6 +207,22 @@ namespace NewWidgets.Widgets
         {
             get { return m_markup; }
             set { m_markup = value; }
+        }
+
+        /// <summary>
+        /// Combines the code-level hidden flag (<see cref="WindowObject.Visible"/>) with the
+        /// resolved <see cref="Display"/> value, the same way a browser combines an element's own
+        /// hidden state with its computed <c>display</c>. The two are kept in separate slots --
+        /// <see cref="DisplayProcessor"/> never writes here directly -- and combined only on this
+        /// read, so neither one can be permanently overwritten by the other depending on call
+        /// order (a value written once at resolve time into someone else's field can never be
+        /// un-written by a later resolve, which is exactly the earlier ClipMargin bug in this
+        /// codebase).
+        /// </summary>
+        public override bool Visible
+        {
+            get { return base.Visible && Display != WidgetDisplay.None; }
+            set { base.Visible = value; }
         }
 
         public override bool Enabled
@@ -265,6 +283,19 @@ namespace NewWidgets.Widgets
         {
             get { return GetProperty(WidgetParameterIndex.Overflow, WidgetOverflow.Visible); }
             set { SetProperty(WidgetParameterIndex.Overflow, value); } // clipping is applied on each redraw so we don't need to call Invalidate of any kind
+        }
+
+        /// <summary>
+        /// The CSS <c>display</c> value resolved for this widget, i.e. the el.style.display slot:
+        /// style resolution (<see cref="DisplayProcessor"/>) and code both write through the same
+        /// underlying style property, so either can set it and either can win depending on which
+        /// ran last -- exactly like the DOM. See <see cref="Visible"/> for where this is combined
+        /// with the code-level hidden flag.
+        /// </summary>
+        public WidgetDisplay Display
+        {
+            get { return GetProperty(WidgetParameterIndex.Display, WidgetDisplay.Block); }
+            set { SetProperty(WidgetParameterIndex.Display, value); }
         }
 
         /// <summary>
@@ -618,7 +649,8 @@ namespace NewWidgets.Widgets
 
             do
             {
-                styles.Add(new StyleSelector(current.StyleElementType, current.StyleClasses, current.StyleId, current.StyleState));
+                styles.Add(new StyleSelector(current.StyleElementType, current.StyleClasses, current.StyleId, current.StyleState,
+                    current.Markup == null ? null : current.Markup.StyleAttributes));
 
                 // Reason why this style was added
 

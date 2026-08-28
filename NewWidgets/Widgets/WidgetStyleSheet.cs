@@ -81,7 +81,36 @@ namespace NewWidgets.Widgets
             {
                 var attr = WidgetParameterMap.GetAttributeByIndex(pair.Key);
 
-                builder.AppendFormat("    {0}: {1};\n", attr.Name, ConversionHelper.FormatValue(pair.Value.GetType(), attr.UnitType, pair.Value));
+                // The inverse of TextAlignProcessor's special case (Widgets/WidgetParameterIndex.cs):
+                // that parser turns the CSS keyword "center" into WidgetAlign.HorizontalCenter alone,
+                // since "center" means only the inline axis. Left to the generic formatter below,
+                // HorizontalCenter would come back out as "horizontalcenter", which is not a CSS
+                // keyword -- a browser ignores it and an external editor would likely flag or drop
+                // it, defeating the one point of a shared, browser-readable stylesheet.
+                //
+                // Same shape, second case -- D233. WidgetBackgroundStyle.NoRepeat is declared as a
+                // synonym of Image (same underlying value 1) so CSS's "no-repeat" round-trips.
+                // The generic formatter below is a bare value.ToString().ToLower(), which for a
+                // value two members share returns whichever was declared first in the enum -- Image,
+                // since it precedes the synonym -- so it would write back the invalid keyword
+                // "image" a browser drops, undoing the fix at every save. "no-repeat" is the only
+                // CSS spelling for this value; write it explicitly rather than let reflection guess.
+                //
+                // Third case, same shape again -- D233. BackImage's "no image" value is an empty
+                // string (BackgroundImageProcessor stores string.Empty for `none`). The generic
+                // formatter below wraps a UnitType.Url string in url("...") unconditionally, so an
+                // empty BackImage would round-trip as url("") -- a browser resolves that against
+                // the stylesheet's own address and tries to load the CSS file as an image. `none`
+                // is the standard's own spelling for "no background at all"; write it explicitly.
+                string formatted = pair.Key == WidgetParameterIndex.TextAlign && WidgetAlign.HorizontalCenter.Equals(pair.Value)
+                    ? "center"
+                    : pair.Key == WidgetParameterIndex.BackStyle && WidgetBackgroundStyle.Image.Equals(pair.Value)
+                    ? "no-repeat"
+                    : pair.Key == WidgetParameterIndex.BackImage && string.Empty.Equals(pair.Value)
+                    ? "none"
+                    : ConversionHelper.FormatValue(pair.Value.GetType(), attr.UnitType, pair.Value);
+
+                builder.AppendFormat("    {0}: {1};\n", attr.Name, formatted);
             }
 
             return builder.ToString();

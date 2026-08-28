@@ -1,0 +1,156 @@
+@runmobile_ignore {}
+
+/* runmobile_design.css -- v1
+   GENERATED from runmobile_design.md's row 10. DO NOT EDIT BY HAND: a hand-tuned reset here
+   is exactly the mistake this file exists to stop, and it comes back the next time this
+   file is regenerated from the contract.
+
+   A compatibility layer, not a design system -- the owner's words: "those are not hacks,
+   but a compatibility layer since engine is not a HTML browser." It resets ONLY the static,
+   load-time user-agent chrome a browser adds to a tag this preview adopts, that no author
+   stylesheet asks for and this engine has no concept of. Every declaration below is
+   traceable to a measured difference between a bare tag and a bare <div> in Chrome, from a
+   file:// address, recorded in runmobile_design.md's row 10. What is computed at run time
+   instead (sprite sizes from the atlas report, the tint matrices, the checkbox structure)
+   stays in runmobile_design.js; this file only ever holds static resets.
+
+   `@runmobile_ignore {}` above is the boundary CSSParser.ParseCSS stops the whole load at
+   (NewWidgets/Styles/CSSParser.cs): this file is browser-only, so the engine must never read
+   a byte of it, or report one either. A browser reads an unknown at-rule as an empty
+   statement and keeps reading everything below it normally -- that asymmetry is the point.
+
+   Link this BEFORE every author stylesheet. Its rules are plain tag selectors, the lowest
+   real specificity there is, so an author rule of equal specificity wins by cascade order
+   alone -- no !important needed to put padding back on a dialog, say.
+
+   One tag per section, so a second tag -- input, button, textarea, hr, progress, select, all
+   of which carry their own UA chrome -- is one more section, not a rewrite. Nothing here is
+   speculative: only `dialog` is listed as an adopted-tag UA-chrome reset because it is the
+   only one this preview has adopted so far. The `html`/`body` section below it is not a
+   UA-chrome reset at all -- see its own comment. */
+
+/* Root font size and page background (runmobile_design.md rows 1 and 2) -- moved here from
+   runmobile_design.js's applyPageDefaults() once measured that both are static: nothing
+   here is computed at run time. Kept its own section, not folded into `dialog`'s reset
+   above, because `html`/`body` carry no adopted widget tag -- there is no "bare tag" to
+   diff against a bare <div> the way there is for `dialog` -- so this is the compatibility
+   layer's OWN default, not a neutralisation of a browser one. Leaving it out of the header's
+   "UA-chrome reset" description above matters: fold it in there and a reader looking for
+   why the page is black would search Chrome's UA stylesheet and find nothing. */
+html {
+    /* One engine font unit is 30 browser pixels -- the engine's own font-scale conversion,
+       not a browser default. The one line in this file a designer might reasonably want to
+       change: every `em`/`rem` length elsewhere in an author stylesheet scales off it. */
+    font-size: 30px;
+    margin: 0;
+    background-color: #000000;
+}
+
+body {
+    margin: 0;
+    background-color: #000000;
+}
+
+/* border-style/border-width: longhand only. The `border` SHORTHAND also resets
+   border-image-* to initial (CSS Backgrounds/Borders, "the border shorthands"), which would
+   erase an author's border-image-source; the longhand carries no such side effect (measured).
+   margin-left/margin-right: cancels the UA `right: 0` + `margin: auto` centring pair. Neither
+   is a CSS initial value (margin's own initial is 0, not auto); both come from the HTML
+   spec's non-normative suggested default, the same as padding and background-color above. */
+dialog {
+    padding: 0;
+    background-color: transparent;
+    border-style: none;
+    border-width: 0;
+    margin-left: 0;
+    margin-right: 0;
+
+    /* display: not a measured QUIRK like the six resets above -- this is STANDARD,
+       OVERRIDDEN ON PURPOSE (COMPATIBILITY.md's classification). The HTML spec's own
+       UA stylesheet hides a bare dialog (`dialog:not([open]) { display: none }`); this
+       engine has no closed-window state to read that from, so a WidgetWindow that
+       exists renders whether or not it carries `open` -- hiding one is what an
+       author's own `display: none` is for, same as `.hidden`. A normal author-origin
+       declaration overrides a normal user-agent declaration regardless of selector
+       specificity (CSS Cascading and Inheritance, cascade origin ordering), so this
+       plain type selector beats `dialog:not([open])` with no `!important`. Measured in
+       Chrome 152.0.7977.65 from a file:// address: a bare `<dialog>`, no `open`
+       attribute, no stylesheet, computes `display: none`; the same dialog against only
+       this rule computes `display: block`. */
+    display: block;
+}
+
+/* border-style/border-width: longhand only, same reason as dialog above -- `border` would
+   also wipe an author's border-image (the nine-patch every real button carries via
+   buttons.css). padding, background-color: same QUIRK as dialog, same fix. font-family/
+   font-size: a plain <div> keeps inheriting its ancestor's font; a bare <button> does not --
+   Chrome's UA stylesheet gives it Arial at a fixed size, breaking the inheritance chain this
+   engine's own `font-family`/`font-size` (WidgetParameterInheritance.Inherit,
+   WidgetParameterIndex.cs) never breaks. `inherit` restores it; the `font` shorthand is not
+   used because font-weight/line-height/font-style already match a bare <div> and touching
+   them was not measured as necessary. appearance: Chrome's suggested rendering for form
+   controls (`auto`); this engine has no native-control concept at all, so `none` is the
+   match -- note it does NOT by itself cancel the border/padding/background-color/font
+   declarations above, those are separate UA rules and are reset separately, measured.
+
+   box-sizing and text-align are deliberately absent: both were measured to differ from a
+   bare <div>, and neither is a divergence from a bare WidgetButton. box-sizing's browser
+   default for <button> is already `border-box`, which is what this engine always draws
+   (WidgetParameterIndex.cs: "a widget has no border and draws its padding inside its size,
+   so its width is already the border box") -- resetting it to `content-box` would newly
+   diverge, not fix one. text-align's browser default for <button> is already `center`, which
+   is what WidgetButton.UpdateLayout hard-codes onto its label for the default (non-Custom)
+   Layout regardless of any CSS -- same reasoning, same conclusion, and it stays true for
+   every `--button-layout` value, not just the default: row 11's script positions the
+   injected <button-label> with its own inline `display: flex` plus `align-items`/
+   `justify-content` (flex-start for `textleft`, center otherwise), read off `--button-layout`
+   at build time and written as an inline style. An inline style always wins over an
+   inherited value, and flex alignment does not consult `text-align` at all -- it positions
+   the label's whole anonymous flex item, not glyphs inside it -- so a bare `<button>`'s UA
+   `center` can never reach the rendered position for any layout, textleft included. No
+   selector below keys off `--button-layout`, and none should: that would duplicate the
+   script's own per-layout logic in a second place with no link between them.
+
+   outline is reset below, on this tag and on the text-input tag section that follows,
+   though it is not a static/rest-state divergence like the ones above -- a bare <button>'s
+   outline computes `none` at rest, same as a bare <div>, and only differs once Chrome draws
+   its own focus ring on `:focus`. QUIRK, COMPATIBILITY.md's classification: a user-agent
+   SUGGESTED rendering, not something either engine's own `:focus` styles (button, textedit
+   family, defaults.css) know to draw around, or need to -- this engine has no outline
+   concept at all. Left in place the preview would show two focus indicators stacked, the
+   engine's nine-patch frame plus Chrome's ring, on every element the engine already draws
+   its own focus state for. Not an accessibility regression to relitigate here: this is a
+   preview of a game UI that renders its own focus state, and the reset makes the preview
+   match what the engine actually draws. */
+button {
+    padding: 0;
+    background-color: transparent;
+    border-style: none;
+    border-width: 0;
+    font-family: inherit;
+    font-size: inherit;
+    appearance: none;
+    outline: none;
+
+    /* display: STANDARD, OVERRIDDEN ON PURPOSE, same classification as dialog's `open`
+       row but a different reason -- WidgetDisplay (Enums.cs) has only None and Block, "the
+       single distinction left that carries meaning is whether the box is drawn at all"
+       (D134 profile, absolute positioning only), and Widget.cs's own default for an unstyled
+       widget is WidgetDisplay.Block. A bare <button> computes `inline-block` in Chrome; this
+       engine cannot represent that value at all, so `block` is the only faithful match. */
+    display: block;
+}
+
+/* outline only -- the text-input tag this preview has adopted so far is `<input>`, typed
+   `text`/`password` (login.xhtml); everything else about a bare `<input>` (its opaque fill,
+   its border, its padding) is neutralised by defaults.css's own `textedit, textfield,
+   textarea, input[type="text"], input[type="password"]` rule, which carries a real
+   `border-image-source` and so already wins the cascade against the UA quirk -- there is no
+   bare-tag gap left for this file to fill there, only the same `:focus` ring row 10's button
+   section explains above. `defaults.css` draws its own `:focus` frame
+   (`panel_white_selected_9`) for exactly these five selectors, so this is where "the
+   elements the engine draws focus for itself" ends: checkbox has no `:focus` rule anywhere
+   in defaults.css and is left alone. */
+input[type="text"], input[type="password"] {
+    outline: none;
+}

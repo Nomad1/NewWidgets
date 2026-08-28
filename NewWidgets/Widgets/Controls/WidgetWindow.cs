@@ -8,7 +8,7 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetWindow : WidgetPanel
     {
-        public new const string ElementType = "window";
+        public new const string ElementType = "dialog";
         //
         private static readonly float s_dragEpsilonSquared = 10.0f*10.0f;
 

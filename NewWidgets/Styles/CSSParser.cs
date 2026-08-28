@@ -92,6 +92,15 @@ namespace NewWidgets.UI.Styles
                             //LogTrace("{0}: {1} params", currentStyle.Trim(), parameters.Count);
                             currentStyle = currentStyle.Trim();
 
+                            // `@runmobile_ignore {}` marks the rest of the file as browser-only:
+                            // a stylesheet a preview script generates (runmobile_design.css) for
+                            // resets this engine has no concept of. A browser reads an unknown
+                            // at-rule as an empty statement and keeps going; this engine stops
+                            // the walk here instead, so nothing past it is parsed and nothing is
+                            // reported as an unknown selector or property.
+                            if (currentStyle == "@runmobile_ignore")
+                                return;
+
                             targetCollection.AddStyle(currentStyle, paramConstructor(currentStyle, parameters));
 
                             currentStyle = null;

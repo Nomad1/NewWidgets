@@ -21,14 +21,20 @@ namespace NewWidgets.Widgets
     public enum WidgetBackgroundStyle
     {
         /// <summary>
-        /// No background at all
+        /// No background at all. CSS's own spelling for this is <c>background-image: none</c>
+        /// (see <see cref="BackgroundImageProcessor"/>), not a repeat mode -- D233.
         /// </summary>
         None = 0,
-        No_Repeat = 0, // synonym
         /// <summary>
         /// Center and no stretch
         /// </summary>
         Image = 1,
+        /// <summary>
+        /// CSS <c>background-repeat: no-repeat</c>: draw the sprite once, do not tile. Says
+        /// nothing about whether a background exists, unlike <see cref="None"/> -- D233. Renders
+        /// identically to <see cref="Image"/>, which already means exactly that.
+        /// </summary>
+        NoRepeat = Image, // synonym
         /// <summary>
         /// Center and aspect fit. Good only for fixed size windows
         /// </summary>
@@ -211,7 +217,7 @@ namespace NewWidgets.Widgets
         Toolbar,
         [Name("tooltip")]
         Tooltip,
-        [Name("window")]
+        [Name("dialog")]
         Window,
     }
 

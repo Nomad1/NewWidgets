@@ -45,6 +45,7 @@ namespace NewWidgets.Widgets
 
         private string m_text;
         private List<KeyValuePair<string, string>> m_attributes;
+        private Dictionary<string, string> m_styleAttributes;
         private List<string> m_comments;
         private List<string> m_trailingComments;
 
@@ -80,6 +81,21 @@ namespace NewWidgets.Widgets
         }
 
         /// <summary>
+        /// Every attribute the source tag carried, exactly as written, whether or not a widget
+        /// property already models it. This is a separate copy from <see cref="Attributes"/>
+        /// on purpose: that list exists so <c>SaveXHTML</c> can round-trip what no property
+        /// holds, and dropping an attribute from it the moment a property models it is correct
+        /// for saving. Style matching needs the opposite -- <c>&lt;input type="checkbox"&gt;</c>
+        /// answers <c>input[type="checkbox"]</c> even though <c>type</c> already picked
+        /// <see cref="WidgetCheckBox"/> out of the markup table and a property never stored it
+        /// verbatim. Null until the first one is added
+        /// </summary>
+        public IDictionary<string, string> StyleAttributes
+        {
+            get { return m_styleAttributes; }
+        }
+
+        /// <summary>
         /// Comments that stood immediately before this element. Null until the first one
         /// </summary>
         public IList<string> Comments
@@ -107,6 +123,14 @@ namespace NewWidgets.Widgets
                 m_attributes = new List<KeyValuePair<string, string>>();
 
             m_attributes.Add(new KeyValuePair<string, string>(name, value));
+        }
+
+        public void SetStyleAttribute(string name, string value)
+        {
+            if (m_styleAttributes == null)
+                m_styleAttributes = new Dictionary<string, string>();
+
+            m_styleAttributes[name] = value;
         }
 
         public void AddComment(string text)
@@ -257,17 +281,17 @@ namespace NewWidgets.Widgets
         /// over the picture. A document that writes <c>&lt;img src="..."&gt;</c> has said the
         /// picture has a URL, and gets that element back unchanged.
         ///
-        /// A window is still not <c>&lt;dialog&gt;</c>: that is HTML5, so XHTML 1.0 Strict has
-        /// no such element, and a browser's <c>dialog:not([open]) { display: none }</c> would
-        /// hide the window and its whole subtree.
+        /// A window is <c>&lt;dialog&gt;</c> now, a real tag rather than a qualifier class on
+        /// <c>&lt;div&gt;</c>. HTML5's <c>dialog:not([open]) { display: none }</c> and its other
+        /// user-agent defaults are neutralised on the browser side, in
+        /// <c>runmobile_design.js</c> under the row-9 browser-quirks workarounds; the engine
+        /// carries none of that, so this table treats it as a plain tag registration like
+        /// <c>&lt;label&gt;</c> or <c>&lt;textarea&gt;</c>.
         ///
-        /// The qualifier class stays a style class after loading, so a browser's
-        /// <c>.window</c> rule and the NewWidgets <c>window</c> rule can live in one stylesheet
-        /// and match the same element.
-        ///
-        /// ponytail: a qualifier class is an ordinary class name, so a panel a game gave the
-        /// class <c>window</c> to would save as <c>&lt;div class="window"&gt;</c> and load back
-        /// as a window. The ceiling is one reserved name per <c>div</c>-backed widget. Upgrade
+        /// ponytail: the qualifier-class approach below (<c>div[class=image]</c>,
+        /// <c>div[class=textfield]</c>) uses an ordinary class name, so a panel a game gave one
+        /// of those classes to would save as <c>&lt;div class="..."&gt;</c> and load back as
+        /// that widget. The ceiling is one reserved name per <c>div</c>-backed widget. Upgrade
         /// path: refuse the qualifier names in <c>Widget.AddStyleClass</c>, or move the marker
         /// to an attribute of its own once the document stops having to be XHTML 1.0 Strict.
         ///
@@ -288,7 +312,7 @@ namespace NewWidgets.Widgets
         static WidgetManager()
         {
             RegisterElement<WidgetPanel>("div", WidgetType.Panel, delegate (WidgetStyle style) { return new WidgetPanel(style); });
-            RegisterElement<WidgetWindow>("div[class=window]", WidgetType.Window, delegate (WidgetStyle style) { return new WidgetWindow(style); });
+            RegisterElement<WidgetWindow>("dialog", WidgetType.Window, delegate (WidgetStyle style) { return new WidgetWindow(style); });
 
             // a heading is a short line of text, which is what a WidgetLabel is. <span> is
             // registered last, so it is the tag a label built in code is written as
@@ -549,7 +573,9 @@ namespace NewWidgets.Widgets
                 Widget widget = CreateMarkupWidget(node);
 
                 if (widget == null)
-                    continue; // a game's own factory answered with nothing; already logged
+                    continue; // either a game's own factory answered with nothing (already
+                              // logged), or the element is <script>, which is skipped by design
+                              // and silently (see CreateMarkupWidget)
 
                 // a comment belongs to the element it stands in front of, so that inserting or
                 // deleting an element in an editor moves its comment with it
@@ -604,6 +630,18 @@ namespace NewWidgets.Widgets
         /// </summary>
         private static Widget CreateMarkupWidget(HtmlNode node)
         {
+            // <script> is a named exception to that rule, not a change to it. D157 is about an
+            // unknown *container* -- a tag the author used to group real UI, which must keep
+            // laying out its children. <script> groups no UI at all; it is instrumentation for
+            // the browser preview (see NewWidgets.RunMobileSample/assets/login.xhtml) that must
+            // by definition be invisible to this engine. Returning null here, before any of the
+            // widget/style machinery below runs, means: no widget, no log, and -- because
+            // LoadMarkupChildren only recurses into a node's children when CreateMarkupWidget
+            // returned one -- an inline script body (ordinary text content on this node, per
+            // HtmlNode) is never touched either.
+            if (node.Element == "script")
+                return null;
+
             string[] classes = null;
             string classAttribute = node.Class;
 
@@ -716,8 +754,15 @@ namespace NewWidgets.Widgets
                 s_markupLabelLinks.Add(new KeyValuePair<Widget, string>(widget, linked));
 
             foreach (KeyValuePair<string, string> attribute in node.Attributes)
+            {
+                // kept for style matching regardless of whether a property already models it --
+                // see WidgetMarkup.StyleAttributes for why this is a second copy and not a
+                // filtered view of the one below
+                widget.Markup.SetStyleAttribute(attribute.Key, attribute.Value);
+
                 if (!IsMarkupAttributeModelled(widget, node, qualifierName, attribute.Key, attribute.Value))
                     widget.Markup.AddAttribute(attribute.Key, attribute.Value);
+            }
         }
 
         /// <summary>

@@ -14,7 +14,10 @@ namespace NewWidgets.UI.Styles
         /// <summary>
         /// Regular expression to separate selectors to different groups
         /// </summary>
-        private static readonly Regex s_selectorParser = new Regex(@"(@{0,1}[\w#:_\-\[\]()\.\='\^\/]+)([\s,+>~]+)", RegexOptions.Compiled);
+        // the token class needs '"' too now that an attribute test can carry a quoted value --
+        // input[type="checkbox"] -- or this splitter cannot tokenize the selector at all before
+        // StyleSelector ever gets to parse it
+        private static readonly Regex s_selectorParser = new Regex(@"(@{0,1}[\w#:_\-\[\]()\.\=""'\^\/]+)([\s,+>~]+)", RegexOptions.Compiled);
 
         private readonly IList<StyleSelector> m_selectors;
         private readonly IList<StyleSelectorCombinator> m_combinators;
@@ -239,7 +242,8 @@ namespace NewWidgets.UI.Styles
                 if (m_selectors[i].PseudoClasses != null) // TODO: different arrays for pseudo classes and pseudo-elements
                     countB += m_selectors[i].PseudoClasses.Length;
 
-                // TODO: count of attributes
+                if (m_selectors[i].Attributes != null) // an attribute test counts the same as a class or a pseudo-class
+                    countB += m_selectors[i].Attributes.Count;
 
                 if (!string.IsNullOrEmpty(m_selectors[i].Element))
                 {

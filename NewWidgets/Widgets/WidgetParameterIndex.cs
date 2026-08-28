@@ -115,22 +115,39 @@ namespace NewWidgets.Widgets
         BoxSizing,
         // WidgetTextField splits its text on the line breaks it is given and never collapses
         // whitespace, which is the `pre` family. It does not wrap a long line either, so no
-        // value is honoured exactly; the two that preserve breaks are the closest and pass
+        // value is honoured exactly; the two that preserve breaks are the closest and pass,
+        // and a WidgetLabel never wraps at all, so `nowrap` is exactly what it already does.
         [WidgetParameter("white-space", "white-space", typeof(string), UnitType.None, WidgetParameterInheritance.Inherit,
-                                        typeof(IgnoredProcessor), "pre", "pre-wrap")]
+                                        typeof(IgnoredProcessor), "pre", "pre-wrap", "nowrap")]
         WhiteSpace,
         [WidgetParameter("border", "border", typeof(string), UnitType.None, WidgetParameterInheritance.Initial,
                                    typeof(IgnoredProcessor), "none")] // nothing in this engine draws a border; a frame is a background nine-patch
         Border,
+        // Same case as `border` above, argued the same way: this engine draws no background
+        // fill of its own -- a frame is the nine-patch below (BackColor/--background-color),
+        // and CSS `background-color` is not that. Unlike `border`, though, no value of it is
+        // ever honoured, only `transparent` is listed rather than every colour: a browser's UA
+        // stylesheet paints an opaque fill behind form controls (<input>, <button>) that this
+        // engine never draws, and `transparent` is the one value a shared stylesheet needs to
+        // undo it. Any other colour is still a colour this engine silently would not draw, and
+        // stays reported so an author is not left believing it took effect.
+        [WidgetParameter("background-color", "background-color", typeof(string), UnitType.None, WidgetParameterInheritance.Initial,
+                                              typeof(IgnoredProcessor), "transparent")]
+        BackgroundColor,
         [WidgetParameter("padding", typeof(Margin), UnitType.Length)] // padding is of type Margin
         Padding,
 
         // Background
 
+        [WidgetParameter("image_color", "--image-color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Initial,
+                                        typeof(BackgroundColorProcessor), "--background-opacity")] // a WidgetImage (e.g. checkbox #checkbox_image) has no property of its own to tint with -- it writes the same slot --background-color does, through the same processor, so an authored alpha unpacks into --background-opacity here exactly as it does for --background-color; the two spellings must behave identically
         [WidgetParameter("back_color", "--background-color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Initial,
-                                       typeof(BackgroundColorProcessor), "--background-opacity")] // an authored alpha is unpacked into the opacity property, because the renderer masks it off the colour
+                                       typeof(BackgroundColorProcessor), "--background-opacity")] // an authored alpha is unpacked into the opacity property, because the renderer masks it off the colour. Last, so SaveCSS still writes it
         BackColor,
-        [WidgetParameter("back_image", "background-image", typeof(string), UnitType.Url)]
+        [WidgetParameter("image", "image", typeof(string), UnitType.Url, WidgetParameterInheritance.Initial,
+                                  typeof(DefaultProcessor), "background-image")] // same idea as `image_color` above: the sprite a WidgetImage draws is this slot
+        [WidgetParameter("back_image", "background-image", typeof(string), UnitType.Url, WidgetParameterInheritance.Initial,
+                                       typeof(BackgroundImageProcessor), "background-repeat")] // Last, so SaveCSS still writes it
         BackImage,
         [WidgetParameter("back_style", "background-repeat", typeof(WidgetBackgroundStyle), UnitType.None, WidgetParameterInheritance.Initial,
                                        typeof(BackgroundRepeatProcessor))] // the CSS keywords on top of this engine's own repeat modes
@@ -189,7 +206,8 @@ namespace NewWidgets.Widgets
         TextColor,
         [WidgetParameter("line_spacing", "line-height", typeof(float), UnitType.Percent, WidgetParameterInheritance.Inherit)]
         LineSpacing,
-        [WidgetParameter("text_align", "text-align", typeof(WidgetAlign), UnitType.None, WidgetParameterInheritance.Inherit)] // TODO: more alignment options
+        [WidgetParameter("text_align", "text-align", typeof(WidgetAlign), UnitType.None, WidgetParameterInheritance.Inherit,
+                                        typeof(TextAlignProcessor))] // TODO: more alignment options
         TextAlign,
         //[WidgetParameter("text_padding", "--text-padding", typeof(Margin), UnitType.Length)] // changed to "padding"
         //TextPadding,
@@ -218,9 +236,9 @@ namespace NewWidgets.Widgets
         [WidgetParameter("caret-color", typeof(uint), UnitType.Color)] // CSS name, accepted
         [WidgetParameter("cursor_color", "--cursor-color", typeof(uint), UnitType.Color)] // legacy. Last, so SaveCSS still writes it
         CursorColor,
-        [WidgetParameter("cursor_char", "--cursor_char")]
+        [WidgetParameter("cursor-char", "--cursor-char")]
         CursorChar,
-        [WidgetParameter("mask_char", "--mask_char")]
+        [WidgetParameter("mask-char", "--mask-char")]
         MaskChar,
 
 
@@ -243,6 +261,8 @@ namespace NewWidgets.Widgets
         [WidgetParameter("src", typeof(string), UnitType.Url)] // CSS @font-face name, accepted
         [WidgetParameter("font_resource", "--font-resource", typeof(string), UnitType.Url)] // legacy. Last, so SaveCSS still writes it
         FontResource,
+        [WidgetParameter("--material", typeof(string))] // names the shader the font's glyphs render with; WidgetManager.RegisterFont prepends it to FontResource with a pipe
+        FontMaterial,
         [WidgetParameter("letter-spacing", typeof(float))] // CSS name, accepted
         [WidgetParameter("font_spacing", "--font-spacing", typeof(float))] // legacy. Last, so SaveCSS still writes it
         FontSpacing,
@@ -875,6 +895,32 @@ namespace NewWidgets.Widgets
     }
 
     /// <summary>
+    /// CSS <c>background-image</c>. <c>none</c> is the standard's own spelling for "no
+    /// background at all" (D233): it clears the sprite the way any other value would, and also
+    /// resets its companion <c>background-repeat</c> slot to <see cref="WidgetBackgroundStyle.None"/>,
+    /// the same double cancellation the old XML <c>back_style: None</c> used to do in one slot
+    /// (D231). A rule that then declares its own <c>background-repeat</c>/<c>background-size</c>
+    /// after this one still wins, same as everywhere else this shared slot is written: source
+    /// order decides (the ponytail comment on <see cref="BackgroundSizeProcessor"/>).
+    /// </summary>
+    internal class BackgroundImageProcessor : CssPropertyProcessor
+    {
+        public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            string value = ConversionHelper.StringParse(stringValue, UnitType.Url);
+
+            if (string.Equals(value, "none", StringComparison.OrdinalIgnoreCase))
+            {
+                data[PropertyIndex] = string.Empty;
+                data[CompanionIndex] = WidgetBackgroundStyle.None;
+                return;
+            }
+
+            data[PropertyIndex] = value;
+        }
+    }
+
+    /// <summary>
     /// CSS <c>border-image-source</c>. Stores the url as it was authored, so <c>SaveCSS</c>
     /// writes a D186 reference back whole (D188), and mirrors it into <c>background-image</c>,
     /// which is the property the renderer reads. <c>none</c> is the initial value and clears
@@ -1035,6 +1081,26 @@ namespace NewWidgets.Widgets
         }
     }
 
+    /// <summary>
+    /// CSS <c>text-align</c>, restricted to the inline axis the way the standard defines it.
+    /// The generic flag parser <see cref="ConversionHelper.EnumParse(Type, string)"/> resolves
+    /// the single keyword "center" to the enum member <see cref="WidgetAlign.Center"/>, which is
+    /// <c>Left | Right | Top | Bottom</c>, so that one keyword carried the vertical bits along
+    /// uninvited. This keeps "center" to <see cref="WidgetAlign.HorizontalCenter"/>. Any other
+    /// spelling -- left, right, or this engine's own "flag, flag" combination such as
+    /// <c>text-align: left, verticalcenter</c> -- is unchanged, still the generic parser, since
+    /// those already say exactly which bits they mean and are how a stylesheet reaches the
+    /// vertical axis today.
+    /// </summary>
+    internal class TextAlignProcessor : CssPropertyProcessor
+    {
+        public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            data[PropertyIndex] = string.Equals(stringValue.Trim(), "center", StringComparison.OrdinalIgnoreCase)
+                ? WidgetAlign.HorizontalCenter
+                : (WidgetAlign)ConversionHelper.EnumParse(typeof(WidgetAlign), stringValue);
+        }
+    }
 
 }
 

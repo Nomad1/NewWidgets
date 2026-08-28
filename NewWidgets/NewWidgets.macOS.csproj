@@ -20,8 +20,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnableCodeSigning>False</EnableCodeSigning>
     <UseSGen>false</UseSGen>
+    <LinkMode>None</LinkMode>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -29,8 +30,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
-    <EnableCodeSigning>false</EnableCodeSigning>
+    <EnableCodeSigning>False</EnableCodeSigning>
     <UseSGen>false</UseSGen>
+    <LinkMode>None</LinkMode>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

@@ -124,13 +124,15 @@ namespace NewWidgets.Utility
         }
 
         /// <summary>
-        /// Converts Margin to set of floats separated by spaces
+        /// Converts Margin to a CSS box shorthand: top, right, bottom, left. This must stay the
+        /// exact inverse of <see cref="MarginParse"/>, which reads that same CSS order -- writing
+        /// any other order rotates every asymmetric box value on a save/load round trip.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
         public static string ToString(Margin value, UnitType unitType = UnitType.None)
         {
-            return string.Format("{0} {1} {2} {3}", ToString(value.Left, unitType), ToString(value.Top, unitType), ToString(value.Right, unitType), ToString(value.Bottom, unitType)); 
+            return string.Format("{0} {1} {2} {3}", ToString(value.Top, unitType), ToString(value.Right, unitType), ToString(value.Bottom, unitType), ToString(value.Left, unitType));
         }
 
         /// <summary>
@@ -623,7 +625,7 @@ namespace NewWidgets.Utility
 
             foreach (string str in strings)
             {
-                result |= (int)Enum.Parse(enumType, str.Replace('-', '_'), true);
+                result |= (int)Enum.Parse(enumType, str.Replace("-", ""), true);
             }
 
             return (Enum)Enum.ToObject(enumType, result);

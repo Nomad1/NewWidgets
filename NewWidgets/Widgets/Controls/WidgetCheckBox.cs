@@ -16,6 +16,12 @@ namespace NewWidgets.Widgets
         //
         private const string ImageClass = "checkbox_image";
 
+        /// <summary>
+        /// A checked checkbox is not focused, so <see cref="Widget.StyleState"/> must report
+        /// <c>:checked</c> for it instead of <c>:focus</c>. See <see cref="Widget.SelectedPseudoClass"/>.
+        /// </summary>
+        protected override string SelectedPseudoClass { get { return ":checked"; } }
+
         private readonly WidgetImage m_image;
         private WidgetLabel m_linkedLabel;
 

@@ -33,8 +33,13 @@ namespace NewWidgets.UI.Styles
 
             StyleSelector selector = node.SelectorList.Selectors[node.SelectorList.Count - 1]; // last selector in the list
 
-            // All nodes
-            m_allNodes[GetNodeKey(selector.ToString(), node.Data)] = node;
+            // All nodes, keyed by the FULL selector chain (".a > .b", not just ".b") -- two
+            // different chains that happen to end in the same segment (".a > .b" and
+            // ".a.c > .b") are two different rules and must not evict one another here. This
+            // also matches the key FindExactStyle already looks up by (selectorList.ToString()),
+            // so a re-declaration of the same chain still merges into the existing node instead
+            // of leaking a duplicate.
+            m_allNodes[GetNodeKey(node.SelectorList.ToString(), node.Data)] = node;
 
             if (!string.IsNullOrEmpty(selector.Id)) // we have an explicit id, i.e. tr#myid
                 AddToCollection(m_idCollection, selector.Id, node);

@@ -262,6 +262,27 @@ namespace NewWidgets.Widgets
         private static void RegisterFont(string fontName, StyleSheetData data)
         {
             string resource = data.GetParameter(WidgetParameterIndex.FontResource, "");
+            string material = data.GetParameter(WidgetParameterIndex.FontMaterial, "");
+
+            // ponytail: a material is just prepended to the resource with a pipe, the same
+            // shape the XML skin loader has always accepted as resource="material|sprite" --
+            // there is no shader-selection concept here beyond string concatenation. Ceiling:
+            // a real material system replaces this once one exists.
+            //
+            // Only the quotes come off. UnquoteFontFamily is font-family logic and does not
+            // belong on a material name, and UrlToSpriteName is worse: it returns everything
+            // after a '#', so composing before it would silently discard the material the
+            // moment a resource carried a fragment. A font is not a sprite and is never
+            // addressed as one, so neither helper has a job here.
+            // Extract first, compose second. UrlToSpriteName returns everything after a '#',
+            // so composing first would silently discard the material whenever a resource
+            // carried a fragment -- and Test 92 pins that a font may be written as
+            // url("ui.svg#glyphs"). Only quotes come off the material: UnquoteFontFamily is
+            // font-family logic and has no business on a shader name.
+            resource = ConversionHelper.UrlToSpriteName(resource);
+
+            if (!string.IsNullOrEmpty(material))
+                resource = material.Trim('"', '\'') + "|" + resource;
 
             if (string.IsNullOrEmpty(fontName) || string.IsNullOrEmpty(resource))
             {
@@ -271,9 +292,7 @@ namespace NewWidgets.Widgets
 
             Font font = new Font(
                 fontName,
-                // src is stored as it was authored, so a D186 reference still carries its atlas
-                // file here; the sprite the font is cut from is the name in the fragment
-                ConversionHelper.UrlToSpriteName(resource),
+                resource,
                 data.GetParameter(WidgetParameterIndex.FontSpacing, 0.0f),
                 data.GetParameter(WidgetParameterIndex.FontLeading, 0),
                 data.GetParameter(WidgetParameterIndex.FontBaseline, 10),
