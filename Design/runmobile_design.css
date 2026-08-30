@@ -139,7 +139,9 @@ button {
        widget is WidgetDisplay.Block. A bare <button> computes `inline-block` in Chrome; this
        engine cannot represent that value at all, so `block` is the only faithful match. */
     display: block;
+
 }
+
 
 /* outline only -- the text-input tag this preview has adopted so far is `<input>`, typed
    `text`/`password` (login.xhtml); everything else about a bare `<input>` (its opaque fill,
@@ -151,6 +153,44 @@ button {
    (`panel_white_selected_9`) for exactly these five selectors, so this is where "the
    elements the engine draws focus for itself" ends: checkbox has no `:focus` rule anywhere
    in defaults.css and is left alone. */
+/* position: PREVIEW ONLY, and the single rule that makes paint order match the engine.
+   CSS 2.1 Appendix E paints POSITIONED descendants (step 8) above in-flow non-positioned boxes
+   (steps 4 and 5), whatever the document order. The engine has no such split: WindowObjectArray
+   draws children in child order and `position` never enters into it. So any absolutely
+   positioned element -- a window's backdrop, say -- jumps above every in-flow sibling here and
+   below them there, and because hit testing follows paint order it swallows their clicks too.
+
+   `relative` with no offsets moves nothing and takes nothing out of flow. What it does is put
+   EVERY element in step 8, where document order alone decides, which is the engine's rule
+   exactly. It also makes every element a containing block for its absolutely positioned
+   children -- again matching the engine, whose ContainingBlockSize returns the immediate
+   parent's box unconditionally, with no notion of a nearest positioned ancestor.
+
+   Specificity 0, so any real rule (`dialog`, an inline `position: absolute`) still wins, and an
+   element that declares absolute stays absolute -- it simply no longer outranks its siblings.
+   This replaces two earlier per-element fixes, on <button> and on the checkbox wrapper, each of
+   which was the same bug seen once; neither is needed now. NOTHING here may name a project's
+   own class: this file has to hold for any document, and .back_pattern was Amalthea's. */
+* {
+    position: relative;
+}
+
 input[type="text"], input[type="password"] {
+    outline: none;
+}
+
+/* appearance: STANDARD, the same UA-widget reset row 10 applies to <button>, and needed for the
+   same reason. A checkbox is the one control whose skin defaults.css puts on the input itself
+   (`input[type="checkbox"]`, a background-image sprite) -- there is no `checkbox` tag and no
+   `.checkbox` class in HTML for it to target instead. Without this the browser paints its own
+   native tick box on top of that sprite and nothing of the skin shows.
+
+   margin and outline follow the same argument as row 10's button reset: Chrome gives a bare
+   checkbox a 3px margin that no engine widget has, and the focus ring is the browser's, not the
+   skin's. The engine draws no UA control at all, so every one of these is a divergence this file
+   exists to erase, not a style choice. */
+input[type="checkbox"] {
+    appearance: none;
+    margin: 0;
     outline: none;
 }

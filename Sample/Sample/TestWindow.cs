@@ -9,8 +9,8 @@ namespace NewWidgets.Sample
     /// <summary>
     /// Test window. Taken from Project Amalthea login dialog.
     ///
-    /// The dialog itself is <c>assets/login.xhtml</c> and its geometry is
-    /// <c>assets/login.css</c>, which the document links. Nothing here builds a control or
+    /// The dialog itself is <c>assets/login.xhtml</c> and its presentation is all in
+    /// <c>assets/ui.css</c>, which the document links. Nothing here builds a control or
     /// computes a position: the document is loaded, every control is found by the same
     /// <c>#id</c> the stylesheet names it by, and what is left is behaviour -- the event
     /// handlers -- plus the handful of things below that no CSS property can say yet.

@@ -211,7 +211,7 @@ namespace NewWidgets.BrowserPreview
 
             // .back_pattern (back.Size = panel.Size = 600x760, Position = (0,0), style
             // "back_pattern": background-image url("back_pattern"), background-repeat: imagetiled,
-            // background-size: 100%). Clipped by .window's own overflow: hidden, same as the
+            // background-size: 100%). Clipped by dialog's own overflow: hidden, same as the
             // engine clips it with the widget's Overflow property.
             // --background-opacity: 4% -- an opacity on the sprite draw itself, see
             // NinePatch.FormatCss for why that is CSS `opacity` and not an rgba background-color.
@@ -271,7 +271,7 @@ namespace NewWidgets.BrowserPreview
             text.AppendLine();
             text.AppendLine("body { margin: 0; background-color: #202020; font-family: monospace; font-size: 30px; }");
             text.AppendLine();
-            text.AppendLine(".window { position: absolute; left: 50%; top: 50%; margin-left: -300px; margin-top: -380px; width: 600px; height: 760px; overflow: hidden; }");
+            text.AppendLine("dialog { position: absolute; left: 50%; top: 50%; margin-left: -300px; margin-top: -380px; width: 600px; height: 760px; overflow: hidden; }");
             text.AppendLine();
             text.AppendLine(".label { position: absolute; color: #ffffff; font-size: 0.6em; height: 35px; overflow: visible; }");
             text.AppendLine(".hidden { display: none; }");
@@ -311,7 +311,7 @@ namespace NewWidgets.BrowserPreview
             text.AppendLine("    <link rel=\"stylesheet\" href=\"login.css\" />");
             text.AppendLine("</head>");
             text.AppendLine("<body>");
-            text.AppendLine("    <div class=\"window\" id=\"login_window\">");
+            text.AppendLine("    <dialog open=\"open\" id=\"login_window\">");
 
             AppendPatch(text, FindBox(boxes, "login_window"));
             AppendPatch(text, FindBox(boxes, "login_back"));
@@ -342,7 +342,7 @@ namespace NewWidgets.BrowserPreview
 
             text.AppendLine("        <span class=\"label\" id=\"fps_label\">FPS: 55.7/61.1</span>");
 
-            text.AppendLine("    </div>");
+            text.AppendLine("    </dialog>");
             text.AppendLine("</body>");
             text.AppendLine("</html>");
 

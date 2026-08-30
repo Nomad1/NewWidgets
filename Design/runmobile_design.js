@@ -177,6 +177,23 @@
         // changed, because that blind copy overwrote the correct size row 8 had set on THIS
         // SAME clone moments earlier).
         applySpriteSizeTo(rec.clone);
+
+        // FRAME_PROPS copied el's own `position`, and an in-flow el hands the clone `static`
+        // or `relative` -- both of which occupy a slot. The clone is el's previous SIBLING, so
+        // showing it then inserts a whole extra box into the parent's flow and everything after
+        // it shifts (measured: the six .square_buttons in #buttons_panel, a flex row, moved and
+        // the row grew the moment one was hovered). It only ever paints, so pin it over el
+        // instead. Siblings share an offsetParent, so el's offset box is already in the
+        // coordinate space an absolute clone resolves against.
+        if (computed.position !== 'absolute' && computed.position !== 'fixed') {
+            rec.clone.style.position = 'absolute';
+            rec.clone.style.left = el.offsetLeft + 'px';
+            rec.clone.style.top = el.offsetTop + 'px';
+            rec.clone.style.width = el.offsetWidth + 'px';
+            rec.clone.style.height = el.offsetHeight + 'px';
+            rec.clone.style.margin = '0'; // the copied margin would offset it a second time
+        }
+
         rec.clone.style.filter = rgb ? 'url(#' + ensureFilter(rgb) + ')' : '';
         rec.clone.style.opacity = opacity !== null ? String(opacity) : '';
         rec.clone.style.display = '';
@@ -209,29 +226,59 @@
 
         var computed = getComputedStyle(input);
         var wrapper = document.createElement('checkbox-frame');
-        wrapper.className = 'checkbox'; // matches `.checkbox`'s background-image etc from here on
+        // Kept as a DOM marker only -- syncLabelColor and this function look for it. It used to
+        // be the element that DREW the checkbox, back when defaults.css carried a `.checkbox`
+        // rule; that rule is gone, because neither a `checkbox` tag nor a `.checkbox` class
+        // exists in HTML, and `input[type="checkbox"]` is now the single source of the skin.
+        // So the wrapper is a positioning box and nothing else: the input itself draws.
+        // NO class is set here. `.checkbox` is Amalthea's own name and this file must work
+        // against any project's stylesheet, so the hook is the custom TAG -- <checkbox-frame>
+        // is created here and cannot collide with anything a document declares. Contrast
+        // .button_image/.button_label/.checkbox_image below, which are hardcoded into the
+        // engine's complex widgets and are the same in every project.
+
         wrapper.style.boxSizing = 'border-box';
         ['position', 'left', 'top', 'width', 'height', 'margin'].forEach(function (prop) {
             wrapper.style[prop] = computed[prop];
         });
 
+        // The input and the tick below are `position: absolute; inset: 0`, which resolves
+        // against the nearest POSITIONED ancestor -- so the wrapper has to be one, or both of
+        // them anchor to the dialog and stay put while the checkbox moves. A checkbox that is
+        // itself absolute already qualifies; a `static` one does not, and every checkbox does
+        // once its document joins normal flow. `relative` with no offsets moves nothing.
+        // Read back from the inline style just written, not getComputedStyle: the wrapper is
+        // not in the document until the line below and a detached element computes to nothing.
+        if (wrapper.style.position === 'static')
+            wrapper.style.position = 'relative';
+
         input.parentNode.insertBefore(wrapper, input);
         wrapper.appendChild(input);
-        // input keeps the `checkbox` class too: label-hover forwards :hover onto the input, never the wrapper, so `.checkbox:hover` needs the class on both (row 7).
         input.style.position = 'absolute';
         input.style.inset = '0';
         input.style.width = '100%';
         input.style.height = '100%';
         input.style.margin = '0';
-        input.style.opacity = '0'; // invisible; the wrapper draws the sprite, the tick draws the mark
+        // Deliberately NOT hidden. It used to be `opacity: 0` with the wrapper drawing the
+        // sprite, which only worked while a `.checkbox` rule existed to draw with. The skin now
+        // lives on `input[type="checkbox"]` alone, so hiding the input hides the checkbox: the
+        // one element the stylesheet can reach would be the one element nobody can see. The
+        // preview sheet's own `appearance: none` stops the browser painting its native control
+        // over the sprite, exactly as it does for <button>.
 
         var tick = document.createElement('checkbox-tick');
-        tick.id = 'checkbox_image'; // a real id, so `.checkbox #checkbox_image` matches natively
+        // The class the engine's WidgetCheckBox hardcodes for its tick child, so a project's
+        // own `... > .checkbox_image` rule reaches it. It was an id before, which no stylesheet
+        // anywhere selects on -- `#checkbox_image` appears in none of them.
+        tick.className = 'checkbox_image';
         tick.setAttribute('aria-hidden', 'true');
         tick.style.position = 'absolute';
         tick.style.boxSizing = 'border-box';
         tick.style.inset = '0'; // no bare element rule reaches this tag, so `inset:0` alone sizes it -- no width/height left to force
-        tick.style.backgroundImage = 'url("ui.svg#check_icon")';
+        // star_ui.svg, not ui.svg: no file named ui.svg exists beside these documents, so this
+        // resolved to nothing and the tick never drew. Both CSS references to the same sprite
+        // (defaults.css, `checkbox > .checkbox_image` and its :hover) name star_ui.svg.
+        tick.style.backgroundImage = 'url("star_ui.svg#check_icon")';
         tick.style.backgroundRepeat = 'no-repeat';
         tick.style.backgroundPosition = 'center';
         tick.style.backgroundSize = 'contain';
@@ -348,12 +395,20 @@
         var forId = label.getAttribute('for');
         var target = forId && document.getElementById(forId);
         if (!target) return;
-        if (target.tagName.toLowerCase() === 'input' && target.type === 'checkbox') {
-            var rec = CHECKBOX_STRUCT.get(target);
-            if (rec && rec.wrapper.matches(':hover')) target = rec.wrapper; // else target stays the input, whose own forwarded :hover this class also matches now
-        }
-        if (!target.matches('.checkbox')) return;
-        label.style.color = getComputedStyle(target).color;
+        // Mirror the CONTROL, never the wrapper. `input[type="checkbox"]:hover` carries the
+        // colour (defaults.css), and hovering a label[for] puts its control in :hover for free,
+        // so the input is both the element the rule reaches and the element whose state is
+        // already right. The wrapper carries no rule at all now that `.checkbox` is gone.
+        //
+        // Clearing rather than returning is the other half. label.style.color is an INLINE
+        // style and outranks every stylesheet rule, so a one-way write sticks forever: once the
+        // hovered #ffaa33 was copied on, nothing ever took it off and it beat .checkbox_label's
+        // own #cceeff for the rest of the session. Dropping the inline value hands the colour
+        // back to the cascade, which is where it belongs whenever there is nothing to mirror.
+        if (target.tagName.toLowerCase() === 'input' && target.type === 'checkbox')
+            label.style.color = getComputedStyle(target).color;
+        else
+            label.style.color = '';
     }
 
     function onStateEvent(e) {
@@ -364,7 +419,7 @@
 
         // The tick actually receives :hover, so an event landing on it must be
         // traced back to the input for the tint and :checked opacity to stay live.
-        var wrap = e.target.closest && e.target.closest('.checkbox');
+        var wrap = e.target.closest && e.target.closest('checkbox-frame'); // the tag this file creates, never a project class name
         var boxInput = wrap && wrap.querySelector('input[type="checkbox"]');
         if (boxInput) syncCheckboxTick(boxInput);
 

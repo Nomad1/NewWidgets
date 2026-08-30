@@ -78,6 +78,11 @@ namespace NewWidgets.UI.Styles
         // reference to actual data. Different nodes (i.e. "tr, .someclass, #number { }") are using the same data object
         private readonly IStyleData m_data;
 
+        // Source order: bumped for every node ever constructed, so a lower value always means
+        // "seen earlier". Used only to break specificity ties in CompareTo.
+        private static int s_sequenceCounter;
+        private readonly int m_sequence;
+
         public IStyleData Data
         {
             get { return m_data; }
@@ -107,6 +112,7 @@ namespace NewWidgets.UI.Styles
         {
             m_selectorList = selector;
             m_data = data;
+            m_sequence = s_sequenceCounter++;
         }
 
         public override string ToString()
@@ -117,9 +123,12 @@ namespace NewWidgets.UI.Styles
         public int CompareTo(StyleNode other)
         {
             int result = Specificity.CompareTo(other.Specificity);
-            if (result <= 0) // we need to avoid result of 0
-                return -1;
-            return 1;
+            if (result != 0)
+                return result;
+
+            // Same specificity: the cascade takes the later declaration, so the node seen
+            // later must sort as greater. Sequence numbers are unique, so this never returns 0.
+            return m_sequence.CompareTo(other.m_sequence);
         }
 
         public bool IsPseudoClassParent(StyleNode child)

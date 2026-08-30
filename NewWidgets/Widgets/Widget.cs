@@ -84,6 +84,10 @@ namespace NewWidgets.Widgets
         private bool m_needsLayout; // flag to indicate that inner label size/opacity/formatting has changed
         private bool m_isResolvingBox; // true only while ResolveBox applies its own result, see Resize
 
+        // true once C# code has set Position directly (outside ResolveBox's own write). A
+        // Static widget positioned this way behaves as position: absolute -- see PositionType.
+        private bool m_codePositioned;
+
 
         /// <summary>
         /// Pseudo-class flag
@@ -299,6 +303,31 @@ namespace NewWidgets.Widgets
         }
 
         /// <summary>
+        /// The effective CSS <c>position</c> for this widget -- the same value <see cref="ResolveBox"/>
+        /// resolves against, promoting a declared Static to Absolute when the widget was placed
+        /// by C# code (see <see cref="m_codePositioned"/> and the <see cref="Position"/> setter).
+        /// Setting Static here clears that promotion, opting the widget back into normal flow.
+        /// </summary>
+        public WidgetPosition PositionType
+        {
+            get
+            {
+
+                WidgetPosition positionMode = GetProperty(WidgetParameterIndex.Position, WidgetPosition.Static);
+                if (positionMode == WidgetPosition.Static && m_codePositioned)
+                    return WidgetPosition.Absolute;
+
+                return positionMode;
+            }
+            set
+            {
+                SetProperty(WidgetParameterIndex.Position, value);
+
+                m_codePositioned = false;
+            }
+        }
+
+        /// <summary>
         /// Wrapper for Overflow
         /// </summary>
         [Obsolete]
@@ -449,22 +478,9 @@ namespace NewWidgets.Widgets
             m_needUpdateStyle = true;
 
             //Size = m_style.Get(WidgetParameterIndex.Size, new Vector2(0, 0)); // obsolete, needed in some very rare cases
+
+            m_codePositioned = true; // this flag means that default position is set from code, not markup. loading from markup resets it
         }
-
-        ///// <summary>
-        ///// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.Widget"/> class for internal use
-        ///// </summary>
-        ///// <param name="styles">Styles.</param>
-        //protected Widget(string id, string style)
-        //   : base(null)
-        //{
-        //    m_styleClass = style;
-        //    m_id = id;
-
-        //    m_currentState = WidgetState.Normal;
-        //    m_needUpdateStyle = true;
-        //    m_needsLayout = true;
-        //}
 
         #region Styles
 
@@ -637,6 +653,23 @@ namespace NewWidgets.Widgets
             InvalidateLayout();
         }
 
+        /// <summary>
+        /// Applies a computed size the same way <see cref="ResolveBox"/> applies its own result --
+        /// through the ordinary <see cref="Size"/> setter, but with <see cref="m_isResolvingBox"/>
+        /// raised so <see cref="Resize"/> does not record it into the own style. For a subclass
+        /// that computes its size from its content or its children, e.g. auto height in
+        /// <see cref="Controls.WidgetPanel.UpdateLayout"/>: going through the plain <see cref="Size"/>
+        /// setter instead would freeze that size into the own style, which sits at the head of the
+        /// cascade and would answer every later layout pass before auto could run again -- see the
+        /// comment on <see cref="Resize"/>.
+        /// </summary>
+        protected void SetResolvedSize(Vector2 size)
+        {
+            m_isResolvingBox = true;
+            Size = size;
+            m_isResolvingBox = false;
+        }
+
         protected virtual void UpdateStyle()
         {
             m_needUpdateStyle = false;
@@ -696,8 +729,10 @@ namespace NewWidgets.Widgets
         /// <summary>
         /// Turns the declared box properties into a real position and size, following CSS 2.1
         /// 10.3.7 for the horizontal axis, 10.6.4 for the vertical one and 10.4 for the min/max
-        /// clamp. Every NewWidgets widget is an absolutely positioned box, so those are the
-        /// rules that apply.
+        /// clamp -- the rules for an absolutely positioned box, which is what every NewWidgets
+        /// widget was before <c>position</c> carried any meaning. Static and relative widgets
+        /// share the same size resolution but never let left/top/right/bottom anchor the box:
+        /// see <see cref="WidgetPosition"/>.
         ///
         /// This runs from UpdateStyle, which is where the engine has always applied CSS
         /// geometry. Keeping it there means a widget that measures its own content in
@@ -716,9 +751,21 @@ namespace NewWidgets.Widgets
             Vector2 size = Size;
             Vector2 position = Position;
 
+            WidgetPosition positionMode = PositionType;
+
+            StyleLength left = m_style.Get(WidgetParameterIndex.Left, StyleLength.Unset);
+            StyleLength right = m_style.Get(WidgetParameterIndex.Right, StyleLength.Unset);
+            StyleLength top = m_style.Get(WidgetParameterIndex.Top, StyleLength.Unset);
+            StyleLength bottom = m_style.Get(WidgetParameterIndex.Bottom, StyleLength.Unset);
+
+            // Only an absolutely positioned box is anchored by left/top/right/bottom -- CSS 2.1
+            // 9.3.1. Static and relative both resolve as if those four were never declared, so
+            // the box keeps the position it already had; relative then offsets that below.
+            bool anchored = positionMode == WidgetPosition.Absolute;
+
             StyleAxis horizontal = new StyleAxis(
-                m_style.Get(WidgetParameterIndex.Left, StyleLength.Unset),
-                m_style.Get(WidgetParameterIndex.Right, StyleLength.Unset),
+                anchored ? left : StyleLength.Unset,
+                anchored ? right : StyleLength.Unset,
                 m_style.Get(WidgetParameterIndex.Width, StyleLength.Unset),
                 m_style.Get(WidgetParameterIndex.MarginLeft, StyleLength.Unset),
                 m_style.Get(WidgetParameterIndex.MarginRight, StyleLength.Unset),
@@ -728,8 +775,8 @@ namespace NewWidgets.Widgets
             horizontal.Resolve(containingBlock.X, ref position.X, ref size.X);
 
             StyleAxis vertical = new StyleAxis(
-                m_style.Get(WidgetParameterIndex.Top, StyleLength.Unset),
-                m_style.Get(WidgetParameterIndex.Bottom, StyleLength.Unset),
+                anchored ? top : StyleLength.Unset,
+                anchored ? bottom : StyleLength.Unset,
                 m_style.Get(WidgetParameterIndex.Height, StyleLength.Unset),
                 m_style.Get(WidgetParameterIndex.MarginTop, StyleLength.Unset),
                 m_style.Get(WidgetParameterIndex.MarginBottom, StyleLength.Unset),
@@ -738,12 +785,23 @@ namespace NewWidgets.Widgets
 
             vertical.Resolve(containingBlock.Y, ref position.Y, ref size.Y);
 
+            if (positionMode == WidgetPosition.Relative)
+            {
+                // CSS 2.1 9.4.3: offset from the position the box would have had, left winning
+                // over right and top winning over bottom when both sides of an axis are declared
+                position.X += left.IsDefinite ? left.Resolve(containingBlock.X) : (right.IsDefinite ? -right.Resolve(containingBlock.X) : 0.0f);
+                position.Y += top.IsDefinite ? top.Resolve(containingBlock.Y) : (bottom.IsDefinite ? -bottom.Resolve(containingBlock.Y) : 0.0f);
+            }
+
+            // Kept true through the Position write below too: that write is ResolveBox applying
+            // its own result, same as Size, and must not itself mark the widget code-positioned.
             m_isResolvingBox = true;
             Size = size;
-            m_isResolvingBox = false;
 
             if (Vector2.DistanceSquared(position, Position) > float.Epsilon)
                 Position = position;
+
+            m_isResolvingBox = false;
 
             // a ZIndex of 0 already means "nothing explicit" in this engine, so it doubles as
             // the not-declared case and no sentinel is needed
@@ -754,6 +812,11 @@ namespace NewWidgets.Widgets
         }
 
         #endregion
+
+        internal void SetCodePositionFlag(bool value)
+        {
+            m_codePositioned = value;
+        }
 
         public override bool Update()
         {

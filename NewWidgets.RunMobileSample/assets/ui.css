@@ -2,14 +2,16 @@
    ui.svg -- so the skin and the geometry are both here and the document links this alone.
 
    The two vocabularies.
-   A widget built in code reports its class's own element name -- panel, label, textedit,
-   window. A widget a document built reports the tag the document used -- div, span, h1,
-   input, textarea. Both have to find this skin, so every rule that carries one name also
-   carries the other, grouped rather than duplicated: one rule, one set of values, and no
-   way for the two spellings to drift apart. When the engine one day speaks only HTML tags,
-   each of these collapses back to a single selector by deleting one word.
+   A widget built in code reports its class's own element name -- panel, label, textedit.
+   A widget a document built reports the tag the document used -- div, span, h1, input,
+   textarea. Both have to find this skin, so every rule that carries one name also carries
+   the other, grouped rather than duplicated: one rule, one set of values, and no way for
+   the two spellings to drift apart. When the engine one day speaks only HTML tags, each of
+   these collapses back to a single selector by deleting one word.
 
-   `button` needs nothing: it is spelled the same either way.
+   `button` and `dialog` need nothing: each is spelled the same either way already -- a
+   window's code-side element name and its document tag are both `dialog` now, D168's
+   `window, .window` alias pair is gone.
 
    Standard CSS only, D186. Every sprite is named `url("ui.svg#name")`: the file is the
    atlas a browser fetches, the fragment is the sprite name this engine looks up, and no
@@ -56,7 +58,7 @@
     --font-baseline: 30;
 }
 
-window, .window {
+dialog {
     position: absolute;
     box-sizing: border-box;
     margin: 0;
@@ -71,7 +73,7 @@ window, .window {
     overflow: hidden;
 }
 
-panel, div {
+div.panel {
     position: absolute;
     box-sizing: border-box;
     margin: 0;
@@ -109,7 +111,7 @@ text {
     color: #ffffff;
 }
 
-textedit, textfield, input, textarea {
+textedit, textfield, textarea, input[type="text"], input[type="password"] {
     position: absolute;
     box-sizing: border-box;
     margin: 0;
@@ -132,23 +134,25 @@ textedit, textfield, input, textarea {
     height: 45px;
     color: #aaaaaa;
     overflow: hidden;
-    clip-path: inset(1px 2px 3px 2px);
+    clip-path: inset(1px 2px 3px 2px); /* the Chrome workaround for this (a `border-box` reference
+        box, without which Chrome drops the border-image entirely) belongs to the browser, not the
+        designer -- see runmobile_design.md row 9 */
     caret-color: #ffffff;
     padding: 2px 6px 0px 6px;
 }
 
-textedit:focus, textfield:focus, input:focus, textarea:focus {
+textedit:focus, textfield:focus, textarea:focus, input[type="text"]:focus, input[type="password"]:focus {
     border-image-source: url("ui.svg#panel_white_normal_9");
     border-image-slice: 33.3333% fill;
     border-image-repeat: stretch;
     color: #ffffff;
 }
 
-textedit:focus:hover, textfield:focus:hover, input:focus:hover, textarea:focus:hover {
+textedit:focus:hover, textfield:focus:hover, textarea:focus:hover, input[type="text"]:focus:hover, input[type="password"]:focus:hover {
     --background-color: #ffee88;
 }
 
-textedit:hover, textfield:hover, input:hover, textarea:hover {
+textedit:hover, textfield:hover, textarea:hover, input[type="text"]:hover, input[type="password"]:hover {
     --background-color: #ffee88;
 }
 
@@ -202,7 +206,7 @@ context_menu {
 context_menu_item {
     position: absolute;
     border: none;
-    background-repeat: no-repeat;
+    background-image: none;
     font-family: "default";
     font-size: 0.5em;
     color: #cceeff;
@@ -210,7 +214,7 @@ context_menu_item {
 }
 
 context_menu_item:hover {
-    background-repeat: no-repeat;
+    background-image: none;
     background-size: 50%;
     color: #ffffff;
 }
@@ -286,13 +290,18 @@ button .button_label {
 }
 
 /* The one control the two vocabularies cannot share a name for. HTML spells a checkbox
-   <input type="checkbox">, so it reports the tag `input` like every other input and the
-   text-edit rule above reaches it -- which is exactly what `input { }` does to a checkbox
-   in a browser. A class is the handle, and the rule has to put back the things a checkbox
-   is not a text edit about: the frame has to be switched OFF rather than replaced, since a
-   border image and a background image are two different properties and a rule that only
-   set the second would leave both drawing; then the nine-patch scale, the text size, the
-   clipping and the caret.
+   <input type="checkbox">, so it reports the tag `input` like every other input, and
+   `input[type="checkbox"]` is what picks it back out of that shared tag -- the same
+   attribute test WidgetManager.RegisterElement already used to choose WidgetCheckBox over
+   WidgetTextEdit at load time. `.checkbox` stays alongside it, not as the matching
+   mechanism any more but because the browser preview cannot point a CSS descendant
+   selector at a real <input>'s children (row 5, ui-preview.md): runmobile_design.js wraps
+   the hidden input in a `<div class="checkbox">` to hold the tick, so `.checkbox` is what
+   that wrapper answers to. The rule has to put back the things a checkbox is not a text
+   edit about: the frame has to be switched OFF rather than replaced, since a border image
+   and a background image are two different properties and a rule that only set the second
+   would leave both drawing; then the nine-patch scale, the text size, the clipping and the
+   caret.
 
    `background-size: 100%` is load-bearing twice over. This engine reads it as the scale
    factor, where 100% is the sprite at its own size; a browser reads it as "as wide as the
@@ -300,39 +309,44 @@ button .button_label {
    give. Without it the 25% on the text-edit rule above leaks in through the cascade.
 
    Declaring the rest costs a code-built checkbox nothing: each value below is the one the
-   engine already falls back to when nothing declares it. */
-checkbox, .checkbox {
+   engine already falls back to when nothing declares it -- except `padding`, which the
+   text-edit family rule above used to hand the checkbox for free while `input { }` still
+   reached it. Closing that leak (this is the D157-completion attribute test doing its job)
+   left the checkbox's own padding undeclared and defaulting to zero, which Test 89 in
+   LoginDialogTests.cs caught: the padding is carried forward here so the login dialog's
+   checkbox keeps the box Sample/Sample/TestWindow.cs gave it before the CSS rewrite. */
+input[type="checkbox"], .checkbox {
     position: absolute;
     appearance: none;
     border: none;
-    background-repeat: imagefit;
     background-image: url("ui.svg#checkbox_back_normal");
-    background-size: 100%;
+    background-position: center;
+    background-size: contain;
     width: 40px;
     height: 40px;
     color: #cceeff;
     font-size: 1em;
     overflow: visible;
     caret-color: #000000;
-    clip-path: inset(0px 0px 0px 0px);
+    padding: 2px 6px 0px 6px;
 }
 
-checkbox:focus, .checkbox:focus {
+input[type="checkbox"]:checked, .checkbox:checked {
     background-image: url("ui.svg#checkbox_back_normal");
     color: #ffffff;
 }
 
-checkbox:hover, .checkbox:hover {
+input[type="checkbox"]:hover, .checkbox:hover {
     background-image: url("ui.svg#checkbox_back_hovered");
     color: #ffffff;
 }
 
-checkbox:focus:hover, .checkbox:focus:hover {
+input[type="checkbox"]:checked:hover, .checkbox:checked:hover {
     background-image: url("ui.svg#checkbox_back_hovered");
     color: #cceeff;
 }
 
-checkbox:disabled, .checkbox:disabled {
+input[type="checkbox"]:disabled, .checkbox:disabled {
     background-image: url("ui.svg#checkbox_back_hovered");
     --image-color: #888888;
     color: #888888;
@@ -354,12 +368,21 @@ checkbox:disabled, .checkbox:disabled {
    this selector against otherwise) and tints `background-image` with the same SVG
    feColorMatrix filter the widget frames use -- `check_icon` is a plain white glyph, so a
    multiplicative tint reproduces a flat recolour exactly. */
-checkbox #checkbox_image, .checkbox #checkbox_image {
+input[type="checkbox"] #checkbox_image, .checkbox #checkbox_image {
+    border: none; /* #checkbox_image is a bare div in a browser (row 5, ui-preview.md), so
+        without this it inherits `panel, div`'s own border-image-source (window_9) same as
+        .text_button/.image_button/.back_pattern/the checkbox/context_menu_item all have to
+        opt out of above -- measured: invisible while the tick's opacity is 0 (unchecked),
+        a window_9 frame around the box once opacity goes to 1 (checked). The `.checkbox`
+        half is the one the browser actually uses -- a real <input> cannot have children at
+        all, so runmobile_design.js's wrapper div is what #checkbox_image is a descendant
+        of there; the `input[type="checkbox"]` half is for this engine's own WidgetCheckBox,
+        whose #checkbox_image is a real child widget of the widget itself. */
     background-image: url("ui.svg#check_icon");
     --image-color: #000032;
 }
 
-checkbox #checkbox_image:hover, .checkbox #checkbox_image:hover {
+input[type="checkbox"] #checkbox_image:hover, .checkbox #checkbox_image:hover {
     background-image: url("ui.svg#check_icon");
     --image-color: #ffffff;
 }
@@ -372,7 +395,8 @@ img {
     position: absolute;
     box-sizing: border-box;
     margin: 0;
-    background-repeat: imagefit;
+    background-position: center;
+    background-size: contain;
     object-fit: contain;
     object-position: center;
 }
@@ -383,8 +407,16 @@ img {
     background-repeat: repeat;
     --background-depth: backclipped;
     background-image: url("ui.svg#back_pattern");
-    background-size: auto; /* the sprite's own size to both readers -- ui.svg's <view> gives
-        a browser the right intrinsic size, so the tile no longer needs a browser-only override */
+    background-size: 100%; /* 100% is scale 1 to this engine -- the sprite at its own size, tiled.
+        A browser cannot derive that same tile size from this rule: a `<view>` fragment carries a
+        viewBox, which is a RATIO, and no pixel size, so nothing in ui.css or ui.svg can state it
+        for a browser to read. Measured seven ways: img.naturalWidth reports the root's default,
+        fetch and XMLHttpRequest and <object>.contentDocument are all blocked by the opaque origin
+        a local file gets, a nested <svg id> is not honoured as a fragment target, and the CSSOM
+        throws for the same origin reason. So row 8 of runmobile_design.js supplies the tile size
+        at run time instead, from the atlas's own reporter (ui-preview.md row 8) -- not from this
+        declaration, which a browser reads as "stretch to the element" and would otherwise get
+        wrong on its own. */
     --background-opacity: 4%;
     overflow: hidden;
     clip-path: inset(2px 2px 2px 2px);
@@ -394,7 +426,7 @@ img {
     position: absolute;
     border: none;
     background-color: transparent; /* same UA fill, inherited from <button> */
-    background-repeat: no-repeat;
+    background-image: none;
     font-family: "default";
     width: 300px;
     height: 20px;
@@ -403,7 +435,7 @@ img {
 }
 
 .text_button:hover {
-    background-repeat: no-repeat;
+    background-image: none;
     color: #ffffff;
 }
 
@@ -417,7 +449,7 @@ img {
 .image_button {
     position: absolute;
     border: none;
-    background-repeat: no-repeat;
+    background-image: none;
     width: 64px;
     height: 64px;
 }

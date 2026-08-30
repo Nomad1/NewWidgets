@@ -94,6 +94,20 @@ namespace NewWidgets.Widgets
     {
         None = 0,
         Block = 1,
+        Flex = 2
+    }
+
+    /// <summary>
+    /// CSS <c>position</c>. Static leaves the box wherever flow (or C# code) put it and ignores
+    /// left/top/right/bottom; relative resolves like Static and then offsets by those edges;
+    /// absolute is CSS 2.1 10.3.7/10.6.4, which is what every NewWidgets box already did before
+    /// this enum existed.
+    /// </summary>
+    public enum WidgetPosition
+    {
+        Static = 0,
+        Relative = 1,
+        Absolute = 2,
     }
 
     public enum WidgetBackgroundDepth

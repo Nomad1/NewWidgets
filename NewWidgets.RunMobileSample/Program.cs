@@ -78,7 +78,16 @@ namespace NewWidgets.RunMobileSample
         private void HandleGameInit()
         {
             SpriteManager.Instance.LoadSpriteAtlas("ui"); // loads ui.bin with default ui atlas
-            SpriteManager.Instance.LoadSpriteAtlas("font5"); // loads font5.bin with font MSDF atlas
+
+            // ponytail: font5.bin/font5.rle here are the plain bitmap font (converted from
+            // NewWidgets.WinFormsSample/assets/font5.png) standing in for the MSDF font atlas
+            // this pair used to hold. MSDF text needs assets/font.frag.shader to resolve the
+            // per-pixel median distance, and that shader path is disabled -- GLHelper (the
+            // fixed-pipeline OpenTK renderer this sample uses) never loads any shader, so an
+            // MSDF atlas drawn through it is channel noise, not glyphs. Same resource name
+            // ("font5"), same call, so nothing downstream (ui.css's @font-face, Font.cs) has to
+            // know the atlas under it changed.
+            SpriteManager.Instance.LoadSpriteAtlas("font5");
             WidgetManager.Init(0.5f); // 0.5 is font scale
             WidgetManager.OnTooltip += TextTooltip;
 
@@ -90,6 +99,41 @@ namespace NewWidgets.RunMobileSample
             // Here we're creating main window and it's added to the Game Controller
             m_window = new TestWindow();
             m_gameController.AddWindow(m_window);
+
+            ForceCaptureHoverState();
+        }
+
+        /// <summary>
+        /// ponytail: T11/T12 capture harness. A screenshot-based capture (see the repo-external
+        /// capture script) cannot synthesize a real mouse-move event before the shot is taken,
+        /// so RUNMOBILE_CAPTURE_HOVER names a widget id inside #login_window (e.g.
+        /// "login_button") to force into Widget.Hovered = true right after the dialog is built,
+        /// so the CSS :hover rules are already resolved by the time the capture script's settle
+        /// delay elapses. No-op when the variable is unset -- the normal interactive run is
+        /// unchanged. Sample-only: nothing in the engine or Sample/TestWindow.cs changed for this.
+        /// </summary>
+        private void ForceCaptureHoverState()
+        {
+            string hoverId = Environment.GetEnvironmentVariable("RUNMOBILE_CAPTURE_HOVER");
+
+            if (string.IsNullOrEmpty(hoverId))
+                return;
+
+            WidgetPanel loginWindow;
+            if (!WidgetPanel.TryFind(m_window, "login_window", out loginWindow))
+            {
+                LogConsole.WriteLine(LogLevel.ERROR, "RUNMOBILE_CAPTURE_HOVER: #login_window not found");
+                return;
+            }
+
+            Widget target;
+            if (!loginWindow.TryFind(hoverId, out target))
+            {
+                LogConsole.WriteLine(LogLevel.ERROR, "RUNMOBILE_CAPTURE_HOVER: #{0} not found in #login_window", hoverId);
+                return;
+            }
+
+            target.Hovered = true;
         }
 
         public static bool TextTooltip(Widget sender, string text, Vector2 position)

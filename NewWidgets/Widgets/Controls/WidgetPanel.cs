@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using NewWidgets.UI;
+using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
@@ -38,6 +40,107 @@ namespace NewWidgets.Widgets
         protected WidgetPanel(string elementType, WidgetStyle style)
             : base(elementType, style)
         {
+        }
+
+        /// <summary>
+        /// Normal flow, CSS 2.1 9.4.1: an in-flow child stacks under the previous one instead of
+        /// keeping whatever position it already had, the way a block container stacks its
+        /// block-level children. Vertical only -- no line boxes, no wrapping, no horizontal flow.
+        ///
+        /// Runs after <see cref="Widget.UpdateLayout"/>, by which point <see cref="Widget.UpdateStyle"/>
+        /// has already resolved this panel's own box (see <see cref="Update"/>), so <see cref="Widget.Size"/>
+        /// here is this panel's settled size and can stand in as the containing block for a
+        /// child's percentage margin.
+        /// </summary>
+        protected override void UpdateLayout()
+        {
+            base.UpdateLayout();
+
+            float top = GetProperty(WidgetParameterIndex.Padding, Margin.Empty).Top;
+            float left = GetProperty(WidgetParameterIndex.Padding, Margin.Empty).Left;
+            WidgetDisplay display = GetProperty(WidgetParameterIndex.Display, WidgetDisplay.Block);
+
+            foreach (Widget child in m_children.List)
+            {
+                if (!child.Visible)
+                    continue; // takes no space, like display: none
+
+                child.Relayout();
+
+                WidgetPosition positionType = child.PositionType;
+
+                // ponytail: CSS z-index does not change flow order, but m_children is sorted by
+                // z-index (see WindowObjectArray), so a child with an explicit z-index stacks out
+                // of document order here.
+                if (positionType == WidgetPosition.Absolute)
+                    continue;
+
+                // A Relative child stays in flow and is placed exactly as if it were Static; its
+                // own offset from left/top/right/bottom is applied by its own ResolveBox and must
+                // not be applied here too.
+
+                StyleLength marginLeft = child.GetProperty(WidgetParameterIndex.MarginLeft, StyleLength.Unset);
+                StyleLength marginRight = child.GetProperty(WidgetParameterIndex.MarginRight, StyleLength.Unset);
+                StyleLength marginTop = child.GetProperty(WidgetParameterIndex.MarginTop, StyleLength.Unset);
+                StyleLength marginBottom = child.GetProperty(WidgetParameterIndex.MarginBottom, StyleLength.Unset);
+
+                float before = marginLeft.IsDefinite ? marginLeft.Resolve(Size.X) : 0.0f;
+                float after = marginRight.IsDefinite ? marginRight.Resolve(Size.X) : 0.0f;
+                float above = marginTop.IsDefinite ? marginTop.Resolve(Size.Y) : 0.0f;
+                float below = marginBottom.IsDefinite ? marginBottom.Resolve(Size.Y) : 0.0f;
+
+                child.Position = new Vector2(left + before, top + above);
+
+                // Widget.Position's setter marks the widget code-positioned, which PositionType
+                // would then read back as Absolute (see Widget.PositionType) and pull it out of
+                // flow on the very next pass. Writing PositionType back to what it already was
+                // clears that promotion -- the same reset Test 133 exercises -- without reaching
+                // into Widget's private m_isResolvingBox from outside its class.
+                //child.PositionType = positionType;
+
+                if (positionType == WidgetPosition.Relative)
+                {
+                    // The offset itself has to come from a real ResolveBox, per the comment
+                    // above -- forced by marking layout dirty again, since child.Relayout() just
+                    // above already cleared both dirty flags and would otherwise no-op. This
+                    // ResolveBox call sees the flow position just written as Position's current
+                    // value and adds left/top/right/bottom on top of it, CSS 2.1 9.4.3.
+                    child.InvalidateLayout();
+                    child.Relayout();
+                }
+
+                // ponytail: adjacent margins do not collapse here, unlike CSS 2.1 8.3.1.
+                if (display == WidgetDisplay.Block)
+                    top += above + child.Size.Y + below;
+                else
+                    left += before + child.Size.X + after;
+            }
+
+            // CSS 2.1 10.6.3: a normal-flow block box whose height is auto -- declared that way,
+            // or never declared at all -- is as tall as its content, here the stacked children's
+            // flow plus the padding below them. A declared height is definite and is left alone,
+            // unlike width, which this engine leaves alone either way -- see StyleUnit.Unset.
+            //
+            // CSS 2.1 10.6.4 says the same of an absolutely positioned box, so being out of flow is
+            // NOT what disqualifies a panel here. One case is: when top and bottom are both pinned
+            // the height is stretched between them, and Widget.ResolveBox has already computed it,
+            // so a content height would clobber a correct answer.
+            StyleLength height = GetProperty(WidgetParameterIndex.Height, StyleLength.Unset);
+
+            bool stretched = PositionType == WidgetPosition.Absolute
+                && GetProperty(WidgetParameterIndex.Top, StyleLength.Unset).IsDefinite
+                && GetProperty(WidgetParameterIndex.Bottom, StyleLength.Unset).IsDefinite;
+
+            if (!height.IsDefinite && !stretched)
+            {
+                float bottom = GetProperty(WidgetParameterIndex.Padding, Margin.Empty).Bottom;
+                float right = GetProperty(WidgetParameterIndex.Padding, Margin.Empty).Right;
+
+                if (display == WidgetDisplay.Block)
+                    SetResolvedSize(new Vector2(Size.X, top + bottom));
+                else
+                    SetResolvedSize(new Vector2(left + right, Size.Y));
+            }
         }
 
         public override bool Update()

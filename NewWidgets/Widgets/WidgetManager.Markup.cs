@@ -693,6 +693,7 @@ namespace NewWidgets.Widgets
             ApplyMarkupStyle(widget, node.GetAttribute("style"));
             ApplyMarkupText(widget, GetMarkupNodeText(node));
             ApplyMarkupAttributes(widget, node, element.AttributeName);
+            widget.SetCodePositionFlag(false);
 
             return widget;
         }

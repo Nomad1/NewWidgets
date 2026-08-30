@@ -58,14 +58,13 @@ namespace NewWidgets.Widgets
         [WidgetParameter("z-index", typeof(int), UnitType.None)] // CSS
         ZIndex,
 
-        // `position` used to be an obsolete Vector2 shorthand for `left top`. It is retired
-        // rather than kept alongside the CSS meaning: no stylesheet in either shipped game or
-        // in the test corpus ever used it, it was already marked [Obsolete], and one name that
-        // means either a pair of numbers or a positioning scheme is a trap for the D132
-        // validator. D134's profile is absolute positioning only, so `absolute` is the value
-        // this engine already is and the rest are outside the profile.
-        [WidgetParameter("position", "position", typeof(string), UnitType.None, WidgetParameterInheritance.Initial,
-                                                 typeof(IgnoredProcessor), "absolute")]
+        // The obsolete Vector2 shorthand for `left top` used this same CSS name and is long
+        // gone; no stylesheet in either shipped game or the test corpus ever used it, and one
+        // name that means either a pair of numbers or a positioning scheme is a trap for the
+        // D132 validator. `position` now carries its real CSS meaning -- see WidgetPosition and
+        // Widget.ResolveBox.
+        [WidgetParameter("position", "position", typeof(WidgetPosition), UnitType.None, WidgetParameterInheritance.Initial,
+                                                 typeof(PositionProcessor))]
         Position,
 
         // Every box this engine draws is a block in an absolutely positioned parent, so the
@@ -562,9 +561,47 @@ namespace NewWidgets.Widgets
                 case "inline-block":
                     data[PropertyIndex] = WidgetDisplay.Block;
                     return;
+                case "flex":
+                case "inline-flex":
+                    data[PropertyIndex] = WidgetDisplay.Flex;
+                    return;
                 default:
                     Report("only none and block are inside the absolute-positioning profile", stringValue);
                     data[PropertyIndex] = WidgetDisplay.Block;
+                    return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// CSS <c>position</c>. Static and relative are honoured for real -- see
+    /// <see cref="Widget.ResolveBox"/> -- and absolute is what every box here already was.
+    /// <c>fixed</c> and <c>sticky</c> have no viewport or scroll-anchoring concept in this
+    /// engine, so both fall back to absolute, the closer of the two supported behaviours.
+    /// </summary>
+    internal class PositionProcessor : CssPropertyProcessor
+    {
+        public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            switch (stringValue.ToLowerInvariant())
+            {
+                case "static":
+                    data[PropertyIndex] = WidgetPosition.Static;
+                    return;
+                case "relative":
+                    data[PropertyIndex] = WidgetPosition.Relative;
+                    return;
+                case "absolute":
+                    data[PropertyIndex] = WidgetPosition.Absolute;
+                    return;
+                case "fixed":
+                case "sticky":
+                    Report("only static, relative and absolute are supported", stringValue);
+                    data[PropertyIndex] = WidgetPosition.Absolute;
+                    return;
+                default:
+                    Report("only static, relative and absolute are supported", stringValue);
+                    data[PropertyIndex] = WidgetPosition.Static;
                     return;
             }
         }

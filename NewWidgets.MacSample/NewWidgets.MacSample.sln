@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 25.0.1706.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewWidgets.MacSample", "NewWidgets.MacSample.csproj", "{A028A5D4-7B8D-4878-B129-A6C27BD0636D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewWidgets.macOS", "..\NewWidgets\NewWidgets.macOS.csproj", "{B9E44780-DC40-4C45-A457-035B20581E54}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A028A5D4-7B8D-4878-B129-A6C27BD0636D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A028A5D4-7B8D-4878-B129-A6C27BD0636D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A028A5D4-7B8D-4878-B129-A6C27BD0636D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A028A5D4-7B8D-4878-B129-A6C27BD0636D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9E44780-DC40-4C45-A457-035B20581E54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9E44780-DC40-4C45-A457-035B20581E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9E44780-DC40-4C45-A457-035B20581E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9E44780-DC40-4C45-A457-035B20581E54}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {75ED8F8A-A698-487C-8271-46DDDA124C8F}
+	EndGlobalSection
+EndGlobal

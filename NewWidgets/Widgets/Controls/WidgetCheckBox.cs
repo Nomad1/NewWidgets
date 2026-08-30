@@ -12,7 +12,7 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetCheckBox : WidgetBackground
     {
-        public new const string ElementType = "checkbox";
+        public new const string ElementType = "input[type=checkbox]";
         //
         private const string ImageClass = "checkbox_image";
 
