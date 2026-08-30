@@ -73,6 +73,10 @@ namespace NewWidgets.Widgets
                                                typeof(DisplayProcessor))]
         Display,
 
+        [WidgetParameter("justify-content", "justify-content", typeof(WidgetJustifyContent), UnitType.None, WidgetParameterInheritance.Initial,
+                                                              typeof(JustifyContentProcessor))]
+        JustifyContent,
+
         // Margins. Only the four longhands are ever stored, the shorthand splits into them.
         // Note that `padding`, `--clip-margin` and `--background-padding` deliberately stay a
         // Margin of plain floats: none of them accepts auto and none of them is percentage-sized
@@ -208,8 +212,21 @@ namespace NewWidgets.Widgets
         TextColor,
         [WidgetParameter("line_spacing", "line-height", typeof(float), UnitType.Percent, WidgetParameterInheritance.Inherit)]
         LineSpacing,
+        // Two CSS properties, one storage slot. WidgetAlign is a flag pair covering both axes and
+        // the renderer wants it whole, so `vertical-align` writes the vertical bits of the same
+        // value `text-align` writes the horizontal bits of. Each processor merges, clearing only
+        // its OWN axis, so the two compose inside a rule whichever order they are written in.
+        //
+        // ponytail: they cannot compose ACROSS rules. The cascade resolves one slot, so the
+        // highest-priority rule that declares either property supplies both axes, and a rule
+        // setting only `text-align` drops a `vertical-align` inherited from a weaker rule. Giving
+        // vertical-align its own index and combining at the read sites is the conformant fix.
+        //
+        // text-align is declared LAST so SaveCSS writes the slot under that name.
+        [WidgetParameter("vertical_align", "vertical-align", typeof(WidgetAlign), UnitType.None, WidgetParameterInheritance.Inherit,
+                                           typeof(VerticalAlignProcessor))]
         [WidgetParameter("text_align", "text-align", typeof(WidgetAlign), UnitType.None, WidgetParameterInheritance.Inherit,
-                                        typeof(TextAlignProcessor))] // TODO: more alignment options
+                                        typeof(TextAlignProcessor))]
         TextAlign,
         //[WidgetParameter("text_padding", "--text-padding", typeof(Margin), UnitType.Length)] // changed to "padding"
         //TextPadding,
@@ -560,6 +577,48 @@ namespace NewWidgets.Widgets
     /// Anything else is reported and treated as a block, because the profile is absolute
     /// positioning only and flow, flex and grid are outside it by design.
     /// </summary>
+    /// <summary>
+    /// CSS <c>justify-content</c>. `start`/`end`/`left`/`right` are the newer spellings of
+    /// flex-start/flex-end and mean the same thing in the left-to-right row this engine lays
+    /// out; `normal` behaves as flex-start.
+    /// </summary>
+    internal class JustifyContentProcessor : CssPropertyProcessor
+    {
+        public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            switch (stringValue.ToLowerInvariant())
+            {
+                case "normal":
+                case "start":
+                case "left":
+                case "flex-start":
+                    data[PropertyIndex] = WidgetJustifyContent.FlexStart;
+                    return;
+                case "end":
+                case "right":
+                case "flex-end":
+                    data[PropertyIndex] = WidgetJustifyContent.FlexEnd;
+                    return;
+                case "center":
+                    data[PropertyIndex] = WidgetJustifyContent.Center;
+                    return;
+                case "space-between":
+                    data[PropertyIndex] = WidgetJustifyContent.SpaceBetween;
+                    return;
+                case "space-around":
+                    data[PropertyIndex] = WidgetJustifyContent.SpaceAround;
+                    return;
+                case "space-evenly":
+                    data[PropertyIndex] = WidgetJustifyContent.SpaceEvenly;
+                    return;
+                default:
+                    Report("not a justify-content keyword this engine lays out", stringValue);
+                    data[PropertyIndex] = WidgetJustifyContent.FlexStart;
+                    return;
+            }
+        }
+    }
+
     internal class DisplayProcessor : CssPropertyProcessor
     {
         public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
@@ -1184,9 +1243,90 @@ namespace NewWidgets.Widgets
     {
         public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
         {
-            data[PropertyIndex] = string.Equals(stringValue.Trim(), "center", StringComparison.OrdinalIgnoreCase)
-                ? WidgetAlign.HorizontalCenter
-                : (WidgetAlign)ConversionHelper.EnumParse(typeof(WidgetAlign), stringValue);
+            string value = stringValue.Trim();
+
+            // The engine's own comma form, `horizontalcenter, top`, names both axes at once. It is
+            // not CSS and a browser drops it, but a half-migrated stylesheet still carries it, so
+            // it is parsed whole and reported rather than silently misread as an inline keyword.
+            if (value.IndexOf(',') >= 0)
+            {
+                Report("text-align names the inline axis only; write the vertical half as vertical-align", stringValue);
+                data[PropertyIndex] = (WidgetAlign)ConversionHelper.EnumParse(typeof(WidgetAlign), stringValue);
+                return;
+            }
+
+            WidgetAlign horizontal;
+
+            switch (value.ToLowerInvariant())
+            {
+                case "left":
+                case "start":
+                    horizontal = WidgetAlign.Left;
+                    break;
+                case "right":
+                case "end":
+                    horizontal = WidgetAlign.Right;
+                    break;
+                case "center":
+                case "justify": // no justification here, and centring is closer than either edge
+                    horizontal = WidgetAlign.HorizontalCenter;
+                    break;
+                default:
+                    Report("not an inline-axis keyword", stringValue);
+                    horizontal = WidgetAlign.Left;
+                    break;
+            }
+
+            data[PropertyIndex] = (Existing(data) & ~WidgetAlign.HorizontalCenter) | horizontal;
+        }
+
+        /// <summary>
+        /// Whatever the OTHER axis already put in the shared slot for this rule, so merging keeps
+        /// it. Nothing there yet reads as no alignment at all.
+        /// </summary>
+        protected WidgetAlign Existing(IDictionary<WidgetParameterIndex, object> data)
+        {
+            object declared;
+
+            return data.TryGetValue(PropertyIndex, out declared) ? (WidgetAlign)declared : WidgetAlign.None;
+        }
+    }
+
+    /// <summary>
+    /// CSS <c>vertical-align</c>: the block axis, the half <c>text-align</c> has no business
+    /// carrying. Writes the same slot, clearing only the vertical bits.
+    /// </summary>
+    internal class VerticalAlignProcessor : TextAlignProcessor
+    {
+        public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            WidgetAlign vertical;
+
+            switch (stringValue.Trim().ToLowerInvariant())
+            {
+                case "top":
+                case "text-top":
+                case "super":
+                    vertical = WidgetAlign.Top;
+                    break;
+                case "bottom":
+                case "text-bottom":
+                case "sub":
+                    vertical = WidgetAlign.Bottom;
+                    break;
+                case "middle":
+                    vertical = WidgetAlign.VerticalCenter;
+                    break;
+                case "baseline": // no baseline metric is carried here, and the top edge is the closest thing
+                    vertical = WidgetAlign.Top;
+                    break;
+                default:
+                    Report("not a block-axis keyword", stringValue);
+                    vertical = WidgetAlign.Top;
+                    break;
+            }
+
+            data[PropertyIndex] = (Existing(data) & ~WidgetAlign.VerticalCenter) | vertical;
         }
     }
 

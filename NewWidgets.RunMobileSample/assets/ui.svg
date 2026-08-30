@@ -38,5 +38,5 @@
 <view id="window_9" viewBox="242 205 238 238"/>
 <view id="window_dialog_9" viewBox="4 111 238 238"/>
 <!-- Report sprites sizes -->
-<script><![CDATA[var v={},a=document.getElementsByTagName("*");for(var i=0;i<a.length;i++){var e=a[i];if((e.localName||"")!=="view")continue;var b=e.getAttribute("viewBox");if(!b)continue;var p=b.trim().split(/[\s,]+/).map(Number);v[e.getAttribute("id")]=[p[2],p[3]];}parent.postMessage({type:"svg-views",file:document.URL.split("/").pop(),views:v},"*");]]></script>
+<script><![CDATA[var a=document.getElementsByTagName("*"),m={},v={},i,e,b,p,g,f,o;for(i=0;i<a.length;i++){e=a[i];if((e.localName||"")==="image")m[[+e.getAttribute("x"),+e.getAttribute("y"),+e.getAttribute("width"),+e.getAttribute("height")]]=e;}for(i=0;i<a.length;i++){e=a[i];if((e.localName||"")!=="view")continue;b=e.getAttribute("viewBox");if(!b)continue;p=b.trim().split(/[\s,]+/).map(Number);g=m[[p[0],p[1],p[2],p[3]]];f=g?(g.getAttribute("data-frame")||"").trim().split(/[\s,]+/).map(Number):[];o=g?(g.getAttribute("data-offset")||"").trim().split(/[\s,]+/).map(Number):[];v[e.getAttribute("id")]=(f.length===2&&o.length===2&&!isNaN(f[0]+f[1]+o[0]+o[1]))?[p[2],p[3],f[0],f[1],o[0],o[1]]:[p[2],p[3]];}parent.postMessage({type:"svg-views",file:document.URL.split("/").pop(),views:v},"*");]]></script>
 </svg>

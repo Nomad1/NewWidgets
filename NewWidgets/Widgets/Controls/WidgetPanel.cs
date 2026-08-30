@@ -65,6 +65,79 @@ namespace NewWidgets.Widgets
             float left = GetProperty(WidgetParameterIndex.Padding, Margin.Empty).Left;
             WidgetDisplay display = GetProperty(WidgetParameterIndex.Display, WidgetDisplay.Block);
 
+            // justify-content hands out whatever room is left over on the main axis, so it has to
+            // know the total extent BEFORE anything is placed: one measuring pass here, then the
+            // placement loop below shifts the start by `justifyOffset` and pads each gap by
+            // `justifyGap`. flex-start needs neither, and is left on the original single-pass
+            // path so nothing that does not ask for this pays for it.
+            //
+            // Only a flex row is justified. A block child takes the full width, so there is no
+            // spare room to hand out -- which is why CSS does not define justify-content for a
+            // block container either.
+            float justifyOffset = 0.0f;
+            float justifyGap = 0.0f;
+
+            if (display == WidgetDisplay.Flex)
+            {
+                WidgetJustifyContent justify = GetProperty(WidgetParameterIndex.JustifyContent, WidgetJustifyContent.FlexStart);
+
+                if (justify != WidgetJustifyContent.FlexStart)
+                {
+                    float content = 0.0f;
+                    int count = 0;
+
+                    foreach (Widget child in m_children.List)
+                    {
+                        if (!child.Visible)
+                            continue;
+
+                        child.Relayout();
+
+                        if (child.PositionType == WidgetPosition.Absolute)
+                            continue; // out of flow, so it takes none of the room
+
+                        StyleLength childBefore = child.GetProperty(WidgetParameterIndex.MarginLeft, StyleLength.Unset);
+                        StyleLength childAfter = child.GetProperty(WidgetParameterIndex.MarginRight, StyleLength.Unset);
+
+                        content += (childBefore.IsDefinite ? childBefore.Resolve(Size.X) : 0.0f)
+                            + child.Size.X
+                            + (childAfter.IsDefinite ? childAfter.Resolve(Size.X) : 0.0f);
+
+                        count++;
+                    }
+
+                    Margin padding = GetProperty(WidgetParameterIndex.Padding, Margin.Empty);
+                    float free = Size.X - padding.Width - content;
+
+                    // A row sized to its own content has nothing spare, and a row that overflows
+                    // has less than nothing: CSS packs both at the start rather than pulling items
+                    // backwards, so anything not positive is left alone.
+                    if (free > 0.0f && count > 0)
+                        switch (justify)
+                        {
+                            case WidgetJustifyContent.FlexEnd:
+                                justifyOffset = free;
+                                break;
+                            case WidgetJustifyContent.Center:
+                                justifyOffset = free / 2.0f;
+                                break;
+                            case WidgetJustifyContent.SpaceBetween:
+                                justifyGap = count > 1 ? free / (count - 1) : 0.0f;
+                                break;
+                            case WidgetJustifyContent.SpaceAround:
+                                justifyGap = free / count;
+                                justifyOffset = justifyGap / 2.0f;
+                                break;
+                            case WidgetJustifyContent.SpaceEvenly:
+                                justifyGap = free / (count + 1);
+                                justifyOffset = justifyGap;
+                                break;
+                        }
+                }
+
+                left += justifyOffset;
+            }
+
             foreach (Widget child in m_children.List)
             {
                 if (!child.Visible)
@@ -118,7 +191,7 @@ namespace NewWidgets.Widgets
                 if (display == WidgetDisplay.Block)
                     top += above + child.Size.Y + below;
                 else
-                    left += before + child.Size.X + after;
+                    left += before + child.Size.X + after + justifyGap;
             }
 
             // CSS 2.1 10.6.3: a normal-flow block box whose height is auto -- declared that way,

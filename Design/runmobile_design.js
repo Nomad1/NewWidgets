@@ -237,6 +237,10 @@
         // .button_image/.button_label/.checkbox_image below, which are hardcoded into the
         // engine's complex widgets and are the same in every project.
 
+        // An unknown element is display: inline, and width/height do nothing on an inline box.
+        // The wrapper is given both below, so it has to be a block first. A flex container
+        // blockifies its items for free, which is why this only shows outside one.
+        wrapper.style.display = 'block';
         wrapper.style.boxSizing = 'border-box';
         ['position', 'left', 'top', 'width', 'height', 'margin'].forEach(function (prop) {
             wrapper.style[prop] = computed[prop];
@@ -447,7 +451,8 @@
     // and Illustrator are expected to strip the reporter on save, and then neither
     // case ever runs -- a repeating background stays scaled to the element and the
     // checkbox tick stays stretched, exactly today's behaviour.
-    var SPRITE_SIZES = {}; // "file#id" -> [w, h], filled as reporters answer
+    var SPRITE_SIZES = {}; // "file#id" -> [w, h, frameW, frameH, offsetX, offsetY], filled as reporters answer
+                           // (an atlas packed before the reporter forwarded frames sends [w, h]; both are accepted)
 
     // A browser resolves url()'s path to an absolute one in computed style, but the
     // reporter names its file with document.URL.split("/").pop() -- basename only
@@ -485,22 +490,69 @@
     // Unconditional -- always re-derives from the live cascade -- because a caller (sync(),
     // below) uses this to correct a size it just overwrote as a side effect; a caller that
     // wants to skip untouched elements gates it itself (applySpriteSizeOnStateChange).
+    // The atlas reports [w, h, frameW, frameH, offsetX, offsetY]: `w/h` are the PACKED pixels
+    // (the artwork with its transparent margin trimmed off) and the frame is the untrimmed cell
+    // the artist drew in, with the artwork sitting inside it at the offset. 493 of 644 sprites in
+    // star_ui.svg are trimmed, so this is the normal case, not an exotic one.
+    //
+    // The engine fits the FRAME to the widget box and lets the artwork ride inside it:
+    // WidgetBackground divides by Sprite.Size, which is OriginalWidth/Height (data-frame), never
+    // the packed size, and the GPU quad shifts by `pivot*OriginalWidth - OffsetX` then spans only
+    // the packed extent (GLHelper.cs). A browser handed a <view> fragment sees the packed rect
+    // ALONE -- no frame, no offset -- so `contain` spreads the artwork across the whole box:
+    // check_icon is 20x20 inside a 54x54 frame, so it drew 2.7x too large and cornered instead of
+    // inset. Reproducing the engine here is two declarations, a size and a position, both scaled
+    // by the same factor the frame needs to reach the box.
     function applySpriteSizeTo(el) {
-        el.style.backgroundSize = ''; // drop any size a previous state set, so the read below sees the live cascade (the current sprite's own repeat/contain), not a leftover override
+        el.style.backgroundSize = '';     // drop what a previous state set, so the reads below see
+        el.style.backgroundPosition = ''; // the live cascade and not our own leftover override
         var computed = getComputedStyle(el);
         var ref = parseSpriteRef(computed.backgroundImage);
         var size = ref && SPRITE_SIZES[ref.file + '#' + ref.id];
         if (!size) return;
-        if (computed.backgroundRepeat === 'repeat') {
-            el.style.backgroundSize = size[0] + 'px ' + size[1] + 'px';
-        } else if (computed.backgroundSize === 'contain') {
-            // Row 8's "larger box" clause: contain already scales a bigger sprite down
-            // correctly, so the native size only belongs here when the sprite is no
-            // bigger than the box on either axis (e.g. the checkbox tick, not its back).
-            if (size[0] <= el.clientWidth && size[1] <= el.clientHeight) {
-                el.style.backgroundSize = size[0] + 'px ' + size[1] + 'px';
-            }
+
+        var w = size[0], h = size[1];
+        // Two values, not six, from an atlas packed before the reporter forwarded frames. Then the
+        // sprite is treated as its own frame and every line below is a no-op -- old atlas, old
+        // behaviour, no crash.
+        var fw = size.length >= 6 ? size[2] : w, fh = size.length >= 6 ? size[3] : h;
+        var ox = size.length >= 6 ? size[4] : 0, oy = size.length >= 6 ? size[5] : 0;
+
+        // A tile has to be told how big one tile is, and an SVG fragment reference reports no
+        // intrinsic size for the browser to work it out. BOTH conditions, not either: an icon
+        // drawn once needs no tile size and gets stretched by one, and `repeat` is CSS's INITIAL
+        // value, so an element that never mentioned background-repeat reads as tiling.
+        // Frame-aware tiling is NOT expressible in CSS -- one background layer cannot tile a frame
+        // with the artwork inset -- so a trimmed tile would still be wrong here. No such sprite
+        // exists: back_pattern is the only repeating one in the stylesheets and it is untrimmed.
+        if (computed.backgroundRepeat === 'repeat'
+            && computed.backgroundSize !== 'contain' && computed.backgroundSize !== 'cover') {
+            el.style.backgroundSize = w + 'px ' + h + 'px';
+            return;
         }
+
+        // Untrimmed: the frame IS the artwork, so the browser's own fit already matches the engine
+        // and writing our own numbers over it would only add rounding. 151 sprites take this exit.
+        if (fw === w && fh === h && ox === 0 && oy === 0) return;
+
+        var W = el.clientWidth, H = el.clientHeight; // padding box -- what a background is drawn into
+        if (!(W > 0 && H > 0)) return;
+
+        // How the FRAME reaches the box, per keyword, mirroring what the widget does with the same
+        // intent: `contain` is ImageFit (one scale, the smaller), `cover` its opposite, and a
+        // percentage or `auto` is ImageStretch, whose FlatScale is a per-axis vector divide.
+        var sx, sy, bs = computed.backgroundSize;
+        if (bs === 'contain') sx = sy = Math.min(W / fw, H / fh);
+        else if (bs === 'cover') sx = sy = Math.max(W / fw, H / fh);
+        else if (bs === 'auto' || bs.indexOf('%') !== -1) { sx = W / fw; sy = H / fh; }
+        else return; // an explicit pixel size is the author's own statement, not ours to reinterpret
+
+        // Where the scaled frame's top-left lands, then the artwork's own offset within it. The
+        // centring term is the engine's default BackgroundPivot of (0.5, 0.5); it falls out to zero
+        // whenever the frame fills the box exactly, which is every stretch case.
+        el.style.backgroundSize = (w * sx) + 'px ' + (h * sy) + 'px';
+        el.style.backgroundPosition = ((W - fw * sx) / 2 + ox * sx) + 'px '
+                                    + ((H - fh * sy) / 2 + oy * sy) + 'px';
     }
 
     function applySpriteSizes() {

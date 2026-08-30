@@ -11,11 +11,6 @@ namespace NewWidgets.UI.Styles
     public class StyleSelector
     {
         /// <summary>
-        /// Regular expression to parse selectors to basic parts
-        /// </summary>
-        private static readonly Regex s_selectorParser = new Regex(@"^(?<element>@{0,1}[\*|\w|\-_]+)?(?<id>#[\w|\-_]+)?(?<class>\.[\w|\-|\._]+)?(?<attributes>\[.+\])?(?<pseudostyle>:.+)?$", RegexOptions.Compiled);
-
-        /// <summary>
         /// Regular expression to parse pseudo classes separated by :
         /// </summary>
         private static readonly Regex s_pseudoClassParser = new Regex(@"(:{1,2}[^:]+)", RegexOptions.Compiled);
@@ -62,46 +57,162 @@ namespace NewWidgets.UI.Styles
             get { return m_attributes; }
         }
 
+        /// <summary>
+        /// Reads one compound selector -- `input.cls[type="text"]:hover` and every other ordering
+        /// of the same parts. CSS puts an optional type FIRST and then allows the id, classes,
+        /// attribute tests and pseudo-classes in ANY order, so this scans tokens rather than
+        /// matching a fixed sequence.
+        ///
+        /// It used to be one regex with the groups in a set order, which meant
+        /// `input[type="text"].cls` -- the spelling anyone would write -- threw "Invalid selector
+        /// string" while `input.cls[type="text"]` parsed. Same selector, and a browser accepts
+        /// both.
+        /// </summary>
         public StyleSelector(string selectorString)
         {
-            MatchCollection matches = s_selectorParser.Matches(selectorString);
+            string element = string.Empty;
+            string id = string.Empty;
+            List<string> classes = new List<string>();
+            List<string> pseudoClasses = null;
+            Dictionary<string, string> attributes = null;
 
-            if (matches.Count != 1)
-                throw new ArgumentException("Invalid selector string", selectorString);
+            int at = 0;
+            int length = selectorString == null ? 0 : selectorString.Length;
 
-            foreach (Match match in matches)
+            // the type, if there is one, is whatever precedes the first token marker
+            while (at < length && !IsTokenStart(selectorString[at]))
+                at++;
+
+            if (at > 0)
+                element = selectorString.Substring(0, at);
+
+            while (at < length)
             {
-                m_id = match.Groups["id"].Value.TrimStart('#'); // element ID should not have leading #
-                m_element = match.Groups["element"].Value; // element type goes as is
-                m_classes = match.Groups["class"].Value.Split(new[] { ' ', '.' }, StringSplitOptions.RemoveEmptyEntries); // classes should be split. May be we need to use Regex as well, but right now simple split would work
+                char marker = selectorString[at];
 
-                if (match.Groups["pseudostyle"].Success) // Pseudo-classes are tricky and can be in form ::first-child, :disabled or even :not(enabled)
+                if (marker == '[')
                 {
-                    MatchCollection psMatches = s_pseudoClassParser.Matches(match.Groups["pseudostyle"].Value);
-                    m_pseudoClasses = new string[psMatches.Count];
+                    int close = FindAttributeEnd(selectorString, at);
 
-                    for (int i = 0; i < m_pseudoClasses.Length; i++)
-                        m_pseudoClasses[i] = psMatches[i].Groups[0].Value;
-                }
+                    if (close < 0)
+                        throw new ArgumentException("Invalid selector string", selectorString);
 
-                string attributesText = match.Groups["attributes"].Value;
-
-                if (!string.IsNullOrEmpty(attributesText))
-                {
-                    // strip the enclosing [ ] and split on the first '=' -- the same parsing
-                    // WidgetManager.RegisterElement already does for its own selector table
-                    string test = attributesText.Substring(1, attributesText.Length - 2);
+                    string test = selectorString.Substring(at + 1, close - at - 1);
                     int equals = test.IndexOf('=');
 
                     if (equals > 0)
                     {
-                        m_attributes = new Dictionary<string, string>(1);
-                        m_attributes[test.Substring(0, equals).Trim()] = test.Substring(equals + 1).Trim().Trim('"', '\'');
+                        if (attributes == null)
+                            attributes = new Dictionary<string, string>(1);
+
+                        attributes[test.Substring(0, equals).Trim()] = test.Substring(equals + 1).Trim().Trim('"', '\'');
                     }
+
+                    at = close + 1;
+                    continue;
                 }
 
-                break;
+                if (marker == ':')
+                {
+                    // one pseudo-class, `::` and a `:not(...)` argument included, ending where the
+                    // next token starts -- a ':' does not end it, since `:focus:hover` is two
+                    int from = at;
+
+                    at++;
+
+                    if (at < length && selectorString[at] == ':')
+                        at++;
+
+                    while (at < length && !IsTokenStart(selectorString[at]))
+                        at++;
+
+                    if (at < length && selectorString[at] == '(')
+                    {
+                        int depth = 0;
+
+                        while (at < length)
+                        {
+                            if (selectorString[at] == '(')
+                                depth++;
+                            else if (selectorString[at] == ')' && --depth == 0)
+                            {
+                                at++;
+                                break;
+                            }
+
+                            at++;
+                        }
+                    }
+
+                    if (at == from + 1)
+                        throw new ArgumentException("Invalid selector string", selectorString);
+
+                    if (pseudoClasses == null)
+                        pseudoClasses = new List<string>();
+
+                    pseudoClasses.Add(selectorString.Substring(from, at - from));
+                    continue;
+                }
+
+                // '#' or '.', both reading a plain name
+                int nameStart = ++at;
+
+                while (at < length && !IsTokenStart(selectorString[at]))
+                    at++;
+
+                if (at == nameStart)
+                    throw new ArgumentException("Invalid selector string", selectorString);
+
+                string name = selectorString.Substring(nameStart, at - nameStart);
+
+                if (marker == '#')
+                    id = name;
+                else
+                    classes.Add(name);
             }
+
+            m_element = element;
+            m_id = id;
+            m_classes = classes.ToArray();
+
+            if (pseudoClasses != null)
+                m_pseudoClasses = pseudoClasses.ToArray();
+
+            m_attributes = attributes;
+        }
+
+        /// <summary>
+        /// True where a simple selector begins, which is also where the one before it ends.
+        /// </summary>
+        private static bool IsTokenStart(char c)
+        {
+            return c == '#' || c == '.' || c == '[' || c == ':';
+        }
+
+        /// <summary>
+        /// The ']' closing the attribute test that opens at <paramref name="from"/>, skipping any
+        /// bracket inside a quoted value. Negative when the test is never closed.
+        /// </summary>
+        private static int FindAttributeEnd(string selectorString, int from)
+        {
+            char quote = '\0';
+
+            for (int i = from + 1; i < selectorString.Length; i++)
+            {
+                char c = selectorString[i];
+
+                if (quote != '\0')
+                {
+                    if (c == quote)
+                        quote = '\0';
+                }
+                else if (c == '"' || c == '\'')
+                    quote = c;
+                else if (c == ']')
+                    return i;
+            }
+
+            return -1;
         }
 
         public StyleSelector(string element, string classes, string id, string pseudoClasses)

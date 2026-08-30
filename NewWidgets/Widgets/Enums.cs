@@ -131,6 +131,21 @@ namespace NewWidgets.Widgets
     }
 
     /// <summary>
+    /// CSS <c>justify-content</c>: how the spare room on the MAIN axis is handed out. Only a
+    /// flex container has one -- a block container's children each take the full width, so there
+    /// is nothing to distribute, which is why CSS does not define this property for them either.
+    /// </summary>
+    public enum WidgetJustifyContent
+    {
+        FlexStart = 0,
+        FlexEnd = 1,
+        Center = 2,
+        SpaceBetween = 3,
+        SpaceAround = 4,
+        SpaceEvenly = 5,
+    }
+
+    /// <summary>
     /// CSS <c>position</c>. Static leaves the box wherever flow (or C# code) put it and ignores
     /// left/top/right/bottom; relative resolves like Static and then offsets by those edges;
     /// absolute is CSS 2.1 10.3.7/10.6.4, which is what every NewWidgets box already did before

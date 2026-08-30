@@ -82,8 +82,39 @@ namespace NewWidgets.Widgets
             return GetStyle(new StyleSelectorList(singleSelector, StyleNodeMatch.Class));
         }
 
+        // Identities of the stylesheets already loaded -- eight bytes each, not the sheets
+        // themselves. See LoadCSS for why they are tracked at all.
+        private static readonly HashSet<long> s_loadedStyleSheets = new HashSet<long>();
+
+        /// <summary>
+        /// Adds a stylesheet to the cascade. Loading the SAME sheet twice is ignored, and that is
+        /// not an optimisation -- it is a correctness fix.
+        ///
+        /// Rules are never merged (see StyleCollection.AddStyle): a second load appends fresh
+        /// nodes with later sequence numbers, and a later node wins a specificity tie. So
+        /// re-loading defaults.css after ui.css moved defaults.css's rules to the END of the
+        /// cascade and silently reverted every ui.css rule that depended on winning such a tie.
+        /// Measured on the real corpus: the game loads defaults.css then ui.css and a special text
+        /// edit resolves `edit_special_inactive_3`; login.xhtml then re-links defaults.css, without
+        /// ui.css, and the same edit resolves `panel_white_normal_9` -- an ordinary edit.
+        ///
+        /// Identified by the CONTENT rather than a filename because the two callers spell the
+        /// same sheet differently: the game asks for "ui/defaults.css", a document links
+        /// "defaults.css". Only a hash and a length are kept, never the text.
+        /// </summary>
         public static void LoadCSS(string uiData)
         {
+            if (string.IsNullOrEmpty(uiData))
+                return;
+
+            // Hash AND length, so two sheets have to collide on both to be mistaken for each
+            // other. Keeping the text itself would mean holding every stylesheet in memory for
+            // the life of the process to answer a yes/no question.
+            long identity = ((long)uiData.GetHashCode() << 32) | (uint)uiData.Length;
+
+            if (!s_loadedStyleSheets.Add(identity))
+                return; // already in the cascade, and loading it again would reorder it
+
             CSSParser.ParseCSS(uiData, s_styleCollection, InitCssData);
         }
 
@@ -390,6 +421,7 @@ namespace NewWidgets.Widgets
         public static void ResetStyles()
         {
             s_styleCollection.Clear();
+            s_loadedStyleSheets.Clear();
             s_fonts.Clear();
             s_mainFont = null;
         }
