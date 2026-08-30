@@ -874,8 +874,22 @@ namespace NewWidgets.Widgets
 
         public override bool Touch(float x, float y, bool press, bool unpress, int pointer)
         {
-            if ((!string.IsNullOrEmpty(m_tooltip) || OnTooltip != null) && ((pointer == 0 && !unpress && !press) || (press && WindowController.Instance.IsTouchScreen)))
-                return WidgetManager.HandleTooltip(this, m_tooltip, new Vector2(x, y), OnTooltip);
+            // A tooltip shown on HOVER is passive and must not report the move as handled. It used
+            // to return here, so a tooltipped WidgetPanel answered `true` to a plain mouse move and
+            // returned before dispatching to its children -- every checkbox inside such a row
+            // stopped hovering, and the only row that still worked was the one with no tooltip.
+            //
+            // A tap on a touch screen is different: there the tooltip IS the gesture's outcome, so
+            // it consumes the press.
+            bool tooltipPress = press && WindowController.Instance.IsTouchScreen;
+
+            if ((!string.IsNullOrEmpty(m_tooltip) || OnTooltip != null) && ((pointer == 0 && !unpress && !press) || tooltipPress))
+            {
+                bool handled = WidgetManager.HandleTooltip(this, m_tooltip, new Vector2(x, y), OnTooltip);
+
+                if (tooltipPress && handled)
+                    return true;
+            }
 
             return base.Touch(x, y, press, unpress, pointer);
         }

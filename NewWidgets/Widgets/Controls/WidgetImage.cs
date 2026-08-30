@@ -68,8 +68,8 @@ namespace NewWidgets.Widgets
 
         public uint Color
         {
-            get { return GetProperty(WidgetParameterIndex.BackColor, (uint)0xffffff); }
-            set { SetProperty(WidgetParameterIndex.BackColor, value); }
+            get { return GetProperty(WidgetParameterIndex.ImageColor, (uint)0xffffff); }
+            set { SetProperty(WidgetParameterIndex.ImageColor, value); }
         }
 
         public Vector2 ImageSize

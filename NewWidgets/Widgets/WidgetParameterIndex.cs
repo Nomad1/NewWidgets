@@ -138,8 +138,6 @@ namespace NewWidgets.Widgets
 
         // Background
 
-        [WidgetParameter("image_color", "--image-color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Initial,
-                                        typeof(BackgroundColorProcessor), "--background-opacity")] // a WidgetImage (e.g. checkbox #checkbox_image) has no property of its own to tint with -- it writes the same slot --background-color does, through the same processor, so an authored alpha unpacks into --background-opacity here exactly as it does for --background-color; the two spellings must behave identically
         [WidgetParameter("back_color", "--background-color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Initial,
                                        typeof(BackgroundColorProcessor), "--background-opacity")] // an authored alpha is unpacked into the opacity property, because the renderer masks it off the colour. Last, so SaveCSS still writes it
         BackColor,
@@ -230,10 +228,20 @@ namespace NewWidgets.Widgets
         //ImagePivot,
         //[WidgetParameter("image_padding", "--image-padding", typeof(Margin), UnitType.Length)] // changed to "padding"
         //ImagePadding,
-        //[WidgetParameter("image_color", "--image-color", typeof(uint), UnitType.Color)]
-        //ImageColor,
-        //[WidgetParameter("image_opacity", "--image-opacity", typeof(float), UnitType.Percent)]
-        //ImageOpacity,
+        /// <summary>
+        /// The tint on a WidgetImage's own picture. Its own slot, NOT an alias of
+        /// <c>--background-color</c>: a picture and the background behind it are two things, and
+        /// aliasing them meant a rule tinting one silently tinted the other. Same mistake, and the
+        /// same fix, as object-fit against background-repeat.
+        /// </summary>
+        [WidgetParameter("image_color", "--image-color", typeof(uint), UnitType.Color, WidgetParameterInheritance.Initial,
+                                        typeof(BackgroundColorProcessor), "--image-opacity")]
+        ImageColor,
+
+        // ponytail: parsed so an authored alpha in --image-color has somewhere to unpack to, but
+        // nothing reads it yet -- WidgetImage takes its alpha from the object's own Opacity.
+        [WidgetParameter("image_opacity", "--image-opacity", typeof(float), UnitType.Percent)]
+        ImageOpacity,
 
         // Text edit
 
