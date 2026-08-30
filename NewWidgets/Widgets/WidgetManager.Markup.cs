@@ -194,7 +194,7 @@ namespace NewWidgets.Widgets
 
         private static readonly char[] s_classSeparators = new char[] { ' ', '\t', '\r', '\n' };
 
-        private static readonly string[] s_labelElements = new string[] { "h1", "h2", "h3", "h4", "h5", "h6", "span" };
+        private static readonly string[] s_labelElements = new string[] { "h1", "h2", "h3", "h4", "h5", "h6", "span", "label" };
 
         private static readonly string[] s_buttonElements = new string[] { "input[type=submit]", "input[type=reset]", "input[type=button]", "a", "button" };
 
@@ -285,8 +285,6 @@ namespace NewWidgets.Widgets
         {
             RegisterElement<WidgetPanel>("div", style => new WidgetPanel(style));
             RegisterElement<WidgetWindow>("dialog", style => new WidgetWindow(style));
-
-            RegisterElement<WidgetLabel>("label", style => new WidgetLabel("label", style, string.Empty));
 
             foreach (string label in s_labelElements)
                 RegisterElement<WidgetLabel>(label, style => { string localLabel = label; return new WidgetLabel(localLabel, style, string.Empty); });
