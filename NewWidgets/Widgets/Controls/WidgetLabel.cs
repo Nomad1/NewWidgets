@@ -1,7 +1,5 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using NewWidgets.UI;
-using NewWidgets.UI.Styles;
 using NewWidgets.Utility;
 
 #if RUNMOBILE
@@ -143,7 +141,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="text">Text.</param>
-        protected WidgetLabel(string elementType, WidgetStyle style, string text)
+        internal WidgetLabel(string elementType, WidgetStyle style, string text)
            : base(elementType, style)
         {
             Text = text;

@@ -8,9 +8,9 @@ namespace NewWidgets.Widgets
     public class WidgetProgressLine : WidgetPanel // TODO: rename to WidgetProgress
     {
         public new const string ElementType = "progress";
-        public const string BackLabelClass = "progress_back_label";
-        public const string FrontLabelClass = "progress_front_label";
-        public const string LineClass = "progress_line";
+        public const string BackLabelElement = "progress-back-label";
+        public const string FrontLabelElement = "progress-front-label";
+        public const string LineElement = "progress-line";
         //
         private string m_text;
         private float m_progress;
@@ -78,16 +78,16 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style"></param>
         /// <param name="text"></param>
-        protected WidgetProgressLine(string elementType, WidgetStyle style, string text)
+        internal WidgetProgressLine(string elementType, WidgetStyle style, string text)
             : base(elementType, style)
         {
-            m_backText = new WidgetLabel(new WidgetStyle(new[] { BackLabelClass },""));
+            m_backText = new WidgetLabel(BackLabelElement, default(WidgetStyle), string.Empty);
             AddChild(m_backText);
 
-            m_progressLine = new WidgetBackground(new WidgetStyle(new[] { LineClass },""));
+            m_progressLine = new WidgetBackground(LineElement, default(WidgetStyle));
             AddChild(m_progressLine);
 
-            m_frontText = new WidgetLabel(new WidgetStyle(new[] { FrontLabelClass },""));
+            m_frontText = new WidgetLabel(FrontLabelElement, default(WidgetStyle), string.Empty);
             AddChild(m_frontText);
 
             m_progress = 0;

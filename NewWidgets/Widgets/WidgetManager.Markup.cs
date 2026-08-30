@@ -153,27 +153,6 @@ namespace NewWidgets.Widgets
     /// <summary>
     /// XHTML markup support: build a widget tree from a document, and write one back out.
     ///
-    /// Element names are real HTML tags wherever a sensible one exists, so the same file opens
-    /// in an HTML editor and in a browser. A widget a document built <b>reports the document's
-    /// own tag</b> as its <see cref="Widget.StyleElementType"/>: <c>&lt;div&gt;</c> builds a
-    /// <see cref="WidgetPanel"/> that answers <c>div</c>, <c>&lt;h1&gt;</c> builds a
-    /// <see cref="WidgetLabel"/> that answers <c>h1</c>. The raw tag, never the registration
-    /// selector -- <c>&lt;input type="checkbox"&gt;</c> answers <c>input</c>, because an author
-    /// writing <c>input { }</c> means every input and <c>checkbox</c> is not an HTML element.
-    ///
-    /// A widget built in code is untouched and still answers the <c>ElementType</c> const of
-    /// its class, so every stylesheet written against <c>panel</c> or <c>label</c> keeps
-    /// matching exactly what it matched before. The two vocabularies do not mix: a
-    /// <c>label { }</c> rule does not reach a <c>&lt;span&gt;</c>, and a user interface is
-    /// designed in HTML or in code rather than in both.
-    ///
-    /// The <see cref="WidgetType"/> recorded next to each registration is the element type the
-    /// widget class is expected to declare for that tag. It is checked against what a freshly
-    /// built widget reports -- before the tag replaces it -- so the table cannot drift away
-    /// from the classes it names; a mismatch is logged rather than thrown.
-    ///
-    /// Layout is absolute only. Nothing here arranges anything: a child is added to its parent
-    /// and its box comes from the cascade, exactly as for a widget built in code.
     /// </summary>
     public static partial class WidgetManager
     {
@@ -189,16 +168,14 @@ namespace NewWidgets.Widgets
             public readonly string TagName; // "input"
             public readonly string AttributeName; // "type", or null for a plain tag
             public readonly string AttributeValue; // "checkbox", or null for a plain tag
-            public readonly string ElementType; // "checkbox", the NewWidgets element type
             public readonly WidgetFactoryDelegate Factory;
 
-            public MarkupElement(string selector, string tagName, string attributeName, string attributeValue, string elementType, WidgetFactoryDelegate factory)
+            public MarkupElement(string selector, string tagName, string attributeName, string attributeValue, WidgetFactoryDelegate factory)
             {
                 Selector = selector;
                 TagName = tagName;
                 AttributeName = attributeName;
                 AttributeValue = attributeValue;
-                ElementType = elementType;
                 Factory = factory;
             }
         }
@@ -217,10 +194,9 @@ namespace NewWidgets.Widgets
 
         private static readonly char[] s_classSeparators = new char[] { ' ', '\t', '\r', '\n' };
 
-        // the six heading elements, all one widget. Registered from a loop rather than six
-        // lines, because nothing distinguishes them here: a heading is a line of text and the
-        // stylesheet says how big
-        private static readonly string[] s_headingElements = new string[] { "h1", "h2", "h3", "h4", "h5", "h6" };
+        private static readonly string[] s_labelElements = new string[] { "h1", "h2", "h3", "h4", "h5", "h6", "span" };
+
+        private static readonly string[] s_buttonElements = new string[] { "input[type=submit]", "input[type=reset]", "input[type=button]", "a", "button" };
 
         // one entry per element met while loading that carried a for="...", resolved once the
         // whole tree exists because either end of the association may stand after the other.
@@ -236,10 +212,6 @@ namespace NewWidgets.Widgets
 
         // selector -> how to build it. Used by the loader
         private static readonly IDictionary<string, MarkupElement> s_markupElements = new Dictionary<string, MarkupElement>();
-
-        // widget class -> selector. Used by the saver. A game's own subclass that registered
-        // nothing falls back to the nearest registered base class
-        private static readonly IDictionary<Type, string> s_markupSelectors = new Dictionary<Type, string>();
 
         // widget class -> its string Text property, or null when it has none. Reflection is
         // cheap here because it happens once per class, at load or save time, never in a frame
@@ -311,47 +283,31 @@ namespace NewWidgets.Widgets
         /// </summary>
         static WidgetManager()
         {
-            RegisterElement<WidgetPanel>("div", WidgetType.Panel, delegate (WidgetStyle style) { return new WidgetPanel(style); });
-            RegisterElement<WidgetWindow>("dialog", WidgetType.Window, delegate (WidgetStyle style) { return new WidgetWindow(style); });
+            RegisterElement<WidgetPanel>("div", style => new WidgetPanel(style));
+            RegisterElement<WidgetWindow>("dialog", style => new WidgetWindow(style));
 
-            // a heading is a short line of text, which is what a WidgetLabel is. <span> is
-            // registered last, so it is the tag a label built in code is written as
-            RegisterElement<WidgetLabel>("label", WidgetType.Label, delegate (WidgetStyle style) { return new WidgetLabel(style); });
+            RegisterElement<WidgetLabel>("label", style => new WidgetLabel("label", style, string.Empty));
 
-            foreach (string heading in s_headingElements)
-                RegisterElement<WidgetLabel>(heading, WidgetType.Label, delegate (WidgetStyle style) { return new WidgetLabel(style); });
+            foreach (string label in s_labelElements)
+                RegisterElement<WidgetLabel>(label, style => { string localLabel = label; return new WidgetLabel(localLabel, style, string.Empty); });
 
-            RegisterElement<WidgetLabel>("span", WidgetType.Label, delegate (WidgetStyle style) { return new WidgetLabel(style); });
+            RegisterElement<WidgetText>("p", style => new WidgetText(style));
 
-            RegisterElement<WidgetText>("p", WidgetType.Text, delegate (WidgetStyle style) { return new WidgetText(style); });
+            foreach (string button in s_buttonElements)
+                RegisterElement<WidgetButton>(button, style => { string localButton = button; return new WidgetButton(localButton, style, string.Empty); });
 
-            // <a> is clickable text and WidgetButton is the only widget here that is. A browser
-            // paints a link from its own stylesheet and this engine has no underline, so the
-            // profile's rule holds: the stylesheet says what a control looks like. Giving it the
-            // button element type is deliberate -- a link and a button are one control here
-            RegisterElement<WidgetButton>("input[type=submit]", WidgetType.Button, delegate (WidgetStyle style) { return new WidgetButton(style); });
-            RegisterElement<WidgetButton>("input[type=reset]", WidgetType.Button, delegate (WidgetStyle style) { return new WidgetButton(style); });
-            RegisterElement<WidgetButton>("input[type=button]", WidgetType.Button, delegate (WidgetStyle style) { return new WidgetButton(style); });
-            RegisterElement<WidgetButton>("a", WidgetType.Button, delegate (WidgetStyle style) { return new WidgetButton(style); });
-            RegisterElement<WidgetButton>("button", WidgetType.Button, delegate (WidgetStyle style) { return new WidgetButton(style); });
+            RegisterElement<WidgetImage>("img", style => new WidgetImage(style));
 
-            RegisterElement<WidgetImage>("img", WidgetType.Image, delegate (WidgetStyle style) { return new WidgetImage(style); });
-            RegisterElement<WidgetImage>("div[class=image]", WidgetType.Image, delegate (WidgetStyle style) { return new WidgetImage(style); });
+            RegisterElement<WidgetLine>("hr", style => new WidgetLine(style));
 
-            RegisterElement<WidgetLine>("hr", WidgetType.Line, delegate (WidgetStyle style) { return new WidgetLine(style); });
+            RegisterElement<WidgetTextEdit>("input", style => new WidgetTextEdit(style));
 
-            // every other input type -- text, password, email, search, tel, url, number, and an
-            // input with no type at all -- falls through to this one, which is what a browser
-            // does with a type it does not recognise
-            RegisterElement<WidgetTextEdit>("input", WidgetType.TextEdit, delegate (WidgetStyle style) { return new WidgetTextEdit(style); });
-
-            RegisterElement<WidgetTextField>("div[class=textfield]", WidgetType.TextField, delegate (WidgetStyle style) { return new WidgetTextField(style); });
-            RegisterElement<WidgetTextField>("textarea", WidgetType.TextField, delegate (WidgetStyle style) { return new WidgetTextField(style); });
+            RegisterElement<WidgetTextField>("textarea", style=> new WidgetTextField(style));
 
             // a radio button is a checkbox that a group is supposed to keep exclusive. Nothing
             // here models the group, so the two are one widget and the tag round-trips
-            RegisterElement<WidgetCheckBox>("input[type=radio]", WidgetType.CheckBox, delegate (WidgetStyle style) { return new WidgetCheckBox(style); });
-            RegisterElement<WidgetCheckBox>("input[type=checkbox]", WidgetType.CheckBox, delegate (WidgetStyle style) { return new WidgetCheckBox(style); });
+            RegisterElement<WidgetCheckBox>("input[type=radio]", style => new WidgetCheckBox("input[type=radio]", style, false));
+            RegisterElement<WidgetCheckBox>("input[type=checkbox]", style=> new WidgetCheckBox("input[type=checkbox]", style, false));
         }
 
         #region Registration
@@ -367,7 +323,7 @@ namespace NewWidgets.Widgets
         /// <param name="selector">Element name, optionally with one attribute test</param>
         /// <param name="widgetType">Declared NewWidgets element type for this tag</param>
         /// <param name="factory">Builds the widget</param>
-        public static void RegisterElement<T>(string selector, WidgetType widgetType, WidgetFactoryDelegate factory) where T : Widget
+        public static void RegisterElement<T>(string selector, WidgetFactoryDelegate factory) where T : Widget
         {
             if (string.IsNullOrEmpty(selector))
                 throw new ArgumentNullException("selector");
@@ -395,24 +351,7 @@ namespace NewWidgets.Widgets
                 attributeValue = test.Substring(equals + 1).Trim('"', '\'');
             }
 
-            s_markupElements[selector] = new MarkupElement(selector, tagName, attributeName, attributeValue, GetElementTypeName(widgetType), factory);
-            s_markupSelectors[typeof(T)] = selector;
-        }
-
-        /// <summary>
-        /// Reads the <see cref="NameAttribute"/> already carried by every <see cref="WidgetType"/>
-        /// member. That attribute table is the element-name list; this method is what finally
-        /// reads it, so there is no second list to keep in step
-        /// </summary>
-        private static string GetElementTypeName(WidgetType widgetType)
-        {
-            FieldInfo field = typeof(WidgetType).GetField(widgetType.ToString(), BindingFlags.Public | BindingFlags.Static);
-
-            if (field != null)
-                foreach (NameAttribute attribute in field.GetCustomAttributes(typeof(NameAttribute), false))
-                    return attribute.Name;
-
-            return widgetType.ToString().ToLowerInvariant();
+            s_markupElements[selector] = new MarkupElement(selector, tagName, attributeName, attributeValue, factory);
         }
 
         #endregion
@@ -665,12 +604,6 @@ namespace NewWidgets.Widgets
                     WindowController.Instance.LogMessage("The factory registered for <{0}> built nothing, element skipped", node.Element);
                     return null;
                 }
-
-                // read before the tag replaces it below: this checks the table against the
-                // widget classes it names, which is a registration mistake and not a styling one
-                if (widget.StyleElementType != element.ElementType)
-                    WindowController.Instance.LogMessage("Element <{0}> is registered as element type '{1}' but the widget it builds declares '{2}'; one of the two is wrong",
-                        node.Element, element.ElementType, widget.StyleElementType);
             }
             else
             {
@@ -680,15 +613,10 @@ namespace NewWidgets.Widgets
 
                 widget = new WidgetMarkupElement(node.Element, style);
                 source = node.Element;
-                element = new MarkupElement(source, node.Element, null, null, null, null);
+                element = new MarkupElement(source, node.Element, null, null, null);
             }
 
             widget.Markup = new WidgetMarkup(source);
-
-            // the document's own tag is the element type from here on, so the author's
-            // div/span/h1/input rules match and the class's own name stops being visible. Set
-            // before anything resolves a style: nothing has, the widget is not in a tree yet
-            widget.StyleElementType = node.Element;
 
             ApplyMarkupStyle(widget, node.GetAttribute("style"));
             ApplyMarkupText(widget, GetMarkupNodeText(node));
@@ -962,21 +890,17 @@ namespace NewWidgets.Widgets
                 if (markup == null || markup.Source == null)
                 {
                     // built in code, so the tag is the last one registered for its class
-                    string selector = GetMarkupSelector(widget.GetType());
-
-                    if (selector == null)
+                    if (!s_markupElements.TryGetValue(widget.StyleElementType, out element))
                     {
                         WindowController.Instance.LogMessage("Widget class {0} has no registered element, skipped while saving", widget.GetType().Name);
                         continue;
                     }
-
-                    element = s_markupElements[selector];
                 }
                 else if (!s_markupElements.TryGetValue(markup.Source, out element))
                 {
                     // an element in no table, or one whose registration a game has since
                     // replaced: the tag the document used is written back as it stood
-                    element = new MarkupElement(markup.Source, markup.Source, null, null, null, null);
+                    element = new MarkupElement(markup.Source, markup.Source, null, null, null);
                 }
 
                 if (markup != null && markup.Comments != null)
@@ -1118,23 +1042,6 @@ namespace NewWidgets.Widgets
 
             node.SetAttribute("rows", (rows < 1 ? 1 : rows).ToString());
             node.SetAttribute("cols", (columns < 1 ? 1 : columns).ToString());
-        }
-
-        /// <summary>
-        /// Walks up the class hierarchy, so a game's own subclass of a registered widget still
-        /// saves as the base class's element until it registers one of its own
-        /// </summary>
-        private static string GetMarkupSelector(Type type)
-        {
-            for (Type current = type; current != null; current = current.BaseType)
-            {
-                string selector;
-
-                if (s_markupSelectors.TryGetValue(current, out selector))
-                    return selector;
-            }
-
-            return null;
         }
 
         private static string GetMarkupText(Widget widget)

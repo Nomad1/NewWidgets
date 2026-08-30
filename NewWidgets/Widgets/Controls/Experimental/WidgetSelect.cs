@@ -10,9 +10,9 @@ namespace NewWidgets.Widgets
     public class WidgetSelect : WidgetPanel
     {
         public new const string ElementType = "select";
-        public const string LeftButtonClass = "select_left";
-        public const string RightButtonClass = "select_right";
-        public const string LabelClass = "select_label";
+        public const string LeftButtonElement = "select-left";
+        public const string RightButtonElement = "select-right";
+        public const string LabelElement = "select-label";
         //
 
         // key/value pairs in insertion order, indexed by position only -- the control never
@@ -161,16 +161,16 @@ namespace NewWidgets.Widgets
         {
             m_items = items == null ? new List<KeyValuePair<string, object>>() : new List<KeyValuePair<string, object>>(items);
 
-            m_leftButton = new WidgetButton(new WidgetStyle(new[] { LeftButtonClass },""), "<");
+            m_leftButton = new WidgetButton(LeftButtonElement, default(WidgetStyle), "<");
             AddChild(m_leftButton);
             m_leftButton.OnPress += (obj) => HandleChange(-1);
             m_leftButton.Relayout();
 
-            m_label = new WidgetLabel(new WidgetStyle(new[] { LabelClass },""), m_items.Count > 0 ? m_items[0].Key : string.Empty);
+            m_label = new WidgetLabel(LabelElement, default(WidgetStyle), m_items.Count > 0 ? m_items[0].Key : string.Empty);
             AddChild(m_label);
             m_label.Relayout();
 
-            m_rightButton = new WidgetButton(new WidgetStyle(new[] { RightButtonClass },""), ">");
+            m_rightButton = new WidgetButton(RightButtonElement, default(WidgetStyle), ">");
             AddChild(m_rightButton);
             m_rightButton.OnPress += (obj) => HandleChange(+1);
             m_rightButton.Relayout();

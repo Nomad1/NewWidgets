@@ -8,7 +8,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetPanel : WidgetBackground, IWindowContainer
     {
-        public new const string ElementType = "panel";
+        public new const string ElementType = "div";
         //
 
         private readonly WindowObjectArray<Widget> m_children = new WindowObjectArray<Widget>();
@@ -37,7 +37,7 @@ namespace NewWidgets.Widgets
         /// Initializes a new instance of the <see cref="T:NewWidgets.Widgets.WidgetPanel"/> class.
         /// </summary>
         /// <param name="style">Style.</param>
-        protected WidgetPanel(string elementType, WidgetStyle style)
+        internal WidgetPanel(string elementType, WidgetStyle style)
             : base(elementType, style)
         {
         }

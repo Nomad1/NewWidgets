@@ -69,7 +69,7 @@ namespace NewWidgets.Widgets
 
         // not readonly: the markup loader replaces it with the tag the document used, so this
         // is assigned in more than one place. See StyleElementType
-        private string m_elementType;
+        private readonly string m_elementType;
         private string m_id;
         private string[] m_styleClasses;
         private WidgetState m_currentState;
@@ -107,31 +107,10 @@ namespace NewWidgets.Widgets
 
         /// <summary>
         /// Element type, i.e. button, label, checkbox -- the name a type selector matches.
-        ///
-        /// A widget built in code reports the <c>ElementType</c> const of its own class, which
-        /// is what every stylesheet written against this engine already says. A widget a
-        /// document built reports <b>the tag the document used</b>: <c>div</c>, <c>span</c>,
-        /// <c>h1</c>, <c>input</c>, <c>textarea</c>. The raw tag, not the registration selector
-        /// that matched it, because an author writing <c>input { }</c> means every input and
-        /// <c>checkbox</c> is not an element any editor emits.
-        ///
-        /// That is one name per widget, not two. Nothing in <see cref="StyleCollection"/> or
-        /// <see cref="StyleSelector"/> knows this happened -- the selector chain is built from
-        /// whatever this property answers -- so the cascade gains no second lookup and no extra
-        /// comparison, which is what D144 requires of it.
-        ///
-        /// The consequence is intended: a <c>label { }</c> rule does not reach a widget the
-        /// document wrote as <c>&lt;span&gt;</c>. There are two vocabularies, one per authoring
-        /// mode, and a user interface is designed in HTML or in code, not in both.
-        ///
-        /// The setter is internal because the markup loader is the only thing that has a tag to
-        /// offer today. It is an ordinary instance field either way, so a constructor that takes
-        /// an element name -- <c>new WidgetLabel("h2", style)</c> -- is a public overload away.
         /// </summary>
         public string StyleElementType
         {
             get { return m_elementType; }
-            internal set { m_elementType = value; InvalidateStyle(); }
         }
 
         /// <summary>
@@ -491,16 +470,7 @@ namespace NewWidgets.Widgets
 
         /// <summary>
         /// Reads a property from the widget's own style alone, ignoring the whole cascade behind
-        /// it. This is the el.style.width read: the missing read half of <see cref="SetProperty"/>,
-        /// which every widget property setter in the library writes through and which lands in the
-        /// own style and nowhere else.
-        ///
-        /// Kept although its only caller today is one assertion in Test 35, because nothing else
-        /// can ask the question that assertion asks. GetProperty walks the cascade, so on a widget
-        /// whose class legitimately declares a width it cannot tell a value frozen into the own
-        /// style from the class rule the widget is supposed to be re-resolving -- which is exactly
-        /// the defect Test 35 guards. It costs one dictionary probe, walks no cascade and is
-        /// strictly cheaper than GetProperty, so it adds nothing to the path D144 protects
+        /// it.
         /// </summary>
         internal T GetOwnProperty<T>(WidgetParameterIndex index, T defaultValue)
         {

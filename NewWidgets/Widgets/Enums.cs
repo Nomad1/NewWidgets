@@ -1,5 +1,4 @@
 ﻿using System;
-using NewWidgets.Utility;
 
 namespace NewWidgets.Widgets
 {
@@ -199,40 +198,6 @@ namespace NewWidgets.Widgets
     public enum WidgetStyleClassIndex
     {
         None = 0,
-    }
-
-    public enum WidgetType : int
-    {
-        [Name("*")]
-        Widget = 0, // basic widget, does nothing
-        [Name("background")]
-        Background,
-        [Name("button")]
-        Button,
-        [Name("panel")]
-        Panel,
-        [Name("image")]
-        Image,
-        [Name("checkbox")]
-        CheckBox,
-        [Name("label")]
-        Label,
-        [Name("text")]
-        Text,
-        [Name("line")]
-        Line,
-        [Name("scrollview")]
-        ScrollView,
-        [Name("textedit")]
-        TextEdit,
-        [Name("textfield")]
-        TextField,
-        [Name("toolbar")]
-        Toolbar,
-        [Name("tooltip")]
-        Tooltip,
-        [Name("dialog")]
-        Window,
     }
 
     /// <summary>

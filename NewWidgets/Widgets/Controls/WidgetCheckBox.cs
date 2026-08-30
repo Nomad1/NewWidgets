@@ -14,7 +14,7 @@ namespace NewWidgets.Widgets
     {
         public new const string ElementType = "input[type=checkbox]";
         //
-        private const string ImageClass = "checkbox_image";
+        private const string ImageElement = "checkbox-image";
 
         /// <summary>
         /// A checked checkbox is not focused, so <see cref="Widget.StyleState"/> must report
@@ -100,10 +100,10 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="style">Style.</param>
         /// <param name="isChecked">If set to <c>true</c> is checked.</param>
-        protected WidgetCheckBox(string elementType, WidgetStyle style, bool isChecked)
+        internal WidgetCheckBox(string elementType, WidgetStyle style, bool isChecked)
             : base(elementType, style)
         {
-            m_image = new WidgetImage(new WidgetStyle(new[] { ImageClass }, ""));
+            m_image = new WidgetImage(ImageElement, default(WidgetStyle), 0, string.Empty);
             m_image.Parent = this;
 
             Selected = isChecked;

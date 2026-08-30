@@ -12,9 +12,9 @@ namespace NewWidgets.Widgets
     {
         public new const string ElementType = "slider";
 
-        public const string TrackerClass = "slider_track";
-        public const string LabelClass = "slider_label";
-        public const string LineClass = "slider_line";
+        public const string TrackerElement = "slider-track";
+        public const string LabelElement = "slider-label";
+        public const string LineElement = "slider-line";
 
         // TODO: make configurable
         private static readonly float s_inset = 15f;
@@ -109,15 +109,15 @@ namespace NewWidgets.Widgets
             m_min = Math.Min(min, max);
             m_text = "{0:0%}";
 
-            m_progressLine = new WidgetProgressLine(new WidgetStyle(new[] { LineClass },""));
+            m_progressLine = new WidgetProgressLine(LineElement, default(WidgetStyle), string.Empty);
             AddChild(m_progressLine);
 
-            m_trackButton = new TrackingButton(new WidgetStyle(new[] { TrackerClass }, ""));
+            m_trackButton = new TrackingButton(TrackerElement, default(WidgetStyle));
             m_trackButton.Position = new Vector2(0, m_progressLine.Size.Y - s_inset);
             m_trackButton.OnDrag += HandleDrag;
             AddChild(m_trackButton);
 
-            m_label = new WidgetLabel(new WidgetStyle(new[] { LabelClass }, ""));
+            m_label = new WidgetLabel(LabelElement, default(WidgetStyle), string.Empty);
             AddChild(m_label);
 
             SetValue(m_min);
@@ -205,8 +205,8 @@ namespace NewWidgets.Widgets
                 get { return m_dragged; }
             }
 
-            public TrackingButton(WidgetStyle style)
-                : base(style)
+            public TrackingButton(string elementType, WidgetStyle style)
+                : base(elementType, style, 0, string.Empty)
             {
             }
 

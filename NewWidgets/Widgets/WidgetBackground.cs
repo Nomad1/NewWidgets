@@ -94,7 +94,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="elementType"></param>
         /// <param name="style"></param>
-        protected WidgetBackground(string elementType, WidgetStyle style)
+        internal WidgetBackground(string elementType, WidgetStyle style)
             : base(elementType, style)
         {
             m_background = new WindowObjectArray<WindowObject>();

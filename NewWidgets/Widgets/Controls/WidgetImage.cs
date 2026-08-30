@@ -10,7 +10,7 @@ namespace NewWidgets.Widgets
 {
     public class WidgetImage : Widget
     {
-        public new const string ElementType = "image";
+        public new const string ElementType = "img";
 
         // internal component for image
         private ImageObject m_imageObject;
@@ -126,7 +126,7 @@ namespace NewWidgets.Widgets
         /// <param name="style">Style.</param>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        protected WidgetImage(string elementType, WidgetStyle style, WidgetBackgroundStyle imageStyle, string image)
+        internal WidgetImage(string elementType, WidgetStyle style, WidgetBackgroundStyle imageStyle, string image)
             : base(elementType, style)
         {
             if (imageStyle != 0)
