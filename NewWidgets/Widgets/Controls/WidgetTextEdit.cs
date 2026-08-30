@@ -11,7 +11,20 @@ namespace NewWidgets.Widgets
     /// </summary>
     public class WidgetTextEdit : WidgetBackground, IFocusable
     {
-        public new const string ElementType = "input";
+        /// <summary>
+        /// An <c>&lt;input&gt;</c> that is a text field until something masks it. The type is an
+        /// ATTRIBUTE, split off here by Widget's constructor, so `input[type="text"]` reaches one
+        /// of these whether a document or C# built it -- and <see cref="MaskChar"/> moves it to
+        /// `password` the moment a mask is set, the way a browser distinguishes the same two.
+        /// </summary>
+        public new const string ElementType = "input[type=text]";
+
+        /// <summary>
+        /// The attribute name and the two values <see cref="MaskChar"/> switches between.
+        /// </summary>
+        private const string TypeAttribute = "type";
+        private const string TextType = "text";
+        private const string PasswordType = "password";
         //
         private int m_cursorPosition;
         private Vector2 m_contentOffset;
@@ -33,6 +46,11 @@ namespace NewWidgets.Widgets
         /// Delegate should return true if string is valid and false if not
         /// </summary>
         public event Func<string, string, bool> OnValidateInput;
+
+        public override string ToString()
+        {
+            return string.Format("<{0}> #{1} {2}x{3} font={4} text={5}", StyleElementType, StyleId, (int)Size.X, (int)Size.Y, Font, string.IsNullOrEmpty(MaskChar) ? "\"" + Text + "\"" : "masked, " + (Text == null ? 0 : Text.Length) + " chars");
+        }
 
         public Font Font
         {
@@ -128,6 +146,18 @@ namespace NewWidgets.Widgets
             set
             {
                 SetProperty(WidgetParameterIndex.MaskChar, value);
+
+                // A masked edit IS an input[type="password"], so say so where the cascade can
+                // see it. Written only on a real change: SetStyleAttribute invalidates the
+                // style, the style is where MaskChar itself is read from, and rewriting the
+                // same value on every assignment would re-resolve for nothing.
+                string type = string.IsNullOrEmpty(value) ? TextType : PasswordType;
+
+                string current;
+
+                if (!StyleAttributes.TryGetValue(TypeAttribute, out current) || current != type)
+                    SetStyleAttribute(TypeAttribute, type);
+
                 InvalidateLayout();
             }
         }
@@ -207,6 +237,12 @@ namespace NewWidgets.Widgets
 
         protected override void UpdateLayout()
         {
+            // Nothing to lay out without a font, and measuring with none throws inside
+            // LabelObject -- see WidgetLabel.UpdateLayout for why a missing font is a logged
+            // error rather than a crash.
+            if (Font == null)
+                return;
+
             if (m_label == null)
             {
                 m_label = new LabelObject(this, Font, MaskText(m_text, MaskChar));

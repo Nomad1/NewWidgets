@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Numerics;
 using NewWidgets.UI;
 using NewWidgets.UI.Styles;
@@ -67,9 +68,13 @@ namespace NewWidgets.Widgets
         private WidgetStyleSheet m_style;
         private readonly StyleSheetData m_ownStyle;
 
-        // not readonly: the markup loader replaces it with the tag the document used, so this
-        // is assigned in more than one place. See StyleElementType
+        // style-relevant attributes: the ones the constructor split out of its own element
+        // type (e.g. type=checkbox for input[type=checkbox]), overridden one at a time by
+        // SetStyleAttribute as the markup loader reads the source document. This is the single
+        // home for them -- the cascade never reads WidgetMarkup. See StyleAttributes
+        private readonly IDictionary<string, string> m_attributes;
         private readonly string m_elementType;
+
         private string m_id;
         private string[] m_styleClasses;
         private WidgetState m_currentState;
@@ -103,14 +108,6 @@ namespace NewWidgets.Widgets
                     InvalidateStyle();
                 }
             }
-        }
-
-        /// <summary>
-        /// Element type, i.e. button, label, checkbox -- the name a type selector matches.
-        /// </summary>
-        public string StyleElementType
-        {
-            get { return m_elementType; }
         }
 
         /// <summary>
@@ -291,12 +288,17 @@ namespace NewWidgets.Widgets
         {
             get
             {
+                WidgetPosition declared;
 
-                WidgetPosition positionMode = GetProperty(WidgetParameterIndex.Position, WidgetPosition.Static);
-                if (positionMode == WidgetPosition.Static && m_codePositioned)
-                    return WidgetPosition.Absolute;
+                // Asked whether the property was DECLARED, not what it resolves to. A defaulted
+                // read answers Static both when an author wrote `position: static` and when
+                // nothing said anything at all, and only the second one may be promoted --
+                // otherwise a document that deliberately puts a widget in flow is overruled the
+                // moment any code touches its position.
+                if (m_style.TryGetValue(WidgetParameterIndex.Position, out declared))
+                    return declared;
 
-                return positionMode;
+                return m_codePositioned ? WidgetPosition.Absolute : WidgetPosition.Static;
             }
             set
             {
@@ -431,6 +433,43 @@ namespace NewWidgets.Widgets
         }
 #endif
 
+        public string StyleElementType
+        {
+            get { return m_elementType; }
+        }
+
+        /// <summary>
+        /// Every attribute this widget answers to for style matching, i.e. <c>type=checkbox</c>
+        /// so a <c>input[type="checkbox"]</c> rule can find it. Starts with whatever the
+        /// constructor split out of the element type it was given and grows as
+        /// <see cref="SetStyleAttribute"/> is called; this is what <see cref="UpdateStyle"/>
+        /// passes to the live <see cref="NewWidgets.UI.Styles.StyleSelector"/> it builds.
+        /// </summary>
+        public IDictionary<string, string> StyleAttributes
+        {
+            get { return m_attributes; }
+        }
+
+        /// <summary>
+        /// Adds or overrides one style-matching attribute. Called by the markup loader for
+        /// every attribute the source element carried, so a document attribute always wins
+        /// over an intrinsic one of the same name -- <c>&lt;input type="password"&gt;</c> on a
+        /// widget whose own element type already said <c>type=text</c> ends up <c>password</c>.
+        /// </summary>
+        public void SetStyleAttribute(string name, string value)
+        {
+            m_attributes[name] = value;
+            InvalidateStyle();
+        }
+
+        /// <summary>
+        /// One line for a log or a debugger watch: the tag, the id, the classes and the box.
+        /// </summary>
+        public override string ToString()
+        {
+            return string.Format("<{0}> #{1} .{2} {3}x{4} at {5},{6}", m_elementType, m_id, m_styleClasses == null ? "" : string.Join(".", m_styleClasses), (int)Size.X, (int)Size.Y, (int)Position.X, (int)Position.Y);
+        }
+
         public event TooltipDelegate OnTooltip;
 
         /// <summary>
@@ -440,7 +479,16 @@ namespace NewWidgets.Widgets
         protected Widget(string elementType, WidgetStyle style = default(WidgetStyle))
             : base(null)
         {
-            m_elementType = elementType;
+            string attributeName;
+            string attributeValue;
+
+            m_elementType = WidgetManager.SplitSelector(elementType, out attributeName, out attributeValue);
+
+            m_attributes = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(attributeName))
+                m_attributes.Add(attributeName, attributeValue);
+
             m_id = string.IsNullOrEmpty(style.Id) ? string.Empty : style.Id;
             m_styleClasses = style.Classes;
 
@@ -653,7 +701,7 @@ namespace NewWidgets.Widgets
             do
             {
                 styles.Add(new StyleSelector(current.StyleElementType, current.StyleClasses, current.StyleId, current.StyleState,
-                    current.Markup == null ? null : current.Markup.StyleAttributes));
+                    current.StyleAttributes));
 
                 // Reason why this style was added
 

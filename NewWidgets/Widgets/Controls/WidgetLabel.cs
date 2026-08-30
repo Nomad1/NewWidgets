@@ -46,6 +46,11 @@ namespace NewWidgets.Widgets
             }
         }
       
+        public override string ToString()
+        {
+            return string.Format("<{0}> #{1} {2}x{3} font={4} text=\"{5}\"", StyleElementType, StyleId, (int)Size.X, (int)Size.Y, Font, Text);
+        }
+
         public Font Font
         {
             get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
@@ -149,6 +154,14 @@ namespace NewWidgets.Widgets
 
         protected override void UpdateLayout()
         {
+            // Nothing to lay out without a font, and measuring with none throws inside
+            // LabelObject. WidgetManager.GetFont returns null for a family no @font-face
+            // registered -- one typo in a stylesheet, or a document loaded before its fonts --
+            // and a missing glyph is not worth taking the frame down for. The lookup logs the
+            // error already; this just declines to draw.
+            if (Font == null)
+                return;
+
             // If label is not yet created - create it. Otherwise all the changes are already it
             if (m_label == null)
                 m_label = new LabelObject(this, Font, Text, RichText);

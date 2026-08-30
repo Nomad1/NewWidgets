@@ -152,6 +152,11 @@ namespace NewWidgets.Widgets
                                        typeof(BackgroundRepeatProcessor))] // the CSS keywords on top of this engine's own repeat modes
         BackStyle,
 
+        // CSS's own property for how a WidgetImage's picture fits its box -- background-repeat
+        // above is about tiling a background and a picture cannot repeat. See WidgetImageStyle.
+        [WidgetParameter("object-fit", "object-fit", typeof(WidgetImageStyle), UnitType.None, WidgetParameterInheritance.Initial,
+                                       typeof(ObjectFitProcessor))]
+        ObjectFit,
 
         [WidgetParameter("back_depth", "--background-depth", typeof(WidgetBackgroundDepth))] // nothing like that in HTML
         BackDepth,
@@ -568,6 +573,44 @@ namespace NewWidgets.Widgets
                 default:
                     Report("only none and block are inside the absolute-positioning profile", stringValue);
                     data[PropertyIndex] = WidgetDisplay.Block;
+                    return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// CSS <c>object-fit</c>: how a WidgetImage's own picture fits its box, as opposed to
+    /// <c>background-repeat</c>/<see cref="WidgetBackgroundStyle"/>, which is about tiling a
+    /// background and cannot apply to a picture. <c>fill</c>, <c>contain</c>, <c>cover</c> and
+    /// <c>none</c> map onto the fit this engine already draws. <c>scale-down</c> has no static
+    /// equivalent here -- it shrinks like <c>contain</c> but never enlarges -- so it takes the
+    /// closest one, <c>contain</c>. Anything else is reported and falls back to <c>contain</c>,
+    /// today's default.
+    /// </summary>
+    internal class ObjectFitProcessor : CssPropertyProcessor
+    {
+        public override void Process(IDictionary<WidgetParameterIndex, object> data, string stringValue)
+        {
+            switch (stringValue.ToLowerInvariant())
+            {
+                case "fill":
+                    data[PropertyIndex] = WidgetImageStyle.ImageStretch;
+                    return;
+                case "contain":
+                    data[PropertyIndex] = WidgetImageStyle.ImageFit;
+                    return;
+                case "cover":
+                    data[PropertyIndex] = WidgetImageStyle.ImageFill;
+                    return;
+                case "none":
+                    data[PropertyIndex] = WidgetImageStyle.Image;
+                    return;
+                case "scale-down": // ponytail: shrinks like contain but never enlarges; contain is the closest static approximation
+                    data[PropertyIndex] = WidgetImageStyle.ImageFit;
+                    return;
+                default:
+                    Report("only fill, contain, cover, none and scale-down are supported", stringValue);
+                    data[PropertyIndex] = WidgetImageStyle.ImageFit;
                     return;
             }
         }

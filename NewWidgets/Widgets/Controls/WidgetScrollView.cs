@@ -74,6 +74,11 @@ namespace NewWidgets.Widgets
             set { m_contentView.Enabled = value; }
         }
 
+        public override string ToString()
+        {
+            return string.Format("<{0}> #{1} {2}x{3} children={4} content={5}x{6}", StyleElementType, StyleId, (int)Size.X, (int)Size.Y, Children.Count, (int)ContentSize.X, (int)ContentSize.Y);
+        }
+
         public Vector2 ContentSize
         {
             get

@@ -41,6 +41,11 @@ namespace NewWidgets.Widgets
 
         // Dynamic properties
 
+        public override string ToString()
+        {
+            return string.Format("<{0}> #{1} {2}x{3} text=\"{4}\" image={5} state={6}", StyleElementType, StyleId, (int)Size.X, (int)Size.Y, Text, Image, CurrentState);
+        }
+
         public string Text
         {
             get { return m_label.Text; }
@@ -252,13 +257,13 @@ namespace NewWidgets.Widgets
 
                 if ((Layout & WidgetButtonLayout.ImageLeft) != 0)
                 {
-                    m_image.ImageStyle = WidgetBackgroundStyle.ImageTopLeft;
+                    m_image.ImageStyle = WidgetImageStyle.ImageTopLeft;
                     m_image.ImagePivot = new Vector2(0, 0);
                 }
                 else
                 if ((Layout & WidgetButtonLayout.Custom) == 0)
                 {
-                    m_image.ImageStyle = WidgetBackgroundStyle.ImageFit;
+                    m_image.ImageStyle = WidgetImageStyle.ImageFit;
                     // ImagePivot?
                 }
             }

@@ -21,6 +21,11 @@ namespace NewWidgets.Widgets
 
         private float m_maxWidth;
 
+        public override string ToString()
+        {
+            return string.Format("<{0}> #{1} {2}x{3} font={4} text=\"{5}\"", StyleElementType, StyleId, (int)Size.X, (int)Size.Y, Font, Text);
+        }
+
         public Font Font
         {
             get { return GetProperty(WidgetParameterIndex.Font, WidgetManager.MainFont); }
@@ -124,6 +129,12 @@ namespace NewWidgets.Widgets
 
         protected override void UpdateLayout()
         {
+            // Nothing to lay out without a font, and measuring with none throws inside
+            // LabelObject -- see WidgetLabel.UpdateLayout for why a missing font is a logged
+            // error rather than a crash.
+            if (Font == null)
+                return;
+
             string[] lines = string.IsNullOrEmpty(m_text) ? new string[0]: m_text.Split(new string[] { Environment.NewLine, "\r", "\n", "|n", "\\n" }, StringSplitOptions.None);
 
             float lineHeight = (Font.Height + LineSpacing) * FontSize; // TODO: spacing

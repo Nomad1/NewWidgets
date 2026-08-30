@@ -45,7 +45,6 @@ namespace NewWidgets.Widgets
 
         private string m_text;
         private List<KeyValuePair<string, string>> m_attributes;
-        private Dictionary<string, string> m_styleAttributes;
         private List<string> m_comments;
         private List<string> m_trailingComments;
 
@@ -73,26 +72,15 @@ namespace NewWidgets.Widgets
 
         /// <summary>
         /// Attributes the loader did not turn into a widget property, in document order. Null
-        /// until the first one is added
+        /// until the first one is added. What no property holds so <c>SaveXHTML</c> can
+        /// round-trip it -- an attribute a property already models is dropped from this list,
+        /// which is correct for saving but not for style matching, so this is not what
+        /// <see cref="NewWidgets.UI.Styles.StyleSelector"/> reads; see
+        /// <see cref="Widget.StyleAttributes"/> for that
         /// </summary>
         public IList<KeyValuePair<string, string>> Attributes
         {
             get { return m_attributes; }
-        }
-
-        /// <summary>
-        /// Every attribute the source tag carried, exactly as written, whether or not a widget
-        /// property already models it. This is a separate copy from <see cref="Attributes"/>
-        /// on purpose: that list exists so <c>SaveXHTML</c> can round-trip what no property
-        /// holds, and dropping an attribute from it the moment a property models it is correct
-        /// for saving. Style matching needs the opposite -- <c>&lt;input type="checkbox"&gt;</c>
-        /// answers <c>input[type="checkbox"]</c> even though <c>type</c> already picked
-        /// <see cref="WidgetCheckBox"/> out of the markup table and a property never stored it
-        /// verbatim. Null until the first one is added
-        /// </summary>
-        public IDictionary<string, string> StyleAttributes
-        {
-            get { return m_styleAttributes; }
         }
 
         /// <summary>
@@ -123,14 +111,6 @@ namespace NewWidgets.Widgets
                 m_attributes = new List<KeyValuePair<string, string>>();
 
             m_attributes.Add(new KeyValuePair<string, string>(name, value));
-        }
-
-        public void SetStyleAttribute(string name, string value)
-        {
-            if (m_styleAttributes == null)
-                m_styleAttributes = new Dictionary<string, string>();
-
-            m_styleAttributes[name] = value;
         }
 
         public void AddComment(string text)
@@ -197,12 +177,6 @@ namespace NewWidgets.Widgets
         private static readonly string[] s_labelElements = new string[] { "h1", "h2", "h3", "h4", "h5", "h6", "span", "label" };
 
         private static readonly string[] s_buttonElements = new string[] { "input[type=submit]", "input[type=reset]", "input[type=button]", "a", "button" };
-
-        // one entry per element met while loading that carried a for="...", resolved once the
-        // whole tree exists because either end of the association may stand after the other.
-        // The key is the element that carried the attribute -- a checkbox naming its label,
-        // which is this engine's own spelling, or a <label> naming its control, which is HTML's
-        private static readonly IList<KeyValuePair<Widget, string>> s_markupLabelLinks = new List<KeyValuePair<Widget, string>>();
 
         // the HTML void elements: no content, no closing tag. A browser parses anything written
         // between the tags of one as a sibling node, not as its content, so the saver has to
@@ -329,27 +303,37 @@ namespace NewWidgets.Widgets
             if (factory == null)
                 throw new ArgumentNullException("factory");
 
-            string tagName = selector;
-            string attributeName = null;
-            string attributeValue = null;
+            string attributeName;
+            string attributeValue;
+            string tagName = SplitSelector(selector, out attributeName, out attributeValue);
+          
+            s_markupElements[selector] = new MarkupElement(selector, tagName, attributeName, attributeValue, factory);
+        }
 
+        public static string SplitSelector(string selector, out string attributeName, out string attributeValue)
+        {
             int bracket = selector.IndexOf('[');
 
-            if (bracket > 0 && selector.EndsWith("]", StringComparison.Ordinal))
+            if (bracket == -1)
             {
-                tagName = selector.Substring(0, bracket);
-
-                string test = selector.Substring(bracket + 1, selector.Length - bracket - 2);
-                int equals = test.IndexOf('=');
-
-                if (equals <= 0)
-                    throw new ArgumentException("Markup selector " + selector + " needs an attribute test of the form [name=value]");
-
-                attributeName = test.Substring(0, equals);
-                attributeValue = test.Substring(equals + 1).Trim('"', '\'');
+                attributeName = null;
+                attributeValue = null;
+                return selector;
             }
 
-            s_markupElements[selector] = new MarkupElement(selector, tagName, attributeName, attributeValue, factory);
+            if (!selector.EndsWith("]", StringComparison.Ordinal))
+                throw new ArgumentException("No closing bracket for selector " + selector);
+
+            string test = selector.Substring(bracket + 1, selector.Length - bracket - 2);
+            int equals = test.IndexOf('=');
+
+            if (equals <= 0)
+                throw new ArgumentException("Markup selector " + selector + " needs an attribute test of the form [name=value]");
+
+            attributeName = test.Substring(0, equals);
+            attributeValue = test.Substring(equals + 1).Trim('"', '\'');
+
+            return selector.Substring(0, bracket);
         }
 
         #endregion
@@ -378,10 +362,12 @@ namespace NewWidgets.Widgets
                 return;
             }
 
-            // ponytail: the pending for="..." list is a static, so two loads cannot be in flight
-            // at once. Nothing in this engine loads a document from inside another one; the
-            // upgrade path is to thread the list through LoadMarkupChildren as a parameter.
-            s_markupLabelLinks.Clear();
+            // one entry per element met while loading that carried a for="...", resolved below
+            // once the whole tree exists because either end of the association may stand after
+            // the other. The key is the element that carried the attribute -- a checkbox naming
+            // its label, which is this engine's own spelling, or a <label> naming its control,
+            // which is HTML's. Local to this load, so two loads in flight cannot collide.
+            List<KeyValuePair<Widget, string>> labelLinks = new List<KeyValuePair<Widget, string>>();
 
             foreach (HtmlNode node in document.Children)
             {
@@ -391,7 +377,7 @@ namespace NewWidgets.Widgets
                         LoadMarkupHead(node, styleSheetLoader);
                         break;
                     case "body":
-                        LoadMarkupChildren(node, parent);
+                        LoadMarkupChildren(node, parent, labelLinks);
                         break;
                     default:
                         WindowController.Instance.LogMessage("Got unknown element <{0}> under <html> in XHTML document", node.Element);
@@ -399,7 +385,7 @@ namespace NewWidgets.Widgets
                 }
             }
 
-            ResolveMarkupLabelLinks(parent);
+            ResolveMarkupLabelLinks(parent, labelLinks);
         }
 
         /// <summary>
@@ -413,9 +399,9 @@ namespace NewWidgets.Widgets
         /// name nothing answers to is logged and skipped, the same tolerance the loader shows
         /// an unknown element
         /// </summary>
-        private static void ResolveMarkupLabelLinks(IWindowContainer parent)
+        private static void ResolveMarkupLabelLinks(IWindowContainer parent, IList<KeyValuePair<Widget, string>> labelLinks)
         {
-            foreach (KeyValuePair<Widget, string> link in s_markupLabelLinks)
+            foreach (KeyValuePair<Widget, string> link in labelLinks)
             {
                 WidgetCheckBox check = link.Key as WidgetCheckBox;
 
@@ -450,8 +436,6 @@ namespace NewWidgets.Widgets
                 if (!WidgetPanel.TryFind(parent, link.Value, out target))
                     WindowController.Instance.LogMessage("Label #{0} is for=\"{1}\" but nothing with that id was loaded", link.Key.StyleId, link.Value);
             }
-
-            s_markupLabelLinks.Clear();
         }
 
         private static void LoadMarkupHead(HtmlNode head, StyleSheetLoaderDelegate styleSheetLoader)
@@ -490,7 +474,7 @@ namespace NewWidgets.Widgets
             }
         }
 
-        private static void LoadMarkupChildren(HtmlNode parentNode, IWindowContainer parent)
+        private static void LoadMarkupChildren(HtmlNode parentNode, IWindowContainer parent, IList<KeyValuePair<Widget, string>> labelLinks)
         {
             // comments met since the last element. Allocated only when a document has any,
             // which most do not
@@ -507,7 +491,7 @@ namespace NewWidgets.Widgets
                     continue;
                 }
 
-                Widget widget = CreateMarkupWidget(node);
+                Widget widget = CreateMarkupWidget(node, labelLinks);
 
                 if (widget == null)
                     continue; // either a game's own factory answered with nothing (already
@@ -536,7 +520,7 @@ namespace NewWidgets.Widgets
                 if (container == null)
                     WindowController.Instance.LogMessage("Element <{0}> cannot have children, {1} node(s) inside it skipped", node.Element, node.Children.Count);
                 else
-                    LoadMarkupChildren(node, container);
+                    LoadMarkupChildren(node, container, labelLinks);
             }
 
             // a comment after the last element has no element to lead, so it belongs to the
@@ -565,7 +549,7 @@ namespace NewWidgets.Widgets
         /// every control nested inside it as well, so wrapping two controls in a
         /// <c>&lt;section&gt;</c> made both disappear, and a document is what the owner edits
         /// </summary>
-        private static Widget CreateMarkupWidget(HtmlNode node)
+        private static Widget CreateMarkupWidget(HtmlNode node, IList<KeyValuePair<Widget, string>> labelLinks)
         {
             // <script> is a named exception to that rule, not a change to it. D157 is about an
             // unknown *container* -- a tag the author used to group real UI, which must keep
@@ -618,7 +602,7 @@ namespace NewWidgets.Widgets
 
             ApplyMarkupStyle(widget, node.GetAttribute("style"));
             ApplyMarkupText(widget, GetMarkupNodeText(node));
-            ApplyMarkupAttributes(widget, node, element.AttributeName);
+            ApplyMarkupAttributes(widget, node, element.AttributeName, labelLinks);
             widget.SetCodePositionFlag(false);
 
             return widget;
@@ -645,7 +629,7 @@ namespace NewWidgets.Widgets
         /// those two attributes on documents that code also edits; the upgrade path is to make
         /// the own style enumerable and drop both from the kept set.
         /// </summary>
-        private static void ApplyMarkupAttributes(Widget widget, HtmlNode node, string qualifierName)
+        private static void ApplyMarkupAttributes(Widget widget, HtmlNode node, string qualifierName, IList<KeyValuePair<Widget, string>> labelLinks)
         {
             string title = node.GetAttribute("title");
 
@@ -678,14 +662,14 @@ namespace NewWidgets.Widgets
             // either end may carry the association: a checkbox naming its label, or -- the form
             // HTML defines and an editor emits -- a label naming its control
             if (!string.IsNullOrEmpty(linked) && (check != null || (widget is WidgetLabel && node.Element == "label")))
-                s_markupLabelLinks.Add(new KeyValuePair<Widget, string>(widget, linked));
+                labelLinks.Add(new KeyValuePair<Widget, string>(widget, linked));
 
             foreach (KeyValuePair<string, string> attribute in node.Attributes)
             {
-                // kept for style matching regardless of whether a property already models it --
-                // see WidgetMarkup.StyleAttributes for why this is a second copy and not a
-                // filtered view of the one below
-                widget.Markup.SetStyleAttribute(attribute.Key, attribute.Value);
+                // kept for style matching regardless of whether a property already models it,
+                // overriding whatever the widget's own element type already said -- see
+                // Widget.SetStyleAttribute
+                widget.SetStyleAttribute(attribute.Key, attribute.Value);
 
                 if (!IsMarkupAttributeModelled(widget, node, qualifierName, attribute.Key, attribute.Value))
                     widget.Markup.AddAttribute(attribute.Key, attribute.Value);

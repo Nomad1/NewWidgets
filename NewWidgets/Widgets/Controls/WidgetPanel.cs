@@ -13,6 +13,11 @@ namespace NewWidgets.Widgets
 
         private readonly WindowObjectArray<Widget> m_children = new WindowObjectArray<Widget>();
 
+        public override string ToString()
+        {
+            return string.Format("<{0}> #{1} {2}x{3} at {4},{5} children={6}", StyleElementType, StyleId, (int)Size.X, (int)Size.Y, (int)Position.X, (int)Position.Y, Children.Count);
+        }
+
         public IList<Widget> Children
         {
             get { return m_children.List; }

@@ -71,6 +71,40 @@ namespace NewWidgets.Widgets
     }
 
     /// <summary>
+    /// CSS <c>object-fit</c>: how a <see cref="Controls.WidgetImage"/>'s own picture fits its
+    /// box. <see cref="WidgetBackgroundStyle"/> is mostly about repeating a background, and a
+    /// picture cannot repeat, so this enum holds only the cases <see cref="Controls.WidgetImage"/>
+    /// can actually draw -- one member per case in its switch.
+    /// </summary>
+    public enum WidgetImageStyle
+    {
+        /// <summary>
+        /// Natural size, no scaling, drawn from the padding box's top-left corner
+        /// </summary>
+        Image = 1,
+        /// <summary>
+        /// Center and aspect fit. Good only for fixed size windows
+        /// </summary>
+        ImageFit = 2,
+        /// <summary>
+        /// Aspect fit starting from top left
+        /// </summary>
+        ImageTopLeft = 3,
+        /// <summary>
+        /// Center and stretch
+        /// </summary>
+        ImageStretch = 4,
+        /// <summary>
+        /// Center and aspect fill without gaps
+        /// </summary>
+        ImageFill = 8,
+        /// <summary>
+        /// Aspect fill starting from top left
+        /// </summary>
+        ImageTopLeftFill = 9,
+    }
+
+    /// <summary>
     /// How <c>border-image</c> tiles the four edge slices between the corners.
     /// CSS Backgrounds and Borders 3, section 6.4. The renderer still divides a sprite by
     /// three and stretches, so only <see cref="Stretch"/> is honoured today; the other three

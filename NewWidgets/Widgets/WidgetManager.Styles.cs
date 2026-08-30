@@ -396,16 +396,16 @@ namespace NewWidgets.Widgets
 
 
         #region XML style for backwards compatibility
-
+#if USE_XML_STYLES
         private static readonly IDictionary<string, string> s_lookForwardStyles = new Dictionary<string, string>();
         private static readonly IDictionary<string, string> s_defaultStyles = new Dictionary<string, string>();
-
+        
         [Obsolete]
         public static void LoadUI(string uiData)
         {
             LoadXML(uiData);
         }
-
+        
         /// <summary>
         /// Loads ui data from a XML string
         /// </summary>
@@ -450,7 +450,7 @@ namespace NewWidgets.Widgets
                 throw new WidgetException("Error loading ui data", ex);
             }
         }
-
+        
         private static void RegisterXmlFont(XmlNode node)
         {
             string name = node.Attributes.GetNamedItem("name").Value;
@@ -648,7 +648,7 @@ namespace NewWidgets.Widgets
 
             return attribute == null ? null : attribute.Value;
         }
-
-        #endregion
+#endif
+#endregion
     }
 }

@@ -9,8 +9,6 @@ namespace NewWidgets.UI.Styles
     public class StyleCollection
     {
         /// All possible nodes
-        private readonly IDictionary<string, StyleNode> m_allNodes = new Dictionary<string, StyleNode>();
-
         private readonly IDictionary<string, ICollection<StyleNode>> m_elementCollection = new Dictionary<string, ICollection<StyleNode>>();
         private readonly IDictionary<string, ICollection<StyleNode>> m_idCollection = new Dictionary<string, ICollection<StyleNode>>();
         private readonly IDictionary<string, ICollection<StyleNode>> m_classCollection = new Dictionary<string, ICollection<StyleNode>>();
@@ -33,14 +31,6 @@ namespace NewWidgets.UI.Styles
 
             StyleSelector selector = node.SelectorList.Selectors[node.SelectorList.Count - 1]; // last selector in the list
 
-            // All nodes, keyed by the FULL selector chain (".a > .b", not just ".b") -- two
-            // different chains that happen to end in the same segment (".a > .b" and
-            // ".a.c > .b") are two different rules and must not evict one another here. This
-            // also matches the key FindExactStyle already looks up by (selectorList.ToString()),
-            // so a re-declaration of the same chain still merges into the existing node instead
-            // of leaking a duplicate.
-            m_allNodes[GetNodeKey(node.SelectorList.ToString(), node.Data)] = node;
-
             if (!string.IsNullOrEmpty(selector.Id)) // we have an explicit id, i.e. tr#myid
                 AddToCollection(m_idCollection, selector.Id, node);
 
@@ -49,31 +39,6 @@ namespace NewWidgets.UI.Styles
 
             if (!string.IsNullOrEmpty(selector.Element))
                 AddToCollection(m_elementCollection, selector.Element, node); // there is an element name, i.e. button
-        }
-
-        /// <summary>
-        /// The key a node is stored under, and with it the answer to "is this the same rule
-        /// again?". A selector is its own identity, so a re-declared <c>.button</c> merges
-        /// into the node already there. An at-rule is not a selector: five <c>@font-face</c>
-        /// blocks all spell the header <c>@font-face</c>, so keying on the header alone
-        /// collapses five fonts into one node and the last one wins. CSS names the face
-        /// inside the block, and <see cref="ISelfNamedStyleData"/> is how the data hands that
-        /// name over.
-        ///
-        /// Only at-rules ask. A normal rule that happens to declare <c>font-family</c> must
-        /// keep merging with its own re-declaration, so its key stays the selector alone.
-        /// </summary>
-        private static string GetNodeKey(string selectorString, IStyleData data)
-        {
-            if (string.IsNullOrEmpty(selectorString) || selectorString[0] != '@')
-                return selectorString;
-
-            ISelfNamedStyleData named = data as ISelfNamedStyleData;
-
-            if (named == null || string.IsNullOrEmpty(named.StyleDataName))
-                return selectorString;
-
-            return selectorString + " " + named.StyleDataName;
         }
 
         /// <summary>
@@ -109,55 +74,18 @@ namespace NewWidgets.UI.Styles
         /// <param name="properties"></param>
         public void AddStyle(StyleSelectorList selectorList, IStyleData data)
         {
+            // One node per selector, and NOTHING is ever merged into a node that already
+            // exists. A stylesheet loaded later adds rules; it never reaches inside the ones
+            // already there. That is what CSS does -- `h4 { }` written twice is two rules, and
+            // the cascade picks between them by specificity and then by declaration order
+            // (StyleNode.CompareTo) -- and it is what keeps every node's data READ ONLY.
+            //
+            // The data object is deliberately shared by all the selectors of one comma group:
+            // `a, b { ... }` really is one block of declarations, and sharing it costs nothing
+            // now that nobody writes to it. Merging into it was the whole bug (D249): a later
+            // rule for `b` rewrote the declarations `a` was reading.
             foreach (StyleSelectorList selector in selectorList.Split())
-            {
-                StyleNode node = FindExactStyle(selector, data);
-
-                if (node != null) // we have a node that is 100% matching the new one, so we need to append new data to it
-                {
-                    node.Data.LoadData(data);
-                }
-                else
-                {
-                    node = new StyleNode(selector, data);
-                    AddStyle(node);
-                }
-            }
-        }
-
-        private StyleNode FindExactStyle(StyleSelectorList selectorList, IStyleData data)
-        {
-            if (selectorList == null || selectorList.IsEmpty || !selectorList.IsSingleChain)
-                throw new ArgumentException("Invalid StyleNode for FindExactStyle call");
-
-            // Nomad: fast search was a mistake, excat search requires exact results
-
-            StyleNode result;
-
-            if (m_allNodes.TryGetValue(GetNodeKey(selectorList.ToString(), data), out result))
-                return result;
-
-#if OLD
-            // then we look in our dictionaries for nodes having some of the target parts
-            ICollection<StyleNode> collection = null;
-
-            if (!string.IsNullOrEmpty(selector.Id)) // if it has an id, check id collection
-                m_idCollection.TryGetValue(selector.Id, out collection);
-            else if (selector.Classes.Length > 0) // if it has a class, check class collection
-                m_classCollection.TryGetValue(selector.Classes[selector.Classes.Length - 1], out collection);
-            else
-                if (!string.IsNullOrEmpty(selector.Element)) // otherwise check element collection
-                m_elementCollection.TryGetValue(selector.Element, out collection);
-
-            if (collection != null)
-            {
-                foreach (StyleNode node in collection)
-                    if (node.SelectorList.Equals(selectorList)) // here we check only for exact 100% match
-                        return node;
-            }
-#endif
-
-            return null;
+                AddStyle(new StyleNode(selector, data));
         }
 
         /// <summary>
@@ -295,7 +223,33 @@ namespace NewWidgets.UI.Styles
         /// <param name="outputStream"></param>
         public void Dump(System.IO.TextWriter outputStream)
         {
-            foreach (StyleNode node in m_allNodes.Values)
+            // The three collections between them hold every node, so there is no fourth list to
+            // keep in step with them. A node reachable by more than one of its parts -- an
+            // element rule that also carries a class -- comes back more than once, hence the set.
+            //
+            // ponytail: a selector with no element, no id and no class would be in none of them
+            // and would not print. Nothing writes one today.
+            HashSet<StyleNode> nodes = new HashSet<StyleNode>();
+
+            foreach (ICollection<StyleNode> collection in m_elementCollection.Values)
+                foreach (StyleNode node in collection)
+                    nodes.Add(node);
+
+            foreach (ICollection<StyleNode> collection in m_idCollection.Values)
+                foreach (StyleNode node in collection)
+                    nodes.Add(node);
+
+            foreach (ICollection<StyleNode> collection in m_classCollection.Values)
+                foreach (StyleNode node in collection)
+                    nodes.Add(node);
+
+            List<StyleNode> ordered = new List<StyleNode>(nodes);
+
+            // by sequence, not by CompareTo: that sorts specificity first, and a dump wants the
+            // stylesheet back in the order it was written
+            ordered.Sort(delegate (StyleNode left, StyleNode right) { return left.Sequence.CompareTo(right.Sequence); });
+
+            foreach (StyleNode node in ordered)
                 outputStream.WriteLine(node);
         }
 
@@ -305,7 +259,6 @@ namespace NewWidgets.UI.Styles
         /// </summary>
         public void Clear()
         {
-            m_allNodes.Clear();
             m_elementCollection.Clear();
             m_idCollection.Clear();
             m_classCollection.Clear();

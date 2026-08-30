@@ -122,7 +122,7 @@ namespace NewWidgets.UI.Styles
 
         /// <param name="attributes">Attribute tests to carry -- see <see cref="Attributes"/>.
         /// Passed by a widget building its own live selector to match against the cascade, from
-        /// whatever <c>Widget.Markup.StyleAttributes</c> the document gave it</param>
+        /// whatever <c>Widget.StyleAttributes</c> the document gave it</param>
         public StyleSelector(string element, string [] classes, string id, string [] pseudoClasses = null, IDictionary<string, string> attributes = null)
         {
             m_element = string.IsNullOrEmpty(element) ? "" : element; // element type goes as is

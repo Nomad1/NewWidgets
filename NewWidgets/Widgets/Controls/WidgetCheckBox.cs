@@ -37,6 +37,11 @@ namespace NewWidgets.Widgets
         /// </summary>
         public event Func<WidgetCheckBox, bool> OnCheckChanged;
 
+        public override string ToString()
+        {
+            return string.Format("<{0}> #{1} {2}x{3} checked={4}", StyleElementType, StyleId, (int)Size.X, (int)Size.Y, Checked);
+        }
+
         public bool Checked
         {
             get { return Selected; }
@@ -49,6 +54,12 @@ namespace NewWidgets.Widgets
                 {
                     m_image.Position = value ? Vector2.Zero : new Vector2(0, Size.Y / 4.0f); // Size.Y/4 is needed for animation
                     m_image.Opacity = value ? 1.0f : 0.0f;
+
+                    // The tick carries the state itself, so a stylesheet can dress it. Setting
+                    // it here invalidates the tick's own style, which is the only thing that
+                    // makes it re-read the cascade: a state change on this checkbox never
+                    // reaches a child on its own.
+                    m_image.Selected = value;
                 }
 
                 Selected = value;
@@ -223,7 +234,7 @@ namespace NewWidgets.Widgets
         protected void AnimateFinished()
         {
             m_animating = false;
-            
+
             if (OnChecked != null)
                 WindowController.Instance.ScheduleAction(delegate { OnChecked(this); }, 1);
         }

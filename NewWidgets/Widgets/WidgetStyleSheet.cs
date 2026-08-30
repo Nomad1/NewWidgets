@@ -163,7 +163,13 @@ namespace NewWidgets.Widgets
             m_hasOwnStyle = true;
         }
 
-        internal T Get<T>(WidgetParameterIndex index, T defaultValue)
+        /// <summary>
+        /// Whether the property was DECLARED anywhere this widget's cascade reaches, and its
+        /// value if so. A defaulted read cannot answer that: `position: static` written by an
+        /// author and nothing written at all both come back as Static, and only one of them may
+        /// be treated as "the game code decides".
+        /// </summary>
+        internal bool TryGetValue<T>(WidgetParameterIndex index, out T tresult)
         {
             WidgetParameterAttribute attr = WidgetParameterMap.GetAttributeByIndex(index);
 
@@ -187,12 +193,6 @@ namespace NewWidgets.Widgets
                 if (node.Next == null)
                     break;
 
-                //if ((node.Value.Item2 & StyleNodeMatch.OwnStyle) != 0) // owns styles has maximum priority but if not found, they won't stop the cascade
-                //{
-                //    node = node.Next;
-                //    continue;
-                //}
-
                 // if next style is the same as this one less on pseudo-class, we can think of it as a parent and do a one-time exception for data lookup
                 // otherwise we need to check if the property inheritance is Initial and then break
 
@@ -206,25 +206,6 @@ namespace NewWidgets.Widgets
             }
 
             if (result == null)
-                return defaultValue;
-
-            if (result.GetType() != typeof(T))
-                throw new WidgetException(string.Format("Trying to retrieve parameter {0} with cast to incompatible type {1} from type {2}", index, typeof(T), result.GetType()));
-
-            return (T)result;
-        }
-        /*
-        internal bool TryGetValue<T>(WidgetParameterIndex index, out T tresult)
-        {
-            object result = null;
-
-            foreach (StyleNode data in m_data)
-                if (((StyleSheetData)data.Data).TryGetParameter(index, out result))
-                {
-                    break;
-                }
-
-            if (result == null)
             {
                 tresult = default(T);
                 return false;
@@ -236,7 +217,13 @@ namespace NewWidgets.Widgets
             tresult = (T)result;
             return true;
         }
-        */
+
+        internal T Get<T>(WidgetParameterIndex index, T defaultValue)
+        {
+            T result;
+
+            return TryGetValue(index, out result) ? result : defaultValue;
+        }
         /// <summary>
         /// Retrieve parameter by name
         /// </summary>

@@ -83,6 +83,16 @@ namespace NewWidgets.UI.Styles
         private static int s_sequenceCounter;
         private readonly int m_sequence;
 
+        /// <summary>
+        /// The order this rule was seen in, which is declaration order across every stylesheet
+        /// loaded so far. <see cref="CompareTo"/> uses it only to break a specificity tie; on
+        /// its own it is what "the document order" means here.
+        /// </summary>
+        internal int Sequence
+        {
+            get { return m_sequence; }
+        }
+
         public IStyleData Data
         {
             get { return m_data; }

@@ -18,6 +18,11 @@ namespace NewWidgets.Widgets
         // cached last texture name
         private string m_lastTexture;
 
+        public override string ToString()
+        {
+            return string.Format("<{0}> #{1} {2}x{3} image={4} fit={5}", StyleElementType, StyleId, (int)Size.X, (int)Size.Y, Image, ImageStyle);
+        }
+
         public string Image
         {
             get { return GetProperty(WidgetParameterIndex.BackImage, ""); }
@@ -42,10 +47,10 @@ namespace NewWidgets.Widgets
             set { SetProperty(WidgetParameterIndex.BackPadding, value); InvalidateLayout(); }
         }
 
-        public WidgetBackgroundStyle ImageStyle
+        public WidgetImageStyle ImageStyle
         {
-            get { return GetProperty(WidgetParameterIndex.BackStyle, WidgetBackgroundStyle.ImageFit); }
-            set { SetProperty(WidgetParameterIndex.BackStyle, value); InvalidateLayout(); }
+            get { return GetProperty(WidgetParameterIndex.ObjectFit, WidgetImageStyle.ImageFit); }
+            set { SetProperty(WidgetParameterIndex.ObjectFit, value); InvalidateLayout(); }
         }
 
         //public float ImageAlpha
@@ -90,7 +95,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="image">Image.</param>
         public WidgetImage(string image)
-            : this(ElementType, default(WidgetStyle), string.IsNullOrEmpty(image) ? 0 : WidgetBackgroundStyle.ImageFit, image)
+            : this(ElementType, default(WidgetStyle), string.IsNullOrEmpty(image) ? 0 : WidgetImageStyle.ImageFit, image)
         {
 
         }
@@ -101,10 +106,10 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetBackgroundStyle imageStyle, string image = "")
+        public WidgetImage(WidgetImageStyle imageStyle, string image = "")
             : this(ElementType, default(WidgetStyle), string.IsNullOrEmpty(image)? 0 : imageStyle, image)
         {
-           
+
         }
 
         /// <summary>
@@ -113,7 +118,7 @@ namespace NewWidgets.Widgets
         /// </summary>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        public WidgetImage(WidgetStyle style = default(WidgetStyle), WidgetBackgroundStyle imageStyle = 0, string image = "")
+        public WidgetImage(WidgetStyle style = default(WidgetStyle), WidgetImageStyle imageStyle = 0, string image = "")
             : this(ElementType, style, string.IsNullOrEmpty(image) ? 0 : imageStyle, image)
         {
 
@@ -126,7 +131,7 @@ namespace NewWidgets.Widgets
         /// <param name="style">Style.</param>
         /// <param name="imageStyle">Image style.</param>
         /// <param name="image">Image.</param>
-        internal WidgetImage(string elementType, WidgetStyle style, WidgetBackgroundStyle imageStyle, string image)
+        internal WidgetImage(string elementType, WidgetStyle style, WidgetImageStyle imageStyle, string image)
             : base(elementType, style)
         {
             if (imageStyle != 0)
@@ -147,11 +152,7 @@ namespace NewWidgets.Widgets
             m_lastTexture = Image;
 
             if (string.IsNullOrEmpty(Image))
-            {
-                if (ImageStyle != WidgetBackgroundStyle.None)
-                    WindowController.Instance.LogMessage("Initing WidgetImage {0} without texture", this);
                 return;
-            }
 
             if (m_imageObject == null)
             {
@@ -170,19 +171,22 @@ namespace NewWidgets.Widgets
             Vector2 start = ImagePadding.TopLeft;
             Vector2 center = start + size / 2;
 
-            Vector2 position;
-            float scale;
+            // Pre-initialized rather than left for the switch to assign: WidgetImageStyle now
+            // holds only cases this switch covers, so there is no default branch left to prove
+            // that to the compiler.
+            Vector2 position = Vector2.Zero;
+            float scale = 1.0f;
             bool nonUniformScale = false;
             float scaleY = 1.0f;
 
-            WidgetBackgroundStyle style = ImageStyle;
+            WidgetImageStyle style = ImageStyle;
 
             switch (style)
             {
-                case WidgetBackgroundStyle.ImageFit:
-                case WidgetBackgroundStyle.ImageTopLeft:
+                case WidgetImageStyle.ImageFit:
+                case WidgetImageStyle.ImageTopLeft:
                     {
-                        if (style == WidgetBackgroundStyle.ImageTopLeft)
+                        if (style == WidgetImageStyle.ImageTopLeft)
                             position = Vector2.Zero;
                         else
                             position = center;
@@ -195,10 +199,10 @@ namespace NewWidgets.Widgets
 
                         break;
                     }
-                case WidgetBackgroundStyle.ImageFill:
-                case WidgetBackgroundStyle.ImageTopLeftFill:
+                case WidgetImageStyle.ImageFill:
+                case WidgetImageStyle.ImageTopLeftFill:
                     {
-                        if (style == WidgetBackgroundStyle.ImageTopLeftFill)
+                        if (style == WidgetImageStyle.ImageTopLeftFill)
                             position = Vector2.Zero;
                         else
                             position = center;
@@ -211,7 +215,7 @@ namespace NewWidgets.Widgets
 
                         break;
                     }
-                case WidgetBackgroundStyle.ImageStretch:
+                case WidgetImageStyle.ImageStretch:
                     {
                         position = center;
 
@@ -221,18 +225,13 @@ namespace NewWidgets.Widgets
                         nonUniformScale = true;
                         break;
                     }
-                case WidgetBackgroundStyle.Image:
+                case WidgetImageStyle.Image:
                     {
                         position = start;
                         scale = 1.0f;
                         // Center and no stretch
                         break;
                     }
-                default:
-                    WindowController.Instance.LogError("Invalid background style {0} specified for WidgetImage", style);
-                    m_imageObject.Remove();
-                    m_imageObject = null;
-                    return;
             }
 
             m_imageObject.Sprite.PivotShift = ImagePivot;
